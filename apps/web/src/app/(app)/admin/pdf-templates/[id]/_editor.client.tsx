@@ -7,9 +7,13 @@ import {
   useGeneratedValueTranslations,
 } from '@/i18n/generated'
 
-// PDF document editor — a full-height shell with a paper-setup bar, a Design
-// tab (the GrapesJS builder at page width) and a Preview tab (Paged.js paginates
-// the template with sample data into real pages + header/footer + page numbers).
+// PDF document editor — a full-height shell with a paper-setup bar and three
+// tabs: Design (the GrapesJS builder at page width), HTML (the same markup as
+// raw text, for power users) and Preview (Paged.js paginates the template with
+// sample data into real pages + header/footer + page numbers).
+//
+// All three read and write ONE markup string, so an edit made in either editor
+// is what gets saved and what the preview paginates.
 
 import { useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
@@ -17,7 +21,7 @@ import Link from 'next/link'
 import { toast } from 'sonner'
 import type { Editor } from 'grapesjs'
 import { ArrowLeft, FileText, Save } from 'lucide-react'
-import { Button, Input, Select } from '@beaconhs/ui'
+import { Button, Input, Select, Textarea } from '@beaconhs/ui'
 import { savePdfTemplateDesign } from '../_actions'
 import { serializeTemplateEditor } from '@/lib/template-builder-html'
 
@@ -86,32 +90,45 @@ export function PdfTemplateEditor({
   const [marginMm, setMarginMm] = useState(template.marginMm)
   const [headerHtml, setHeaderHtml] = useState(template.headerHtml)
   const [footerHtml, setFooterHtml] = useState(template.footerHtml)
-  const [tab, setTab] = useState<'design' | 'preview'>('design')
+  const [tab, setTab] = useState<'design' | 'html' | 'preview'>('design')
   const [previewHtml, setPreviewHtml] = useState('')
   const [busy, setBusy] = useState(false)
+  // The authoritative markup between tab switches. The designer owns it while
+  // the Design tab is open; the HTML tab edits this string directly and the
+  // canvas is remounted from it (keyed) when you switch back.
+  const [sourceDraft, setSourceDraft] = useState(template.sourceHtml ?? '')
+  const [builderKey, setBuilderKey] = useState(0)
 
   const metrics = pageMetrics(paperSize, orientation, marginMm)
 
-  const snapshot = () => {
+  /** Current markup: live from the canvas on Design, else the raw draft. */
+  const currentHtml = (): string | null => {
+    if (tab !== 'design') return sourceDraft
     const ed = editorRef.current
-    if (!ed) return null
-    return {
-      sourceHtml: serializeTemplateEditor(ed),
-    }
+    return ed ? serializeTemplateEditor(ed) : null
+  }
+
+  const goToTab = (next: 'design' | 'html' | 'preview') => {
+    const html = currentHtml()
+    if (html !== null) setSourceDraft(html)
+    if (next === 'design' && tab === 'html') setBuilderKey((k) => k + 1)
+    if (next === 'preview') setPreviewHtml(html ?? template.sourceHtml ?? '')
+    setTab(next)
   }
 
   const onSave = async () => {
-    const snap = snapshot()
-    if (!snap) {
+    const sourceHtml = currentHtml()
+    if (sourceHtml === null) {
       toast.error(tGenerated('m_004a5b87102f57'))
       return
     }
+    setSourceDraft(sourceHtml)
     setBusy(true)
     try {
       const res = await savePdfTemplateDesign({
         id: template.id,
         name,
-        sourceHtml: snap.sourceHtml,
+        sourceHtml,
         paperSize,
         orientation,
         marginMm,
@@ -125,13 +142,6 @@ export function PdfTemplateEditor({
     } finally {
       setBusy(false)
     }
-  }
-
-  const showPreview = () => {
-    const ed = editorRef.current
-    const html = ed ? serializeTemplateEditor(ed) : (template.sourceHtml ?? '')
-    setPreviewHtml(html)
-    setTab('preview')
   }
 
   return (
@@ -170,14 +180,21 @@ export function PdfTemplateEditor({
         <div className="ml-2 inline-flex rounded-md border border-slate-200 p-0.5 dark:border-slate-700">
           <button
             type="button"
-            onClick={() => setTab('design')}
+            onClick={() => goToTab('design')}
             className={`rounded px-3 py-1 text-sm ${tab === 'design' ? 'bg-teal-600 text-white' : 'text-slate-600 dark:text-slate-300'}`}
           >
             <GeneratedText id="m_0006b9b63f781f" />
           </button>
           <button
             type="button"
-            onClick={showPreview}
+            onClick={() => goToTab('html')}
+            className={`rounded px-3 py-1 text-sm ${tab === 'html' ? 'bg-teal-600 text-white' : 'text-slate-600 dark:text-slate-300'}`}
+          >
+            <GeneratedText id="m_02c198fd90b44e" />
+          </button>
+          <button
+            type="button"
+            onClick={() => goToTab('preview')}
             className={`rounded px-3 py-1 text-sm ${tab === 'preview' ? 'bg-teal-600 text-white' : 'text-slate-600 dark:text-slate-300'}`}
           >
             <GeneratedText id="m_11d37007232de5" />
@@ -257,9 +274,23 @@ export function PdfTemplateEditor({
       <div className="min-h-0 flex-1">
         <GeneratedValue
           value={
-            tab === 'design' ? (
+            tab === 'html' ? (
+              <div className="flex h-full min-h-0 flex-col gap-1.5 p-3">
+                <p className="shrink-0 text-xs text-slate-500 dark:text-slate-400">
+                  <GeneratedText id="m_13f8bb86805041" />
+                </p>
+                <Textarea
+                  value={sourceDraft}
+                  onChange={(e) => setSourceDraft(e.target.value)}
+                  spellCheck={false}
+                  aria-label={tGenerated('m_12a44c42d2c6f4')}
+                  className="min-h-0 flex-1 resize-none font-mono text-xs leading-relaxed"
+                />
+              </div>
+            ) : tab === 'design' ? (
               <PdfBuilder
-                initialHtml={template.sourceHtml ?? null}
+                key={builderKey}
+                initialHtml={sourceDraft || null}
                 pageWidthPx={metrics.pageW}
                 pageHeightPx={metrics.pageH}
                 marginPx={metrics.margin}

@@ -514,6 +514,8 @@ Flows run automatically when things happen on your form.
 
 Rename a flow from its pencil button. Flow names can be up to 200 characters.
 
+Watch for the amber warning bar above the canvas. It appears when a flow would do something that saves cleanly but behaves badly — most often attaching the record PDF to **A record is created** on hazard assessments or site inspections. Those records are started empty and filled in afterwards, so the attached PDF is blank; use **A record is submitted** to send the finished document. The warning never blocks a save, so you can keep the setup if you meant it.
+
 For **Send email**, recipients can follow the record. **The record person's manager** follows the reporting manager of the person or user in the selected field. **A People group in the record person's department** reaches only group members in the same department as the selected person field. **A contact for the record location** sends only when the selected contact belongs to the location in the selected record field. **A recipient for a matching compliance assignment** sends only when the record person is part of that assignment. These options let one flow replace separate rules for every department, project, or assignment.
 
 To send a filled Excel form, add an **XLSX template** under **Spreadsheet attachments**. Cells containing a field marker such as \`{{site_name}}\` are replaced with the record value. Add an optional **Include only when** rule for site-specific or client-specific forms. Hazard-assessment templates can also use \`{{SIGNATURE-NAME}}\`, \`{{SIGNATURE-VALUE}}\`, and \`{{AdditionalInformation['Question text']}}\`.
@@ -680,6 +682,8 @@ Open [Admin](/admin) from the sidebar. You only see the tiles your permissions a
 - **Data sources** — reference lists and live data your apps bind to. Search by name, key, or description and filter by **Reference** or **Live responses**. Inside a reference source, search its row values and its Builder references separately.
 - **Data export** — audited CSV exports across modules and Builder apps. Search and filter the source catalogue, then sort it by name, group, or sensitivity. Builder app sources follow the role you are currently using; template builders can also export records from draft and archived apps for review.
 - **Email templates** and **PDF templates** — branded emails and paper documents. PDF templates drive record downloads: every module ships with an editable default document, and each Builder app gets its own generated one the first time it is published. On the **Module print defaults** tab you pick which template each module's **PDF** button renders, and press **Generate default template** for any app that lacks one. Records without a template get a clean field-summary PDF.
+
+Open a PDF template to get three tabs. **Design** is the drag-and-drop page builder. **HTML** shows the same document as raw markup for people who would rather type it — edit there and switch back to **Design** to reload the canvas from your markup. **Preview** paginates the result on real paper with the header, footer, and page numbers. All three edit one document, so **Save** stores whichever tab you were last working in. Repeating rows (hazards, signatures, checklist items) are marked on the row itself, so the builder cannot break them.
 
 ## Configure direct card printing
 

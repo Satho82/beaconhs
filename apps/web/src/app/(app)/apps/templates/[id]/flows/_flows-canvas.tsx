@@ -34,6 +34,7 @@ import {
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import {
+  AlertTriangle,
   ArrowLeft,
   GitBranch,
   Mail,
@@ -57,7 +58,7 @@ import type {
   FlowSubjectProfile,
   TriggerData,
 } from '@beaconhs/forms-core'
-import { emptyAutomationGraph } from '@beaconhs/forms-core'
+import { emptyAutomationGraph, warnAutomationGraph } from '@beaconhs/forms-core'
 import { LogicBuilder } from '../designer/logic-builder'
 import { toast } from '@/lib/toast'
 import { MAX_FLOW_NAME_LENGTH } from '@/lib/flows/flow-name-policy'
@@ -1193,6 +1194,14 @@ export function FlowsCanvas({
     setSelectedNodeId(null)
   }
 
+  // Non-blocking authoring warnings, recomputed as the graph is edited. These
+  // never stop a save — they catch the mistakes the schema cannot, above all
+  // "email the record PDF on create" on a subject whose record starts empty.
+  const graphWarnings = useMemo(
+    () => warnAutomationGraph(fromFlow(nodes, edges), profile, selectedFlow?.name),
+    [nodes, edges, profile, selectedFlow?.name],
+  )
+
   const save = () => {
     if (!selectedFlowId) return
     const graph = fromFlow(nodes, edges)
@@ -1488,6 +1497,25 @@ export function FlowsCanvas({
             />
           </div>
         </header>
+
+        <GeneratedValue
+          value={
+            graphWarnings.length > 0 ? (
+              <div className="flex shrink-0 items-start gap-2 border-b border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-200">
+                <AlertTriangle size={14} className="mt-px shrink-0" />
+                <ul className="min-w-0 space-y-1">
+                  <GeneratedValue
+                    value={graphWarnings.map((warning) => (
+                      <li key={warning}>
+                        <GeneratedValue value={warning} />
+                      </li>
+                    ))}
+                  />
+                </ul>
+              </div>
+            ) : null
+          }
+        />
 
         <div className="relative min-h-0 flex-1">
           <GeneratedValue

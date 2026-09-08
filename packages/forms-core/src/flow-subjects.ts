@@ -59,6 +59,18 @@ export type FlowSubjectProfile = {
    * subject has no tabular data.
    */
   collections?: FlowCollectionDef[]
+  /**
+   * Set when the subject's record is created EMPTY and filled in afterwards
+   * (a hazard assessment is started, then tasks/controls/PPE/signatures are
+   * added before it is submitted). Names the trigger that fires once the record
+   * is actually complete.
+   *
+   * `warnAutomationGraph` uses this to flag the classic mistake: attaching the
+   * record PDF to an `on_create` branch, which emails a blank document. Absent
+   * ⇒ the record is complete the moment it is created (a corrective action, an
+   * incident report) and `on_create` is a fine time to send it.
+   */
+  completionTrigger?: TriggerData['trigger']
 }
 
 // The full vocabulary a Builder form template supports today — used to build the

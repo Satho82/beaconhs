@@ -440,6 +440,65 @@ export function lintWorkerTriggerCompatibility(graph: AutomationGraph): string[]
   return Array.from(new Set(errors))
 }
 
+// --- Static warnings (non-blocking; surfaced in the builder) ---------------
+
+/** Does this send_email branch carry a PDF of the record? */
+function sendsRecordPdf(action: ActionData): boolean {
+  return (
+    action.action === 'send_email' && (Boolean(action.attachPdf) || Boolean(action.pdfTemplateId))
+  )
+}
+
+const COMPLETION_WORDS = /\b(submit|submitted|lock|locked|complete|completed|final|sign-?off)\b/i
+
+/**
+ * Best-effort warnings a flow author can knowingly ignore — unlike
+ * `lintAutomationGraph`, nothing here blocks a save.
+ *
+ * The rule that matters: a subject whose record is built up after creation
+ * (`profile.completionTrigger`) will hand an `on_create` branch a record that
+ * is still empty. Attaching the record PDF there emails a blank document —
+ * exactly how a fully-signed hazard assessment went out as a blank JSA.
+ */
+export function warnAutomationGraph(
+  graph: AutomationGraph,
+  profile?: FlowSubjectProfile,
+  flowName?: string,
+): string[] {
+  const warnings: string[] = []
+  const byId = new Map(graph.nodes.map((n) => [n.id, n]))
+  const outbound = (id: string) => graph.edges.filter((e) => e.source === id)
+
+  for (const trigger of graph.nodes) {
+    if (trigger.data.kind !== 'trigger' || trigger.data.trigger.trigger !== 'on_create') continue
+
+    if (flowName && COMPLETION_WORDS.test(flowName)) {
+      warnings.push(
+        `This flow is named "${flowName}" but runs on create, before anyone fills the record in. Rename it or switch the trigger.`,
+      )
+    }
+    if (!profile?.completionTrigger) continue
+
+    const seen = new Set<string>()
+    const walk = (nodeId: string) => {
+      if (seen.has(nodeId)) return
+      seen.add(nodeId)
+      const node = byId.get(nodeId)
+      if (!node) return
+      if (node.id !== trigger.id && node.data.kind === 'trigger') return
+      if (node.data.kind === 'action' && sendsRecordPdf(node.data.action)) {
+        warnings.push(
+          `Action ${node.id} attaches the record PDF to an "on create" branch. A ${profile.label.toLowerCase()} record is empty at that moment, so the PDF will be blank — use "${profile.completionTrigger}" to send the finished record.`,
+        )
+      }
+      for (const edge of outbound(nodeId)) walk(edge.target)
+    }
+    for (const edge of outbound(trigger.id)) walk(edge.target)
+  }
+
+  return Array.from(new Set(warnings))
+}
+
 // --- Engine: plan which actions/gates fire for a trigger -------------------
 
 // A reached gate carries its node id so the runtime can persist an approval

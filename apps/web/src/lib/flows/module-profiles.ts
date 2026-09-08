@@ -53,6 +53,10 @@ export const MODULE_FLOW_PROFILES: Record<string, FlowSubjectProfile> = {
     subjectKey: 'hazid',
     label: 'Hazard Assessments',
     triggers: ['on_create', 'on_sign', 'on_submit', 'on_unlock', 'on_delete', 'manual'],
+    // An assessment is STARTED empty — tasks, controls, PPE, questions and crew
+    // signatures all land before Submit & lock. Emailing its PDF on create ships
+    // a blank JSA.
+    completionTrigger: 'on_submit',
     actions: [
       'send_email',
       'notify_role',
@@ -402,6 +406,9 @@ export const MODULE_FLOW_PROFILES: Record<string, FlowSubjectProfile> = {
     subjectKey: 'inspections',
     label: 'Site Inspections',
     triggers: ['on_create', 'on_submit', 'status_change', 'manual'],
+    // The checklist is answered after the record exists, so the same blank-PDF
+    // trap applies as on hazard assessments.
+    completionTrigger: 'on_submit',
     actions: [
       'send_email',
       'notify_role',

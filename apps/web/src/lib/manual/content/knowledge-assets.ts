@@ -122,6 +122,8 @@ To start one, click **New assessment**. In the flyout, choose the person, then c
 6. A graded assessment with a free-text answer shows **Awaiting review**. Your answers are locked while training staff award the points. Other graded assessments show the score and pass or fail result immediately.
 7. A completion-only assessment shows **Completed**. It records your answers without inventing a score or pass mark.
 
+Use **Print / PDF** in the assessment header for a paper copy of the attempt with every question and answer. A passed assessment also offers **Certificate**.
+
 ${CSV_EXPORT_LIMIT_GUIDANCE}
 
 ## Tips
@@ -272,6 +274,8 @@ Presenting never changes anyone's records. When the class is done, issue records
 
 A person marked as a no-show cannot pass. A cancelled class is read-only; choose **Reopen class** before changing details, the roster, or completion decisions. A completed class stays locked so its issued records cannot drift.
 
+Use **Print / PDF** in the class header for a paper session sheet with the roster on it — handy for a sign-in sheet or a training file.
+
 ## Enroll learners for sign-off
 
 Classroom and on-the-job courses are not self-started — workers see them in [My training](/my/training) only once you enroll them.
@@ -404,7 +408,7 @@ You only see your own sign-off on this page. Other people's signatures stay with
 
 If a supervisor is running a group sign-off at a toolbox talk, they will pass you the tablet to sign your name on their screen instead.
 
-For a facilitator-led session, each signature saves immediately. After the last person signs, the facilitator selects the site or project and taps **Complete session**. Completion locks the roster and runs the configured sign-off automations once.
+For a facilitator-led session, each signature saves immediately. After the last person signs, the facilitator selects the site or project and taps **Complete session**. Completion locks the roster and runs the configured sign-off automations once. **Print / PDF** in the header saves the acknowledgement register — who was asked, who signed, and when.
 
 Acknowledgment requests can also show up in your notifications. Follow the link, read, and tap **Acknowledge**.
 
@@ -517,7 +521,7 @@ If your role manages Documents, use the document tabs to keep the library organi
 
 1. Open **Categories** to arrange the library into a hierarchy. Search by category, description, or parent. Use **Level** to show top-level or nested categories, and **Usage** to find categories with or without documents. Use the searchable **Parent** picker to move a category within the hierarchy. Category names must be unique under the same parent, but different branches can reuse a name.
 2. Open **Types** to manage classifications such as Policy, Procedure, SDS, and Manual. Use the search box to find a type by name, key, or description. Use **Usage** to show types that are used or unused.
-3. Open **Management reviews** to record board reviews of the safety management system. Under **Documents reviewed**, add the published documents the board reviewed, then click **Save documents**. BeaconHS pins each document to its exact published version, so a later revision cannot change the historical review record. Search by review title, or use **Next review** to show reviews that have or do not have another review scheduled.
+3. Open **Management reviews** to record board reviews of the safety management system. **Print / PDF** on a review gives you the minutes: attendees, documents reviewed, decisions, and actions raised. Under **Documents reviewed**, add the published documents the board reviewed, then click **Save documents**. BeaconHS pins each document to its exact published version, so a later revision cannot change the historical review record. Search by review title, or use **Next review** to show reviews that have or do not have another review scheduled.
 
 Periodic reviews on an individual document also record the exact published version. Open the document's **Reviews** tab, click **Record review**, and explicitly choose the outcome. Historical reviews whose old source did not capture an outcome are labelled **outcome not recorded** instead of being treated as approvals.
 
@@ -653,6 +657,7 @@ ${CSV_EXPORT_LIMIT_GUIDANCE}
 ## Tips
 
 - A red **missing** badge means someone reported the unit missing. If you find it, tell your supervisor.
+- **Print / PDF** on a unit gives you its asset record sheet. The **QR label** button beside it prints the tag that goes on the unit — they are two different documents.
 - Need to inspect a unit before use? See [Equipment checks](/help/equipment-inspections).`,
   },
   {
@@ -819,6 +824,7 @@ If you manage equipment, submitted inspections can send emails on their own — 
 ## Tips
 
 - Use the **Status** chips on the list — **All**, **Draft**, **In progress**, **Submitted**, or **Closed** — to find an inspection you started earlier.
+- Tap **Print / PDF** in the inspection panel for a paper copy with every criterion listed line by line.
 - Never pencil-whip it. A failed item with a photo gets fixed a lot faster than a fake pass.
 - Inspecting your harness or hard hat instead? That lives in [PPE](/help/ppe).`,
   },

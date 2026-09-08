@@ -5,7 +5,7 @@ import { getGeneratedTranslations } from '@/i18n/generated.server'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { asc, eq } from 'drizzle-orm'
-import { Award, Check, X } from 'lucide-react'
+import { Award, Check, FileText, X } from 'lucide-react'
 import {
   Badge,
   Button,
@@ -31,6 +31,7 @@ import { formatDate, formatDateTime } from '@/lib/datetime'
 import { canSeeRecord } from '@/lib/visibility'
 import { PageContainer } from '@/components/page-layout'
 import { DetailGrid } from '@/components/detail-grid'
+import { DownloadLink } from '@/components/download-link'
 import { isUuid } from '@/lib/list-params'
 import {
   cancelAssessmentAttempt,
@@ -149,13 +150,24 @@ export default async function AssessmentAttemptDetailPage({
             )
           }
           actions={
-            attempt.status === 'submitted' && attempt.passed ? (
-              <Link href={`/training/assessments/${attempt.id}/certificate`}>
+            <div className="flex items-center gap-2">
+              <DownloadLink href={`/training/assessments/${attempt.id}/pdf`}>
                 <Button variant="outline">
-                  <Award size={14} /> <GeneratedText id="m_12069317ccd53b" />
+                  <FileText size={14} /> <GeneratedText id="m_016088be0b1e51" />
                 </Button>
-              </Link>
-            ) : null
+              </DownloadLink>
+              <GeneratedValue
+                value={
+                  attempt.status === 'submitted' && attempt.passed ? (
+                    <Link href={`/training/assessments/${attempt.id}/certificate`}>
+                      <Button variant="outline">
+                        <Award size={14} /> <GeneratedText id="m_12069317ccd53b" />
+                      </Button>
+                    </Link>
+                  ) : null
+                }
+              />
+            </div>
           }
         />
 

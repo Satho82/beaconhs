@@ -26,17 +26,31 @@ import { renderOnDemandPdfResponse } from '@/lib/pdf-route'
 
 // Modules whose record PDFs can be driven by a tenant template. Each has a
 // registered flow adapter (loadValues + the record-summary fallback) AND a
-// /…/pdf route wired through renderModulePdfResponse below. Documents are
-// excluded — they're hand-authored, so the document *is* the content.
+// /…/pdf route wired through renderModulePdfResponse below.
+//
+// This list IS the "Module print defaults" picker, so every module profile that
+// ships a seeded template belongs here — a template nobody can assign is a
+// template nobody can use. `module-pdf-targets.test.ts` holds the two halves
+// together: seeded template ⇒ entry here ⇒ a real route.
+//
+// The `documents` entry is the management REVIEW record (minutes), not a
+// controlled document. A document's own /documents/:id/pdf renders its authored
+// DOCX through Collabora — the document *is* the content, so it has no template.
 const MODULE_PDF_TARGETS: { moduleKey: string; label: string }[] = [
   { moduleKey: 'incidents', label: 'Incidents' },
   { moduleKey: 'hazid', label: 'Hazard assessments' },
   { moduleKey: 'corrective-actions', label: 'Corrective actions' },
   { moduleKey: 'equipment', label: 'Equipment work orders' },
+  { moduleKey: 'equipment-assets', label: 'Equipment asset records' },
+  { moduleKey: 'equipment-inspections', label: 'Equipment checks' },
   { moduleKey: 'ppe', label: 'PPE inspections' },
   { moduleKey: 'ppe-issues', label: 'PPE issue reports' },
   { moduleKey: 'journals', label: 'Journals' },
   { moduleKey: 'inspections', label: 'Inspections' },
+  { moduleKey: 'training', label: 'Training assessments' },
+  { moduleKey: 'training-classes', label: 'Training classes' },
+  { moduleKey: 'document-signoffs', label: 'Document sign-off sessions' },
+  { moduleKey: 'documents', label: 'Management reviews' },
   { moduleKey: 'vehicle-log', label: 'Vehicle log (monthly sheet)' },
 ]
 

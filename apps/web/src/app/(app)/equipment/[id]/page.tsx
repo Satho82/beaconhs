@@ -96,6 +96,7 @@ import { Section } from '@/components/section'
 import { TabNav, pickActiveTab } from '@/components/tab-nav'
 import { ActivityFeed } from '@/components/activity-feed'
 import { PageContainer } from '@/components/page-layout'
+import { DownloadLink } from '@/components/download-link'
 import { RemoteSelectField } from '@/components/remote-search-select'
 import { SearchInput } from '@/components/search-input'
 import { readCustomFieldValues } from '@beaconhs/forms-core'
@@ -1414,6 +1415,12 @@ export default async function EquipmentDetailPage({
                   ) : null
                 }
               />
+              <DownloadLink href={`/equipment/${id}/pdf`}>
+                <Button variant="outline">
+                  <FileText size={14} />
+                  <GeneratedText id="m_016088be0b1e51" />
+                </Button>
+              </DownloadLink>
               <Link href={`/equipment/${id}/qr`}>
                 <Button variant="outline">
                   <QrCode size={14} />

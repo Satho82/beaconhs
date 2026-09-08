@@ -4,7 +4,7 @@ import { GeneratedText, GeneratedValue } from '@/i18n/generated'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { and, eq, inArray, isNull } from 'drizzle-orm'
-import { Gavel, Trash2 } from 'lucide-react'
+import { FileText, Gavel, Trash2 } from 'lucide-react'
 import {
   Badge,
   Button,
@@ -30,6 +30,7 @@ import { DetailGrid } from '@/components/detail-grid'
 import { Section } from '@/components/section'
 import { TabNav, pickActiveTab } from '@/components/tab-nav'
 import { DetailPageLayout } from '@/components/page-layout'
+import { DownloadLink } from '@/components/download-link'
 import { isUuid } from '@/lib/list-params'
 import { ActionItemsPicker, DocumentMultiPicker } from './_components/document-multi-picker'
 import { OverviewEditor } from './_components/overview-editor'
@@ -170,12 +171,19 @@ export default async function ManagementReviewDetailPage({
             </div>
           }
           actions={
-            <form action={deleteManagementReviewAndRedirect} className="inline">
-              <input type="hidden" name="id" value={id} />
-              <Button type="submit" variant="outline">
-                <Trash2 size={14} /> <GeneratedText id="m_11773f3c3f7558" />
-              </Button>
-            </form>
+            <div className="flex items-center gap-2">
+              <DownloadLink href={`/documents/management-reviews/${id}/pdf`}>
+                <Button variant="outline">
+                  <FileText size={14} /> <GeneratedText id="m_016088be0b1e51" />
+                </Button>
+              </DownloadLink>
+              <form action={deleteManagementReviewAndRedirect} className="inline">
+                <input type="hidden" name="id" value={id} />
+                <Button type="submit" variant="outline">
+                  <Trash2 size={14} /> <GeneratedText id="m_11773f3c3f7558" />
+                </Button>
+              </form>
+            </div>
           }
         />
       }

@@ -10,7 +10,7 @@ import { GeneratedText, GeneratedValue } from '@/i18n/generated'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { and, asc, desc, eq, isNotNull, isNull } from 'drizzle-orm'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, FileText } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle, Button, PageHeader } from '@beaconhs/ui'
 import {
   attachments,
@@ -24,6 +24,7 @@ import { attachmentUrl } from '@/lib/attachment-url'
 import { can } from '@beaconhs/tenant'
 import { requireRequestContext } from '@/lib/auth'
 import { PageContainer } from '@/components/page-layout'
+import { DownloadLink } from '@/components/download-link'
 import { isUuid, pickString } from '@/lib/list-params'
 import { SignOffSheet, type SheetSigner } from './_sign-off-sheet'
 
@@ -156,6 +157,17 @@ export default async function SignOffPage({
           title={tGenerated('m_1b116800589b7a')}
           description={tGeneratedValue(`${doc.title} · ${doc.key}`)}
           back={{ href: backHref, label: 'Back to document' }}
+          actions={
+            // Only a saved session has a register worth printing; a brand-new
+            // sheet has no id yet.
+            resumeSessionId && !invalidSession ? (
+              <DownloadLink href={`/documents/sign-off-sessions/${resumeSessionId}/pdf`}>
+                <Button variant="outline">
+                  <FileText size={14} /> <GeneratedText id="m_016088be0b1e51" />
+                </Button>
+              </DownloadLink>
+            ) : undefined
+          }
         />
 
         <GeneratedValue

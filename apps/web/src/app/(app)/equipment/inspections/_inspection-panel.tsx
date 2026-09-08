@@ -4,8 +4,9 @@ import { GeneratedText, GeneratedValue } from '@/i18n/generated'
 import Link from 'next/link'
 import { and, asc, eq, inArray, isNull } from 'drizzle-orm'
 import { Alert, AlertDescription, AlertTitle, Badge, Button, UrlDrawer } from '@beaconhs/ui'
-import { CheckCheck, ClipboardCheck, RotateCcw, Wrench } from 'lucide-react'
+import { CheckCheck, ClipboardCheck, FileText, RotateCcw, Wrench } from 'lucide-react'
 import { attachmentUrl } from '@/lib/attachment-url'
+import { DownloadLink } from '@/components/download-link'
 import {
   attachments,
   equipmentInspectionRecordAttachments,
@@ -299,6 +300,11 @@ export async function EquipmentInspectionDrawer({
         <div className="flex w-full items-center justify-between gap-3">
           <InspectionStatusPill status={progress} answered={answered} total={total} />
           <div className="flex items-center gap-2">
+            <DownloadLink href={`/equipment/inspections/${record.id}/pdf`}>
+              <Button variant="outline">
+                <FileText size={14} /> <GeneratedText id="m_016088be0b1e51" />
+              </Button>
+            </DownloadLink>
             <GeneratedValue
               value={
                 finalized && canInspect ? (

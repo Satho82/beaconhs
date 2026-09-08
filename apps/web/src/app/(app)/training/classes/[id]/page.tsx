@@ -4,7 +4,16 @@ import { GeneratedText, GeneratedValue } from '@/i18n/generated'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { and, asc, count, eq, ilike, inArray, isNotNull, isNull, or } from 'drizzle-orm'
-import { Ban, Check, GraduationCap, Presentation, RotateCcw, Trash2, UserCheck } from 'lucide-react'
+import {
+  Ban,
+  Check,
+  FileText,
+  GraduationCap,
+  Presentation,
+  RotateCcw,
+  Trash2,
+  UserCheck,
+} from 'lucide-react'
 import {
   Badge,
   Button,
@@ -37,6 +46,7 @@ import { TableToolbar } from '@/components/table-toolbar'
 import { ClassDetailFields } from '../_class-fields'
 import { TabNav, pickActiveTab } from '@/components/tab-nav'
 import { DetailPageLayout } from '@/components/page-layout'
+import { DownloadLink } from '@/components/download-link'
 import {
   addClassAttendee,
   cancelClass,
@@ -335,6 +345,11 @@ export default async function TrainingClassPage({
           actions={
             !canManageClasses ? null : (
               <div className="flex items-center gap-2">
+                <DownloadLink href={`/training/classes/${cls.id}/pdf`}>
+                  <Button variant="outline" size="sm">
+                    <FileText size={14} /> <GeneratedText id="m_016088be0b1e51" />
+                  </Button>
+                </DownloadLink>
                 <GeneratedValue
                   value={
                     hasContent ? (

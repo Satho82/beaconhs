@@ -276,11 +276,11 @@ jobs:
           docker run --rm --network infra-net \
             -v "$GITHUB_WORKSPACE:/workspace" \
             -w /workspace \
-            -e NODE_ENV \
-            -e MIGRATION_DATABASE_URL \
-            -e DATABASE_URL \
-            -e SUPERADMIN_DATABASE_URL \
-            -e DATABASE_OWNER_ROLE \
+            -e NODE_ENV="$NODE_ENV" \
+            -e MIGRATION_DATABASE_URL="$MIGRATION_DATABASE_URL" \
+            -e DATABASE_URL="$DATABASE_URL" \
+            -e SUPERADMIN_DATABASE_URL="$SUPERADMIN_DATABASE_URL" \
+            -e DATABASE_OWNER_ROLE="$DATABASE_OWNER_ROLE" \
             node:24-bookworm \
             bash -lc 'corepack enable && corepack prepare pnpm@10.30.3 --activate && pnpm --filter @beaconhs/db exec tsx src/migrate.ts'
 

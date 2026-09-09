@@ -272,7 +272,17 @@ jobs:
           DATABASE_URL: ${{ secrets.DEV_DATABASE_URL }}
           SUPERADMIN_DATABASE_URL: ${{ secrets.DEV_SUPERADMIN_DATABASE_URL }}
           DATABASE_OWNER_ROLE: beaconhs_owner
-        run: pnpm --filter @beaconhs/db exec tsx src/migrate.ts
+        run: |
+          docker run --rm --network infra-net \
+            -v "$GITHUB_WORKSPACE:/workspace" \
+            -w /workspace \
+            -e NODE_ENV \
+            -e MIGRATION_DATABASE_URL \
+            -e DATABASE_URL \
+            -e SUPERADMIN_DATABASE_URL \
+            -e DATABASE_OWNER_ROLE \
+            node:24-bookworm \
+            bash -lc 'corepack enable && corepack prepare pnpm@10.30.3 --activate && pnpm --filter @beaconhs/db exec tsx src/migrate.ts'
 
       # coolwsd caches browser assets at startup, so a changed branding file
       # needs a Collabora restart; an unchanged file needs nothing.

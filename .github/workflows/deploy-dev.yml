@@ -265,6 +265,19 @@ jobs:
       # Forward-only schema migrations run before the redeploy. The unpooled
       # migrator login can SET ROLE to the NOLOGIN owner; neither credential
       # reaches the long-running deployment containers.
+      - name: Validate migration URL
+  env:
+    MIGRATION_DATABASE_URL: ${{ secrets.DEV_MIGRATION_DATABASE_URL }}
+  run: |
+    node -e '
+      const u = new URL(process.env.MIGRATION_DATABASE_URL);
+      console.log("Migration URL is valid");
+      console.log("Protocol:", u.protocol);
+      console.log("Host:", u.hostname);
+      console.log("Port:", u.port || "(default)");
+      console.log("Database:", u.pathname);
+      console.log("Username:", decodeURIComponent(u.username));
+      console.log("Password present:", Boolean(u.password));
       - name: Run database migrations
         env:
           NODE_ENV: production

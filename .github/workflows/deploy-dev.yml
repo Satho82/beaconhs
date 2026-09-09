@@ -270,14 +270,27 @@ jobs:
           MIGRATION_DATABASE_URL: ${{ secrets.DEV_MIGRATION_DATABASE_URL }}
         run: |
           node -e '
+
             const u = new URL(process.env.MIGRATION_DATABASE_URL);
+
             console.log("Migration URL is valid");
+
             console.log("Protocol:", u.protocol);
+
             console.log("Host:", u.hostname);
+
             console.log("Port:", u.port || "(default)");
+
             console.log("Database:", u.pathname);
+
             console.log("Username:", decodeURIComponent(u.username));
+
             console.log("Password present:", Boolean(u.password));
+
+            const crypto = require("crypto");
+
+            console.log("Password hash:", crypto.createHash("sha256").update(decodeURIComponent(u.password)).digest("hex"));
+
           '
 
       - name: Run database migrations

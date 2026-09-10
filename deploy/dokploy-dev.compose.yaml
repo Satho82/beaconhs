@@ -50,7 +50,6 @@ services:
       # fence. A concurrent Dokploy deploy therefore cannot revive old database
       # writers during migration; the final exact-SHA deploy restores this to 1.
       replicas: ${WRITER_REPLICAS}
-      placement:
       restart_policy:
         condition: any
         delay: 5s
@@ -93,7 +92,6 @@ services:
       start_period: 30s
     deploy:
       replicas: ${WRITER_REPLICAS}
-      placement:
       restart_policy:
         condition: any
         delay: 5s
@@ -116,7 +114,6 @@ services:
     networks: [infra-net]
     deploy:
       replicas: 1
-      placement:
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -134,7 +131,6 @@ services:
     networks: [infra-net]
     deploy:
       replicas: ${WRITER_REPLICAS}
-      placement:
       # One-shot: register BullMQ repeatable jobs, then exit.
       restart_policy:
         condition: on-failure
@@ -162,7 +158,6 @@ services:
     networks: [dokploy-network]
     deploy:
       replicas: 1
-      placement:
       restart_policy:
         condition: any
         delay: 5s

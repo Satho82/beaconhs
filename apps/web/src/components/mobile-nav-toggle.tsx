@@ -19,8 +19,9 @@ import { SidebarNav, type SidebarNavGroup } from './sidebar-nav'
 import { useNavGroups } from './use-platform-nav'
 import { ThemeToggle } from './theme-toggle'
 import { useHydrated } from '@/lib/use-hydrated'
+import type { PlatformBranding } from '@/lib/platform-branding-config'
 
-export function MobileNavToggle({ groups }: { groups: SidebarNavGroup[] }) {
+export function MobileNavToggle({ groups, platformBranding }: { groups: SidebarNavGroup[]; platformBranding?: PlatformBranding }) {
   const tGenerated = useGeneratedTranslations()
   const { open, setOpen } = useMobileNav()
   const navGroups = useNavGroups(groups)
@@ -86,7 +87,7 @@ export function MobileNavToggle({ groups }: { groups: SidebarNavGroup[] }) {
                         }}
                       >
                         <div className="flex h-14 items-center justify-between border-b border-slate-200 px-4 dark:border-slate-800">
-                          <Logo className="h-7 w-auto" />
+                          <Logo className="h-7 w-auto" branding={platformBranding} />
                           <button
                             type="button"
                             onClick={() => setOpen(false)}

@@ -14,15 +14,18 @@ import { Logo } from './brand-logo'
 import { SidebarNav, type SidebarNavGroup } from './sidebar-nav'
 import { useNavGroups } from './use-platform-nav'
 import { ThemeToggle } from './theme-toggle'
+import type { PlatformBranding } from '@/lib/platform-branding-config'
 
 const COOKIE = 'sidebar_collapsed'
 
 export function AppSidebar({
   groups,
   defaultCollapsed = false,
+  platformBranding,
 }: {
   groups: SidebarNavGroup[]
   defaultCollapsed?: boolean
+  platformBranding?: PlatformBranding
 }) {
   const tGeneratedValue = useGeneratedValueTranslations()
   const [collapsed, setCollapsed] = useState(defaultCollapsed)
@@ -55,7 +58,7 @@ export function AppSidebar({
           collapsed ? 'justify-center' : 'gap-2',
         )}
       >
-        <GeneratedValue value={collapsed ? null : <Logo className="h-7 w-auto" />} />
+        <GeneratedValue value={collapsed ? null : <Logo className="h-7 w-auto" branding={platformBranding} />} />
         <button
           type="button"
           onClick={toggle}

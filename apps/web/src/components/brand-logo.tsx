@@ -211,6 +211,11 @@ function WordmarkArt({ mode }: { mode: Mode }) {
 /* ------------------------------- Components ------------------------------ */
 
 type LogoProps = SVGProps<SVGSVGElement> & {
+  branding?: {
+    productName?: string
+    logoUrl?: string
+    primaryColor?: string
+  }
   /** Loop the beacon-ray shimmer + lit lamp. */
   animated?: boolean
   /** Draw the whole logo in once, then keep the beacon looping (splash). */
@@ -232,8 +237,20 @@ export function LogoMark({ animated, draw, className, ...rest }: LogoProps) {
   )
 }
 
-export function Logo({ animated, draw, className, ...rest }: LogoProps) {
+export function Logo({ animated, draw, branding, className, ...rest }: LogoProps) {
   const mode: Mode = draw ? 'draw' : animated ? 'loop' : 'static'
+  const customLogo = branding?.logoUrl?.trim()
+
+  if (customLogo) {
+    return (
+      <img
+        src={customLogo}
+        alt={branding?.productName || PRODUCT_NAME}
+        className={cn('h-8 w-auto object-contain', className)}
+      />
+    )
+  }
+
   return (
     <svg
       viewBox={`0 0 ${LOCKUP_W} 116`}

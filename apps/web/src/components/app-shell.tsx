@@ -16,6 +16,7 @@ import { MobileTabBar } from './mobile-tab-bar'
 import { ServiceWorkerRegistrar } from './service-worker-registrar'
 import { ImpersonationBanner } from './impersonation-banner'
 import { AppScrollReset } from './app-scroll-reset'
+import type { PlatformBranding } from '@/lib/platform-branding-config'
 
 type Ctx = {
   isSuperAdmin: boolean
@@ -26,6 +27,7 @@ type Ctx = {
 
 export function AppShell({
   ctx,
+  platformBranding,
   account,
   groups,
   availableTenants,
@@ -38,6 +40,7 @@ export function AppShell({
   children,
 }: {
   ctx: Ctx
+  platformBranding?: PlatformBranding
   /** The real signed-in user's display name + email, shown in the account menu. */
   account: { name: string; email: string }
   // Resolved server-side from the module registry + the tenant's saved nav
@@ -62,7 +65,11 @@ export function AppShell({
   return (
     <div className="flex [height:100dvh] h-screen overflow-hidden">
       <ServiceWorkerRegistrar unreadCount={unreadCount} />
-      <AppSidebar groups={groups} defaultCollapsed={defaultCollapsed} />
+      <AppSidebar
+        groups={groups}
+        defaultCollapsed={defaultCollapsed}
+        platformBranding={platformBranding}
+      />
 
       <MobileNavProvider>
         <div className="flex min-w-0 flex-1 flex-col overflow-hidden [padding-top:env(safe-area-inset-top)]">
@@ -94,7 +101,7 @@ export function AppShell({
           />
 
           <header className="flex h-14 shrink-0 items-center gap-2 border-b border-slate-200 bg-white px-3 sm:gap-4 sm:px-6 dark:border-slate-800 dark:bg-slate-900">
-            <MobileNavToggle groups={groups} />
+            <MobileNavToggle groups={groups} platformBranding={platformBranding} />
             <TenantSwitcher
               current={{ id: ctx.tenantId, name: ctx.tenantName }}
               available={availableTenants}

@@ -25,6 +25,7 @@ import { WalkthroughProvider } from '@/components/walkthrough/provider.client'
 import { resolveNavGroups } from '@/lib/nav/resolve'
 import { resolveWalkthroughs } from '@/lib/walkthroughs/service'
 import { RegulatoryTerminologyProvider } from '@/components/regulatory-terminology'
+import { getPlatformBranding } from '@/lib/platform-branding-config'
 
 // Every page in the authenticated app shell requires the per-request context
 // (auth + tenant + RLS-scoped DB), so none can be statically prerendered.
@@ -42,7 +43,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   const defaultCollapsed = (await cookies()).get('sidebar_collapsed')?.value === '1'
 
-  const [tenant, available, roles, unread, navGroups, sessionUser, walkthroughs] =
+  const [tenant, available, roles, unread, navGroups, sessionUser, walkthroughs, platformBranding] =
     await Promise.all([
       withSuperAdmin(db, async (tx) => {
         const [t] = await tx
@@ -67,6 +68,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       getSessionUser(),
       // Guided tours this user may launch + the first-run auto-start pick.
       ctx.db((tx) => resolveWalkthroughs(ctx, tx)),
+      getPlatformBranding(),
     ])
   if (!tenant) redirect('/login')
 
@@ -102,6 +104,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <ThemeProvider>
       <NavigationProvider>
         <AppShell
+          platformBranding={platformBranding}
           ctx={{
             isSuperAdmin: ctx.isSuperAdmin,
             membership: ctx.membership,

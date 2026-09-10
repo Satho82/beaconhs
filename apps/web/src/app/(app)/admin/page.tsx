@@ -13,6 +13,7 @@ import {
   Mail,
   MessageSquare,
   PanelLeft,
+  Palette,
   PlayCircle,
   Printer,
   RefreshCw,
@@ -70,6 +71,7 @@ type Tile = {
   badge?: string
   icon: ReactNode
   permission?: string
+  superAdminOnly?: boolean
 }
 type Group = { key: string; label: string; accent: Accent; tiles: Tile[] }
 
@@ -102,6 +104,13 @@ const STATIC_GROUPS: Group[] = [
     label: 'Workspace',
     accent: 'violet',
     tiles: [
+      {
+        href: '/platform/branding',
+        icon: <Palette size={18} />,
+        title: 'Platform branding',
+        desc: 'Product name, logo & primary colour',
+        superAdminOnly: true,
+      },
       {
         href: '/admin/settings',
         icon: <SlidersHorizontal size={18} />,
@@ -272,7 +281,7 @@ export default async function AdminPage({
   ]
 
   // Pills filter to a category; search narrows within the visible scope.
-  const canSeeTile = (t: Tile) => !t.permission || ctx.isSuperAdmin || can(ctx, t.permission)
+  const canSeeTile = (t: Tile) => (!t.superAdminOnly || ctx.isSuperAdmin) && (!t.permission || ctx.isSuperAdmin || can(ctx, t.permission))
   const matches = (t: Tile) => !query || `${t.title} ${t.desc}`.toLowerCase().includes(query)
   const permittedGroups = allGroups
     .map((g) => ({ ...g, tiles: g.tiles.filter(canSeeTile) }))

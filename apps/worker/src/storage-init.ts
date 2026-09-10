@@ -6,6 +6,6 @@ async function main(): Promise<void> {
 }
 
 main().catch((error: unknown) => {
-  console.error('[storage-init] failed:', error instanceof Error ? error.message : 'unknown error')
+  console.error('[storage-init] failed:', error)
   process.exitCode = 1
 })

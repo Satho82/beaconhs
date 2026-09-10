@@ -51,7 +51,6 @@ services:
       # writers during migration; the final exact-SHA deploy restores this to 1.
       replicas: ${WRITER_REPLICAS}
       placement:
-        constraints: [node.hostname==dokploy-mgr]
       restart_policy:
         condition: any
         delay: 5s
@@ -95,7 +94,6 @@ services:
     deploy:
       replicas: ${WRITER_REPLICAS}
       placement:
-        constraints: [node.hostname==dokploy-mgr]
       restart_policy:
         condition: any
         delay: 5s
@@ -119,7 +117,6 @@ services:
     deploy:
       replicas: 1
       placement:
-        constraints: [node.hostname==dokploy-mgr]
       restart_policy:
         condition: on-failure
         delay: 5s
@@ -138,7 +135,6 @@ services:
     deploy:
       replicas: ${WRITER_REPLICAS}
       placement:
-        constraints: [node.hostname==dokploy-mgr]
       # One-shot: register BullMQ repeatable jobs, then exit.
       restart_policy:
         condition: on-failure
@@ -167,7 +163,6 @@ services:
     deploy:
       replicas: 1
       placement:
-        constraints: [node.hostname==dokploy-mgr]
       restart_policy:
         condition: any
         delay: 5s

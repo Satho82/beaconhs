@@ -25,6 +25,7 @@ export const platformSettings = pgTable('platform_settings', {
   // unbounded high-volume tables (audit_log, kiosk_scans, *_log, notifications,
   // compliance_dispatches). Shape = DbMaintenanceSettings in db/maintenance.ts.
   database: jsonb('database').$type<Record<string, unknown>>().default({}).notNull(),
+  branding: jsonb('branding').$type<Record<string, unknown>>().default({}).notNull(),
   ...timestamps,
 })
 

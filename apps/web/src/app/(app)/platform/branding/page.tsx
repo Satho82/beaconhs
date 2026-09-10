@@ -1,6 +1,15 @@
 import { Palette } from 'lucide-react'
 import { GeneratedValue } from '@/i18n/generated'
-import { Button, Card, CardContent, CardHeader, CardTitle, DetailHeader, Input, Label } from '@beaconhs/ui'
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  DetailHeader,
+  Input,
+  Label,
+} from '@beaconhs/ui'
 import { PageContainer } from '@/components/page-layout'
 import { getPlatformBranding } from '@/lib/platform-branding-config'
 import { savePlatformBrandingAction } from './_actions'
@@ -64,8 +73,8 @@ export default async function PlatformBrandingPage() {
               </div>
 
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                These settings control the product-wide identity. Individual tenant branding
-                remains separate and can override branding where tenant-specific branding is used.
+                These settings control the product-wide identity. Individual tenant branding remains
+                separate and can override branding where tenant-specific branding is used.
               </p>
 
               <GeneratedValue
@@ -74,11 +83,7 @@ export default async function PlatformBrandingPage() {
                     <div className="rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
                       <Label className="text-xs">Preview</Label>
                       <div className="mt-2 flex items-center gap-3">
-                        <img
-                          src={branding.logoUrl}
-                          alt=""
-                          className="h-10 w-auto object-contain"
-                        />
+                        <img src={branding.logoUrl} alt="" className="h-10 w-auto object-contain" />
                         <span
                           className="font-semibold"
                           style={{ color: branding.primaryColor ?? '#1B2B4A' }}

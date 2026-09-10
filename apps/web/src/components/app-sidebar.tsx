@@ -58,7 +58,9 @@ export function AppSidebar({
           collapsed ? 'justify-center' : 'gap-2',
         )}
       >
-        <GeneratedValue value={collapsed ? null : <Logo className="h-7 w-auto" branding={platformBranding} />} />
+        <GeneratedValue
+          value={collapsed ? null : <Logo className="h-7 w-auto" branding={platformBranding} />}
+        />
         <button
           type="button"
           onClick={toggle}

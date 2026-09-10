@@ -21,7 +21,13 @@ import { ThemeToggle } from './theme-toggle'
 import { useHydrated } from '@/lib/use-hydrated'
 import type { PlatformBranding } from '@/lib/platform-branding-config'
 
-export function MobileNavToggle({ groups, platformBranding }: { groups: SidebarNavGroup[]; platformBranding?: PlatformBranding }) {
+export function MobileNavToggle({
+  groups,
+  platformBranding,
+}: {
+  groups: SidebarNavGroup[]
+  platformBranding?: PlatformBranding
+}) {
   const tGenerated = useGeneratedTranslations()
   const { open, setOpen } = useMobileNav()
   const navGroups = useNavGroups(groups)

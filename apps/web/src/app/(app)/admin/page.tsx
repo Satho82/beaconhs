@@ -281,7 +281,9 @@ export default async function AdminPage({
   ]
 
   // Pills filter to a category; search narrows within the visible scope.
-  const canSeeTile = (t: Tile) => (!t.superAdminOnly || ctx.isSuperAdmin) && (!t.permission || ctx.isSuperAdmin || can(ctx, t.permission))
+  const canSeeTile = (t: Tile) =>
+    (!t.superAdminOnly || ctx.isSuperAdmin) &&
+    (!t.permission || ctx.isSuperAdmin || can(ctx, t.permission))
   const matches = (t: Tile) => !query || `${t.title} ${t.desc}`.toLowerCase().includes(query)
   const permittedGroups = allGroups
     .map((g) => ({ ...g, tiles: g.tiles.filter(canSeeTile) }))

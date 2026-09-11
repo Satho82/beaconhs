@@ -26,7 +26,7 @@ describe('renderEmail — inline', () => {
     expect(r.subject).toBe('Hello Sam')
     expect(r.text).toBe('Hi Sam,\nScore: 88.')
     expect(r.html).toContain('Hi Sam,<br/>Score: 88.')
-    expect(r.html).toContain('BeaconHS')
+    expect(r.html).toContain('Uvanoo Portal')
   })
   it('reduces HTML-bearing values to plain text (no literal tags in emails)', () => {
     const r = renderEmail(

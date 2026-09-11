@@ -186,7 +186,7 @@ async function sendViaSmtp(args: {
   const { sendVia } = await import('@beaconhs/emails')
   const host = process.env.SMTP_HOST ?? 'localhost'
   const port = Number(process.env.SMTP_PORT ?? 1025)
-  const from = process.env.SMTP_FROM ?? 'BeaconHS <noreply@beaconhs.local>'
+  const from = process.env.SMTP_FROM ?? 'Uvanoo Portal <noreply@uvanoo.local>'
   if (!Number.isInteger(port) || port < 1 || port > 65_535) {
     throw new Error('[auth] SMTP_PORT must be a whole number from 1 to 65535.')
   }

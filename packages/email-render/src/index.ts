@@ -1067,7 +1067,7 @@ export function renderEmail(spec: RenderableEmail, values: Record<string, unknow
     const body = dropEmptyLabelLines(interpolate(spec.bodyTemplate, values))
     const text = spec.cta ? `${body}\n\n${spec.cta.label}: ${spec.cta.url}` : body
     assertLength(text, EMAIL_RENDER_LIMITS.plainTextChars, 'Plain-text email body')
-    const html = inlineShellHtml(body, spec.cta, spec.brandName?.trim() || 'BeaconHS')
+    const html = inlineShellHtml(body, spec.cta, spec.brandName?.trim() || 'Uvanoo Portal')
     return { subject, html, text }
   }
   // template | design — render {{tokens}} + {{#each}} blocks (escaped values)

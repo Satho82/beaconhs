@@ -128,7 +128,7 @@ describe('lazy auth runtime', () => {
     expect(mocks.enqueueEmail).toHaveBeenCalledWith(
       expect.objectContaining({
         to: 'operator@example.com',
-        subject: 'Reset your BeaconHS password',
+        subject: 'Reset your Uvanoo Portal password',
         meta: { category: 'auth' },
       }),
     )
@@ -140,7 +140,7 @@ describe('lazy auth runtime', () => {
     process.env.NODE_ENV = 'development'
     process.env.SMTP_HOST = 'localhost'
     process.env.SMTP_PORT = '1025'
-    process.env.SMTP_FROM = 'BeaconHS <noreply@beaconhs.local>'
+    process.env.SMTP_FROM = 'Uvanoo Portal <noreply@uvanoo.local>'
     const { getAuth } = await import('./server')
     getAuth()
 
@@ -158,11 +158,11 @@ describe('lazy auth runtime', () => {
         host: 'localhost',
         port: 1025,
         secure: false,
-        from: 'BeaconHS <noreply@beaconhs.local>',
+        from: 'Uvanoo Portal <noreply@uvanoo.local>',
       },
       expect.objectContaining({
         to: 'operator@example.com',
-        subject: 'Sign in to BeaconHS',
+        subject: 'Sign in to Uvanoo Portal',
       }),
     )
     expect(mocks.enqueueEmail).not.toHaveBeenCalled()

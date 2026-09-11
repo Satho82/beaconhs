@@ -107,7 +107,7 @@ const STATIC_GROUPS: Group[] = [
       {
         href: '/platform/branding',
         icon: <Palette size={18} />,
-        title: 'Platform branding',
+        title: tGenerated('m_17d3955fc7b8c9'),
         desc: 'Product name, logo & primary colour',
         superAdminOnly: true,
       },

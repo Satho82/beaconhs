@@ -1,6 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { getGeneratedTranslations } from '@/i18n/generated.server'
 import type { RequestContext } from '@beaconhs/tenant'
 import { requireRequestContext } from '@/lib/auth'
 import { recordAudit } from '@/lib/audit'
@@ -15,6 +16,7 @@ function gatePlatform(ctx: RequestContext) {
 export async function savePlatformBrandingAction(formData: FormData) {
   const ctx = await requireRequestContext()
   gatePlatform(ctx)
+  const tGenerated = await getGeneratedTranslations()
 
   const productName = String(formData.get('productName') ?? '').trim()
   const logoUrl = String(formData.get('logoUrl') ?? '').trim()
@@ -54,7 +56,7 @@ export async function savePlatformBrandingAction(formData: FormData) {
   await recordAudit(ctx, {
     entityType: 'platform',
     action: 'update',
-    summary: 'Updated platform branding',
+    summary: tGenerated('m_15176e3aae0a5c'),
     metadata: {
       productName: productName || null,
       logoConfigured: Boolean(logoUrl),

@@ -46,9 +46,9 @@ function createAuth() {
       // (`/api/auth/reset-password/<token>?callbackURL=/reset-password`), which
       // validates the token and forwards the user to our /reset-password page.
       sendResetPassword: async ({ user, url }) => {
-        const subject = 'Reset your BeaconHS password'
-        const text = `A password reset was requested for your BeaconHS account.\n\nSet a new password:\n\n${url}\n\nThis link expires in 1 hour. If you didn't request it, ignore this email — your password won't change.`
-        const html = `<p>A password reset was requested for your BeaconHS account.</p><p><a href="${escapeHtml(url)}">Set a new password</a></p><p>This link expires in 1 hour. If you didn't request it, ignore this email — your password won't change.</p>`
+        const subject = 'Reset your Uvanoo Portal password'
+        const text = `A password reset was requested for your Uvanoo Portal account.\n\nSet a new password:\n\n${url}\n\nThis link expires in 1 hour. If you didn't request it, ignore this email — your password won't change.`
+        const html = `<p>A password reset was requested for your Uvanoo Portal account.</p><p><a href="${escapeHtml(url)}">Set a new password</a></p><p>This link expires in 1 hour. If you didn't request it, ignore this email — your password won't change.</p>`
         await sendAuthEmail({ to: user.email, subject, html, text, label: 'password-reset' })
       },
     },
@@ -69,14 +69,14 @@ function createAuth() {
               ? metadata.tenantName.trim()
               : 'your organization'
           const subject = invite
-            ? `You're invited to ${tenantName} in BeaconHS`
-            : 'Sign in to BeaconHS'
+            ? `You're invited to ${tenantName} in Uvanoo Portal`
+            : 'Sign in to Uvanoo Portal'
           const text = invite
-            ? `You've been invited to join ${tenantName} in BeaconHS.\n\nAccept the invitation and sign in:\n\n${url}\n\nThis one-time link expires in 15 minutes. If you weren't expecting this invitation, ignore this email.`
-            : `Click this link to sign in to BeaconHS:\n\n${url}\n\nThis one-time link expires in 15 minutes. If you didn't request it, ignore this email.`
+            ? `You've been invited to join ${tenantName} in Uvanoo Portal.\n\nAccept the invitation and sign in:\n\n${url}\n\nThis one-time link expires in 15 minutes. If you weren't expecting this invitation, ignore this email.`
+            : `Click this link to sign in to Uvanoo Portal:\n\n${url}\n\nThis one-time link expires in 15 minutes. If you didn't request it, ignore this email.`
           const html = invite
-            ? `<p>You've been invited to join <strong>${escapeHtml(tenantName)}</strong> in BeaconHS.</p><p><a href="${escapeHtml(url)}">Accept the invitation and sign in</a></p><p>This one-time link expires in 15 minutes.</p>`
-            : `<p>Click <a href="${escapeHtml(url)}">here</a> to sign in to BeaconHS.</p><p>This one-time link expires in 15 minutes.</p>`
+            ? `<p>You've been invited to join <strong>${escapeHtml(tenantName)}</strong> in Uvanoo Portal.</p><p><a href="${escapeHtml(url)}">Accept the invitation and sign in</a></p><p>This one-time link expires in 15 minutes.</p>`
+            : `<p>Click <a href="${escapeHtml(url)}">here</a> to sign in to Uvanoo Portal.</p><p>This one-time link expires in 15 minutes.</p>`
           await sendAuthEmail({
             to: email,
             subject,

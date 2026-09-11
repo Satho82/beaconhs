@@ -1,3 +1,3 @@
 export function GET(request: Request): Response {
-  return Response.redirect(new URL('/icon0.svg', request.url), 308)
+  return Response.redirect(new URL('/icon.png', request.url), 308)
 }

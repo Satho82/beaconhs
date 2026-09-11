@@ -2,6 +2,7 @@ import { getGeneratedTranslations } from '@/i18n/generated.server'
 import { GeneratedText } from '@/i18n/generated'
 import Link from 'next/link'
 import { Logo } from '@/components/brand-logo'
+import { getPlatformBranding } from '@/lib/platform-branding-config'
 import { ForgotPasswordForm } from './forgot-password-form'
 
 export async function generateMetadata() {
@@ -9,12 +10,13 @@ export async function generateMetadata() {
   return { title: tGenerated('m_0443f19fd4e298') }
 }
 
-export default function ForgotPasswordPage() {
+export default async function ForgotPasswordPage() {
+  const branding = await getPlatformBranding()
   return (
     <main className="grid min-h-screen place-items-center px-4">
       <div className="w-full max-w-sm space-y-6">
         <div className="text-center">
-          <Logo animated className="mx-auto h-11 w-auto" />
+          <Logo animated className="mx-auto h-11 w-auto" branding={branding} />
           <h1 className="mt-5 text-xl font-semibold">
             <GeneratedText id="m_1d36181969e2c6" />
           </h1>

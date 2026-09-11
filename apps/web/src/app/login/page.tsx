@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import { Alert, AlertDescription } from '@beaconhs/ui'
 import { Logo } from '@/components/brand-logo'
 import { getCurrentUserId } from '@/lib/auth'
+import { getPlatformBranding } from '@/lib/platform-branding-config'
 import { LoginForm } from './login-form'
 
 export async function generateMetadata() {
@@ -21,11 +22,12 @@ export default async function LoginPage({
   if (userId) redirect('/auth/continue')
   const sp = await searchParams
   const justReset = sp.reset === '1'
+  const branding = await getPlatformBranding()
   return (
     <main className="grid min-h-screen place-items-center px-4">
       <div className="w-full max-w-sm space-y-6">
         <div className="text-center">
-          <Logo animated className="mx-auto h-11 w-auto" />
+          <Logo animated className="mx-auto h-11 w-auto" branding={branding} />
           <h1 className="mt-5 text-xl font-semibold">
             <GeneratedText id="m_1d1210bb1b1dca" />
           </h1>

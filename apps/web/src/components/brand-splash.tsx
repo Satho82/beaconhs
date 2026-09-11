@@ -10,7 +10,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { cn } from '@beaconhs/ui'
-import { BrandSplash } from './brand-logo'
+import { BrandSplash, type LogoProps } from './brand-logo'
 
 const MIN_VISIBLE_MS = 2000 // full draw-in completes at ~1.9s
 const REDUCED_MOTION_MIN_MS = 500 // static logo — no reason to linger
@@ -36,7 +36,7 @@ export function SplashHold() {
 
 type Phase = 'visible' | 'fading' | 'gone'
 
-export function SplashScreen() {
+export function SplashScreen({ branding }: { branding?: LogoProps['branding'] }) {
   const [phase, setPhase] = useState<Phase>('visible')
   const phaseRef = useRef<Phase>('visible')
   const shownAt = useRef(0) // 0 = document start, so streaming time counts
@@ -88,7 +88,7 @@ export function SplashScreen() {
       )}
       style={{ transitionDuration: `${FADE_MS}ms` }}
     >
-      <BrandSplash />
+      <BrandSplash branding={branding} />
     </div>
   )
 }

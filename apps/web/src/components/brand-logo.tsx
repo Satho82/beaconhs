@@ -210,7 +210,7 @@ function WordmarkArt({ mode }: { mode: Mode }) {
 
 /* ------------------------------- Components ------------------------------ */
 
-type LogoProps = SVGProps<SVGSVGElement> & {
+export type LogoProps = SVGProps<SVGSVGElement> & {
   branding?: {
     productName?: string
     logoUrl?: string
@@ -240,6 +240,7 @@ export function LogoMark({ animated, draw, className, ...rest }: LogoProps) {
 export function Logo({ animated, draw, branding, className, ...rest }: LogoProps) {
   const mode: Mode = draw ? 'draw' : animated ? 'loop' : 'static'
   const customLogo = branding?.logoUrl?.trim()
+  const customName = branding?.productName?.trim()
 
   if (customLogo) {
     return (
@@ -255,24 +256,42 @@ export function Logo({ animated, draw, branding, className, ...rest }: LogoProps
     <svg
       viewBox={`0 0 ${LOCKUP_W} 116`}
       role="img"
-      aria-label={PRODUCT_NAME}
+      aria-label={customName || PRODUCT_NAME}
       className={cn('h-8 w-auto', INK_CLASS, className)}
       {...rest}
+      style={{
+        ...rest.style,
+        ...(customName && branding?.primaryColor ? { color: branding.primaryColor } : {}),
+      }}
     >
       <g transform="translate(0 5)">
         <MarkArt mode={mode} />
       </g>
-      <WordmarkArt mode={mode} />
+      {customName ? (
+        <text
+          x={WORD_X}
+          y={WORD_Y + 70 * WORD_SCALE}
+          fill="currentColor"
+          fontFamily="Inter, ui-sans-serif, system-ui, sans-serif"
+          fontSize={31}
+          fontWeight={700}
+          letterSpacing="-0.8"
+        >
+          {customName}
+        </text>
+      ) : (
+        <WordmarkArt mode={mode} />
+      )}
     </svg>
   )
 }
 
 /** Full-screen brand splash: the logo draws itself in, then the beacon keeps
  *  sweeping. Used as the root route-loading fallback. */
-export function BrandSplash() {
+export function BrandSplash({ branding }: { branding?: LogoProps['branding'] }) {
   return (
     <div className="flex h-dvh w-full items-center justify-center bg-slate-50 dark:bg-slate-950">
-      <Logo draw className="h-14 w-auto sm:h-[4.5rem]" />
+      <Logo draw className="h-14 w-auto sm:h-[4.5rem]" branding={branding} />
     </div>
   )
 }

@@ -8,20 +8,25 @@ import { AppLinkProvider } from '@/components/app-link-provider'
 import { SplashScreen } from '@/components/brand-splash'
 import { getGeneratedTranslations } from '@/i18n/generated.server'
 import { PRODUCT_NAME } from '@/lib/brand'
+import { getPlatformBranding } from '@/lib/platform-branding-config'
 
 export async function generateMetadata(): Promise<Metadata> {
-  const tGenerated = await getGeneratedTranslations()
+  const [tGenerated, branding] = await Promise.all([
+    getGeneratedTranslations(),
+    getPlatformBranding(),
+  ])
+  const productName = branding.productName?.trim() || PRODUCT_NAME
   return {
-    title: { default: PRODUCT_NAME, template: `%s · ${PRODUCT_NAME}` },
+    title: { default: productName, template: `%s · ${productName}` },
     description: tGenerated('m_1502d68cae153f'),
     // The manifest <link> is rendered manually in <head> below so it can carry
     // crossorigin="use-credentials" — without it the browser fetches the manifest
     // without the session cookie and the per-tenant branding can't be resolved.
-    applicationName: PRODUCT_NAME,
+    applicationName: productName,
     appleWebApp: {
       capable: true,
       statusBarStyle: 'default',
-      title: PRODUCT_NAME,
+      title: productName,
     },
   }
 }
@@ -51,11 +56,12 @@ export const dynamic = 'force-dynamic'
 const THEME_INIT = `(function(){try{var t=localStorage.getItem('theme')||'system';var m=window.matchMedia('(prefers-color-scheme: dark)').matches;var d=t==='dark'||(t==='system'&&m);var e=document.documentElement;e.classList.toggle('dark',d);e.classList.toggle('light',!d);}catch(e){}})();`
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const [headerStore, locale, messages, timeZone] = await Promise.all([
+  const [headerStore, locale, messages, timeZone, branding] = await Promise.all([
     headers(),
     getLocale(),
     getMessages(),
     getTimeZone(),
+    getPlatformBranding(),
   ])
   const nonce = headerStore.get('x-nonce') ?? undefined
   return (
@@ -74,7 +80,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <GeneratedValue value={children} />
           </AppLinkProvider>
         </NextIntlClientProvider>
-        <SplashScreen />
+        <SplashScreen branding={branding} />
       </body>
     </html>
   )

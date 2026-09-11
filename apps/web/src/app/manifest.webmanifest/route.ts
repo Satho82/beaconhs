@@ -14,6 +14,7 @@ import { eq } from 'drizzle-orm'
 import { db, withSuperAdmin } from '@beaconhs/db'
 import { tenants } from '@beaconhs/db/schema'
 import { getRequestContext } from '@/lib/auth'
+import { getPlatformBranding } from '@/lib/platform-branding-config'
 
 export const dynamic = 'force-dynamic'
 
@@ -28,17 +29,20 @@ export async function GET() {
   let themeColor = '#1B2B4A'
 
   try {
+    const branding = await getPlatformBranding()
+    name = branding.productName?.trim() || name
+    themeColor = branding.primaryColor?.trim() || themeColor
+
     const ctx = await getRequestContext()
     if (ctx) {
       const [tenant] = await withSuperAdmin(db, async (tx) => {
         return tx
-          .select({ name: tenants.name, branding: tenants.branding })
+          .select({ branding: tenants.branding })
           .from(tenants)
           .where(eq(tenants.id, ctx.tenantId))
           .limit(1)
       })
       if (tenant) {
-        name = tenant.name
         themeColor = tenant.branding?.primaryColor || themeColor
       }
     }

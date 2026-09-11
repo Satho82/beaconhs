@@ -9,7 +9,9 @@ describe('root brand provider contract', () => {
   it('keeps the brand splash independent from the application i18n provider', () => {
     expect(PRODUCT_NAME).toBe('BeaconHS')
     expect(logoSource).not.toContain('useGeneratedTranslations')
-    expect(logoSource.match(/aria-label=\{PRODUCT_NAME\}/g)).toHaveLength(2)
+    expect(logoSource.match(/aria-label=\{PRODUCT_NAME\}/g)).toHaveLength(1)
+    expect(logoSource).toContain('aria-label={customName || PRODUCT_NAME}')
+    expect(logoSource).toContain('branding={branding}')
   })
 
   it('does not initialize translation hooks for structural React nodes', () => {

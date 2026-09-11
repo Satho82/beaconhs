@@ -211,6 +211,17 @@ export const PERMISSION_CATALOGUE = [
   'equipment.inspect',
   'equipment.workorder.create',
   'equipment.workorder.close',
+  // Uvanoo hospitality operations.
+  'hospitality.read',
+  'hospitality.manage',
+  'maintenance.read',
+  'maintenance.create',
+  'maintenance.update',
+  'maintenance.verify',
+  'operational_tasks.read',
+  'operational_tasks.manage',
+  'operational_tasks.complete',
+  'hospitality.signoff.complete',
   // PPE
   'ppe.read.all',
   'ppe.manage',

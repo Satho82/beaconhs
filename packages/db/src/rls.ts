@@ -103,6 +103,18 @@ CREATE POLICY tenant_isolation ON ${table}
 // The Better-Auth tables (user, session, account, verification) are global and
 // not in this list.
 export const TENANT_SCOPED_TABLES = [
+  'hospitality_properties',
+  'hospitality_buildings',
+  'hospitality_floors',
+  'hospitality_rooms',
+  'qr_targets',
+  'maintenance_issues',
+  'maintenance_work_orders',
+  'operational_task_templates',
+  'operational_task_schedules',
+  'operational_task_occurrences',
+  'manager_signoffs',
+  'tenant_module_entitlements',
   'reference_counters',
   'org_units',
   'departments',

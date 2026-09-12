@@ -12,12 +12,13 @@
 // Read-only: never writes. A tenant gets a persisted row only when an admin
 // saves in /admin/navigation; until then everyone sees the computed defaults.
 
-import { and, eq, inArray, isNull } from 'drizzle-orm'
+import { and, eq, gt, inArray, isNull, lte, or } from 'drizzle-orm'
 import { can, type RequestContext } from '@beaconhs/tenant'
 import type { Database } from '@beaconhs/db'
 import {
   formTemplates,
   tenantNavConfigs,
+  tenantModuleEntitlements,
   type NavItemConfig,
   type TenantNavConfig,
 } from '@beaconhs/db/schema'
@@ -30,6 +31,8 @@ import {
   PINNED_FORM_DEFAULT_ICON,
   withMissingModules,
 } from './registry'
+import { effectiveModuleKeys } from '@/lib/module-entitlements/policy'
+import type { ModuleKey } from '@/lib/module-entitlements/catalogue'
 import { getEffectiveRoleKeys } from '@/lib/effective-roles'
 import { templateAccessWhere } from '@/app/(app)/apps/_lib/access'
 
@@ -38,6 +41,18 @@ import { templateAccessWhere } from '@/app/(app)/apps/_lib/access'
 // package subpath import.
 const LIFT_PLAN_TEMPLATE_KEY = 'lift-plan'
 const TOOLBOX_TEMPLATE_KEY = 'toolbox-talk'
+
+// Navigation is deliberately only a presentation layer. This mapping keeps a
+// disabled module out of the tenant shell while the route and service guards
+// remain the authority for every request and mutation.
+const NAV_MODULE_ENTITLEMENTS: Partial<Record<string, ModuleKey>> = {
+  hospitality: 'hospitality.properties',
+}
+
+export function isNavModuleEntitled(moduleKey: string, entitledModules: ReadonlySet<ModuleKey>): boolean {
+  const requiredEntitlement = NAV_MODULE_ENTITLEMENTS[moduleKey]
+  return !requiredEntitlement || entitledModules.has(requiredEntitlement)
+}
 
 // A pinned form is visible to anyone who can interact with form responses at
 // all. Workers have forms.response.create / read.self; reviewers/admins have
@@ -106,6 +121,24 @@ export async function resolveNavGroups(
 ): Promise<SidebarNavGroup[]> {
   const config = await loadNavConfig(tx)
   const effectiveRoleKeys = await getEffectiveRoleKeys(ctx, tx)
+  const now = new Date()
+  const entitlementRows = await tx
+    .select({
+      moduleKey: tenantModuleEntitlements.moduleKey,
+      state: tenantModuleEntitlements.state,
+      effectiveFrom: tenantModuleEntitlements.effectiveFrom,
+      effectiveUntil: tenantModuleEntitlements.effectiveUntil,
+    })
+    .from(tenantModuleEntitlements)
+    .where(
+      and(
+        eq(tenantModuleEntitlements.tenantId, ctx.tenantId),
+        eq(tenantModuleEntitlements.state, 'enabled'),
+        or(isNull(tenantModuleEntitlements.effectiveFrom), lte(tenantModuleEntitlements.effectiveFrom, now)),
+        or(isNull(tenantModuleEntitlements.effectiveUntil), gt(tenantModuleEntitlements.effectiveUntil, now)),
+      ),
+    )
+  const entitledModules = effectiveModuleKeys(entitlementRows.map((row) => row.moduleKey))
 
   // Batch-resolve pinned form templates → name / icon.
   const formIds = [
@@ -136,7 +169,7 @@ export async function resolveNavGroups(
     const items: SidebarNavItem[] = []
     for (const item of g.items) {
       if (item.hidden) continue
-      const resolved = resolveItem(item, ctx, formMeta)
+      const resolved = resolveItem(item, ctx, formMeta, entitledModules)
       if (resolved) items.push(resolved)
     }
     if (items.length > 0) {
@@ -154,10 +187,12 @@ function resolveItem(
   item: NavItemConfig,
   ctx: RequestContext,
   formMeta: Map<string, { name: string; iconKey: string | null }>,
+  entitledModules: Set<ModuleKey>,
 ): SidebarNavItem | null {
   if (item.kind === 'module') {
     const mod = moduleByKey(item.moduleKey)
     if (!mod) return null // stale/removed module key
+    if (!isNavModuleEntitled(mod.key, entitledModules)) return null
     if (mod.requiredPermission && !can(ctx, mod.requiredPermission)) return null
     if (mod.requiredAnyPermission?.length && !mod.requiredAnyPermission.some((p) => can(ctx, p))) {
       return null

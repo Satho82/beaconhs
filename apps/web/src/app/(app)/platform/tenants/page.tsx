@@ -223,12 +223,17 @@ export default async function AdminTenantsPage({
                           <GeneratedValue
                             value={
                               tenant.status === 'active' ? (
-                                <form action={viewAs}>
-                                  <input type="hidden" name="tenantId" value={tenant.id} />
-                                  <Button type="submit" size="sm" variant="outline">
-                                    <GeneratedText id="m_1583ec793bd336" />
-                                  </Button>
-                                </form>
+                                <div className="flex flex-wrap gap-2">
+                                  <form action={viewAs}>
+                                    <input type="hidden" name="tenantId" value={tenant.id} />
+                                    <Button type="submit" size="sm" variant="outline">
+                                      <GeneratedText id="m_1583ec793bd336" />
+                                    </Button>
+                                  </form>
+                                  <Link href={`/platform/tenants/${tenant.id}/entitlements`}>
+                                    <Button type="button" size="sm" variant="outline">Modules</Button>
+                                  </Link>
+                                </div>
                               ) : (
                                 <span className="text-xs text-slate-400">
                                   <GeneratedText id="m_134f2adcabdf96" />

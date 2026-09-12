@@ -19,8 +19,13 @@ export const MODULE_CATALOGUE = [
     description: 'Room and hospitality-asset issues, work orders, evidence, and verification.',
   },
   {
-    key: 'hospitality.operations',
-    name: 'Hospitality operations',
+    key: 'hospitality.compliance',
+    name: 'Hospitality compliance',
+    description: 'Hospitality inspections, evidence, verification, and compliance follow-up.',
+  },
+  {
+    key: 'hospitality.diary',
+    name: 'Hospitality operational diary',
     description: 'Operational task templates, scheduled occurrences, reminders, and escalations.',
   },
   {
@@ -45,4 +50,3 @@ export function isModuleKey(value: string): value is ModuleKey {
 export function getModuleDefinition(moduleKey: ModuleKey): ModuleDefinition {
   return MODULES_BY_KEY.get(moduleKey)!
 }
-

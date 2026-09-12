@@ -1,0 +1,28 @@
+import Link from 'next/link'
+import { and, eq } from 'drizzle-orm'
+import { Button, EmptyState, Input, Label, PageHeader, Select } from '@beaconhs/ui'
+import { tenantUsers, users } from '@beaconhs/db/schema'
+import { can } from '@beaconhs/tenant'
+import { requireRequestContext } from '@/lib/auth'
+import { listPropertyDiary } from '@/lib/hospitality/diary'
+import { createDiaryTemplateAction, completeDiaryTaskAction, setDiaryTemplateActiveAction } from './actions'
+
+export const dynamic = 'force-dynamic'
+
+export default async function PropertyDiaryPage({ params }: { params: Promise<{ propertyId: string }> }) {
+  const ctx = await requireRequestContext(); const { propertyId } = await params
+  const tasks = await listPropertyDiary(ctx, propertyId)
+  const members = await ctx.db((tx) => tx.select({ id: tenantUsers.id, name: tenantUsers.displayName, email: users.email }).from(tenantUsers).innerJoin(users, eq(users.id, tenantUsers.userId)).where(and(eq(tenantUsers.tenantId, ctx.tenantId), eq(tenantUsers.status, 'active'))))
+  const manage = can(ctx, 'hospitality.manage')
+  const today = tasks.filter((row) => !row.overdue && row.occurrence.status !== 'completed')
+  const overdue = tasks.filter((row) => row.overdue)
+  const completed = tasks.filter((row) => row.occurrence.status === 'completed')
+  return <main className="mx-auto max-w-5xl p-4 sm:p-6"><PageHeader title="Operational diary" description="Property tasks generated from daily, weekly, and monthly schedules." action={<Button asChild variant="outline"><Link href={`/hospitality/properties/${propertyId}`}>Back to property</Link></Button>} />
+    {manage && <section className="mt-5 rounded-lg border p-4"><h2 className="font-semibold">Create task template</h2><form action={createDiaryTemplateAction} className="mt-3 grid gap-3 sm:grid-cols-3"><input type="hidden" name="propertyId" value={propertyId}/><Label className="sm:col-span-2">Title<Input name="title" required maxLength={200} placeholder="Opening Checklist"/></Label><Label>Due time<Input name="dueTime" type="time" defaultValue="09:00" required/></Label><Label>Instructions<Input name="instructions" maxLength={4000}/></Label><Label>Recurrence<Select name="recurrence" defaultValue="daily"><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="monthly">Monthly</option></Select></Label><Label>Weekday (weekly)<Select name="weekday" defaultValue="1"><option value="0">Sunday</option><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option><option value="6">Saturday</option></Select></Label><Label>Month day (monthly)<Input name="monthDay" type="number" min="1" max="28" defaultValue="1"/></Label><Label>Timezone<Input name="timezone" defaultValue={ctx.timezone} required/></Label><Label>Assignee<Select name="assigneeId" defaultValue=""><option value="">Unassigned</option>{members.map((member) => <option key={member.id} value={member.id}>{member.name || member.email}</option>)}</Select></Label><div className="flex items-end"><Button type="submit">Create template</Button></div></form></section>}
+    <DiarySection title="Overdue" rows={overdue} propertyId={propertyId} manage={manage}/><DiarySection title="Today & upcoming" rows={today} propertyId={propertyId} manage={manage}/><DiarySection title="Completed" rows={completed} propertyId={propertyId} manage={manage}/>
+  </main>
+}
+
+function DiarySection({ title, rows, propertyId, manage }: { title: string; rows: Awaited<ReturnType<typeof listPropertyDiary>>; propertyId: string; manage: boolean }) {
+  return <section className="mt-6"><h2 className="text-lg font-semibold">{title}</h2>{rows.length === 0 ? <EmptyState title={`No ${title.toLowerCase()} tasks`} /> : <div className="mt-3 grid gap-3">{rows.map(({ occurrence, schedule, template, overdue }) => <article className="rounded-lg border p-4" key={occurrence.id}><div className="flex flex-wrap justify-between gap-2"><div><h3 className="font-medium">{template.title}</h3><p className="text-sm text-muted-foreground">Due {occurrence.dueAt.toLocaleString()} · {overdue ? 'overdue' : occurrence.status}</p>{template.instructions && <p className="mt-2 text-sm">{template.instructions}</p>}</div><span className="text-xs text-muted-foreground">{schedule.timezone}</span></div>{manage && occurrence.status !== 'completed' && <form action={completeDiaryTaskAction} className="mt-3 flex flex-col gap-2 sm:flex-row"><input type="hidden" name="propertyId" value={propertyId}/><input type="hidden" name="occurrenceId" value={occurrence.id}/><Input name="completionNotes" placeholder="Completion notes"/><Button type="submit">Complete</Button></form>}{manage && <form action={setDiaryTemplateActiveAction} className="mt-2"><input type="hidden" name="propertyId" value={propertyId}/><input type="hidden" name="scheduleId" value={schedule.id}/><input type="hidden" name="isActive" value={schedule.isActive ? 'false' : 'true'}/><Button size="sm" variant="outline" type="submit">{schedule.isActive ? 'Disable future tasks' : 'Enable future tasks'}</Button></form>}</article>)}</div>}</section>
+}

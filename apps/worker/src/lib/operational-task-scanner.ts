@@ -8,6 +8,8 @@ import { db, withSuperAdmin } from '@beaconhs/db'
 import {
   operationalTaskOccurrences,
   operationalTaskSchedules,
+  operationalTaskTemplates,
+  hospitalityProperties,
   tenantModuleEntitlements,
 } from '@beaconhs/db/schema'
 import {
@@ -47,7 +49,21 @@ export async function scanOperationalTaskSchedules(
           or(isNull(tenantModuleEntitlements.effectiveUntil), gt(tenantModuleEntitlements.effectiveUntil, now)),
         ),
       )
-      .where(eq(operationalTaskSchedules.isActive, true))
+      .innerJoin(
+        operationalTaskTemplates,
+        and(
+          eq(operationalTaskTemplates.tenantId, operationalTaskSchedules.tenantId),
+          eq(operationalTaskTemplates.id, operationalTaskSchedules.templateId),
+        ),
+      )
+      .innerJoin(
+        hospitalityProperties,
+        and(
+          eq(hospitalityProperties.tenantId, operationalTaskSchedules.tenantId),
+          eq(hospitalityProperties.id, operationalTaskSchedules.propertyId),
+        ),
+      )
+      .where(and(eq(operationalTaskSchedules.isActive, true), isNull(operationalTaskTemplates.deletedAt), isNull(hospitalityProperties.deletedAt)))
       .limit(SCHEDULE_BATCH_SIZE),
   )
   const result: OperationalTaskScanResult = { schedules: schedules.length, created: 0, errors: 0 }
@@ -90,6 +106,7 @@ export async function scanOperationalTaskSchedules(
               scheduleId: schedule.id,
               occurrenceAt: occurrence.scheduledAt,
               dueAt: occurrence.dueAt,
+              assignedToTenantUserId: schedule.assignedToTenantUserId,
             })),
           )
           .onConflictDoNothing({

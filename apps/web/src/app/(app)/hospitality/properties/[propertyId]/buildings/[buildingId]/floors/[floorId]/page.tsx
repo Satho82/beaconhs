@@ -1,0 +1,10 @@
+import { and, eq, isNull } from 'drizzle-orm'
+import { notFound } from 'next/navigation'
+import { Button, EmptyState, Input, Label, PageHeader } from '@beaconhs/ui'
+import { hospitalityFloors, hospitalityRooms } from '@beaconhs/db/schema'
+import { requireRequestContext } from '@/lib/auth'
+import { assertTenantModuleEntitled } from '@/lib/module-entitlements/server'
+import { assertCan } from '@beaconhs/tenant'
+import { can } from '@beaconhs/tenant'
+import { updateFloorAction } from '../../../../../actions'
+export default async function FloorPage({params}:{params:Promise<{propertyId:string;buildingId:string;floorId:string}>}){const ctx=await requireRequestContext();await assertTenantModuleEntitled(ctx,'hospitality.properties');assertCan(ctx,'hospitality.read');const {propertyId,buildingId,floorId}=await params;const d=await ctx.db(async tx=>{const[floor]=await tx.select().from(hospitalityFloors).where(and(eq(hospitalityFloors.tenantId,ctx.tenantId),eq(hospitalityFloors.id,floorId),eq(hospitalityFloors.buildingId,buildingId),isNull(hospitalityFloors.deletedAt))).limit(1);return{floor,rooms:floor?await tx.select().from(hospitalityRooms).where(and(eq(hospitalityRooms.tenantId,ctx.tenantId),eq(hospitalityRooms.floorId,floorId),isNull(hospitalityRooms.deletedAt))):[]}});if(!d.floor)notFound();return <main className="mx-auto max-w-5xl p-4"><PageHeader title={d.floor.name} description={d.floor.code}/>{can(ctx,'hospitality.manage')&&<form action={updateFloorAction} className="my-4 grid gap-2 rounded border p-3 sm:grid-cols-3"><input type="hidden" name="propertyId" value={propertyId}/><input type="hidden" name="buildingId" value={buildingId}/><input type="hidden" name="floorId" value={floorId}/><Label>Name<Input name="name" defaultValue={d.floor.name} required/></Label><Label>Code<Input name="code" defaultValue={d.floor.code} required/></Label><Button type="submit">Save changes</Button></form>}{d.rooms.length?d.rooms.map(r=><div className="border p-3" key={r.id}>{r.code}</div>):<EmptyState title="No rooms or apartments" description="Rooms will appear here when added."/>}</main>}

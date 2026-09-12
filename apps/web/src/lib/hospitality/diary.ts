@@ -4,9 +4,11 @@ import {
   operationalTaskOccurrences,
   operationalTaskSchedules,
   operationalTaskTemplates,
+  correctiveActions,
   tenantUsers,
 } from '@beaconhs/db/schema'
 import { assertCan, type RequestContext } from '@beaconhs/tenant'
+import { nextReference } from '@/lib/reference'
 import { recordAudit } from '@/lib/audit'
 import { assertTenantModuleEntitled } from '@/lib/module-entitlements/server'
 
@@ -139,4 +141,20 @@ export async function completeDiaryTask(ctx: RequestContext, propertyId: string,
   if (!task) throw new Error('Task cannot be completed.')
   await recordAudit(ctx, { entityType: 'operational_task_occurrence', entityId: task.id, action: 'update', summary: 'Completed diary task', metadata: { propertyId, transition: 'completed' } })
   return task
+}
+
+export async function getOrCreateDiaryCorrectiveAction(ctx: RequestContext, propertyId: string, occurrenceId: string) {
+  await gate(ctx, true); await propertyForTenant(ctx, propertyId)
+  const result = await ctx.db(async (tx) => {
+    const [task] = await tx.select({ occurrence: operationalTaskOccurrences, schedule: operationalTaskSchedules, template: operationalTaskTemplates }).from(operationalTaskOccurrences).innerJoin(operationalTaskSchedules, and(eq(operationalTaskSchedules.tenantId, operationalTaskOccurrences.tenantId), eq(operationalTaskSchedules.id, operationalTaskOccurrences.scheduleId))).innerJoin(operationalTaskTemplates, and(eq(operationalTaskTemplates.tenantId, operationalTaskSchedules.tenantId), eq(operationalTaskTemplates.id, operationalTaskSchedules.templateId))).where(and(eq(operationalTaskOccurrences.tenantId, ctx.tenantId), eq(operationalTaskOccurrences.id, occurrenceId), eq(operationalTaskSchedules.propertyId, propertyId))).limit(1).for('update')
+    if (!task) throw new Error('Task does not belong to this property.')
+    const [existing] = await tx.select().from(correctiveActions).where(and(eq(correctiveActions.tenantId, ctx.tenantId), eq(correctiveActions.sourceEntityType, 'operational_task_occurrence'), eq(correctiveActions.sourceEntityId, occurrenceId))).limit(1)
+    if (existing) return { row: existing, created: false }
+    const reference = await nextReference(tx, ctx.tenantId, 'corrective_action')
+    const [row] = await tx.insert(correctiveActions).values({ tenantId: ctx.tenantId, reference, title: `Overdue diary task: ${task.template.title}`, description: `Created from hospitality property ${propertyId}; task due ${task.occurrence.dueAt.toISOString()}.`, severity: 'high', status: 'open', source: 'other', sourceEntityType: 'operational_task_occurrence', sourceEntityId: occurrenceId, assignedOn: new Date().toISOString().slice(0, 10), assignedByTenantUserId: ctx.membership?.id ?? null, ownerTenantUserId: ctx.membership?.id ?? null, metadata: { propertyId, occurrenceId } }).returning()
+    if (!row) throw new Error('Corrective action creation failed.')
+    return { row, created: true }
+  })
+  if (result.created) await recordAudit(ctx, { entityType: 'operational_task_occurrence', entityId: occurrenceId, action: 'update', summary: `Created corrective action ${result.row.reference}`, metadata: { correctiveActionId: result.row.id, propertyId } })
+  return result
 }

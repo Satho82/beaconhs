@@ -2,7 +2,8 @@
 
 import { revalidatePath } from 'next/cache'
 import { requireRequestContext } from '@/lib/auth'
-import { completeDiaryTask, createDiaryTemplate, setDiaryTemplateActive, updateDiaryTemplate } from '@/lib/hospitality/diary'
+import { completeDiaryTask, createDiaryTemplate, getOrCreateDiaryCorrectiveAction, setDiaryTemplateActive, updateDiaryTemplate } from '@/lib/hospitality/diary'
+import { redirect } from 'next/navigation'
 
 const value = (form: FormData, key: string) => String(form.get(key) ?? '')
 const optional = (form: FormData, key: string) => value(form, key).trim() || undefined
@@ -32,4 +33,10 @@ export async function setDiaryTemplateActiveAction(form: FormData) {
 export async function completeDiaryTaskAction(form: FormData) {
   const ctx = await requireRequestContext(); const propertyId = value(form, 'propertyId')
   await completeDiaryTask(ctx, propertyId, value(form, 'occurrenceId'), value(form, 'completionNotes')); revalidatePath(path(propertyId))
+}
+
+export async function createDiaryCorrectiveActionAction(form: FormData) {
+  const ctx = await requireRequestContext(); const propertyId = value(form, 'propertyId')
+  const result = await getOrCreateDiaryCorrectiveAction(ctx, propertyId, value(form, 'occurrenceId'))
+  redirect(`/corrective-actions/${result.row.id}`)
 }

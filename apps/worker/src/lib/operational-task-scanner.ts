@@ -17,6 +17,7 @@ import {
   planOperationalTaskOccurrences,
   type OperationalTaskSchedule,
 } from './operational-task-schedule'
+import { processOperationalTaskLifecycle } from './operational-task-lifecycle'
 
 const SCHEDULE_BATCH_SIZE = 100
 const OCCURRENCES_PER_SCHEDULE = 100
@@ -132,5 +133,8 @@ export async function scanOperationalTaskSchedules(
     const overdue = await withSuperAdmin(db, (tx) => tx.update(operationalTaskOccurrences).set({ status: 'overdue' }).where(and(lt(operationalTaskOccurrences.dueAt, now), inArray(operationalTaskOccurrences.status, ['open', 'in_progress']), inArray(operationalTaskOccurrences.scheduleId, schedules.map(({ schedule }) => schedule.id)))).returning({ id: operationalTaskOccurrences.id }))
     result.overdue = overdue.length
   }
+  // The lifecycle worker is ledger-backed, so every scheduled retry is safe.
+  // It only examines active, entitled diary context and ignores completed tasks.
+  await processOperationalTaskLifecycle(now)
   return result
 }

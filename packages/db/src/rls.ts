@@ -113,6 +113,7 @@ export const TENANT_SCOPED_TABLES = [
   'operational_task_templates',
   'operational_task_schedules',
   'operational_task_occurrences',
+  'operational_task_lifecycle_events',
   'manager_signoffs',
   'tenant_module_entitlements',
   'reference_counters',

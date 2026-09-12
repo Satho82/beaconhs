@@ -3,9 +3,13 @@
 // idempotency boundary: overlapping ticks and retries can both plan a slot,
 // but only one occurrence is persisted.
 
-import { and, desc, eq } from 'drizzle-orm'
+import { and, desc, eq, gt, isNull, lte, or } from 'drizzle-orm'
 import { db, withSuperAdmin } from '@beaconhs/db'
-import { operationalTaskOccurrences, operationalTaskSchedules } from '@beaconhs/db/schema'
+import {
+  operationalTaskOccurrences,
+  operationalTaskSchedules,
+  tenantModuleEntitlements,
+} from '@beaconhs/db/schema'
 import {
   parseOperationalTaskRecurrence,
   planOperationalTaskOccurrences,
@@ -31,14 +35,24 @@ export async function scanOperationalTaskSchedules(
 ): Promise<OperationalTaskScanResult> {
   const schedules = await withSuperAdmin(db, (tx) =>
     tx
-      .select()
+      .select({ schedule: operationalTaskSchedules })
       .from(operationalTaskSchedules)
+      .innerJoin(
+        tenantModuleEntitlements,
+        and(
+          eq(tenantModuleEntitlements.tenantId, operationalTaskSchedules.tenantId),
+          eq(tenantModuleEntitlements.moduleKey, 'hospitality.diary'),
+          eq(tenantModuleEntitlements.state, 'enabled'),
+          or(isNull(tenantModuleEntitlements.effectiveFrom), lte(tenantModuleEntitlements.effectiveFrom, now)),
+          or(isNull(tenantModuleEntitlements.effectiveUntil), gt(tenantModuleEntitlements.effectiveUntil, now)),
+        ),
+      )
       .where(eq(operationalTaskSchedules.isActive, true))
       .limit(SCHEDULE_BATCH_SIZE),
   )
   const result: OperationalTaskScanResult = { schedules: schedules.length, created: 0, errors: 0 }
 
-  for (const schedule of schedules) {
+  for (const { schedule } of schedules) {
     try {
       const recurrence = parseOperationalTaskRecurrence(schedule.recurrence)
       const created = await withSuperAdmin(db, async (tx) => {

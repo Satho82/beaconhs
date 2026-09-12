@@ -144,9 +144,9 @@ export async function processScheduledTick(job: Job<ScheduledTick>): Promise<voi
       const result = await scanOperationalTaskSchedules(
         Number.isFinite(slotMs) ? new Date(slotMs) : new Date(),
       )
-      if (result.created > 0 || result.errors > 0) {
+      if (result.created > 0 || result.overdue > 0 || result.errors > 0) {
         console.log(
-          `[scheduled] operational_tasks: ${result.created} occurrences from ${result.schedules} schedules / ${result.errors} errors`,
+          `[scheduled] operational_tasks: ${result.created} occurrences / ${result.overdue} overdue from ${result.schedules} schedules / ${result.errors} errors`,
         )
       }
       if (result.errors > 0) {

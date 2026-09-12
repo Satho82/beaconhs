@@ -77,6 +77,14 @@ export async function listPropertyDiary(ctx: RequestContext, propertyId: string,
   return rows.map((row) => ({ ...row, overdue: isOperationalTaskOverdue(row.occurrence, now) }))
 }
 
+export async function getDiaryTemplate(ctx: RequestContext, propertyId: string, scheduleId: string) {
+  await gate(ctx)
+  const property = await propertyForTenant(ctx, propertyId)
+  const [row] = await ctx.db((tx) => tx.select({ schedule: operationalTaskSchedules, template: operationalTaskTemplates }).from(operationalTaskSchedules).innerJoin(operationalTaskTemplates, and(eq(operationalTaskTemplates.tenantId, operationalTaskSchedules.tenantId), eq(operationalTaskTemplates.id, operationalTaskSchedules.templateId))).where(and(eq(operationalTaskSchedules.tenantId, ctx.tenantId), eq(operationalTaskSchedules.id, scheduleId), eq(operationalTaskSchedules.propertyId, propertyId), isNull(operationalTaskTemplates.deletedAt))).limit(1))
+  if (!row) throw new Error('Task template does not belong to this property.')
+  return { property, ...row }
+}
+
 export async function createDiaryTemplate(ctx: RequestContext, propertyId: string, input: DiaryTemplateInput) {
   await gate(ctx, true)
   const property = await propertyForTenant(ctx, propertyId)

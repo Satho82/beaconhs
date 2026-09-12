@@ -5,6 +5,7 @@ import {
   operationalTaskSchedules,
   operationalTaskTemplates,
   correctiveActions,
+  operationalTaskLifecycleEvents,
   tenantUsers,
 } from '@beaconhs/db/schema'
 import { assertCan, type RequestContext } from '@beaconhs/tenant'
@@ -85,6 +86,14 @@ export async function getDiaryTemplate(ctx: RequestContext, propertyId: string, 
   const [row] = await ctx.db((tx) => tx.select({ schedule: operationalTaskSchedules, template: operationalTaskTemplates }).from(operationalTaskSchedules).innerJoin(operationalTaskTemplates, and(eq(operationalTaskTemplates.tenantId, operationalTaskSchedules.tenantId), eq(operationalTaskTemplates.id, operationalTaskSchedules.templateId))).where(and(eq(operationalTaskSchedules.tenantId, ctx.tenantId), eq(operationalTaskSchedules.id, scheduleId), eq(operationalTaskSchedules.propertyId, propertyId), isNull(operationalTaskTemplates.deletedAt))).limit(1))
   if (!row) throw new Error('Task template does not belong to this property.')
   return { property, ...row }
+}
+
+export async function getDiaryOccurrenceDetail(ctx: RequestContext, propertyId: string, occurrenceId: string) {
+  await gate(ctx); await propertyForTenant(ctx, propertyId)
+  const [task] = await ctx.db((tx) => tx.select({ occurrence: operationalTaskOccurrences, schedule: operationalTaskSchedules, template: operationalTaskTemplates }).from(operationalTaskOccurrences).innerJoin(operationalTaskSchedules, and(eq(operationalTaskSchedules.tenantId, operationalTaskOccurrences.tenantId), eq(operationalTaskSchedules.id, operationalTaskOccurrences.scheduleId))).innerJoin(operationalTaskTemplates, and(eq(operationalTaskTemplates.tenantId, operationalTaskSchedules.tenantId), eq(operationalTaskTemplates.id, operationalTaskSchedules.templateId))).where(and(eq(operationalTaskOccurrences.tenantId, ctx.tenantId), eq(operationalTaskOccurrences.id, occurrenceId), eq(operationalTaskSchedules.propertyId, propertyId))).limit(1))
+  if (!task) throw new Error('Task does not belong to this property.')
+  const { events, correctiveAction } = await ctx.db(async (tx) => ({ events: await tx.select().from(operationalTaskLifecycleEvents).where(and(eq(operationalTaskLifecycleEvents.tenantId, ctx.tenantId), eq(operationalTaskLifecycleEvents.occurrenceId, occurrenceId))).orderBy(asc(operationalTaskLifecycleEvents.processedAt)), correctiveAction: (await tx.select().from(correctiveActions).where(and(eq(correctiveActions.tenantId, ctx.tenantId), eq(correctiveActions.sourceEntityType, 'operational_task_occurrence'), eq(correctiveActions.sourceEntityId, occurrenceId))).limit(1))[0] ?? null }))
+  return { ...task, events, correctiveAction }
 }
 
 export async function createDiaryTemplate(ctx: RequestContext, propertyId: string, input: DiaryTemplateInput) {

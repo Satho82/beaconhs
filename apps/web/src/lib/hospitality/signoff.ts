@@ -22,3 +22,7 @@ export async function confirmSignoff(ctx: RequestContext, propertyId: string, ki
   if(!row) throw new Error('This period has already been signed off.')
   await recordAudit(ctx,{entityType:'manager_signoff',entityId:row.id,action:'sign',summary:`Confirmed ${kind} manager sign-off`,metadata:{propertyId,periodStart:summary.start.toISOString(),periodEnd:summary.end.toISOString()}}); return row
 }
+export async function listPropertySignoffs(ctx: RequestContext, propertyId: string) {
+  await gate(ctx)
+  return ctx.db(tx=>tx.select().from(managerSignoffs).where(and(eq(managerSignoffs.tenantId,ctx.tenantId),eq(managerSignoffs.propertyId,propertyId))).orderBy(managerSignoffs.confirmedAt))
+}

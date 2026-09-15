@@ -86,6 +86,10 @@ describe('production cutover migration integrity', () => {
       '0035_journal_analysis_runs.sql',
       '0036_training_report_wallet_cutover.sql',
       '0037_platform_branding.sql',
+      '0038_uvanoo_hospitality_foundation.sql',
+      '0039_uvanoo_maintenance_issue_lifecycle.sql',
+      '0040_uvanoo_operational_diary_completion.sql',
+      '0041_uvanoo_operational_task_lifecycle.sql',
     ])
 
     const journal = JSON.parse(readFileSync(new URL('_journal.json', metaFolder), 'utf8')) as {
@@ -129,6 +133,10 @@ describe('production cutover migration integrity', () => {
       { idx: 34, tag: '0035_journal_analysis_runs' },
       { idx: 35, tag: '0036_training_report_wallet_cutover' },
       { idx: 36, tag: '0037_platform_branding' },
+      { idx: 37, tag: '0038_uvanoo_hospitality_foundation' },
+      { idx: 38, tag: '0039_uvanoo_maintenance_issue_lifecycle' },
+      { idx: 39, tag: '0040_uvanoo_operational_diary_completion' },
+      { idx: 40, tag: '0041_uvanoo_operational_task_lifecycle' },
     ])
     for (let index = 1; index < journal.entries.length; index++) {
       expect(journal.entries[index]!.when).toBeGreaterThan(journal.entries[index - 1]!.when)
@@ -150,6 +158,30 @@ describe('production cutover migration integrity', () => {
       expect(snapshots[index]!.id).not.toBe(snapshots[index]!.prevId)
     }
     expect([...cutoverSql.matchAll(/^-- Squashed source:/gm)]).toHaveLength(30)
+  })
+
+  it('creates hospitality parent keys before installing dependent tenant foreign keys', () => {
+    const foundation = readFileSync(
+      new URL('0038_uvanoo_hospitality_foundation.sql', drizzleFolder),
+      'utf8',
+    )
+    const lifecycle = readFileSync(
+      new URL('0041_uvanoo_operational_task_lifecycle.sql', drizzleFolder),
+      'utf8',
+    )
+    const sql = foundation + lifecycle
+    for (const table of [
+      'operational_task_templates',
+      'operational_task_schedules',
+      'operational_task_occurrences',
+    ]) {
+      const parentKey = sql.indexOf(
+        `CREATE UNIQUE INDEX "${table}_tenant_id_id_ux" ON "${table}" ("tenant_id","id")`,
+      )
+      const reference = sql.indexOf(`REFERENCES "${table}"("tenant_id","id")`)
+      expect(parentKey, `${table} parent key must exist`).toBeGreaterThan(-1)
+      expect(reference, `${table} must retain its tenant foreign key`).toBeGreaterThan(parentKey)
+    }
   })
 
   it('normalizes completion-only assessment history during the review cutover', () => {

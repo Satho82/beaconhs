@@ -1,5 +1,6 @@
 'use server'
 
+import { normalizeEntitlementChange } from '@/lib/module-entitlements/policy'
 import { revalidatePath } from 'next/cache'
 import { requireRequestContext } from '@/lib/auth'
 import { setTenantModuleEntitlement } from '@/lib/module-entitlements/platform'
@@ -16,12 +17,16 @@ export async function saveTenantModuleEntitlementAction(formData: FormData) {
   const ctx = await requireRequestContext()
   const tenantId = String(formData.get('tenantId') ?? '').trim()
   if (!tenantId) throw new Error('Tenant is required.')
-  await setTenantModuleEntitlement(ctx, tenantId, {
-    moduleKey: String(formData.get('moduleKey') ?? ''),
-    state: String(formData.get('state') ?? ''),
-    effectiveFrom: optionalDate(formData.get('effectiveFrom')),
-    effectiveUntil: optionalDate(formData.get('effectiveUntil')),
-  })
+  await setTenantModuleEntitlement(
+    ctx,
+    tenantId,
+    normalizeEntitlementChange({
+      moduleKey: String(formData.get('moduleKey') ?? ''),
+      state: String(formData.get('state') ?? ''),
+      effectiveFrom: optionalDate(formData.get('effectiveFrom')),
+      effectiveUntil: optionalDate(formData.get('effectiveUntil')),
+    }),
+  )
   revalidatePath(`/platform/tenants/${tenantId}/entitlements`)
   revalidatePath('/', 'layout')
 }

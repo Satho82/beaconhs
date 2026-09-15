@@ -170,7 +170,14 @@ export const NAV_MODULES: NavModule[] = [
 
   // Assets & people
   { key: 'people', href: '/people', label: 'People', iconKey: 'users', group: 'Assets & people' },
-  { key: 'hospitality', href: '/hospitality/properties', label: 'Hospitality', iconKey: 'building', requiredPermission: 'hospitality.read', group: 'Assets & people' },
+  {
+    key: 'hospitality',
+    href: '/hospitality/properties',
+    label: 'Hospitality',
+    iconKey: 'building',
+    requiredPermission: 'hospitality.read',
+    group: 'Assets & people',
+  },
   {
     key: 'locations',
     href: '/locations',

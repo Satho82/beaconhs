@@ -4,43 +4,11 @@ import { and, eq } from 'drizzle-orm'
 import { db, withSuperAdmin } from '@beaconhs/db'
 import { auditLog, tenantModuleEntitlements, tenants } from '@beaconhs/db/schema'
 import type { RequestContext } from '@beaconhs/tenant'
-import { assertModuleKey } from './policy'
-import type { ModuleKey } from './catalogue'
-
-export type EntitlementChange = {
-  moduleKey: ModuleKey
-  state: 'enabled' | 'disabled'
-  effectiveFrom: Date | null
-  effectiveUntil: Date | null
-}
-
-export function normalizeEntitlementChange(input: {
-  moduleKey: string
-  state: string
-  effectiveFrom?: Date | null
-  effectiveUntil?: Date | null
-}): EntitlementChange {
-  assertModuleKey(input.moduleKey)
-  if (input.state !== 'enabled' && input.state !== 'disabled') {
-    throw new Error('Entitlement state must be enabled or disabled.')
-  }
-  if (
-    input.effectiveFrom &&
-    input.effectiveUntil &&
-    input.effectiveUntil <= input.effectiveFrom
-  ) {
-    throw new Error('The entitlement end must be after its start.')
-  }
-  return {
-    moduleKey: input.moduleKey,
-    state: input.state,
-    effectiveFrom: input.effectiveFrom ?? null,
-    effectiveUntil: input.effectiveUntil ?? null,
-  }
-}
+import { normalizeEntitlementChange, type EntitlementChange } from './policy'
 
 function assertPlatformOperator(ctx: RequestContext): void {
-  if (!ctx.isSuperAdmin) throw new Error('Only platform super-admins can manage module entitlements.')
+  if (!ctx.isSuperAdmin)
+    throw new Error('Only platform super-admins can manage module entitlements.')
 }
 
 /**
@@ -52,7 +20,11 @@ function assertPlatformOperator(ctx: RequestContext): void {
 export async function listTenantModuleEntitlements(ctx: RequestContext, tenantId: string) {
   assertPlatformOperator(ctx)
   return withSuperAdmin(db, async (tx) => {
-    const [tenant] = await tx.select({ id: tenants.id, name: tenants.name }).from(tenants).where(eq(tenants.id, tenantId)).limit(1)
+    const [tenant] = await tx
+      .select({ id: tenants.id, name: tenants.name })
+      .from(tenants)
+      .where(eq(tenants.id, tenantId))
+      .limit(1)
     if (!tenant) throw new Error('Tenant not found.')
     const rows = await tx
       .select()
@@ -72,12 +44,21 @@ export async function setTenantModuleEntitlement(
   assertPlatformOperator(ctx)
   const change = normalizeEntitlementChange(input)
   return withSuperAdmin(db, async (tx) => {
-    const [tenant] = await tx.select({ id: tenants.id }).from(tenants).where(eq(tenants.id, tenantId)).limit(1)
+    const [tenant] = await tx
+      .select({ id: tenants.id })
+      .from(tenants)
+      .where(eq(tenants.id, tenantId))
+      .limit(1)
     if (!tenant) throw new Error('Tenant not found.')
     const [before] = await tx
       .select()
       .from(tenantModuleEntitlements)
-      .where(and(eq(tenantModuleEntitlements.tenantId, tenantId), eq(tenantModuleEntitlements.moduleKey, change.moduleKey)))
+      .where(
+        and(
+          eq(tenantModuleEntitlements.tenantId, tenantId),
+          eq(tenantModuleEntitlements.moduleKey, change.moduleKey),
+        ),
+      )
       .limit(1)
     const [row] = await tx
       .insert(tenantModuleEntitlements)
@@ -96,9 +77,17 @@ export async function setTenantModuleEntitlement(
       action: 'update',
       summary: `${change.state === 'enabled' ? 'Enabled' : 'Disabled'} ${change.moduleKey}`,
       before: before
-        ? { state: before.state, effectiveFrom: before.effectiveFrom?.toISOString() ?? null, effectiveUntil: before.effectiveUntil?.toISOString() ?? null }
+        ? {
+            state: before.state,
+            effectiveFrom: before.effectiveFrom?.toISOString() ?? null,
+            effectiveUntil: before.effectiveUntil?.toISOString() ?? null,
+          }
         : null,
-      after: { state: row.state, effectiveFrom: row.effectiveFrom?.toISOString() ?? null, effectiveUntil: row.effectiveUntil?.toISOString() ?? null },
+      after: {
+        state: row.state,
+        effectiveFrom: row.effectiveFrom?.toISOString() ?? null,
+        effectiveUntil: row.effectiveUntil?.toISOString() ?? null,
+      },
       metadata: { moduleKey: change.moduleKey, platformControlled: true },
     })
     return row

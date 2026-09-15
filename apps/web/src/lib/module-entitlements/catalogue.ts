@@ -37,7 +37,7 @@ export const MODULE_CATALOGUE = [
 
 export type ModuleKey = (typeof MODULE_CATALOGUE)[number]['key']
 
-export type ModuleDefinition = (typeof MODULE_CATALOGUE)[number]
+type ModuleDefinition = (typeof MODULE_CATALOGUE)[number]
 
 const MODULES_BY_KEY = new Map<ModuleKey, ModuleDefinition>(
   MODULE_CATALOGUE.map((module) => [module.key, module]),

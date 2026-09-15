@@ -23,6 +23,7 @@ const mocks = vi.hoisted(() => {
       return instance
     }),
     enqueueEmail: vi.fn(),
+    getPlatformBranding: vi.fn(),
     instance,
     magicLink: vi.fn((options) => {
       state.magicLinkOptions = options
@@ -47,6 +48,7 @@ vi.mock('pg', () => ({
     }
   },
 }))
+vi.mock('./platform-branding', () => ({ getPlatformBranding: mocks.getPlatformBranding }))
 vi.mock('./invites', () => ({
   acceptInviteAfterMagicLink: vi.fn(),
   inviteGrantFromCallbackURL: vi.fn(),
@@ -59,6 +61,7 @@ beforeEach(() => {
   vi.resetModules()
   vi.clearAllMocks()
   process.env = { ...originalEnv }
+  mocks.getPlatformBranding.mockResolvedValue({})
   mocks.enqueueEmail.mockResolvedValue({ id: 'job-1' })
   mocks.sendVia.mockResolvedValue({ id: 'smtp-1' })
 })
@@ -72,6 +75,7 @@ describe('lazy auth runtime', () => {
     await import('./server')
 
     expect(mocks.pool).not.toHaveBeenCalled()
+    expect(mocks.getPlatformBranding).not.toHaveBeenCalled()
     expect(mocks.magicLink).not.toHaveBeenCalled()
     expect(mocks.nextCookies).not.toHaveBeenCalled()
     expect(mocks.betterAuth).not.toHaveBeenCalled()

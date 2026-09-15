@@ -52,7 +52,8 @@ function optionalString(value: unknown): string | undefined {
 export function normalizePlatformBranding(value: unknown): PlatformBranding {
   if (!value || typeof value !== 'object') return {}
   const raw = value as Record<string, unknown>
-  const rawEmail = raw.email && typeof raw.email === 'object' ? (raw.email as Record<string, unknown>) : {}
+  const rawEmail =
+    raw.email && typeof raw.email === 'object' ? (raw.email as Record<string, unknown>) : {}
   const rawCopy =
     rawEmail.authEmail && typeof rawEmail.authEmail === 'object'
       ? (rawEmail.authEmail as Record<string, unknown>)

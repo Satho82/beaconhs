@@ -22,7 +22,7 @@ import { processOperationalTaskLifecycle } from './operational-task-lifecycle'
 const SCHEDULE_BATCH_SIZE = 100
 const OCCURRENCES_PER_SCHEDULE = 100
 
-export type OperationalTaskScanResult = {
+type OperationalTaskScanResult = {
   schedules: number
   created: number
   overdue: number
@@ -47,8 +47,14 @@ export async function scanOperationalTaskSchedules(
           eq(tenantModuleEntitlements.tenantId, operationalTaskSchedules.tenantId),
           eq(tenantModuleEntitlements.moduleKey, 'hospitality.diary'),
           eq(tenantModuleEntitlements.state, 'enabled'),
-          or(isNull(tenantModuleEntitlements.effectiveFrom), lte(tenantModuleEntitlements.effectiveFrom, now)),
-          or(isNull(tenantModuleEntitlements.effectiveUntil), gt(tenantModuleEntitlements.effectiveUntil, now)),
+          or(
+            isNull(tenantModuleEntitlements.effectiveFrom),
+            lte(tenantModuleEntitlements.effectiveFrom, now),
+          ),
+          or(
+            isNull(tenantModuleEntitlements.effectiveUntil),
+            gt(tenantModuleEntitlements.effectiveUntil, now),
+          ),
         ),
       )
       .innerJoin(
@@ -65,10 +71,21 @@ export async function scanOperationalTaskSchedules(
           eq(hospitalityProperties.id, operationalTaskSchedules.propertyId),
         ),
       )
-      .where(and(eq(operationalTaskSchedules.isActive, true), isNull(operationalTaskTemplates.deletedAt), isNull(hospitalityProperties.deletedAt)))
+      .where(
+        and(
+          eq(operationalTaskSchedules.isActive, true),
+          isNull(operationalTaskTemplates.deletedAt),
+          isNull(hospitalityProperties.deletedAt),
+        ),
+      )
       .limit(SCHEDULE_BATCH_SIZE),
   )
-  const result: OperationalTaskScanResult = { schedules: schedules.length, created: 0, overdue: 0, errors: 0 }
+  const result: OperationalTaskScanResult = {
+    schedules: schedules.length,
+    created: 0,
+    overdue: 0,
+    errors: 0,
+  }
 
   for (const { schedule } of schedules) {
     try {
@@ -130,7 +147,22 @@ export async function scanOperationalTaskSchedules(
   // Status is materialized for queryable Today/Overdue views, while the diary
   // service still derives overdue from dueAt as defence against a delayed tick.
   if (schedules.length > 0) {
-    const overdue = await withSuperAdmin(db, (tx) => tx.update(operationalTaskOccurrences).set({ status: 'overdue' }).where(and(lt(operationalTaskOccurrences.dueAt, now), inArray(operationalTaskOccurrences.status, ['open', 'in_progress']), inArray(operationalTaskOccurrences.scheduleId, schedules.map(({ schedule }) => schedule.id)))).returning({ id: operationalTaskOccurrences.id }))
+    const overdue = await withSuperAdmin(db, (tx) =>
+      tx
+        .update(operationalTaskOccurrences)
+        .set({ status: 'overdue' })
+        .where(
+          and(
+            lt(operationalTaskOccurrences.dueAt, now),
+            inArray(operationalTaskOccurrences.status, ['open', 'in_progress']),
+            inArray(
+              operationalTaskOccurrences.scheduleId,
+              schedules.map(({ schedule }) => schedule.id),
+            ),
+          ),
+        )
+        .returning({ id: operationalTaskOccurrences.id }),
+    )
     result.overdue = overdue.length
   }
   // The lifecycle worker is ledger-backed, so every scheduled retry is safe.

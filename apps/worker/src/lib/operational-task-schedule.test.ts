@@ -19,7 +19,7 @@ describe('operational task occurrence planner', () => {
   it('keeps the configured local time across spring DST and calculates due time from the instant', () => {
     const slots = planOperationalTaskOccurrences({
       schedule: dailyToronto,
-      after: new Date('2026-03-07T12:01:00.000Z'),
+      after: new Date('2026-03-07T13:01:00.000Z'),
       through: new Date('2026-03-09T13:00:00.000Z'),
       limit: 10,
     })
@@ -33,7 +33,12 @@ describe('operational task occurrence planner', () => {
 
   it('plans missed occurrences in order and caps catch-up work', () => {
     const slots = planOperationalTaskOccurrences({
-      schedule: { ...dailyToronto, timezone: 'UTC', dueOffsetMinutes: 0 },
+      schedule: {
+        ...dailyToronto,
+        timezone: 'UTC',
+        dueOffsetMinutes: 0,
+        activeFrom: new Date('2026-03-01T00:00:00.000Z'),
+      },
       after: new Date('2026-03-01T00:00:00.000Z'),
       through: new Date('2026-03-10T12:00:00.000Z'),
       limit: 3,
@@ -81,12 +86,12 @@ describe('operational task occurrence planner', () => {
   })
 
   it('rejects invalid timezone, offset, and activation bounds before scanning', () => {
-    expect(() => validateOperationalTaskSchedule({ ...dailyToronto, timezone: 'Not/AZone' })).toThrow(
-      /timezone is invalid/,
-    )
-    expect(() => validateOperationalTaskSchedule({ ...dailyToronto, dueOffsetMinutes: -1 })).toThrow(
-      /non-negative/,
-    )
+    expect(() =>
+      validateOperationalTaskSchedule({ ...dailyToronto, timezone: 'Not/AZone' }),
+    ).toThrow(/timezone is invalid/)
+    expect(() =>
+      validateOperationalTaskSchedule({ ...dailyToronto, dueOffsetMinutes: -1 }),
+    ).toThrow(/non-negative/)
     expect(() =>
       validateOperationalTaskSchedule({
         ...dailyToronto,
@@ -100,9 +105,22 @@ describe('operational task occurrence planner', () => {
       cron: '0 8 * * *',
       dueOffsetMinutes: 30,
     })
-    expect(() => parseOperationalTaskRecurrence({ dueOffsetMinutes: 30 })).toThrow(/cron is required/)
-    expect(() => parseOperationalTaskRecurrence({ cron: '0 8 * * *', dueOffsetMinutes: 1.5 })).toThrow(
-      /whole number/,
+    expect(() => parseOperationalTaskRecurrence({ dueOffsetMinutes: 30 })).toThrow(
+      /cron is required/,
     )
+    expect(() =>
+      parseOperationalTaskRecurrence({ cron: '0 8 * * *', dueOffsetMinutes: 1.5 }),
+    ).toThrow(/whole number/)
   })
+})
+
+describe('recurrence offset input boundary', () => {
+  it.each([null, {}, '30', -1, Number.NaN, Number.POSITIVE_INFINITY])(
+    'rejects invalid offset %j',
+    (dueOffsetMinutes) => {
+      expect(() => parseOperationalTaskRecurrence({ cron: '0 8 * * *', dueOffsetMinutes })).toThrow(
+        /due offset/,
+      )
+    },
+  )
 })

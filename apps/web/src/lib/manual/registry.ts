@@ -5,6 +5,7 @@ import type { RequestContext } from '@beaconhs/tenant'
 import { can } from '@beaconhs/tenant'
 import { translateSystemCopy } from '@beaconhs/i18n/messages'
 import { GETTING_STARTED_ARTICLES } from './content/getting-started'
+import { HOSPITALITY_ARTICLES } from './content/hospitality'
 import { FRONTLINE_ARTICLES } from './content/frontline'
 import { KNOWLEDGE_ASSETS_ARTICLES } from './content/knowledge-assets'
 import { OVERSIGHT_ADMIN_ARTICLES } from './content/oversight-admin'
@@ -13,6 +14,7 @@ import { MANUAL_GROUP_ORDER, type ManualArticle, type ManualGroup } from './type
 const MANUAL_ARTICLES: ManualArticle[] = [
   ...GETTING_STARTED_ARTICLES,
   ...FRONTLINE_ARTICLES,
+  ...HOSPITALITY_ARTICLES,
   ...KNOWLEDGE_ASSETS_ARTICLES,
   ...OVERSIGHT_ADMIN_ARTICLES,
 ]

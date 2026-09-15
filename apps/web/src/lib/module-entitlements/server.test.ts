@@ -1,21 +1,15 @@
 import { describe, expect, it } from 'vitest'
-import { isEntitlementEffective } from './server'
+import { isEntitlementEffective } from './policy'
 
 const NOW = new Date('2026-09-11T12:00:00.000Z')
 
 describe('temporal module entitlement policy', () => {
   it('requires enabled state and a currently active window', () => {
     expect(
-      isEntitlementEffective(
-        { state: 'enabled', effectiveFrom: null, effectiveUntil: null },
-        NOW,
-      ),
+      isEntitlementEffective({ state: 'enabled', effectiveFrom: null, effectiveUntil: null }, NOW),
     ).toBe(true)
     expect(
-      isEntitlementEffective(
-        { state: 'disabled', effectiveFrom: null, effectiveUntil: null },
-        NOW,
-      ),
+      isEntitlementEffective({ state: 'disabled', effectiveFrom: null, effectiveUntil: null }, NOW),
     ).toBe(false)
   })
 

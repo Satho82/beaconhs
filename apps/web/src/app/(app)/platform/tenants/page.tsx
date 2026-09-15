@@ -49,6 +49,8 @@ export default async function AdminTenantsPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
+  const translateHospitality = await getGeneratedTranslations()
+
   const tGeneratedValue = await getGeneratedValueTranslations()
   const tGenerated = await getGeneratedTranslations()
   const userId = await getCurrentUserId()
@@ -231,7 +233,9 @@ export default async function AdminTenantsPage({
                                     </Button>
                                   </form>
                                   <Link href={`/platform/tenants/${tenant.id}/entitlements`}>
-                                    <Button type="button" size="sm" variant="outline">Modules</Button>
+                                    <Button type="button" size="sm" variant="outline">
+                                      {translateHospitality('m_03abc46dafbce6')}
+                                    </Button>
                                   </Link>
                                 </div>
                               ) : (

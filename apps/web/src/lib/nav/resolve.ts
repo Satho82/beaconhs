@@ -1,3 +1,4 @@
+import { isNavModuleEntitled } from './entitlements'
 // Server-side nav resolver.
 //
 // Turns the code-defined module registry + a tenant's saved overrides
@@ -41,18 +42,6 @@ import { templateAccessWhere } from '@/app/(app)/apps/_lib/access'
 // package subpath import.
 const LIFT_PLAN_TEMPLATE_KEY = 'lift-plan'
 const TOOLBOX_TEMPLATE_KEY = 'toolbox-talk'
-
-// Navigation is deliberately only a presentation layer. This mapping keeps a
-// disabled module out of the tenant shell while the route and service guards
-// remain the authority for every request and mutation.
-const NAV_MODULE_ENTITLEMENTS: Partial<Record<string, ModuleKey>> = {
-  hospitality: 'hospitality.properties',
-}
-
-export function isNavModuleEntitled(moduleKey: string, entitledModules: ReadonlySet<ModuleKey>): boolean {
-  const requiredEntitlement = NAV_MODULE_ENTITLEMENTS[moduleKey]
-  return !requiredEntitlement || entitledModules.has(requiredEntitlement)
-}
 
 // A pinned form is visible to anyone who can interact with form responses at
 // all. Workers have forms.response.create / read.self; reviewers/admins have
@@ -134,8 +123,14 @@ export async function resolveNavGroups(
       and(
         eq(tenantModuleEntitlements.tenantId, ctx.tenantId),
         eq(tenantModuleEntitlements.state, 'enabled'),
-        or(isNull(tenantModuleEntitlements.effectiveFrom), lte(tenantModuleEntitlements.effectiveFrom, now)),
-        or(isNull(tenantModuleEntitlements.effectiveUntil), gt(tenantModuleEntitlements.effectiveUntil, now)),
+        or(
+          isNull(tenantModuleEntitlements.effectiveFrom),
+          lte(tenantModuleEntitlements.effectiveFrom, now),
+        ),
+        or(
+          isNull(tenantModuleEntitlements.effectiveUntil),
+          gt(tenantModuleEntitlements.effectiveUntil, now),
+        ),
       ),
     )
   const entitledModules = effectiveModuleKeys(entitlementRows.map((row) => row.moduleKey))

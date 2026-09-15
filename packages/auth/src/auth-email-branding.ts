@@ -13,26 +13,29 @@ type RenderedAuthEmail = { subject: string; html: string; text: string }
 
 const DEFAULT_PRODUCT_NAME = 'Uvanoo Portal'
 
-const defaults: Record<AuthEmailKind, Required<Pick<AuthEmailCopy, 'magicLinkSubject' | 'magicLinkBody' | 'magicLinkCta'>> | Required<Pick<AuthEmailCopy, 'inviteSubject' | 'inviteBody' | 'inviteCta'>> | Required<Pick<AuthEmailCopy, 'passwordResetSubject' | 'passwordResetBody' | 'passwordResetCta'>>> = {
+const defaults: Record<AuthEmailKind, { subject: string; body: string; cta: string }> = {
   'magic-link': {
-    magicLinkSubject: 'Sign in to {{productName}}',
-    magicLinkBody: 'Use the secure link below to sign in to {{productName}}.',
-    magicLinkCta: 'Sign in',
+    subject: 'Sign in to {{productName}}',
+    body: 'Use the secure link below to sign in to {{productName}}.',
+    cta: 'Sign in',
   },
   invite: {
-    inviteSubject: "You're invited to {{tenantName}} in {{productName}}",
-    inviteBody: "You've been invited to join {{tenantName}} in {{productName}}.",
-    inviteCta: 'Accept invitation and sign in',
+    subject: "You're invited to {{tenantName}} in {{productName}}",
+    body: "You've been invited to join {{tenantName}} in {{productName}}.",
+    cta: 'Accept invitation and sign in',
   },
   'password-reset': {
-    passwordResetSubject: 'Reset your {{productName}} password',
-    passwordResetBody: 'A password reset was requested for your {{productName}} account.',
-    passwordResetCta: 'Set a new password',
+    subject: 'Reset your {{productName}} password',
+    body: 'A password reset was requested for your {{productName}} account.',
+    cta: 'Set a new password',
   },
 }
 
 function replaceTokens(value: string, tokens: Record<string, string>): string {
-  return value.replace(/{{\s*(productName|tenantName)\s*}}/g, (_, token: string) => tokens[token] ?? '')
+  return value.replace(
+    /{{\s*(productName|tenantName)\s*}}/g,
+    (_, token: string) => tokens[token] ?? '',
+  )
 }
 
 function escapeHtml(value: string): string {
@@ -48,7 +51,9 @@ function asSafeHttpUrl(value: string | undefined): string | undefined {
   if (!value) return undefined
   try {
     const parsed = new URL(value)
-    return parsed.protocol === 'https:' || parsed.protocol === 'http:' ? parsed.toString() : undefined
+    return parsed.protocol === 'https:' || parsed.protocol === 'http:'
+      ? parsed.toString()
+      : undefined
   } catch {
     return undefined
   }
@@ -62,22 +67,22 @@ function selectedCopy(kind: AuthEmailKind, copy: AuthEmailCopy | undefined) {
   const fallback = defaults[kind]
   if (kind === 'magic-link') {
     return {
-      subject: copy?.magicLinkSubject || fallback.magicLinkSubject,
-      body: copy?.magicLinkBody || fallback.magicLinkBody,
-      cta: copy?.magicLinkCta || fallback.magicLinkCta,
+      subject: copy?.magicLinkSubject || fallback.subject,
+      body: copy?.magicLinkBody || fallback.body,
+      cta: copy?.magicLinkCta || fallback.cta,
     }
   }
   if (kind === 'invite') {
     return {
-      subject: copy?.inviteSubject || fallback.inviteSubject,
-      body: copy?.inviteBody || fallback.inviteBody,
-      cta: copy?.inviteCta || fallback.inviteCta,
+      subject: copy?.inviteSubject || fallback.subject,
+      body: copy?.inviteBody || fallback.body,
+      cta: copy?.inviteCta || fallback.cta,
     }
   }
   return {
-    subject: copy?.passwordResetSubject || fallback.passwordResetSubject,
-    body: copy?.passwordResetBody || fallback.passwordResetBody,
-    cta: copy?.passwordResetCta || fallback.passwordResetCta,
+    subject: copy?.passwordResetSubject || fallback.subject,
+    body: copy?.passwordResetBody || fallback.body,
+    cta: copy?.passwordResetCta || fallback.cta,
   }
 }
 
@@ -91,18 +96,24 @@ export function renderAuthEmail(input: RenderAuthEmailInput): RenderedAuthEmail 
   const body = replaceTokens(copy.body, tokens)
   const cta = replaceTokens(copy.cta, tokens)
   const url = asSafeHttpUrl(input.url)
-  if (!url) throw new Error('[auth] Refusing to render an authentication email with an invalid URL.')
+  if (!url)
+    throw new Error('[auth] Refusing to render an authentication email with an invalid URL.')
   const footer = input.branding.email?.footer
   const supportEmail = input.branding.email?.supportEmail
   const support = supportEmail ? `Need help? Contact ${supportEmail}.` : undefined
-  const expiry = input.kind === 'password-reset' ? 'This link expires in 1 hour.' : 'This one-time link expires in 15 minutes.'
+  const expiry =
+    input.kind === 'password-reset'
+      ? 'This link expires in 1 hour.'
+      : 'This one-time link expires in 15 minutes.'
   const ignore =
     input.kind === 'password-reset'
       ? "If you didn't request it, ignore this email — your password won't change."
       : input.kind === 'invite'
         ? "If you weren't expecting this invitation, ignore this email."
         : "If you didn't request it, ignore this email."
-  const text = [body, '', `${cta}:`, url, '', expiry, ignore, footer, support].filter(Boolean).join('\n')
+  const text = [body, '', `${cta}:`, url, '', expiry, ignore, footer, support]
+    .filter(Boolean)
+    .join('\n')
   const logo = asSafeHttpUrl(input.branding.logoUrl)
   const color = asSafeColor(input.branding.primaryColor)
   const footerHtml = [footer, support]

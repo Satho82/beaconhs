@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { isNavModuleEntitled } from './resolve'
+import { isNavModuleEntitled } from './entitlements'
 
 describe('module entitlement navigation filter', () => {
   it('does not restore hospitality from a tenant navigation preference when its module is disabled', () => {

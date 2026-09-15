@@ -3,31 +3,8 @@ import 'server-only'
 import { and, eq, gt, isNull, lte, or } from 'drizzle-orm'
 import { tenantModuleEntitlements } from '@beaconhs/db/schema'
 import type { RequestContext } from '@beaconhs/tenant'
-import {
-  assertModuleEntitled,
-  effectiveModuleKeys,
-  ModuleNotEntitledError,
-} from './policy'
+import { assertModuleEntitled, isEntitlementEffective, effectiveModuleKeys } from './policy'
 import type { ModuleKey } from './catalogue'
-
-type EntitlementWindow = {
-  state: 'enabled' | 'disabled'
-  effectiveFrom: Date | null
-  effectiveUntil: Date | null
-}
-
-/**
- * Applies the temporal entitlement rule consistently to storage and future
- * plan/property resolvers. The ending instant is exclusive, so adjacent plans
- * cannot both be effective at the same moment.
- */
-export function isEntitlementEffective(row: EntitlementWindow, now: Date): boolean {
-  return (
-    row.state === 'enabled' &&
-    (row.effectiveFrom === null || row.effectiveFrom <= now) &&
-    (row.effectiveUntil === null || row.effectiveUntil > now)
-  )
-}
 
 /**
  * Reads effective tenant entitlements using the RequestContext-bound database.
@@ -66,9 +43,7 @@ export async function loadEnabledModuleKeys(
   // Keep the pure rule here too, so a future resolver that broadens the query
   // cannot accidentally make an expired or disabled module effective.
   return effectiveModuleKeys(
-    rows
-      .filter((row) => isEntitlementEffective(row, now))
-      .map((row) => row.moduleKey),
+    rows.filter((row) => isEntitlementEffective(row, now)).map((row) => row.moduleKey),
   )
 }
 
@@ -78,7 +53,5 @@ export async function assertTenantModuleEntitled(
   moduleKey: ModuleKey,
   now = new Date(),
 ): Promise<void> {
-  assertModuleEntitled([...await loadEnabledModuleKeys(ctx, now)], moduleKey)
+  assertModuleEntitled([...(await loadEnabledModuleKeys(ctx, now))], moduleKey)
 }
-
-export { ModuleNotEntitledError }

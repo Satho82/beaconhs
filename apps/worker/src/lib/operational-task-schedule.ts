@@ -15,19 +15,19 @@ export type OperationalTaskSchedule = {
 }
 
 /** Persisted in `operational_task_schedules.recurrence`. */
-export type OperationalTaskRecurrence = {
+type OperationalTaskRecurrence = {
   cron: string
   dueOffsetMinutes?: number
 }
 
-export type PlannedTaskOccurrence = {
+type PlannedTaskOccurrence = {
   scheduledAt: Date
   dueAt: Date
   /** Stable across scanner retries and worker deployments. */
   idempotencyKey: string
 }
 
-export type PlanTaskOccurrencesInput = {
+type PlanTaskOccurrencesInput = {
   schedule: OperationalTaskSchedule
   /** The exclusive materialisation cursor, normally the last created slot. */
   after: Date
@@ -67,7 +67,9 @@ function dueOffsetMilliseconds(value: number | null | undefined): number {
  * makes unsupported recurrence variants fail visibly instead of silently
  * producing an incorrect operational obligation.
  */
-export function parseOperationalTaskRecurrence(value: Record<string, unknown>): OperationalTaskRecurrence {
+export function parseOperationalTaskRecurrence(
+  value: Record<string, unknown>,
+): OperationalTaskRecurrence {
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
     throw new Error('Task schedule recurrence must be an object')
   }
@@ -76,7 +78,12 @@ export function parseOperationalTaskRecurrence(value: Record<string, unknown>): 
     throw new Error('Task schedule recurrence cron is required')
   }
   const dueOffsetMinutes = value.dueOffsetMinutes
-  if (dueOffsetMinutes !== undefined && !Number.isSafeInteger(dueOffsetMinutes)) {
+  if (
+    dueOffsetMinutes !== undefined &&
+    (typeof dueOffsetMinutes !== 'number' ||
+      !Number.isSafeInteger(dueOffsetMinutes) ||
+      dueOffsetMinutes < 0)
+  ) {
     throw new Error('Task schedule due offset must be a whole number of minutes')
   }
   return { cron, ...(dueOffsetMinutes === undefined ? {} : { dueOffsetMinutes }) }

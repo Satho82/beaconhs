@@ -30,3 +30,6 @@ packages/db/src/scripts/dokploy-*.ts
 coverage
 playwright-report
 test-results
+
+# Local pnpm caches are not release source.
+**/.pnpm-store

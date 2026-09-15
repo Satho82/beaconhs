@@ -5,6 +5,12 @@ import { staticSecurityHeaders } from './src/lib/security-headers'
 
 const nextConfig: NextConfig = {
   output: 'standalone',
+  // Optional build-only target for memory-constrained staging builders.
+  experimental: {
+    turbopackMemoryLimit: process.env.TURBOPACK_MEMORY_LIMIT_MB
+      ? Number(process.env.TURBOPACK_MEMORY_LIMIT_MB) * 1024 * 1024
+      : undefined,
+  },
   deploymentId: process.env.DEPLOYMENT_VERSION,
   reactStrictMode: true,
   poweredByHeader: false,

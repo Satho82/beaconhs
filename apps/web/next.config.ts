@@ -60,9 +60,10 @@ const nextConfig: NextConfig = {
     'puppeteer-core',
     '@aws-sdk/client-s3',
     '@aws-sdk/s3-request-presigner',
-    // jsdom-backed sanitizer and its optional native canvas backend are
-    // server-only. Keep the complete chain external so Webpack never attempts
-    // to bundle canvas.node.
+    // Node/SSR uses the jsdom-backed sanitizer; browser builds use its DOM-only
+    // conditional export. Keep isomorphic-dompurify in this app's runtime
+    // dependencies: Next can externalize it only if it resolves from apps/web
+    // to the same package as the shared forms/email imports.
     'isomorphic-dompurify',
     'jsdom',
     'canvas',

@@ -205,6 +205,9 @@ importers:
       grapesjs:
         specifier: ^0.22.16
         version: 0.22.16
+      isomorphic-dompurify:
+        specifier: ^3.18.0
+        version: 3.18.0(@noble/hashes@2.2.0)(canvas@3.2.3)
       juice:
         specifier: ^12.1.1
         version: 12.1.1

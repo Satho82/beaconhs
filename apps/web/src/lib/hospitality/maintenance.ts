@@ -1,9 +1,39 @@
+import { randomBytes } from 'node:crypto'
 import { and, eq, isNull } from 'drizzle-orm'
 import { maintenanceIssues, hospitalityRooms, tenantUsers } from '@beaconhs/db/schema'
 import { assertCan, type RequestContext } from '@beaconhs/tenant'
 import { assertTenantModuleEntitled } from '@/lib/module-entitlements/server'
 import { recordAudit } from '@/lib/audit'
 const priorities = new Set(['low', 'medium', 'high', 'critical'])
+export const MAINTENANCE_STATUSES = [
+  'reported',
+  'acknowledged',
+  'assigned',
+  'in_progress',
+  'awaiting_parts',
+  'completed',
+  'closed',
+  'cancelled',
+] as const
+export type MaintenanceStatus = (typeof MAINTENANCE_STATUSES)[number]
+
+const transitions: Record<string, readonly MaintenanceStatus[]> = {
+  reported: ['acknowledged', 'assigned', 'cancelled'],
+  acknowledged: ['assigned', 'in_progress', 'cancelled'],
+  assigned: ['in_progress', 'awaiting_parts', 'completed', 'cancelled'],
+  in_progress: ['awaiting_parts', 'completed', 'cancelled'],
+  awaiting_parts: ['in_progress', 'completed', 'cancelled'],
+  completed: ['closed', 'in_progress'],
+  closed: [],
+  cancelled: ['reported'],
+  triaged: ['assigned', 'in_progress', 'cancelled'],
+  work_ordered: ['assigned', 'in_progress', 'completed', 'cancelled'],
+}
+
+export function canTransitionMaintenanceIssue(from: string, to: string): boolean {
+  return from === to || (transitions[from]?.includes(to as MaintenanceStatus) ?? false)
+}
+
 async function gate(ctx: RequestContext, write = false) {
   await assertTenantModuleEntitled(ctx, 'hospitality.maintenance')
   assertCan(ctx, write ? 'maintenance.update' : 'maintenance.read')
@@ -17,6 +47,10 @@ export async function createRoomMaintenanceIssue(
 ) {
   await gate(ctx, true)
   if (!priorities.has(priority)) throw new Error('Invalid maintenance priority')
+  const summary = title.trim()
+  const details = description.trim()
+  if (!summary || summary.length > 200) throw new Error('Maintenance summary is required')
+  if (details.length > 2_000) throw new Error('Maintenance description is too long')
   const [room] = await ctx.db((tx) =>
     tx
       .select({ id: hospitalityRooms.id })
@@ -37,9 +71,11 @@ export async function createRoomMaintenanceIssue(
       .values({
         tenantId: ctx.tenantId,
         roomId,
-        reference: `MI-${Date.now()}`,
-        summary: title.trim(),
-        description: description.trim() || null,
+        reference:
+          `MI-${Date.now().toString(36).toUpperCase()}-` +
+          randomBytes(3).toString('hex').toUpperCase(),
+        summary,
+        description: details || null,
         priority,
         reportedByTenantUserId: ctx.membership?.id ?? null,
       })
@@ -64,8 +100,27 @@ export async function updateMaintenanceIssue(
 ) {
   await gate(ctx, true)
   if (!priorities.has(priority)) throw new Error('Invalid maintenance priority')
-  if (!['reported', 'triaged', 'work_ordered', 'cancelled'].includes(status))
+  if (!MAINTENANCE_STATUSES.includes(status as MaintenanceStatus))
     throw new Error('Invalid maintenance status')
+  const notes = resolutionNotes.trim()
+  if (notes.length > 2_000) throw new Error('Resolution notes are too long')
+  const [current] = await ctx.db((tx) =>
+    tx
+      .select({
+        status: maintenanceIssues.status,
+        completedAt: maintenanceIssues.completedAt,
+        completedByTenantUserId: maintenanceIssues.completedByTenantUserId,
+      })
+      .from(maintenanceIssues)
+      .where(and(eq(maintenanceIssues.tenantId, ctx.tenantId), eq(maintenanceIssues.id, id)))
+      .limit(1),
+  )
+  if (!current) throw new Error('No maintenance issue exists in this tenant')
+  if (!canTransitionMaintenanceIssue(current.status, status))
+    throw new Error(`Cannot move maintenance from ${current.status} to ${status}`)
+  if (status === 'assigned' && !assignee) throw new Error('Choose an assignee first')
+  if ((status === 'completed' || status === 'closed') && !notes)
+    throw new Error('Resolution notes are required before completion')
   if (assignee) {
     const [u] = await ctx.db((tx) =>
       tx
@@ -76,17 +131,19 @@ export async function updateMaintenanceIssue(
     )
     if (!u) throw new Error('Assignee does not belong to this tenant')
   }
-  const complete = status === 'work_ordered' && resolutionNotes.trim()
+  const complete = status === 'completed' || status === 'closed'
   const [r] = await ctx.db((tx) =>
     tx
       .update(maintenanceIssues)
       .set({
         priority,
-        status: status as 'reported' | 'triaged' | 'work_ordered' | 'cancelled',
+        status: status as MaintenanceStatus,
         assignedToTenantUserId: assignee || null,
-        resolutionNotes: resolutionNotes.trim() || null,
-        completedAt: complete ? new Date() : null,
-        completedByTenantUserId: complete ? (ctx.membership?.id ?? null) : null,
+        resolutionNotes: notes || null,
+        completedAt: complete ? (current.completedAt ?? new Date()) : null,
+        completedByTenantUserId: complete
+          ? (current.completedByTenantUserId ?? ctx.membership?.id ?? null)
+          : null,
       })
       .where(and(eq(maintenanceIssues.tenantId, ctx.tenantId), eq(maintenanceIssues.id, id)))
       .returning(),

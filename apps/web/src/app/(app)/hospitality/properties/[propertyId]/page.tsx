@@ -83,7 +83,7 @@ export default async function PropertyDetail({
         description={`${property.code} · ${property.timezone}`}
         actions={
           <div className="flex flex-wrap gap-2">
-            {modules.has('hospitality.diary') && (
+            {modules.has('hospitality.manager-signoff') && (
               <Button asChild variant="outline">
                 <Link href={`/hospitality/properties/${property.id}/signoff`}>
                   {' '}

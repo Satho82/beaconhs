@@ -1,5 +1,6 @@
 import { getGeneratedTranslations } from '@/i18n/generated.server'
-import { isUuid } from '@/lib/list-params'
+import { isUuid, parseListParams } from '@/lib/list-params'
+import { Pagination } from '@/components/pagination'
 import { notFound } from 'next/navigation'
 import type { SignoffKind } from '@/lib/hospitality/signoff-period'
 import Link from 'next/link'
@@ -14,17 +15,23 @@ export default async function SignoffPage({
   searchParams,
 }: {
   params: Promise<{ propertyId: string }>
-  searchParams: Promise<{ kind?: string }>
+  searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
   const translateHospitality = await getGeneratedTranslations()
 
   const { propertyId } = await params
   if (!isUuid(propertyId)) notFound()
   const ctx = await requireRequestContext()
-  const kind: SignoffKind = (await searchParams).kind === 'monthly' ? 'monthly' : 'weekly'
+  const search = await searchParams
+  const kind: SignoffKind = search.kind === 'monthly' ? 'monthly' : 'weekly'
+  const list = parseListParams(search, {
+    sort: 'confirmed',
+    dir: 'desc',
+    allowedSorts: ['confirmed'] as const,
+  })
   const [summary, history] = await Promise.all([
     signoffSummary(ctx, propertyId, kind),
-    listPropertySignoffs(ctx, propertyId),
+    listPropertySignoffs(ctx, propertyId, kind, list.perPage, (list.page - 1) * list.perPage),
   ])
   const manage = can(ctx, 'hospitality.manage')
   return (
@@ -93,9 +100,9 @@ export default async function SignoffPage({
       )}
       <section className="mt-6">
         <h2 className="text-lg font-semibold">{translateHospitality('m_1cc99fa21ebbaa')}</h2>
-        {history.length ? (
+        {history.rows.length ? (
           <div className="mt-3 grid gap-2">
-            {history.map((row) => (
+            {history.rows.map((row) => (
               <div className="rounded border p-3" key={row.id}>
                 {row.kind} · {row.periodStart.toLocaleDateString()} –{' '}
                 {row.periodEnd.toLocaleDateString()} {translateHospitality('m_0c745bfb66df3b')}{' '}
@@ -106,6 +113,13 @@ export default async function SignoffPage({
         ) : (
           <EmptyState title={translateHospitality('m_11f45f4a48ad6b')} />
         )}
+        <Pagination
+          basePath={`/hospitality/properties/${propertyId}/signoff`}
+          currentParams={search}
+          total={history.total}
+          page={list.page}
+          perPage={list.perPage}
+        />
       </section>
     </main>
   )

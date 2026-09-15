@@ -15,6 +15,7 @@ import { updateFloor } from '@/lib/hospitality/properties'
 import { updateRoom } from '@/lib/hospitality/properties'
 import { createRoomMaintenanceIssue } from '@/lib/hospitality/maintenance'
 import { updateMaintenanceIssue } from '@/lib/hospitality/maintenance'
+import { provisionRoomQr, rotateRoomQr } from '@/lib/hospitality/room-qr'
 const value = (f: FormData, key: string) => String(f.get(key) ?? '')
 export async function createPropertyAction(
   _previous: PropertyFormState,
@@ -140,4 +141,22 @@ export async function updateMaintenanceIssueAction(f: FormData) {
     value(f, 'assignee'),
   )
   redirect(`/hospitality/maintenance/${r.id}`)
+}
+
+function roomPath(f: FormData) {
+  return `/hospitality/properties/${value(f, 'propertyId')}/buildings/${value(f, 'buildingId')}/floors/${value(f, 'floorId')}/rooms/${value(f, 'roomId')}`
+}
+
+export async function provisionRoomQrAction(f: FormData) {
+  const ctx = await requireRequestContext()
+  await provisionRoomQr(ctx, value(f, 'roomId'))
+  revalidatePath(roomPath(f))
+  redirect(roomPath(f))
+}
+
+export async function rotateRoomQrAction(f: FormData) {
+  const ctx = await requireRequestContext()
+  await rotateRoomQr(ctx, value(f, 'roomId'))
+  revalidatePath(roomPath(f))
+  redirect(roomPath(f))
 }

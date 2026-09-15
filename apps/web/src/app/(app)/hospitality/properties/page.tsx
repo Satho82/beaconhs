@@ -2,11 +2,12 @@ import { PageContainer } from '@/components/page-layout'
 import { SearchInput } from '@/components/search-input'
 import { Pagination } from '@/components/pagination'
 import { can } from '@beaconhs/tenant'
-import { getGeneratedTranslations } from '@/i18n/generated.server'
+import { getGeneratedTranslations, getGeneratedValueTranslations } from '@/i18n/generated.server'
 import Link from 'next/link'
 import { Button, EmptyState, PageHeader } from '@beaconhs/ui'
 import { requireRequestContext } from '@/lib/auth'
 import { listProperties } from '@/lib/hospitality/properties'
+import { loadEnabledModuleKeys } from '@/lib/module-entitlements/server'
 
 /** Additive Uvanoo module; the existing tenant dashboard remains unchanged. */
 export default async function HospitalityPropertiesPage({
@@ -14,24 +15,35 @@ export default async function HospitalityPropertiesPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
-  const translateHospitality = await getGeneratedTranslations()
+  const [translateHospitality, translateValue] = await Promise.all([
+    getGeneratedTranslations(),
+    getGeneratedValueTranslations(),
+  ])
 
   const ctx = await requireRequestContext()
   const search = await searchParams
   const { properties, total, params } = await listProperties(ctx, search)
+  const modules = await loadEnabledModuleKeys(ctx)
   return (
     <PageContainer>
       <PageHeader
         title={translateHospitality('m_008a1e78d9023f')}
         description={translateHospitality('m_06f2e6bfa2a821')}
         actions={
-          can(ctx, 'hospitality.manage') && (
-            <Button asChild>
-              <Link href="/hospitality/properties/new">
-                {translateHospitality('m_1768b1fbb37747')}
-              </Link>
-            </Button>
-          )
+          <div className="flex flex-wrap gap-2">
+            {modules.has('hospitality.maintenance') && (
+              <Button asChild variant="outline">
+                <Link href="/hospitality/maintenance">{translateValue('Maintenance queue')}</Link>
+              </Button>
+            )}
+            {can(ctx, 'hospitality.manage') && (
+              <Button asChild>
+                <Link href="/hospitality/properties/new">
+                  {translateHospitality('m_1768b1fbb37747')}
+                </Link>
+              </Button>
+            )}
+          </div>
         }
       />
       <div className="mt-4">

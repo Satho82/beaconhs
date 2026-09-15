@@ -1,5 +1,5 @@
 import { signoffPeriod, type SignoffKind } from './signoff-period'
-import { and, eq, gte, lt } from 'drizzle-orm'
+import { and, count, desc, eq, gte, isNull, lt } from 'drizzle-orm'
 import {
   hospitalityProperties,
   managerSignoffs,
@@ -12,6 +12,7 @@ import { recordAudit } from '@/lib/audit'
 
 async function gate(ctx: RequestContext, write = false) {
   await assertTenantModuleEntitled(ctx, 'hospitality.diary')
+  await assertTenantModuleEntitled(ctx, 'hospitality.manager-signoff')
   assertCan(ctx, write ? 'hospitality.manage' : 'hospitality.read')
 }
 export async function signoffSummary(
@@ -60,6 +61,9 @@ export async function confirmSignoff(
   now = new Date(),
 ) {
   await gate(ctx, true)
+  if (!ctx.membership?.id) throw new Error('A tenant membership is required to sign off a period.')
+  const cleanComments = comments.trim()
+  if (cleanComments.length > 4_000) throw new Error('Manager comments are too long.')
   const summary = await signoffSummary(ctx, propertyId, kind, now)
   const [property] = await ctx.db((tx) =>
     tx
@@ -69,6 +73,7 @@ export async function confirmSignoff(
         and(
           eq(hospitalityProperties.tenantId, ctx.tenantId),
           eq(hospitalityProperties.id, propertyId),
+          isNull(hospitalityProperties.deletedAt),
         ),
       )
       .limit(1),
@@ -84,9 +89,9 @@ export async function confirmSignoff(
         periodStart: summary.start,
         periodEnd: summary.end,
         summary,
-        comments: comments.trim() || null,
+        comments: cleanComments || null,
         confirmedAt: now,
-        confirmedByTenantUserId: ctx.membership?.id ?? 'super-admin',
+        confirmedByTenantUserId: ctx.membership.id,
       })
       .onConflictDoNothing()
       .returning(),
@@ -105,15 +110,28 @@ export async function confirmSignoff(
   })
   return row
 }
-export async function listPropertySignoffs(ctx: RequestContext, propertyId: string) {
+export async function listPropertySignoffs(
+  ctx: RequestContext,
+  propertyId: string,
+  kind: SignoffKind,
+  limit: number,
+  offset: number,
+) {
   await gate(ctx)
-  return ctx.db((tx) =>
-    tx
+  const where = and(
+    eq(managerSignoffs.tenantId, ctx.tenantId),
+    eq(managerSignoffs.propertyId, propertyId),
+    eq(managerSignoffs.kind, kind),
+  )
+  return ctx.db(async (tx) => {
+    const rows = await tx
       .select()
       .from(managerSignoffs)
-      .where(
-        and(eq(managerSignoffs.tenantId, ctx.tenantId), eq(managerSignoffs.propertyId, propertyId)),
-      )
-      .orderBy(managerSignoffs.confirmedAt),
-  )
+      .where(where)
+      .orderBy(desc(managerSignoffs.confirmedAt), desc(managerSignoffs.id))
+      .limit(limit)
+      .offset(offset)
+    const [total] = await tx.select({ value: count() }).from(managerSignoffs).where(where)
+    return { rows, total: total?.value ?? 0 }
+  })
 }

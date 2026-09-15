@@ -29,6 +29,12 @@ export const maintenanceIssueStatus = pgEnum('maintenance_issue_status', [
   'triaged',
   'work_ordered',
   'cancelled',
+  'acknowledged',
+  'assigned',
+  'in_progress',
+  'awaiting_parts',
+  'completed',
+  'closed',
 ])
 export const maintenanceIssueSource = pgEnum('maintenance_issue_source', [
   'staff',
@@ -223,6 +229,10 @@ export const maintenanceIssues = pgTable(
     summary: text('summary').notNull(),
     description: text('description'),
     reportedByTenantUserId: uuid('reported_by_tenant_user_id'),
+    publicSubmissionId: uuid('public_submission_id'),
+    guestName: text('guest_name'),
+    guestContact: text('guest_contact'),
+    guestContactConsent: boolean('guest_contact_consent').default(false).notNull(),
     assignedToTenantUserId: uuid('assigned_to_tenant_user_id'),
     completedAt: timestamp('completed_at', { withTimezone: true }),
     completedByTenantUserId: uuid('completed_by_tenant_user_id'),
@@ -232,6 +242,15 @@ export const maintenanceIssues = pgTable(
   (t) => ({
     tenantRef: uniqueIndex('maintenance_issues_tenant_reference_ux').on(t.tenantId, t.reference),
     tenantIdId: uniqueIndex('maintenance_issues_tenant_id_id_ux').on(t.tenantId, t.id),
+    publicSubmission: uniqueIndex('maintenance_issues_public_submission_ux').on(
+      t.tenantId,
+      t.publicSubmissionId,
+    ),
+    tenantStatusCreated: index('maintenance_issues_tenant_status_created_idx').on(
+      t.tenantId,
+      t.status,
+      t.createdAt,
+    ),
     roomFk: foreignKey({
       name: 'maintenance_issues_tenant_room_fk',
       columns: [t.tenantId, t.roomId],

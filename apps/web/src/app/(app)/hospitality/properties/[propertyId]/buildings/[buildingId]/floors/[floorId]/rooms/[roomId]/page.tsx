@@ -1,6 +1,6 @@
-import { getGeneratedTranslations } from '@/i18n/generated.server'
+import { getGeneratedTranslations, getGeneratedValueTranslations } from '@/i18n/generated.server'
 import { isUuid } from '@/lib/list-params'
-import { and, eq, isNull } from 'drizzle-orm'
+import { and, desc, eq, isNull } from 'drizzle-orm'
 import { notFound } from 'next/navigation'
 import { Button, Input, Label, PageHeader } from '@beaconhs/ui'
 import {
@@ -9,21 +9,27 @@ import {
   hospitalityProperties,
   hospitalityRooms,
   maintenanceIssues,
+  qrTargets,
 } from '@beaconhs/db/schema'
 import Link from 'next/link'
 import { requireRequestContext } from '@/lib/auth'
-import { assertTenantModuleEntitled } from '@/lib/module-entitlements/server'
+import { assertTenantModuleEntitled, loadEnabledModuleKeys } from '@/lib/module-entitlements/server'
 import { assertCan, can } from '@beaconhs/tenant'
 import {
   updateRoomAction,
   reportMaintenanceIssueAction,
+  provisionRoomQrAction,
+  rotateRoomQrAction,
 } from '@/app/(app)/hospitality/properties/actions'
 export default async function RoomPage({
   params,
 }: {
   params: Promise<{ propertyId: string; buildingId: string; floorId: string; roomId: string }>
 }) {
-  const translateHospitality = await getGeneratedTranslations()
+  const [translateHospitality, translateValue] = await Promise.all([
+    getGeneratedTranslations(),
+    getGeneratedValueTranslations(),
+  ])
 
   const { propertyId, buildingId, floorId, roomId } = await params
   const p = { propertyId, buildingId, floorId, roomId }
@@ -32,6 +38,8 @@ export default async function RoomPage({
   const ctx = await requireRequestContext()
   await assertTenantModuleEntitled(ctx, 'hospitality.properties')
   assertCan(ctx, 'hospitality.read')
+  const modules = await loadEnabledModuleKeys(ctx)
+  const maintenanceEnabled = modules.has('hospitality.maintenance')
 
   const d = await ctx.db(async (tx) => {
     const [result] = await tx
@@ -73,19 +81,31 @@ export default async function RoomPage({
       )
       .limit(1)
     const row = result?.room
-    return {
-      row,
-      issues: row
+    const qr =
+      row && maintenanceEnabled
         ? await tx
             .select()
-            .from(maintenanceIssues)
-            .where(
-              and(
-                eq(maintenanceIssues.tenantId, ctx.tenantId),
-                eq(maintenanceIssues.roomId, p.roomId),
-              ),
-            )
-        : [],
+            .from(qrTargets)
+            .where(and(eq(qrTargets.tenantId, ctx.tenantId), eq(qrTargets.roomId, p.roomId)))
+            .limit(1)
+        : []
+    return {
+      row,
+      qr: qr[0] ?? null,
+      issues:
+        row && maintenanceEnabled
+          ? await tx
+              .select()
+              .from(maintenanceIssues)
+              .where(
+                and(
+                  eq(maintenanceIssues.tenantId, ctx.tenantId),
+                  eq(maintenanceIssues.roomId, p.roomId),
+                ),
+              )
+              .orderBy(desc(maintenanceIssues.createdAt), desc(maintenanceIssues.id))
+              .limit(10)
+          : [],
     }
   })
   if (!d.row) notFound()
@@ -123,32 +143,90 @@ export default async function RoomPage({
             </Label>
             <Button type="submit">{translateHospitality('m_1ab9025ed1067c')}</Button>
           </form>
-          <form action={reportMaintenanceIssueAction} className="grid gap-2 rounded border p-3">
-            <input type="hidden" name="roomId" value={p.roomId} />
-            <Label>
-              {' '}
-              {translateHospitality('m_06ea0a48c6d042')} <Input name="title" required />
-            </Label>
-            <Label>
-              {' '}
-              {translateHospitality('m_14d923495cf14c')} <Input name="description" />
-            </Label>
-            <Label>
-              {' '}
-              {translateHospitality('m_00f0e2904a371c')}{' '}
-              <Input name="priority" defaultValue="medium" required />
-            </Label>
-            <Button type="submit">{translateHospitality('m_1ae7759d0d5257')}</Button>
-          </form>
+          {maintenanceEnabled && (
+            <section className="mb-4 rounded border p-3">
+              <h2 className="font-semibold">{translateValue('Guest maintenance QR')}</h2>
+              <p className="text-muted-foreground mt-1 text-sm">
+                {translateValue('The code opens a mobile guest form already linked to this room.')}
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {d.qr?.isActive ? (
+                  <>
+                    <Button asChild variant="outline">
+                      <Link
+                        href={`/hospitality/properties/${p.propertyId}/buildings/${p.buildingId}/floors/${p.floorId}/rooms/${p.roomId}/qr`}
+                      >
+                        {translateValue('View and print QR')}
+                      </Link>
+                    </Button>
+                    <form action={rotateRoomQrAction}>
+                      {Object.entries(p).map(([name, value]) => (
+                        <input key={name} type="hidden" name={name} value={value} />
+                      ))}
+                      <Button type="submit" variant="outline">
+                        {translateValue('Rotate QR')}
+                      </Button>
+                    </form>
+                  </>
+                ) : (
+                  <form action={provisionRoomQrAction}>
+                    {Object.entries(p).map(([name, value]) => (
+                      <input key={name} type="hidden" name={name} value={value} />
+                    ))}
+                    <Button type="submit">{translateValue('Create room QR')}</Button>
+                  </form>
+                )}
+              </div>
+            </section>
+          )}
+          {maintenanceEnabled && (
+            <form action={reportMaintenanceIssueAction} className="grid gap-2 rounded border p-3">
+              <input type="hidden" name="roomId" value={p.roomId} />
+              <Label>
+                {' '}
+                {translateHospitality('m_06ea0a48c6d042')} <Input name="title" required />
+              </Label>
+              <Label>
+                {' '}
+                {translateHospitality('m_14d923495cf14c')} <Input name="description" />
+              </Label>
+              <Label>
+                {' '}
+                {translateHospitality('m_00f0e2904a371c')}{' '}
+                <Input name="priority" defaultValue="medium" required />
+              </Label>
+              <Button type="submit">{translateHospitality('m_1ae7759d0d5257')}</Button>
+            </form>
+          )}
         </>
       )}
-      <section className="mt-4">
-        {d.issues.map((i) => (
-          <Link className="block border p-3" href={`/hospitality/maintenance/${i.id}`} key={i.id}>
-            {i.summary} · {i.priority} · {i.status}
-          </Link>
-        ))}
-      </section>
+      {maintenanceEnabled && (
+        <section className="mt-4">
+          <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+            <h2 className="text-lg font-semibold">{translateValue('Recent maintenance issues')}</h2>
+            <Link href="/hospitality/maintenance" className="text-sm underline">
+              {translateValue('View all')}
+            </Link>
+          </div>
+          {d.issues.length === 0 ? (
+            <p className="text-muted-foreground rounded border p-3 text-sm">
+              {translateValue('No issues reported.')}
+            </p>
+          ) : (
+            <div className="grid gap-2">
+              {d.issues.map((i) => (
+                <Link
+                  className="rounded border p-3"
+                  href={`/hospitality/maintenance/${i.id}`}
+                  key={i.id}
+                >
+                  {i.reference} · {i.summary} · {i.priority} · {i.status}
+                </Link>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
     </main>
   )
 }

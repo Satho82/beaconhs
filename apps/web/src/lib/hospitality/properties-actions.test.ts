@@ -4,6 +4,8 @@ const mocks = vi.hoisted(() => ({
   auth: vi.fn(),
   create: vi.fn(),
   archive: vi.fn(),
+  provisionQr: vi.fn(),
+  rotateQr: vi.fn(),
   revalidate: vi.fn(),
   redirect: vi.fn(),
 }))
@@ -25,10 +27,16 @@ vi.mock('@/lib/hospitality/maintenance', () => ({
   createRoomMaintenanceIssue: vi.fn(),
   updateMaintenanceIssue: vi.fn(),
 }))
+vi.mock('@/lib/hospitality/room-qr', () => ({
+  provisionRoomQr: mocks.provisionQr,
+  rotateRoomQr: mocks.rotateQr,
+}))
 
 import {
   archivePropertyAction,
   createPropertyAction,
+  provisionRoomQrAction,
+  rotateRoomQrAction,
 } from '../../app/(app)/hospitality/properties/actions'
 
 const context = { tenantId: 'tenant-current' }
@@ -82,6 +90,22 @@ describe('property workflow actions', () => {
     )
     expect(mocks.archive).not.toHaveBeenCalled()
   })
+  it('provisions and rotates a room QR in the authenticated tenant context', async () => {
+    const route = {
+      propertyId: id,
+      buildingId: '20000000-0000-4000-8000-000000000002',
+      floorId: '20000000-0000-4000-8000-000000000003',
+      roomId: '20000000-0000-4000-8000-000000000004',
+    }
+    const path = `/hospitality/properties/${route.propertyId}/buildings/${route.buildingId}/floors/${route.floorId}/rooms/${route.roomId}`
+    await expect(provisionRoomQrAction(form(route))).rejects.toThrow(`Redirect ${path}`)
+    expect(mocks.provisionQr).toHaveBeenCalledWith(context, route.roomId)
+    expect(mocks.revalidate).toHaveBeenCalledWith(path)
+
+    await expect(rotateRoomQrAction(form(route))).rejects.toThrow(`Redirect ${path}`)
+    expect(mocks.rotateQr).toHaveBeenCalledWith(context, route.roomId)
+  })
+
   it('archives in the current context and refreshes the property and list', async () => {
     await expect(
       archivePropertyAction(form({ id, confirmation: 'archive', tenantId: 'another-tenant' })),

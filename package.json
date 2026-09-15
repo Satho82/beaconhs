@@ -20,6 +20,7 @@
     "db:push:ci": "pnpm --filter @beaconhs/db push:ci",
     "db:studio": "pnpm --filter @beaconhs/db studio",
     "db:seed": "pnpm --filter @beaconhs/db seed",
+    "db:seed:demo-hotel": "pnpm --filter @beaconhs/db seed:demo-hotel",
     "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,md,json}\"",
     "clean": "turbo run clean && rm -rf node_modules"

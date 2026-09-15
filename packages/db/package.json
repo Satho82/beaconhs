@@ -22,6 +22,7 @@
     "push:ci": "drizzle-kit push --force",
     "studio": "drizzle-kit studio",
     "seed": "tsx --env-file=../../.env src/seed.ts",
+    "seed:demo-hotel": "tsx src/seed-demo-hotel.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist .turbo"

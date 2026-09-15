@@ -26,6 +26,12 @@
   ],
   "tasks": {
     "build": {
+      "env": [
+        "DEPLOYMENT_VERSION",
+        "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY",
+        "TURBOPACK_MEMORY_LIMIT_MB",
+        "NODE_OPTIONS"
+      ],
       "dependsOn": ["^build"],
       "outputs": [".next/**", "!.next/cache/**", "dist/**"]
     },

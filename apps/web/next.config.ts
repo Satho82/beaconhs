@@ -60,8 +60,12 @@ const nextConfig: NextConfig = {
     'puppeteer-core',
     '@aws-sdk/client-s3',
     '@aws-sdk/s3-request-presigner',
-    // jsdom-backed sanitizer — keep it (and jsdom) out of the Next bundle.
+    // jsdom-backed sanitizer and its optional native canvas backend are
+    // server-only. Keep the complete chain external so Webpack never attempts
+    // to bundle canvas.node.
     'isomorphic-dompurify',
+    'jsdom',
+    'canvas',
     // DOCX generation (jszip etc.) — Node-only, used in the export route.
     '@turbodocx/html-to-docx',
     // DOCX → HTML import (mammoth) — Node-only, used in createDocument.

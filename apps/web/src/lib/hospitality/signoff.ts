@@ -61,7 +61,8 @@ export async function confirmSignoff(
   now = new Date(),
 ) {
   await gate(ctx, true)
-  if (!ctx.membership?.id) throw new Error('A tenant membership is required to sign off a period.')
+  const membershipId = ctx.membership?.id
+  if (!membershipId) throw new Error('A tenant membership is required to sign off a period.')
   const cleanComments = comments.trim()
   if (cleanComments.length > 4_000) throw new Error('Manager comments are too long.')
   const summary = await signoffSummary(ctx, propertyId, kind, now)
@@ -91,7 +92,7 @@ export async function confirmSignoff(
         summary,
         comments: cleanComments || null,
         confirmedAt: now,
-        confirmedByTenantUserId: ctx.membership.id,
+        confirmedByTenantUserId: membershipId,
       })
       .onConflictDoNothing()
       .returning(),

@@ -30,7 +30,7 @@ Archived properties disappear from active property lists. Existing records are r
   {
     slug: 'hospitality-maintenance',
     title: 'Guest room QR and maintenance',
-    group: 'Frontline work',
+    group: 'Everyday tasks',
     iconKey: 'wrench',
     summary: 'Create room QR codes and manage guest or staff maintenance reports.',
     keywords: ['hospitality', 'hotel', 'room', 'maintenance', 'guest', 'QR', 'repair'],

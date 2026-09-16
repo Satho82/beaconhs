@@ -8,12 +8,12 @@ import { AppLinkProvider } from '@/components/app-link-provider'
 import { SplashScreen } from '@/components/brand-splash'
 import { getGeneratedTranslations } from '@/i18n/generated.server'
 import { PRODUCT_NAME } from '@/lib/brand'
-import { getPlatformBranding } from '@/lib/platform-branding-config'
+import { getRootPlatformBranding } from '@/lib/platform-branding-config'
 
 export async function generateMetadata(): Promise<Metadata> {
   const [tGenerated, branding] = await Promise.all([
     getGeneratedTranslations(),
-    getPlatformBranding(),
+    getRootPlatformBranding(),
   ])
   const productName = branding.productName?.trim() || PRODUCT_NAME
   return {
@@ -61,7 +61,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     getLocale(),
     getMessages(),
     getTimeZone(),
-    getPlatformBranding(),
+    getRootPlatformBranding(),
   ])
   const nonce = headerStore.get('x-nonce') ?? undefined
   return (

@@ -9,6 +9,8 @@ vi.mock('@beaconhs/auth/platform-branding', () => ({
   getPlatformBranding: mocks.getPlatformBranding,
   savePlatformBranding: mocks.savePlatformBranding,
 }))
+vi.mock('@/components/brand-logo', () => ({ BrandSplash: () => null }))
+vi.mock('@/components/brand-splash', () => ({ SplashHold: () => null }))
 
 const originalNextPhase = process.env.NEXT_PHASE
 
@@ -22,11 +24,15 @@ afterEach(() => {
 })
 
 describe('root platform branding boundary', () => {
-  it('uses product defaults during a production build without invoking the database reader', async () => {
+  it('resolves the build-time root loading path without invoking the database reader', async () => {
     process.env.NEXT_PHASE = 'phase-production-build'
-    const { getRootPlatformBranding } = await import('./platform-branding-config')
+    const [{ getRootPlatformBranding }, { default: RootLoading }] = await Promise.all([
+      import('./platform-branding-config'),
+      import('../app/loading'),
+    ])
 
     await expect(getRootPlatformBranding()).resolves.toEqual({})
+    await expect(RootLoading()).resolves.toBeDefined()
     expect(mocks.getPlatformBranding).not.toHaveBeenCalled()
   })
 

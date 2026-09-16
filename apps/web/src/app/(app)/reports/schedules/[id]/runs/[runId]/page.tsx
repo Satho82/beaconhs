@@ -11,7 +11,7 @@ import { GeneratedText } from '@/i18n/generated'
 import { getGeneratedTranslations } from '@/i18n/generated.server'
 import { requireRequestContext } from '@/lib/auth'
 import { isUuid } from '@/lib/list-params'
-import { toSchedule } from '../../../page'
+import { toSchedule } from '../../../_schedule'
 
 export default async function RunDetailPage({
   params,

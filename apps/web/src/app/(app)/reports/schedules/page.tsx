@@ -1,7 +1,6 @@
 import { and, asc, count, eq, ilike, or } from 'drizzle-orm'
 import { reportSchedules } from '@beaconhs/db/schema'
 import { can } from '@beaconhs/tenant'
-import type { ReportSchedule } from '@beaconhs/reports'
 import { PageHeader } from '@beaconhs/ui'
 import { ListPageLayout } from '@/components/page-layout'
 import { getGeneratedTranslations } from '@/i18n/generated.server'
@@ -9,6 +8,7 @@ import { requireRequestContext } from '@/lib/auth'
 import { ReportsSubNav } from '../_nav'
 import { loadScheduleFormData } from './_data'
 import { BeaconScheduleList } from './_schedule-list.client'
+import { toSchedule } from './_schedule'
 
 export const dynamic = 'force-dynamic'
 const PER_PAGE = 25
@@ -71,32 +71,3 @@ export default async function ReportSchedulesPage({
     </ListPageLayout>
   )
 }
-
-function toSchedule(row: typeof reportSchedules.$inferSelect): ReportSchedule {
-  return {
-    schemaVersion: 1,
-    id: row.id,
-    definitionId: row.definitionId,
-    name: row.name,
-    active: row.active,
-    cadence: row.cadence,
-    timezone: row.timezone,
-    hour: row.hour,
-    minute: row.minute,
-    dayOfWeek: row.dayOfWeek,
-    dayOfMonth: row.dayOfMonth,
-    weekOfMonth: row.weekOfMonth as 1 | 2 | 3 | 4 | 5 | null,
-    repeatEvery: row.repeatEvery,
-    startsOn: row.startsOn,
-    endsOn: row.endsOn,
-    recipientUserIds: row.recipientUserIds,
-    recipientEmails: row.recipientEmails,
-    filters: row.filters,
-    emailSubject: row.emailSubject,
-    emailMessage: row.emailMessage,
-    nextRunAt: row.nextRunAt,
-    lastRunAt: row.lastRunAt,
-  }
-}
-
-export { toSchedule }

@@ -10,7 +10,7 @@ import { requireRequestContext } from '@/lib/auth'
 import { isUuid } from '@/lib/list-params'
 import { loadScheduleFormData } from '../_data'
 import { BeaconScheduleForm } from '../_schedule-form'
-import { toSchedule } from '../page'
+import { toSchedule } from '../_schedule'
 import { BeaconReportRunHistory } from './_run-history.client'
 
 const PER_PAGE = 25

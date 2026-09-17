@@ -61,6 +61,7 @@ beforeEach(() => {
   vi.resetModules()
   vi.clearAllMocks()
   process.env = { ...originalEnv }
+  delete process.env.BETTER_AUTH_TRUSTED_ORIGINS
   mocks.getPlatformBranding.mockResolvedValue({})
   mocks.enqueueEmail.mockResolvedValue({ id: 'job-1' })
   mocks.sendVia.mockResolvedValue({ id: 'smtp-1' })
@@ -99,6 +100,51 @@ describe('lazy auth runtime', () => {
     expect(mocks.magicLink).toHaveBeenCalledTimes(1)
     expect(mocks.nextCookies).toHaveBeenCalledTimes(1)
     expect(mocks.betterAuth).toHaveBeenCalledTimes(1)
+  })
+
+  it('trusts only the canonical origin unless explicit alternatives are configured', async () => {
+    process.env.DATABASE_URL = 'postgresql://app:secret@db.example.test/beaconhs'
+    process.env.BETTER_AUTH_SECRET = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+    process.env.BETTER_AUTH_URL = 'https://app.example.test'
+    const { getAuth } = await import('./server')
+    getAuth()
+    expect(mocks.betterAuth).toHaveBeenCalledWith(
+      expect.objectContaining({ trustedOrigins: ['https://app.example.test'] }),
+    )
+  })
+
+  it('permits an explicit fallback origin without duplicating the canonical origin', async () => {
+    process.env.DATABASE_URL = 'postgresql://app:secret@db.example.test/beaconhs'
+    process.env.BETTER_AUTH_SECRET = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+    process.env.BETTER_AUTH_URL = 'https://app.example.test'
+    process.env.BETTER_AUTH_TRUSTED_ORIGINS =
+      ' https://staging.example.test, https://app.example.test, '
+    const { getAuth } = await import('./server')
+    getAuth()
+    expect(mocks.betterAuth).toHaveBeenCalledWith(
+      expect.objectContaining({
+        trustedOrigins: ['https://app.example.test', 'https://staging.example.test'],
+      }),
+    )
+  })
+
+  it.each([
+    '*',
+    'https://*.example.test',
+    'https://app.example.test/path',
+    'https://app.example.test?redirect=evil',
+    'https://user:pass@app.example.test',
+    'javascript:alert(1)',
+  ])('rejects an unsafe alternate origin: %s', async (origin) => {
+    process.env.DATABASE_URL = 'postgresql://app:secret@db.example.test/beaconhs'
+    process.env.BETTER_AUTH_SECRET = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+    process.env.BETTER_AUTH_TRUSTED_ORIGINS = origin
+    const { getAuth } = await import('./server')
+    expect(() => getAuth()).toThrow(
+      '[auth] BETTER_AUTH_TRUSTED_ORIGINS must contain exact HTTP(S) origins.',
+    )
+    expect(mocks.betterAuth).not.toHaveBeenCalled()
+    expect(mocks.pool).not.toHaveBeenCalled()
   })
 
   it('returns a valid no-op result from the global after hook', async () => {

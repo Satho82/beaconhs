@@ -18,6 +18,28 @@ function createAuth() {
 
   const baseURL = process.env.BETTER_AUTH_URL ?? 'http://localhost:3000'
 
+  // Alternate operator-owned origins support a hostname transition without
+  // trusting arbitrary request hosts or wildcard callback destinations.
+  const additionalOrigins = (process.env.BETTER_AUTH_TRUSTED_ORIGINS ?? '')
+    .split(',')
+    .map((value) => value.trim())
+    .filter(Boolean)
+  for (const origin of additionalOrigins) {
+    let parsed: URL
+    try {
+      parsed = new URL(origin)
+    } catch {
+      throw new Error('[auth] BETTER_AUTH_TRUSTED_ORIGINS must contain exact HTTP(S) origins.')
+    }
+    if (
+      !['http:', 'https:'].includes(parsed.protocol) ||
+      parsed.origin !== origin ||
+      origin.includes('*')
+    ) {
+      throw new Error('[auth] BETTER_AUTH_TRUSTED_ORIGINS must contain exact HTTP(S) origins.')
+    }
+  }
+
   // BETTER_AUTH_SECRET signs sessions AND seals stored provider API keys.
   // Runtime initialization fails closed in production; a Next build merely
   // imports this module and therefore never needs access to runtime secrets.
@@ -122,7 +144,7 @@ function createAuth() {
         return {}
       },
     },
-    trustedOrigins: [baseURL],
+    trustedOrigins: [...new Set([baseURL, ...additionalOrigins])],
   })
 }
 

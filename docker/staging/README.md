@@ -23,6 +23,11 @@ and recreate the existing staging app roles with `--no-deps`. Do not rerun seeds
 review migration differences before considering any schema operation. Retain the
 previous image and environment for rollback.
 
+For the current staging hostname transition, set `APP_URL` and `BETTER_AUTH_URL`
+to `https://app.frekatio.co.uk`, and explicitly pass
+`BETTER_AUTH_TRUSTED_ORIGINS=https://staging.uvanoo.com` to the app roles. The old
+origin remains an allowed login callback; login emails use the canonical host.
+
 Verify readiness/version, web and worker health, HTTPS at `app.frekatio.co.uk`,
 the fallback `staging.uvanoo.com`, and GM login/Training access before declaring a
 release complete. Image publication alone is not a deployment.

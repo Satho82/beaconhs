@@ -1,9 +1,16 @@
 import { randomBytes } from 'node:crypto'
 import { and, eq, isNull } from 'drizzle-orm'
-import { maintenanceIssues, hospitalityRooms, tenantUsers } from '@beaconhs/db/schema'
+import {
+  maintenanceIssues,
+  hospitalityBuildings,
+  hospitalityFloors,
+  hospitalityRooms,
+  tenantUsers,
+} from '@beaconhs/db/schema'
 import { assertCan, type RequestContext } from '@beaconhs/tenant'
 import { assertTenantModuleEntitled } from '@/lib/module-entitlements/server'
 import { recordAudit } from '@/lib/audit'
+import { assertCanAccessProperty } from '@/lib/hospitality/property-access'
 const priorities = new Set(['low', 'medium', 'high', 'critical'])
 export const MAINTENANCE_STATUSES = [
   'reported',
@@ -44,8 +51,10 @@ export async function createRoomMaintenanceIssue(
   title: string,
   description: string,
   priority: string,
+  source: 'staff' | 'front_office' | 'manager' | 'engineering' | 'staff_qr' = 'staff',
 ) {
-  await gate(ctx, true)
+  await assertTenantModuleEntitled(ctx, 'hospitality.maintenance')
+  assertCan(ctx, 'maintenance.create')
   if (!priorities.has(priority)) throw new Error('Invalid maintenance priority')
   const summary = title.trim()
   const details = description.trim()
@@ -53,8 +62,22 @@ export async function createRoomMaintenanceIssue(
   if (details.length > 2_000) throw new Error('Maintenance description is too long')
   const [room] = await ctx.db((tx) =>
     tx
-      .select({ id: hospitalityRooms.id })
+      .select({ id: hospitalityRooms.id, propertyId: hospitalityBuildings.propertyId })
       .from(hospitalityRooms)
+      .innerJoin(
+        hospitalityFloors,
+        and(
+          eq(hospitalityFloors.tenantId, hospitalityRooms.tenantId),
+          eq(hospitalityFloors.id, hospitalityRooms.floorId),
+        ),
+      )
+      .innerJoin(
+        hospitalityBuildings,
+        and(
+          eq(hospitalityBuildings.tenantId, hospitalityFloors.tenantId),
+          eq(hospitalityBuildings.id, hospitalityFloors.buildingId),
+        ),
+      )
       .where(
         and(
           eq(hospitalityRooms.tenantId, ctx.tenantId),
@@ -65,6 +88,7 @@ export async function createRoomMaintenanceIssue(
       .limit(1),
   )
   if (!room) throw new Error('No room exists in this tenant')
+  assertCanAccessProperty(ctx, room.propertyId)
   const [r] = await ctx.db((tx) =>
     tx
       .insert(maintenanceIssues)
@@ -77,6 +101,7 @@ export async function createRoomMaintenanceIssue(
         summary,
         description: details || null,
         priority,
+        source,
         reportedByTenantUserId: ctx.membership?.id ?? null,
       })
       .returning(),
@@ -110,12 +135,35 @@ export async function updateMaintenanceIssue(
         status: maintenanceIssues.status,
         completedAt: maintenanceIssues.completedAt,
         completedByTenantUserId: maintenanceIssues.completedByTenantUserId,
+        propertyId: hospitalityBuildings.propertyId,
       })
       .from(maintenanceIssues)
+      .innerJoin(
+        hospitalityRooms,
+        and(
+          eq(hospitalityRooms.tenantId, maintenanceIssues.tenantId),
+          eq(hospitalityRooms.id, maintenanceIssues.roomId),
+        ),
+      )
+      .innerJoin(
+        hospitalityFloors,
+        and(
+          eq(hospitalityFloors.tenantId, hospitalityRooms.tenantId),
+          eq(hospitalityFloors.id, hospitalityRooms.floorId),
+        ),
+      )
+      .innerJoin(
+        hospitalityBuildings,
+        and(
+          eq(hospitalityBuildings.tenantId, hospitalityFloors.tenantId),
+          eq(hospitalityBuildings.id, hospitalityFloors.buildingId),
+        ),
+      )
       .where(and(eq(maintenanceIssues.tenantId, ctx.tenantId), eq(maintenanceIssues.id, id)))
       .limit(1),
   )
   if (!current) throw new Error('No maintenance issue exists in this tenant')
+  assertCanAccessProperty(ctx, current.propertyId)
   if (!canTransitionMaintenanceIssue(current.status, status))
     throw new Error(`Cannot move maintenance from ${current.status} to ${status}`)
   if (status === 'assigned' && !assignee) throw new Error('Choose an assignee first')

@@ -1,9 +1,15 @@
 import { and, eq, isNull } from 'drizzle-orm'
-import { hospitalityRooms, qrTargets } from '@beaconhs/db/schema'
+import {
+  hospitalityBuildings,
+  hospitalityFloors,
+  hospitalityRooms,
+  qrTargets,
+} from '@beaconhs/db/schema'
 import { assertCan, type RequestContext } from '@beaconhs/tenant'
 import { recordAuditInTransaction } from '@/lib/audit'
 import { assertTenantModuleEntitled } from '@/lib/module-entitlements/server'
 import { createRoomQrToken } from './guest-maintenance'
+import { assertCanAccessProperty } from './property-access'
 
 async function gate(ctx: RequestContext) {
   await assertTenantModuleEntitled(ctx, 'hospitality.properties')
@@ -14,8 +20,24 @@ async function gate(ctx: RequestContext) {
 async function assertRoom(ctx: RequestContext, roomId: string) {
   const [room] = await ctx.db((tx) =>
     tx
-      .select({ id: hospitalityRooms.id })
+      .select({ id: hospitalityRooms.id, propertyId: hospitalityBuildings.propertyId })
       .from(hospitalityRooms)
+      .innerJoin(
+        hospitalityFloors,
+        and(
+          eq(hospitalityFloors.id, hospitalityRooms.floorId),
+          eq(hospitalityFloors.tenantId, hospitalityRooms.tenantId),
+          isNull(hospitalityFloors.deletedAt),
+        ),
+      )
+      .innerJoin(
+        hospitalityBuildings,
+        and(
+          eq(hospitalityBuildings.id, hospitalityFloors.buildingId),
+          eq(hospitalityBuildings.tenantId, hospitalityRooms.tenantId),
+          isNull(hospitalityBuildings.deletedAt),
+        ),
+      )
       .where(
         and(
           eq(hospitalityRooms.tenantId, ctx.tenantId),
@@ -26,6 +48,7 @@ async function assertRoom(ctx: RequestContext, roomId: string) {
       .limit(1),
   )
   if (!room) throw new Error('No room exists in this tenant.')
+  assertCanAccessProperty(ctx, room.propertyId)
 }
 export async function provisionRoomQr(ctx: RequestContext, roomId: string) {
   await gate(ctx)

@@ -296,13 +296,41 @@ export function canSeeSite(ctx: RequestContext, siteId: string | null): boolean 
   return false
 }
 
+/** True when the context may access a hospitality property inside its active tenant. */
+export function canSeeProperty(ctx: RequestContext, propertyId: string): boolean {
+  if (ctx.isSuperAdmin) return true
+  return ctx.scopes.some(
+    (scope) =>
+      scope.type === 'tenant' ||
+      (scope.type === 'properties' && scope.propertyIds.includes(propertyId)),
+  )
+}
+
+/** Distinct assigned properties, or null for tenant-wide/super-admin access. */
+export function assignedPropertyIds(ctx: RequestContext): string[] | null {
+  if (ctx.isSuperAdmin || ctx.scopes.some((scope) => scope.type === 'tenant')) return null
+  return [
+    ...new Set(
+      ctx.scopes.flatMap((scope) => (scope.type === 'properties' ? scope.propertyIds : [])),
+    ),
+  ]
+}
+
 // The single widest scope the user holds — used by older site/self gates.
 // Newer record lists should prefer recordVisibilityWhere(), which unions ALL of
 // the user's scopes (own + people + team + sites) rather than collapsing to one.
 export function selfOnlyFilter(ctx: RequestContext): RoleScope {
   if (ctx.isSuperAdmin) return { type: 'tenant' }
   let widest: RoleScope | null = null
-  const order = { tenant: 6, sites: 5, team: 4, crews: 3, people: 2, self: 1 } as const
+  const order = {
+    tenant: 7,
+    properties: 6,
+    sites: 5,
+    team: 4,
+    crews: 3,
+    people: 2,
+    self: 1,
+  } as const
   for (const s of ctx.scopes) {
     if (!widest || order[s.type] > order[widest.type]) widest = s
   }

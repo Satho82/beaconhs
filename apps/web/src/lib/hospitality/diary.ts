@@ -17,6 +17,7 @@ import { assertCan, type RequestContext } from '@beaconhs/tenant'
 import { nextReference } from '@/lib/reference'
 import { recordAudit } from '@/lib/audit'
 import { assertTenantModuleEntitled } from '@/lib/module-entitlements/server'
+import { assertCanAccessProperty } from './property-access'
 
 function required(value: string, label: string): string {
   const clean = value.trim()
@@ -40,6 +41,7 @@ function validateTimezone(timezone: string): string {
 }
 
 async function propertyForTenant(ctx: RequestContext, propertyId: string) {
+  assertCanAccessProperty(ctx, propertyId)
   const [property] = await ctx.db((tx) =>
     tx
       .select()

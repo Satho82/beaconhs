@@ -12,7 +12,7 @@ export const HOSPITALITY_ARTICLES: ManualArticle[] = [
     body: `
 # Create and archive properties
 
-Your organisation must have the properties module enabled and you need hospitality management permission.
+Your organisation must have the properties module enabled and you need hospitality management permission. Property access may be limited to one or several hotels by your administrator. Property lists, rooms, maintenance records, and changes are restricted to those assigned hotels. Only a management-company administrator with access to all properties can create a new property.
 
 1. Open **Properties**, then **Add property**.
 2. Enter **Property name**, **Property code**, and **Timezone**. Use an IANA timezone such as Europe/London.
@@ -49,6 +49,13 @@ Your organisation must have the hospitality maintenance module enabled.
 5. If a code is copied or misused, choose **Rotate QR**. The old link stops working immediately.
 
 Guests do not need a staff account. They scan the code, choose an issue type and urgency, describe the problem, and may share contact details with consent. Reports are rate-limited and duplicate submissions reuse the same reference.
+
+## Report a problem from Front Office
+
+1. Open **Hospitality**, choose **Maintenance queue**, then choose **+ Report maintenance issue**.
+2. If you work at one hotel, that property is selected automatically. Portfolio users choose only from their assigned properties.
+3. Choose the room or location, describe the problem, select a priority when needed, then submit.
+4. The report enters the same maintenance queue used by guest QR and engineering reports. Front Office does not need to assign a contractor, create a work order, or enter resolution details.
 
 ## Work the maintenance queue
 

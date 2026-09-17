@@ -14,6 +14,7 @@ import {
   hospitalityRooms,
 } from '@beaconhs/db/schema'
 import { requireRequestContext } from '@/lib/auth'
+import { assertCanAccessProperty } from '@/lib/hospitality/property-access'
 import { assertTenantModuleEntitled } from '@/lib/module-entitlements/server'
 import { assertCan } from '@beaconhs/tenant'
 import { can } from '@beaconhs/tenant'
@@ -32,6 +33,7 @@ export default async function FloorPage({
   const ctx = await requireRequestContext()
   await assertTenantModuleEntitled(ctx, 'hospitality.properties')
   assertCan(ctx, 'hospitality.read')
+  assertCanAccessProperty(ctx, propertyId)
   const translateValue = await getGeneratedValueTranslations()
   const search = await searchParams
   const list = parseListParams(search, { sort: 'code', dir: 'asc', allowedSorts: ['code'] })

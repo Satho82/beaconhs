@@ -12,19 +12,20 @@ type DemoHotelSeedEnvironment = {
   SENTRY_ENVIRONMENT?: string
 }
 
-export function demoId(key: string): string {
-  const bytes = createHash('sha256')
-    .update(`${DEMO_HOTEL_SEED_KEY}:${key}`)
-    .digest()
-    .subarray(0, 16)
+function deterministicId(seedKey: string, key: string): string {
+  const bytes = createHash('sha256').update(`${seedKey}:${key}`).digest().subarray(0, 16)
   bytes[6] = (bytes[6]! & 0x0f) | 0x50
   bytes[8] = (bytes[8]! & 0x3f) | 0x80
   const hex = bytes.toString('hex')
   return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`
 }
 
-function demoToken(key: string): string {
-  return createHash('sha256').update(`${DEMO_HOTEL_SEED_KEY}:token:${key}`).digest('base64url')
+function deterministicToken(seedKey: string, key: string): string {
+  return createHash('sha256').update(`${seedKey}:token:${key}`).digest('base64url')
+}
+
+export function demoId(key: string): string {
+  return deterministicId(DEMO_HOTEL_SEED_KEY, key)
 }
 
 export function assertDemoHotelSeedEnvironment(env: DemoHotelSeedEnvironment): void {
@@ -85,18 +86,31 @@ function countBy<T>(values: T[], key: (value: T) => string): Record<string, numb
   }, {})
 }
 
-export function buildDemoHotelSeedPlan(anchor = new Date()) {
+type DemoHotelSeedPlanOptions = {
+  seedKey?: string
+  tenantId?: string
+  namespace?: string
+}
+
+export function buildDemoHotelSeedPlan(
+  anchor = new Date(),
+  options: DemoHotelSeedPlanOptions = {},
+) {
+  const seedKey = options.seedKey ?? DEMO_HOTEL_SEED_KEY
+  const namespace = options.namespace ? `${options.namespace}:` : ''
+  const id = (key: string) => deterministicId(seedKey, `${namespace}${key}`)
+  const token = (key: string) => deterministicToken(seedKey, `${namespace}${key}`)
   const now = new Date(anchor)
   const weekStart = utcWeekStart(now)
   const monthStart = utcMonthStart(now)
   const currentPeriodPast = new Date(
     Math.max(weekStart.getTime() + 60_000, now.getTime() - 3_600_000),
   )
-  const tenantId = demoId('tenant')
-  const propertyId = demoId('property')
-  const buildingId = demoId('building')
-  const customerOrgUnitId = demoId('org:customer')
-  const siteOrgUnitId = demoId('org:site')
+  const tenantId = options.tenantId ?? id('tenant')
+  const propertyId = id('property')
+  const buildingId = id('building')
+  const customerOrgUnitId = id('org:customer')
+  const siteOrgUnitId = id('org:site')
 
   const floors = [
     ['ground', 'Ground Floor', 'G', '0'],
@@ -105,13 +119,13 @@ export function buildDemoHotelSeedPlan(anchor = new Date()) {
     ['third', 'Third Floor', '3', '3'],
     ['fourth', 'Fourth Floor', '4', '4'],
   ].map(([key, name, code, sortOrder]) => ({
-    id: demoId(`floor:${key}`),
+    id: id(`floor:${key}`),
     tenantId,
     buildingId,
     name: name!,
     code: code!,
     sortOrder: sortOrder!,
-    metadata: { demoSeedKey: DEMO_HOTEL_SEED_KEY },
+    metadata: { demoSeedKey: seedKey },
   }))
 
   const roomNumbers = [
@@ -144,7 +158,7 @@ export function buildDemoHotelSeedPlan(anchor = new Date()) {
           ? 'Classic Twin'
           : 'Classic King'
   const rooms = roomNumbers.map((code, index) => ({
-    id: demoId(`room:${code}`),
+    id: id(`room:${code}`),
     tenantId,
     floorId: floorForRoom(code).id,
     code,
@@ -153,13 +167,13 @@ export function buildDemoHotelSeedPlan(anchor = new Date()) {
     status: roomStatuses[index]!,
     metadata: {
       beds: roomTypeFor(code).includes('Twin') ? 2 : 1,
-      demoSeedKey: DEMO_HOTEL_SEED_KEY,
+      demoSeedKey: seedKey,
     },
   }))
   const qrTargets = rooms.map((room) => ({
-    id: demoId(`qr:${room.code}`),
+    id: id(`qr:${room.code}`),
     tenantId,
-    token: demoToken(`room:${room.code}`),
+    token: token(`room:${room.code}`),
     kind: 'room' as const,
     roomId: room.id,
     equipmentItemId: null,
@@ -173,9 +187,9 @@ export function buildDemoHotelSeedPlan(anchor = new Date()) {
     ['front-office', 'Maya', 'Patel', 'Front Office Supervisor'],
   ].map(([key, firstName, lastName, title]) => ({
     key: key!,
-    userId: demoId(`user:${key}`),
-    tenantUserId: demoId(`member:${key}`),
-    personId: demoId(`person:${key}`),
+    userId: id(`user:${key}`),
+    tenantUserId: id(`member:${key}`),
+    personId: id(`person:${key}`),
     email: `${key}@demo.uvanoo.invalid`,
     firstName: firstName!,
     lastName: lastName!,
@@ -187,7 +201,7 @@ export function buildDemoHotelSeedPlan(anchor = new Date()) {
     ['contractor-hvac', 'Ethan', 'Brown', 'Northstar HVAC'],
   ].map(([key, firstName, lastName, company]) => ({
     key: key!,
-    personId: demoId(`person:${key}`),
+    personId: id(`person:${key}`),
     firstName: firstName!,
     lastName: lastName!,
     company: company!,
@@ -330,9 +344,9 @@ export function buildDemoHotelSeedPlan(anchor = new Date()) {
   ] as const
   const maintenanceIssues = maintenanceSpecs.map(
     ([room, status, priority, source, summary], index) => ({
-      id: demoId(`issue:${index + 1}`),
+      id: id(`issue:${index + 1}`),
       tenantId,
-      roomId: demoId(`room:${room}`),
+      roomId: id(`room:${room}`),
       equipmentItemId: null,
       reference: `HOT-MNT-${String(index + 1).padStart(4, '0')}`,
       status,
@@ -342,7 +356,7 @@ export function buildDemoHotelSeedPlan(anchor = new Date()) {
       description: `Demo scenario: ${summary.toLowerCase()}.`,
       reportedByTenantUserId:
         source === 'guest_qr' ? null : staff[(index + 2) % staff.length]!.tenantUserId,
-      publicSubmissionId: source === 'guest_qr' ? demoId(`public-submission:${index + 1}`) : null,
+      publicSubmissionId: source === 'guest_qr' ? id(`public-submission:${index + 1}`) : null,
       guestName: source === 'guest_qr' ? ['Alex', null, 'Jordan', 'Taylor'][index % 4] : null,
       guestContact: null,
       guestContactConsent: false,
@@ -378,7 +392,7 @@ export function buildDemoHotelSeedPlan(anchor = new Date()) {
   ] as const
   const workOrderIssueIndexes = [3, 4, 5, 6, 7, 8, 9, 10]
   const workOrders = workOrderIssueIndexes.map((issueIndex, index) => ({
-    id: demoId(`work-order:${index + 1}`),
+    id: id(`work-order:${index + 1}`),
     tenantId,
     issueId: maintenanceIssues[issueIndex]!.id,
     reference: `HOT-WO-${String(index + 1).padStart(4, '0')}`,
@@ -409,14 +423,14 @@ export function buildDemoHotelSeedPlan(anchor = new Date()) {
     ['Fan-coil filter rotation', '0 10 1 * *', false],
   ] as const
   const taskTemplates = taskTitles.map(([title, cron, requiresEvidence], index) => ({
-    id: demoId(`task-template:${index + 1}`),
+    id: id(`task-template:${index + 1}`),
     tenantId,
     title,
     instructions: `Follow the hotel SOP for ${title.toLowerCase()} and record any exception.`,
     requiresEvidence,
   }))
   const taskSchedules = taskTemplates.map((template, index) => ({
-    id: demoId(`task-schedule:${index + 1}`),
+    id: id(`task-schedule:${index + 1}`),
     tenantId,
     templateId: template.id,
     propertyId,
@@ -450,7 +464,7 @@ export function buildDemoHotelSeedPlan(anchor = new Date()) {
           : new Date(weekStart.getTime() + (index === 6 ? 60 : 84) * 3_600_000)
       : addDays(now, index - 6)
     return {
-      id: demoId(`occurrence:${index + 1}`),
+      id: id(`occurrence:${index + 1}`),
       tenantId,
       scheduleId: taskSchedules[index % taskSchedules.length]!.id,
       occurrenceAt: new Date(dueAt.getTime() - 3_600_000),
@@ -466,7 +480,7 @@ export function buildDemoHotelSeedPlan(anchor = new Date()) {
     }
   })
   const lifecycleEvents = [4, 5, 6, 7].map((occurrenceIndex, index) => ({
-    id: demoId(`lifecycle:${index + 1}`),
+    id: id(`lifecycle:${index + 1}`),
     tenantId,
     occurrenceId: occurrences[occurrenceIndex]!.id,
     stage: (
@@ -474,11 +488,11 @@ export function buildDemoHotelSeedPlan(anchor = new Date()) {
     )[index]!,
     recipientUserId: staff[index % staff.length]!.userId,
     processedAt: now,
-    metadata: { demoSeedKey: DEMO_HOTEL_SEED_KEY },
+    metadata: { demoSeedKey: seedKey },
   }))
   const inspectionTypes = [
     {
-      id: demoId('inspection-type:room'),
+      id: id('inspection-type:room'),
       tenantId,
       name: 'Guest Room Quality & Safety',
       description: 'Operational room inspection covering safety, condition, and guest readiness.',
@@ -493,7 +507,7 @@ export function buildDemoHotelSeedPlan(anchor = new Date()) {
       createdBy: staff[0]!.userId,
     },
     {
-      id: demoId('inspection-type:plant'),
+      id: id('inspection-type:plant'),
       tenantId,
       name: 'Hotel Plant & Life Safety',
       description: 'Plant-room and life-safety systems inspection.',
@@ -509,7 +523,7 @@ export function buildDemoHotelSeedPlan(anchor = new Date()) {
     },
   ]
   const inspectionGroups = inspectionTypes.map((type, index) => ({
-    id: demoId(`inspection-group:${index + 1}`),
+    id: id(`inspection-group:${index + 1}`),
     tenantId,
     typeId: type.id,
     sequence: 0,
@@ -527,7 +541,7 @@ export function buildDemoHotelSeedPlan(anchor = new Date()) {
     ['plant-access', 1, 'Plant areas are secure, clear, and safely accessible'],
   ] as const
   const inspectionCriteria = inspectionQuestions.map(([key, typeIndex, text], index) => ({
-    id: demoId(`inspection-criterion:${key}`),
+    id: id(`inspection-criterion:${key}`),
     tenantId,
     typeId: inspectionTypes[typeIndex]!.id,
     groupId: inspectionGroups[typeIndex]!.id,
@@ -547,7 +561,7 @@ export function buildDemoHotelSeedPlan(anchor = new Date()) {
     'closed',
   ] as const
   const inspectionRecords = inspectionStatuses.map((status, index) => ({
-    id: demoId(`inspection-record:${index + 1}`),
+    id: id(`inspection-record:${index + 1}`),
     tenantId,
     reference: `HOT-INS-${String(index + 1).padStart(4, '0')}`,
     typeId: inspectionTypes[index % 2]!.id,
@@ -575,7 +589,7 @@ export function buildDemoHotelSeedPlan(anchor = new Date()) {
       : null,
     closedAt: status === 'closed' ? now : null,
     closedByTenantUserId: status === 'closed' ? staff[1]!.tenantUserId : null,
-    metadata: { propertyId, demoSeedKey: DEMO_HOTEL_SEED_KEY },
+    metadata: { propertyId, demoSeedKey: seedKey },
   }))
   const correctiveActionStatuses = [
     'open',
@@ -586,7 +600,7 @@ export function buildDemoHotelSeedPlan(anchor = new Date()) {
     'closed',
   ] as const
   const correctiveActions = correctiveActionStatuses.map((status, index) => ({
-    id: demoId(`ca:${index + 1}`),
+    id: id(`ca:${index + 1}`),
     tenantId,
     reference: `HOT-CA-${String(index + 1).padStart(4, '0')}`,
     title: [
@@ -615,7 +629,7 @@ export function buildDemoHotelSeedPlan(anchor = new Date()) {
     verifiedAt: status === 'closed' ? now : null,
     closedAt: status === 'closed' ? now : null,
     locked: status === 'closed',
-    metadata: { propertyId, demoSeedKey: DEMO_HOTEL_SEED_KEY },
+    metadata: { propertyId, demoSeedKey: seedKey },
   }))
   const recordCriteria = inspectionRecords.flatMap((record, recordIndex) =>
     inspectionCriteria
@@ -623,7 +637,7 @@ export function buildDemoHotelSeedPlan(anchor = new Date()) {
       .map((criterion, index) => {
         const failed = recordIndex === 3 && index === 0
         return {
-          id: demoId(`record-criterion:${recordIndex + 1}:${index + 1}`),
+          id: id(`record-criterion:${recordIndex + 1}:${index + 1}`),
           tenantId,
           recordId: record.id,
           criterionId: criterion.id,
@@ -656,7 +670,7 @@ export function buildDemoHotelSeedPlan(anchor = new Date()) {
     ['WATER-HYGIENE', 'Water Hygiene Control Log', 'under_review', -2],
     ['CONTRACTOR-RAMS', 'Contractor RAMS Register', 'published', 20],
   ].map(([key, title, status, reviewOffset], index) => ({
-    id: demoId(`document:${index + 1}`),
+    id: id(`document:${index + 1}`),
     tenantId,
     key: key as string,
     title: title as string,
@@ -667,7 +681,7 @@ export function buildDemoHotelSeedPlan(anchor = new Date()) {
     nextReviewOn: dateOnly(addDays(now, reviewOffset as number)),
   }))
   const documentVersions = documents.map((document, index) => ({
-    id: demoId(`document-version:${index + 1}`),
+    id: id(`document-version:${index + 1}`),
     tenantId,
     documentId: document.id,
     version: 1,
@@ -687,7 +701,7 @@ export function buildDemoHotelSeedPlan(anchor = new Date()) {
   ] as const
   const complianceObligations = [
     ...documents.map((document, index) => ({
-      id: demoId(`obligation:document:${index + 1}`),
+      id: id(`obligation:document:${index + 1}`),
       tenantId,
       sourceModule: 'document' as const,
       subjectKind: 'per_record' as const,
@@ -703,7 +717,7 @@ export function buildDemoHotelSeedPlan(anchor = new Date()) {
       createdByTenantUserId: staff[0]!.tenantUserId,
     })),
     ...inspectionTypes.map((type, index) => ({
-      id: demoId(`obligation:inspection:${index + 1}`),
+      id: id(`obligation:inspection:${index + 1}`),
       tenantId,
       sourceModule: 'inspection' as const,
       subjectKind: 'per_record' as const,
@@ -724,7 +738,7 @@ export function buildDemoHotelSeedPlan(anchor = new Date()) {
     })),
   ]
   const complianceStatuses = complianceStates.map((status, index) => ({
-    id: demoId(`compliance-status:${index + 1}`),
+    id: id(`compliance-status:${index + 1}`),
     tenantId,
     obligationId: complianceObligations[index]!.id,
     personId: null,
@@ -750,15 +764,15 @@ export function buildDemoHotelSeedPlan(anchor = new Date()) {
     ['HVAC-001', 'Main air-handling unit', 'in_service'],
     ['GEN-001', 'Emergency standby generator', 'out_of_service'],
   ].map(([assetTag, name, status], index) => ({
-    id: demoId(`equipment:${index + 1}`),
+    id: id(`equipment:${index + 1}`),
     tenantId,
-    typeId: demoId('equipment-type'),
-    categoryId: demoId('equipment-category'),
+    typeId: id('equipment-type'),
+    categoryId: id('equipment-category'),
     assetTag: assetTag!,
     serialNumber: `DEMO-${1000 + index}`,
     name: name!,
     description: 'Hotel engineering asset.',
-    qrToken: demoToken(`equipment:${index + 1}`),
+    qrToken: token(`equipment:${index + 1}`),
     status: status as 'in_service' | 'in_repair' | 'out_of_service',
     isDraft: false,
     ownership: 'owned' as const,
@@ -787,7 +801,7 @@ export function buildDemoHotelSeedPlan(anchor = new Date()) {
       -40,
     ],
   ].map(([reference, type, severity, status, title, days], index) => ({
-    id: demoId(`incident:${index + 1}`),
+    id: id(`incident:${index + 1}`),
     tenantId,
     reference: reference as string,
     type: type as 'near_miss' | 'injury' | 'property_damage',
@@ -834,7 +848,7 @@ export function buildDemoHotelSeedPlan(anchor = new Date()) {
       previousMonthStart,
     ],
   ].map(([kind, periodStart, periodEnd], index) => ({
-    id: demoId(`signoff:${index + 1}`),
+    id: id(`signoff:${index + 1}`),
     tenantId,
     propertyId,
     kind: kind as 'weekly' | 'monthly',
@@ -845,7 +859,7 @@ export function buildDemoHotelSeedPlan(anchor = new Date()) {
       completed: 6,
       overdue: 1,
       incomplete: 2,
-      demoSeedKey: DEMO_HOTEL_SEED_KEY,
+      demoSeedKey: seedKey,
     },
     comments: 'Reviewed by management; outstanding items assigned and tracked.',
     confirmedAt: new Date((periodEnd as Date).getTime() + 3_600_000),

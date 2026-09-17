@@ -13,6 +13,7 @@ import {
 } from '@beaconhs/db/schema'
 import Link from 'next/link'
 import { requireRequestContext } from '@/lib/auth'
+import { assertCanAccessProperty } from '@/lib/hospitality/property-access'
 import { assertTenantModuleEntitled, loadEnabledModuleKeys } from '@/lib/module-entitlements/server'
 import { assertCan, can } from '@beaconhs/tenant'
 import {
@@ -38,6 +39,7 @@ export default async function RoomPage({
   const ctx = await requireRequestContext()
   await assertTenantModuleEntitled(ctx, 'hospitality.properties')
   assertCan(ctx, 'hospitality.read')
+  assertCanAccessProperty(ctx, propertyId)
   const modules = await loadEnabledModuleKeys(ctx)
   const maintenanceEnabled = modules.has('hospitality.maintenance')
 

@@ -107,6 +107,7 @@ function fixture({ visible = true, manage = true, total = 31, room = true } = {}
   const ctx = {
     tenantId: tenant,
     isSuperAdmin: false,
+    scopes: [{ type: 'tenant' as const }],
     permissions: new Set(
       manage ? ['hospitality.read', 'hospitality.manage'] : ['hospitality.read'],
     ),

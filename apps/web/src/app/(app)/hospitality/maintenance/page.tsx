@@ -1,6 +1,6 @@
 import { and, count, desc, eq, ilike, isNull, or } from 'drizzle-orm'
 import Link from 'next/link'
-import { EmptyState, PageHeader } from '@beaconhs/ui'
+import { Button, EmptyState, PageHeader } from '@beaconhs/ui'
 import {
   hospitalityBuildings,
   hospitalityFloors,
@@ -19,6 +19,7 @@ import { MAINTENANCE_STATUSES, type MaintenanceStatus } from '@/lib/hospitality/
 import { parseListParams, pickString } from '@/lib/list-params'
 import { assertTenantModuleEntitled } from '@/lib/module-entitlements/server'
 import { assertCan } from '@beaconhs/tenant'
+import { hospitalityPropertyWhere } from '@/lib/hospitality/property-access'
 
 const BASE = '/hospitality/maintenance'
 
@@ -47,6 +48,7 @@ export default async function MaintenanceQueue({
     isNull(hospitalityFloors.deletedAt),
     isNull(hospitalityBuildings.deletedAt),
     isNull(hospitalityProperties.deletedAt),
+    hospitalityPropertyWhere(ctx, hospitalityProperties.id),
     status ? eq(maintenanceIssues.status, status) : undefined,
     params.q
       ? or(
@@ -138,6 +140,13 @@ export default async function MaintenanceQueue({
       <PageHeader
         title={translateValue('Maintenance queue')}
         description={translateValue('Guest and staff issues across active hotel rooms.')}
+        actions={
+          <Button asChild>
+            <Link href="/hospitality/maintenance/report">
+              {translateValue('+ Report maintenance issue')}
+            </Link>
+          </Button>
+        }
       />
       <TableToolbar className="mt-4">
         <SearchInput placeholder={translateValue('Search reference, issue, room or property…')} />

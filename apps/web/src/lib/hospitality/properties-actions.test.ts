@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
   archive: vi.fn(),
   provisionQr: vi.fn(),
   rotateQr: vi.fn(),
+  createIssue: vi.fn(),
   revalidate: vi.fn(),
   redirect: vi.fn(),
 }))
@@ -24,7 +25,7 @@ vi.mock('@/lib/hospitality/properties', () => ({
   updateRoom: vi.fn(),
 }))
 vi.mock('@/lib/hospitality/maintenance', () => ({
-  createRoomMaintenanceIssue: vi.fn(),
+  createRoomMaintenanceIssue: mocks.createIssue,
   updateMaintenanceIssue: vi.fn(),
 }))
 vi.mock('@/lib/hospitality/room-qr', () => ({
@@ -36,6 +37,7 @@ import {
   archivePropertyAction,
   createPropertyAction,
   provisionRoomQrAction,
+  reportMaintenanceIssueAction,
   rotateRoomQrAction,
 } from '../../app/(app)/hospitality/properties/actions'
 
@@ -90,6 +92,31 @@ describe('property workflow actions', () => {
     )
     expect(mocks.archive).not.toHaveBeenCalled()
   })
+  it('creates the quick Front Office report in the shared maintenance engine with source attribution', async () => {
+    const roomId = '20000000-0000-4000-8000-000000000004'
+    mocks.createIssue.mockResolvedValueOnce({ id: 'issue-1' })
+    await expect(
+      reportMaintenanceIssueAction(
+        form({
+          propertyId: id,
+          roomId,
+          title: 'Blocked sink',
+          description: 'Water drains slowly.',
+          priority: 'high',
+          source: 'front_office',
+        }),
+      ),
+    ).rejects.toThrow('Redirect /hospitality/maintenance/issue-1')
+    expect(mocks.createIssue).toHaveBeenCalledWith(
+      context,
+      roomId,
+      'Blocked sink',
+      'Water drains slowly.',
+      'high',
+      'front_office',
+    )
+  })
+
   it('provisions and rotates a room QR in the authenticated tenant context', async () => {
     const route = {
       propertyId: id,

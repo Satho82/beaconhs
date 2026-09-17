@@ -19,6 +19,7 @@ import { MAINTENANCE_STATUSES } from '@/lib/hospitality/maintenance'
 import { assertTenantModuleEntitled } from '@/lib/module-entitlements/server'
 import { assertCan, can } from '@beaconhs/tenant'
 import { updateMaintenanceIssueAction } from '../../properties/actions'
+import { hospitalityPropertyWhere } from '@/lib/hospitality/property-access'
 
 export default async function IssuePage({ params }: { params: Promise<{ issueId: string }> }) {
   const [translateHospitality, translateValue] = await Promise.all([
@@ -67,7 +68,13 @@ export default async function IssuePage({ params }: { params: Promise<{ issueId:
           eq(hospitalityProperties.id, hospitalityBuildings.propertyId),
         ),
       )
-      .where(and(eq(maintenanceIssues.tenantId, ctx.tenantId), eq(maintenanceIssues.id, issueId)))
+      .where(
+        and(
+          eq(maintenanceIssues.tenantId, ctx.tenantId),
+          eq(maintenanceIssues.id, issueId),
+          hospitalityPropertyWhere(ctx, hospitalityProperties.id),
+        ),
+      )
       .limit(1)
     const members = await tx
       .select({ id: tenantUsers.id, name: tenantUsers.displayName, email: users.email })

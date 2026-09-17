@@ -9,6 +9,7 @@ import {
 import { assertCan, type RequestContext } from '@beaconhs/tenant'
 import { assertTenantModuleEntitled } from '@/lib/module-entitlements/server'
 import { recordAudit } from '@/lib/audit'
+import { assertCanAccessProperty } from './property-access'
 
 async function gate(ctx: RequestContext, write = false) {
   await assertTenantModuleEntitled(ctx, 'hospitality.diary')
@@ -22,6 +23,7 @@ export async function signoffSummary(
   now = new Date(),
 ) {
   await gate(ctx)
+  assertCanAccessProperty(ctx, propertyId)
   const { start, end } = signoffPeriod(kind, now)
   const rows = await ctx.db((tx) =>
     tx
@@ -61,6 +63,7 @@ export async function confirmSignoff(
   now = new Date(),
 ) {
   await gate(ctx, true)
+  assertCanAccessProperty(ctx, propertyId)
   const membershipId = ctx.membership?.id
   if (!membershipId) throw new Error('A tenant membership is required to sign off a period.')
   const cleanComments = comments.trim()
@@ -119,6 +122,7 @@ export async function listPropertySignoffs(
   offset: number,
 ) {
   await gate(ctx)
+  assertCanAccessProperty(ctx, propertyId)
   const where = and(
     eq(managerSignoffs.tenantId, ctx.tenantId),
     eq(managerSignoffs.propertyId, propertyId),

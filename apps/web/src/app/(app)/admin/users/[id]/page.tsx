@@ -541,6 +541,7 @@ export default async function AdminUserDetailPage({
                       </div>
                       <ScopePicker
                         sites={scopeOptions.sites}
+                        properties={scopeOptions.properties}
                         crews={scopeOptions.crews}
                         departments={scopeOptions.departments}
                         groups={scopeOptions.groups}

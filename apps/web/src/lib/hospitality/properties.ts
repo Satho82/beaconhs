@@ -1,7 +1,7 @@
 import { propertyInputSchema } from './property-input'
 import { isUuid, parseListParams } from '../list-params'
 import { and, asc, desc, count, eq, ilike, isNull, or } from 'drizzle-orm'
-import { assertCan, type RequestContext } from '@beaconhs/tenant'
+import { assertCan, assignedPropertyIds, type RequestContext } from '@beaconhs/tenant'
 import {
   hospitalityBuildings,
   hospitalityFloors,
@@ -11,6 +11,10 @@ import {
 import type { Database } from '@beaconhs/db'
 import { recordAudit, recordAuditInTransaction } from '@/lib/audit'
 import { assertTenantModuleEntitled } from '@/lib/module-entitlements/server'
+import {
+  assertCanAccessProperty,
+  hospitalityPropertyWhere,
+} from '@/lib/hospitality/property-access'
 
 type CreateProperty = { name: string; code: string; timezone: string }
 function clean(value: string, label: string) {
@@ -45,6 +49,7 @@ async function requireParent(
     .limit(1)
     .for('share')
   if (!row) throw new Error(`No ${label} exists in this tenant`)
+  if (table === hospitalityProperties) assertCanAccessProperty(ctx, row.id)
   // Keep ancestors active until the mutation commits, even during concurrent
   // archival. Follow stored parent links rather than submitted form values.
   if (table === hospitalityFloors) {
@@ -66,6 +71,7 @@ export async function listProperties(
   })
   const where = and(
     eq(hospitalityProperties.tenantId, ctx.tenantId),
+    hospitalityPropertyWhere(ctx, hospitalityProperties.id),
     isNull(hospitalityProperties.deletedAt),
     params.q
       ? or(
@@ -91,6 +97,8 @@ export async function listProperties(
 }
 export async function createProperty(ctx: RequestContext, input: CreateProperty) {
   await gate(ctx, true)
+  if (assignedPropertyIds(ctx) !== null)
+    throw new Error('Only management-company administrators can create properties.')
   const { name, code, timezone } = propertyInputSchema.parse(input)
   return ctx.db(async (tx) => {
     const [row] = await tx
@@ -309,6 +317,7 @@ export async function updateRoom(
 export async function archiveProperty(ctx: RequestContext, id: string) {
   await gate(ctx, true)
   if (!isUuid(id)) throw new Error('Invalid property identifier.')
+  assertCanAccessProperty(ctx, id)
   const [row] = await ctx.db((tx) =>
     tx
       .update(hospitalityProperties)

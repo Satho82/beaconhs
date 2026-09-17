@@ -13,6 +13,7 @@ import {
 import { PageContainer } from '@/components/page-layout'
 import { getGeneratedValueTranslations } from '@/i18n/generated.server'
 import { requireRequestContext } from '@/lib/auth'
+import { assertCanAccessProperty } from '@/lib/hospitality/property-access'
 import { isUuid } from '@/lib/list-params'
 import { assertTenantModuleEntitled } from '@/lib/module-entitlements/server'
 import { guestMaintenanceUrl } from '@/lib/hospitality/room-qr'
@@ -33,6 +34,7 @@ export default async function RoomQrPage({
   await assertTenantModuleEntitled(ctx, 'hospitality.properties')
   await assertTenantModuleEntitled(ctx, 'hospitality.maintenance')
   assertCan(ctx, 'hospitality.read')
+  assertCanAccessProperty(ctx, propertyId)
   const row = await ctx.db(async (tx) => {
     const [result] = await tx
       .select({

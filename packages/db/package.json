@@ -25,7 +25,8 @@
     "seed:demo-hotel": "tsx src/seed-demo-hotel.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "clean": "rm -rf dist .turbo"
+    "clean": "rm -rf dist .turbo",
+    "seed:cycas-demo": "tsx src/seed-cycas-demo.ts"
   },
   "dependencies": {
     "@braedonsaunders/appkit-reports": "^1.1.0",

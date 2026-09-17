@@ -11,6 +11,7 @@ import Link from 'next/link'
 import { Button, EmptyState, PageHeader, Input, Label } from '@beaconhs/ui'
 import { hospitalityBuildings, hospitalityProperties } from '@beaconhs/db/schema'
 import { requireRequestContext } from '@/lib/auth'
+import { assertCanAccessProperty } from '@/lib/hospitality/property-access'
 import { assertTenantModuleEntitled } from '@/lib/module-entitlements/server'
 import { loadEnabledModuleKeys } from '@/lib/module-entitlements/server'
 import { assertCan } from '@beaconhs/tenant'
@@ -31,6 +32,7 @@ export default async function PropertyDetail({
   const ctx = await requireRequestContext()
   await assertTenantModuleEntitled(ctx, 'hospitality.properties')
   assertCan(ctx, 'hospitality.read')
+  assertCanAccessProperty(ctx, id)
 
   const search = await searchParams
   const list = parseListParams(search, { sort: 'name', dir: 'asc', allowedSorts: ['name'] })

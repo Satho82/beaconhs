@@ -96,6 +96,7 @@ export default async function InviteUserPage({
 
               <ScopePicker
                 sites={scopeOptions.sites}
+                properties={scopeOptions.properties}
                 crews={scopeOptions.crews}
                 departments={scopeOptions.departments}
                 groups={scopeOptions.groups}

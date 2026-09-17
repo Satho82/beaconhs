@@ -38,6 +38,10 @@ export const maintenanceIssueStatus = pgEnum('maintenance_issue_status', [
 ])
 export const maintenanceIssueSource = pgEnum('maintenance_issue_source', [
   'staff',
+  'front_office',
+  'manager',
+  'engineering',
+  'staff_qr',
   'guest_qr',
   'inspection',
   'scheduled_task',

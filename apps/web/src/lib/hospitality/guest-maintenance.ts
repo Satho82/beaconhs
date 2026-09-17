@@ -18,14 +18,14 @@ const TOKEN_PATTERN = /^[A-Za-z0-9_-]{43}$/
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 const priorities = new Set(['low', 'medium', 'high'])
 
-export type GuestRoomTarget = {
+type GuestRoomTarget = {
   tenantId: string
   roomId: string
   roomCode: string
   roomName: string | null
   propertyName: string
 }
-export type GuestMaintenanceInput = {
+type GuestMaintenanceInput = {
   token: string
   submissionId: string
   category: string

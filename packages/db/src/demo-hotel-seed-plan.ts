@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto'
 export const DEMO_HOTEL_TENANT_SLUG = 'uvanoo-demo-hotel'
 export const DEMO_HOTEL_SEED_KEY = 'uvanoo-demo-hotel-v1'
 
-export type DemoHotelSeedEnvironment = {
+type DemoHotelSeedEnvironment = {
   UVANOO_DEMO_SEED_TARGET?: string
   UVANOO_DEMO_SEED_CONFIRM?: string
   DATABASE_URL?: string
@@ -23,7 +23,7 @@ export function demoId(key: string): string {
   return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`
 }
 
-export function demoToken(key: string): string {
+function demoToken(key: string): string {
   return createHash('sha256').update(`${DEMO_HOTEL_SEED_KEY}:token:${key}`).digest('base64url')
 }
 
@@ -941,5 +941,3 @@ export function buildDemoHotelSeedPlan(anchor = new Date()) {
     expected,
   }
 }
-
-export type DemoHotelSeedPlan = ReturnType<typeof buildDemoHotelSeedPlan>

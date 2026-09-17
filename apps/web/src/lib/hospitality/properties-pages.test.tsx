@@ -89,6 +89,7 @@ function fixture({ visible = true, manage = true, total = 0 } = {}) {
     tenantId: tenant,
     timezone: 'UTC',
     isSuperAdmin: false,
+    scopes: [{ type: 'tenant' }],
     permissions: new Set(
       manage ? ['hospitality.read', 'hospitality.manage'] : ['hospitality.read'],
     ),

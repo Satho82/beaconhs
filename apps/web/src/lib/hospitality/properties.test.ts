@@ -148,7 +148,7 @@ function fixture(permissions = ['hospitality.manage', 'hospitality.read']) {
     localeOverride: null,
     membership: null,
     personId: null,
-    scopes: [],
+    scopes: [{ type: 'tenant' }],
     permissions: new Set(permissions),
     db: db as RequestContext['db'],
   }

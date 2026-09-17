@@ -135,8 +135,8 @@ jobs:
             DEPLOYMENT_VERSION=${{ github.sha }}
           secrets: |
             next_server_actions_key=${{ secrets.UVANOO_STAGING_SERVER_ACTIONS_KEY }}
-          cache-from: type=gha,scope=uvanoo-staging
-          cache-to: type=gha,mode=max,scope=uvanoo-staging
+          # Next embeds the action key in build output; keep layers out of
+          # public-repository Actions caches accessible from pull requests.
       - name: Record immutable staging image
         env:
           IMAGE_DIGEST: ${{ steps.build.outputs.digest }}

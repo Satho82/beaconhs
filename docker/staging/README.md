@@ -1,4 +1,37 @@
-# Uvanoo isolated staging readiness package
+# Uvanoo staging
+
+## Validated staging releases
+
+The feature branch `feature/uvanoo-phase-1-foundation` is validated by
+`.github/workflows/uvanoo-validation.yml`. After every validation gate passes,
+a separate GitHub-hosted job builds the exact commit for linux/amd64 and publishes
+`ghcr.io/satho82/uvanoo-staging-app:<full-commit-sha>`. It records the immutable
+image digest in the run summary. The workflow does not deploy, run staging
+migrations, or access the VPS. Keep the container package private.
+
+Before running the image job, configure repository Actions secret
+`UVANOO_STAGING_SERVER_ACTIONS_KEY` with the existing staging build key. Supply it
+directly from the protected staging key file; do not print it, commit it, use a
+production key, or pass it as a build argument. BuildKit mounts it as
+`next_server_actions_key`. The VPS needs authenticated read access to the package.
+
+For an authorized staging upgrade, confirm the source SHA and successful run,
+record the current app image/version, verify staging backups, and pull the new
+image by digest. Use the inspected live staging Compose file and environment,
+not this initial-provisioning template. Update only the staging app image/version
+and recreate the existing staging app roles with `--no-deps`. Do not rerun seeds;
+review migration differences before considering any schema operation. Retain the
+previous image and environment for rollback.
+
+Verify readiness/version, web and worker health, HTTPS at `app.frekatio.co.uk`,
+the fallback `staging.uvanoo.com`, and GM login/Training access before declaring a
+release complete. Image publication alone is not a deployment.
+
+## Historical initial-provisioning plan
+
+The following checkpoint describes the original preparation batch, not the
+current live deployment. Its uncommitted-source inventory and capacity figures
+must not be used as the state of a later release.
 
 **Preparation only. Nothing has been deployed or provisioned.** This template
 requires hostname/routing decisions, reviewed image digests, unique credentials,

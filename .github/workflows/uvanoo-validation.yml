@@ -1,4 +1,4 @@
-name: Uvanoo validation (no deployment)
+name: Uvanoo validation and staging image (no deployment)
 
 permissions:
   contents: read
@@ -93,3 +93,53 @@ jobs:
         run: pnpm --filter @beaconhs/db exec tsx src/migrate.ts
       - run: pnpm test
       - run: pnpm build
+  image:
+    name: Build staging image
+    needs: ci
+    if: github.ref == 'refs/heads/feature/uvanoo-phase-1-foundation'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
+      - name: Require staging Server Actions key
+        env:
+          STAGING_SERVER_ACTIONS_KEY: ${{ secrets.UVANOO_STAGING_SERVER_ACTIONS_KEY }}
+        run: |
+          if [ -z "$STAGING_SERVER_ACTIONS_KEY" ]; then
+            echo 'Configure UVANOO_STAGING_SERVER_ACTIONS_KEY before building staging.' >&2
+            exit 1
+          fi
+      - uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c
+      - uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and publish staging image
+        id: build
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          tags: ghcr.io/satho82/uvanoo-staging-app:${{ github.sha }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/Satho82/beaconhs
+            org.opencontainers.image.revision=${{ github.sha }}
+          build-args: |
+            DEPLOYMENT_VERSION=${{ github.sha }}
+          secrets: |
+            next_server_actions_key=${{ secrets.UVANOO_STAGING_SERVER_ACTIONS_KEY }}
+          cache-from: type=gha,scope=uvanoo-staging
+          cache-to: type=gha,mode=max,scope=uvanoo-staging
+      - name: Record immutable staging image
+        env:
+          IMAGE_DIGEST: ${{ steps.build.outputs.digest }}
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          printf 'Source: `%s`\n\nImage: `ghcr.io/satho82/uvanoo-staging-app@%s`\n' "$SOURCE_SHA" "$IMAGE_DIGEST" >> "$GITHUB_STEP_SUMMARY"

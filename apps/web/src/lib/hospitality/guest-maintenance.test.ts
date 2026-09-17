@@ -85,6 +85,8 @@ describe('guest room maintenance input', () => {
   it.each([
     [{ ...valid, token: 'room-101' }, 'invalid'],
     [{ ...valid, submissionId: 'not-a-uuid' }, 'refresh'],
+    [{ ...valid, submissionId: '10000000-0000-1000-8000-000000000001' }, 'refresh'],
+    [{ ...valid, submissionId: '10000000-0000-4000-7000-000000000001' }, 'refresh'],
     [{ ...valid, description: 'no' }, 'detail'],
     [{ ...valid, priority: 'critical' }, 'urgency'],
   ])('rejects invalid public input', (input, message) => {

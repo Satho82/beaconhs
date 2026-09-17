@@ -13,9 +13,9 @@ import {
 } from '@beaconhs/db/schema'
 import { db, withSuperAdmin, withTenant } from '@beaconhs/db'
 import { consumeRateLimit } from '@beaconhs/jobs/rate-limit'
+import { isUuid } from '@/lib/list-params'
 
 const TOKEN_PATTERN = /^[A-Za-z0-9_-]{43}$/
-const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 const priorities = new Set(['low', 'medium', 'high'])
 
 type GuestRoomTarget = {
@@ -64,7 +64,11 @@ export function parseGuestMaintenanceInput(input: Record<string, unknown>): Gues
     website: bounded(input.website, 200),
   }
   if (!isRoomQrToken(parsed.token)) throw new Error('This room QR code is invalid.')
-  if (!UUID_PATTERN.test(parsed.submissionId))
+  if (
+    !isUuid(parsed.submissionId) ||
+    parsed.submissionId[14] !== '4' ||
+    !'89ab'.includes(parsed.submissionId[19]!.toLowerCase())
+  )
     throw new Error('Please refresh the page and try again.')
   if (!parsed.category) throw new Error('Choose the type of issue.')
   if (parsed.description.length < 5) throw new Error('Please add a little more detail.')

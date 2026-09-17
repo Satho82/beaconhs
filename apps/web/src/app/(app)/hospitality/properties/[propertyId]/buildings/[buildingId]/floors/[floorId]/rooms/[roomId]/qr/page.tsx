@@ -26,8 +26,9 @@ export default async function RoomQrPage({
   params: Promise<{ propertyId: string; buildingId: string; floorId: string; roomId: string }>
 }) {
   const translateValue = await getGeneratedValueTranslations()
-  const p = await params
-  if (Object.values(p).some((value) => !isUuid(value))) notFound()
+  const { propertyId, buildingId, floorId, roomId } = await params
+  const p = { propertyId, buildingId, floorId, roomId }
+  if (!isUuid(propertyId) || !isUuid(buildingId) || !isUuid(floorId) || !isUuid(roomId)) notFound()
   const ctx = await requireRequestContext()
   await assertTenantModuleEntitled(ctx, 'hospitality.properties')
   await assertTenantModuleEntitled(ctx, 'hospitality.maintenance')

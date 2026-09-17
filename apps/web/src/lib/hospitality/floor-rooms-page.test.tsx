@@ -3,10 +3,11 @@ import { Children, isValidElement, type ReactNode } from 'react'
 import { getTableName, type SQL } from 'drizzle-orm'
 import { PgDialect } from 'drizzle-orm/pg-core'
 
-const mocks = vi.hoisted(() => ({ auth: vi.fn(), entitlement: vi.fn() }))
+const mocks = vi.hoisted(() => ({ auth: vi.fn(), entitlement: vi.fn(), modules: vi.fn() }))
 vi.mock('@/lib/auth', () => ({ requireRequestContext: mocks.auth }))
 vi.mock('@/lib/module-entitlements/server', () => ({
   assertTenantModuleEntitled: mocks.entitlement,
+  loadEnabledModuleKeys: mocks.modules,
 }))
 vi.mock('@/i18n/generated.server', () => ({
   getGeneratedTranslations: async () => (key: string) => key,
@@ -33,9 +34,12 @@ vi.mock('@/app/(app)/hospitality/properties/actions', () => ({
   updateFloorAction: vi.fn(),
   updateRoomAction: vi.fn(),
   reportMaintenanceIssueAction: vi.fn(),
+  provisionRoomQrAction: vi.fn(),
+  rotateRoomQrAction: vi.fn(),
 }))
 import FloorPage from '@/app/(app)/hospitality/properties/[propertyId]/buildings/[buildingId]/floors/[floorId]/page'
 import RoomPage from '@/app/(app)/hospitality/properties/[propertyId]/buildings/[buildingId]/floors/[floorId]/rooms/[roomId]/page'
+import RoomQrPage from '@/app/(app)/hospitality/properties/[propertyId]/buildings/[buildingId]/floors/[floorId]/rooms/[roomId]/qr/page'
 
 const tenant = '10000000-0000-4000-8000-000000000001'
 const propertyId = '20000000-0000-4000-8000-000000000001'
@@ -119,6 +123,7 @@ const page = (search: Record<string, string | string[] | undefined> = {}, floor 
 beforeEach(() => {
   vi.clearAllMocks()
   mocks.entitlement.mockResolvedValue(undefined)
+  mocks.modules.mockResolvedValue(new Set(['hospitality.maintenance']))
 })
 
 describe('floor room and apartment browsing', () => {
@@ -247,7 +252,9 @@ function roomFixture(visible = true) {
           },
           where: (condition: SQL) => {
             queries.push(dialect.sqlToQuery(condition))
-            if (getTableName(table) === 'maintenance_issues') return Promise.resolve([])
+            if (getTableName(table) === 'maintenance_issues')
+              return { orderBy: () => ({ limit: async () => [] }) }
+            if (getTableName(table) === 'qr_targets') return { limit: async () => [] }
             return {
               limit: async () =>
                 visible
@@ -283,6 +290,12 @@ const roomPage = (
 ) =>
   RoomPage({ params: Promise.resolve({ propertyId, buildingId, floorId, roomId, ...overrides }) })
 describe('room detail ancestor protection', () => {
+  it('does not load maintenance or QR data when the module is disabled', async () => {
+    const f = roomFixture()
+    mocks.modules.mockResolvedValue(new Set())
+    await roomPage()
+    expect(f.queries).toHaveLength(1)
+  })
   it('joins the full tenant-bound hierarchy and excludes every archived ancestor', async () => {
     const f = roomFixture()
     const rendered = nodes(await roomPage())
@@ -303,7 +316,10 @@ describe('room detail ancestor protection', () => {
     expect(f.joins[2]?.sql).toContain(
       '"hospitality_properties"."id" = "hospitality_buildings"."property_id"',
     )
+    expect(f.queries[1]?.sql).toContain('qr_targets')
     expect(f.queries[1]?.params).toEqual([tenant, roomId])
+    expect(f.queries[2]?.sql).toContain('maintenance_issues')
+    expect(f.queries[2]?.params).toEqual([tenant, roomId])
   })
   it('returns 404 and never loads issues when no active matching hierarchy exists', async () => {
     const f = roomFixture(false)
@@ -327,4 +343,20 @@ describe('room detail ancestor protection', () => {
     await expect(roomPage()).rejects.toThrow('disabled')
     expect(f.ctx.db).not.toHaveBeenCalled()
   })
+})
+
+describe('room QR route guards', () => {
+  it.each(['propertyId', 'buildingId', 'floorId', 'roomId'])(
+    'rejects invalid %s before authentication or data access',
+    async (key) => {
+      const f = roomFixture()
+      await expect(
+        RoomQrPage({
+          params: Promise.resolve({ propertyId, buildingId, floorId, roomId, [key]: 'invalid' }),
+        }),
+      ).rejects.toThrow('404')
+      expect(mocks.auth).not.toHaveBeenCalled()
+      expect(f.ctx.db).not.toHaveBeenCalled()
+    },
+  )
 })

@@ -133,6 +133,7 @@ jobs:
             org.opencontainers.image.revision=${{ github.sha }}
           build-args: |
             DEPLOYMENT_VERSION=${{ github.sha }}
+            BUILD_NODE_HEAP_MB=8192
           secrets: |
             next_server_actions_key=${{ secrets.UVANOO_STAGING_SERVER_ACTIONS_KEY }}
           # Next embeds the action key in build output; keep layers out of

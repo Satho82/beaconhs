@@ -6,7 +6,9 @@ The feature branch `feature/uvanoo-phase-1-foundation` is validated by
 `.github/workflows/uvanoo-validation.yml`. After every validation gate passes,
 a separate GitHub-hosted job builds the exact commit for linux/amd64 and publishes
 `ghcr.io/satho82/uvanoo-staging-app:<full-commit-sha>`. It records the immutable
-image digest in the run summary. The workflow does not deploy, run staging
+image digest in the run summary. The image job sets `BUILD_NODE_HEAP_MB=8192`,
+matching the successful validation build; this affects only the off-host builder,
+not runtime container memory. The workflow does not deploy, run staging
 migrations, or access the VPS. Keep the container package private.
 
 Before running the image job, configure repository Actions secret

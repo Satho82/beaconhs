@@ -31,7 +31,8 @@ RUN printf '%s' "$DEPLOYMENT_VERSION" | grep -Eq '^[0-9a-f]{40}$'
 # The production type-analysis graph now exceeds V8's container default heap
 # on clean BuildKit workers. Keep the larger ceiling in the builder only; the
 # runtime image retains Node's normal memory policy.
-ENV NODE_OPTIONS=--max-old-space-size=4096
+ARG BUILD_NODE_HEAP_MB=4096
+ENV NODE_OPTIONS=--max-old-space-size=${BUILD_NODE_HEAP_MB}
 COPY . .
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
     pnpm install --frozen-lockfile

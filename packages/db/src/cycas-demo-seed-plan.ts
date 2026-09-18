@@ -318,7 +318,7 @@ export function buildCycasDemoSeedPlan(anchor = new Date()) {
   }
 }
 
-export type CycasDemoAccount = {
+type CycasDemoAccount = {
   email: string
   userId: string
 }

@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { assertCycasSeedEnvironment, buildCycasDemoSeedPlan, cycasId } from './cycas-demo-seed-plan'
+import {
+  assertCycasSeedEnvironment,
+  buildCycasDemoSeedPlan,
+  cycasId,
+  findCycasDemoIdentityCollisions,
+  getCycasDemoAccounts,
+} from './cycas-demo-seed-plan'
 
 const anchor = new Date('2026-09-17T12:00:00.000Z')
 
@@ -33,10 +39,35 @@ describe('Cycas Hospitality portfolio seed plan', () => {
     expect(plan.staff.filter((member) => member.key === 'cluster-gm')).toHaveLength(1)
   })
 
+  it('uses a deterministic Cycas-only namespace with no internal or Demo Hotel collisions', () => {
+    const plan = buildCycasDemoSeedPlan(anchor)
+    const accounts = getCycasDemoAccounts(plan)
+    const contractors = [...plan.hotels.fenchurch.contractors, ...plan.hotels.lincoln.contractors]
+    const allPeopleEmails = [...accounts, ...contractors].map((identity) => identity.email)
+    expect(accounts).toHaveLength(18)
+    expect(contractors).toHaveLength(6)
+    expect(new Set(allPeopleEmails).size).toBe(allPeopleEmails.length)
+    expect(allPeopleEmails.every((email) => email.endsWith('@cycas.demo.uvanoo.invalid'))).toBe(
+      true,
+    )
+    expect(allPeopleEmails).not.toContain('gm@demo.uvanoo.invalid')
+    const existingDemoHotelAccounts = ['gm', 'maintenance', 'duty', 'engineer', 'front-office'].map(
+      (key) => ({ email: `${key}@demo.uvanoo.invalid`, userId: `existing-${key}` }),
+    )
+    expect(findCycasDemoIdentityCollisions(accounts, existingDemoHotelAccounts)).toEqual([])
+    expect(
+      findCycasDemoIdentityCollisions(accounts, [
+        { email: accounts[0]!.email, userId: 'not-the-seed-owned-id' },
+      ]),
+    ).toEqual([{ email: accounts[0]!.email, userId: 'not-the-seed-owned-id' }])
+  })
+
   it('contains meaningful, varied operations and H&S registry records for both hotels', () => {
     const plan = buildCycasDemoSeedPlan(anchor)
-    expect(plan.hotels.fenchurch.maintenanceIssues.length).toBeGreaterThanOrEqual(10)
-    expect(plan.hotels.lincoln.maintenanceIssues.length).toBeGreaterThanOrEqual(10)
+    expect(plan.expected.rooms).toEqual({ fenchurch: 33, lincoln: 33 })
+    expect(plan.expected.maintenanceIssues).toEqual({ fenchurch: 12, lincoln: 12 })
+    expect(plan.expected.operationalRecords).toEqual({ fenchurch: 21, lincoln: 21 })
+    expect(plan.expected.users).toBe(18)
     expect(plan.expected.complianceRegistry).toEqual({ fenchurch: 22, lincoln: 22 })
     for (const property of plan.properties) {
       const records = plan.registry.filter((record) => record.propertyId === property.id)

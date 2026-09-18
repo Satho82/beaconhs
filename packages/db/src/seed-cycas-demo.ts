@@ -44,6 +44,8 @@ import {
   CYCAS_DEMO_SEED_KEY,
   CYCAS_DEMO_TENANT_SLUG,
   cycasId,
+  findCycasDemoIdentityCollisions,
+  getCycasDemoAccounts,
 } from './cycas-demo-seed-plan'
 
 config({ path: new URL('../../../.env', import.meta.url), quiet: true })
@@ -70,16 +72,7 @@ if (process.env.UVANOO_CYCAS_SEED_DRY_RUN === '1') {
 
 const { db, sql: pg } = createSuperClient()
 const hotels = [plan.hotels.fenchurch, plan.hotels.lincoln]
-const supportingStaff = hotels.flatMap((hotel) => hotel.staff)
-const allAccounts = [
-  ...plan.staff,
-  ...supportingStaff.map((member) => ({
-    ...member,
-    propertyIds: [] as string[],
-    roleKey: 'restricted',
-  })),
-]
-const uniqueAccounts = [...new Map(allAccounts.map((member) => [member.userId, member])).values()]
+const uniqueAccounts = getCycasDemoAccounts(plan)
 
 async function verifyOwnership() {
   const [existing] = await db
@@ -97,9 +90,14 @@ async function verifyOwnership() {
     .select({ id: users.id, email: users.email })
     .from(users)
     .where(inArray(users.email, [...expectedUsers.keys()]))
-  for (const collision of collisions)
-    if (collision.id !== expectedUsers.get(collision.email))
-      throw new Error(`Refusing to seed: demo email ${collision.email} belongs to another user`)
+  const ownershipConflicts = findCycasDemoIdentityCollisions(
+    uniqueAccounts,
+    collisions.map((collision) => ({ email: collision.email, userId: collision.id })),
+  )
+  if (ownershipConflicts[0])
+    throw new Error(
+      `Refusing to seed: demo email ${ownershipConflicts[0].email} belongs to another user`,
+    )
 }
 
 async function seed() {

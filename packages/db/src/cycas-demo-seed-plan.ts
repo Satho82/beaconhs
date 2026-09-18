@@ -96,19 +96,44 @@ const permissions = {
   restricted: ['hospitality.read', 'maintenance.read', 'operational_tasks.read'],
 } as const
 
+const CYCAS_DEMO_EMAIL_DOMAIN = 'cycas.demo.uvanoo.invalid'
+
+function namespaceHotelIdentities(
+  hotel: ReturnType<typeof buildDemoHotelSeedPlan>,
+  property: 'fenchurch' | 'lincoln',
+): ReturnType<typeof buildDemoHotelSeedPlan> {
+  return {
+    ...hotel,
+    staff: hotel.staff.map((member) => ({
+      ...member,
+      email: `${property}.${member.key}@${CYCAS_DEMO_EMAIL_DOMAIN}`,
+    })),
+    contractors: hotel.contractors.map((contractor) => ({
+      ...contractor,
+      email: `${property}.${contractor.key}@${CYCAS_DEMO_EMAIL_DOMAIN}`,
+    })),
+  }
+}
+
 export function buildCycasDemoSeedPlan(anchor = new Date()) {
   const tenantId = cycasId('tenant')
-  const fenchurch = buildDemoHotelSeedPlan(anchor, {
-    seedKey: CYCAS_DEMO_SEED_KEY,
-    tenantId,
-    namespace: 'fenchurch',
-  })
+  const fenchurch = namespaceHotelIdentities(
+    buildDemoHotelSeedPlan(anchor, {
+      seedKey: CYCAS_DEMO_SEED_KEY,
+      tenantId,
+      namespace: 'fenchurch',
+    }),
+    'fenchurch',
+  )
   const lincolnAnchor = new Date(anchor.getTime() + 5 * 86_400_000)
-  const lincoln = buildDemoHotelSeedPlan(lincolnAnchor, {
-    seedKey: CYCAS_DEMO_SEED_KEY,
-    tenantId,
-    namespace: 'lincoln',
-  })
+  const lincoln = namespaceHotelIdentities(
+    buildDemoHotelSeedPlan(lincolnAnchor, {
+      seedKey: CYCAS_DEMO_SEED_KEY,
+      tenantId,
+      namespace: 'lincoln',
+    }),
+    'lincoln',
+  )
   const properties = [
     {
       id: fenchurch.propertyId,
@@ -191,7 +216,7 @@ export function buildCycasDemoSeedPlan(anchor = new Date()) {
     userId: cycasId(`user:${key}`),
     tenantUserId: cycasId(`member:${key}`),
     personId: cycasId(`person:${key}`),
-    email: `${key}@cycas-demo.uvanoo.invalid`,
+    email: `${key}@${CYCAS_DEMO_EMAIL_DOMAIN}`,
     firstName,
     lastName,
     title,
@@ -273,7 +298,7 @@ export function buildCycasDemoSeedPlan(anchor = new Date()) {
       managementCompanies: 1,
       properties: 2,
       propertyNames: properties.map((property) => property.name),
-      users: staff.length,
+      users: staff.length + fenchurch.staff.length + lincoln.staff.length,
       clusterGmPropertyAssignments: 2,
       rooms: { fenchurch: fenchurch.rooms.length, lincoln: lincoln.rooms.length },
       maintenanceIssues: {
@@ -291,4 +316,25 @@ export function buildCycasDemoSeedPlan(anchor = new Date()) {
       },
     },
   }
+}
+
+export type CycasDemoAccount = {
+  email: string
+  userId: string
+}
+
+export function getCycasDemoAccounts(plan: ReturnType<typeof buildCycasDemoSeedPlan>) {
+  const accounts = [...plan.staff, ...plan.hotels.fenchurch.staff, ...plan.hotels.lincoln.staff]
+  return [...new Map(accounts.map((account) => [account.userId, account])).values()]
+}
+
+export function findCycasDemoIdentityCollisions(
+  accounts: readonly CycasDemoAccount[],
+  existing: readonly CycasDemoAccount[],
+): CycasDemoAccount[] {
+  const expected = new Map(accounts.map((account) => [account.email, account.userId]))
+  return existing.filter((account) => {
+    const expectedId = expected.get(account.email)
+    return expectedId !== undefined && expectedId !== account.userId
+  })
 }

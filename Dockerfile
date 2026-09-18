@@ -36,12 +36,9 @@ ENV NODE_OPTIONS=--max-old-space-size=${BUILD_NODE_HEAP_MB}
 COPY . .
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
     pnpm install --frozen-lockfile
-# A stable Server Action key lets an action rendered immediately before a
-# rollout be decrypted by the replacement instance. BuildKit mounts the key
-# only for this command; it is not persisted as an image environment variable.
-RUN --mount=type=secret,id=next_server_actions_key,required=true \
-    NEXT_SERVER_ACTIONS_ENCRYPTION_KEY="$(cat /run/secrets/next_server_actions_key)" \
-    pnpm turbo run build --filter=@beaconhs/web --filter=@beaconhs/worker
+# Next generates a fresh Server Actions encryption key for each build. Deploy
+# this exact image digest to every replica so they share the same build output.
+RUN pnpm turbo run build --filter=@beaconhs/web --filter=@beaconhs/worker
 # `pnpm build` bundles the worker's first-party + @beaconhs/* code via esbuild,
 # leaving only real npm deps as external imports. Emit a prod-only deployment
 # with a HOISTED (flat) node_modules so those externals — including transitive

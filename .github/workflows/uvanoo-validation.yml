@@ -106,14 +106,6 @@ jobs:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           persist-credentials: false
-      - name: Require staging Server Actions key
-        env:
-          STAGING_SERVER_ACTIONS_KEY: ${{ secrets.UVANOO_STAGING_SERVER_ACTIONS_KEY }}
-        run: |
-          if [ -z "$STAGING_SERVER_ACTIONS_KEY" ]; then
-            echo 'Configure UVANOO_STAGING_SERVER_ACTIONS_KEY before building staging.' >&2
-            exit 1
-          fi
       - uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c
       - uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0
         with:
@@ -134,10 +126,8 @@ jobs:
           build-args: |
             DEPLOYMENT_VERSION=${{ github.sha }}
             BUILD_NODE_HEAP_MB=8192
-          secrets: |
-            next_server_actions_key=${{ secrets.UVANOO_STAGING_SERVER_ACTIONS_KEY }}
-          # Next embeds the action key in build output; keep layers out of
-          # public-repository Actions caches accessible from pull requests.
+          # Next generates a fresh Server Actions encryption key for this build.
+          # Every replica of the release must run this exact immutable digest.
       - name: Record immutable staging image
         env:
           IMAGE_DIGEST: ${{ steps.build.outputs.digest }}

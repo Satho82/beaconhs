@@ -11,11 +11,10 @@ matching the successful validation build; this affects only the off-host builder
 not runtime container memory. The workflow does not deploy, run staging
 migrations, or access the VPS. Keep the container package private.
 
-Before running the image job, configure repository Actions secret
-`UVANOO_STAGING_SERVER_ACTIONS_KEY` with the existing staging build key. Supply it
-directly from the protected staging key file; do not print it, commit it, use a
-production key, or pass it as a build argument. BuildKit mounts it as
-`next_server_actions_key`. The VPS needs authenticated read access to the package.
+The image build deliberately does not accept an externally managed Server Actions
+key. Next.js generates a fresh per-build key in its server output. Keep the GHCR
+package private and deploy the exact same immutable image digest to every web
+replica in a release. The VPS needs authenticated read access to the package.
 
 For an authorized staging upgrade, confirm the source SHA and successful run,
 record the current app image/version, verify staging backups, and pull the new
@@ -113,12 +112,13 @@ SMS, AI, push or integration credentials, database restores, or live customer da
    Dockerfile `DEPLOYMENT_VERSION` build argument. Record the base HEAD separately:
    do not label dirty source as if it were the unchanged base commit. Do not commit
    to or change the source VPS checkout as part of this procedure.
-5. The Dockerfile requires BuildKit secret `next_server_actions_key` (a separate,
-   newly generated staging Server Actions encryption key). Supply it via a secret
-   mount, never a build argument or checked-in file. The optional build argument
-   is `NEXT_PUBLIC_SENTRY_DSN`; leave it empty initially. Builds/installations
-   happen only in that later authorized builder. Pin all infrastructure images
-   to reviewed digests, including PostgreSQL 16 and Redis 7.4 family images.
+5. The Dockerfile lets Next.js generate a fresh Server Actions encryption key for
+   each build. Do not supply an external key by secret, environment variable, or
+   build argument. Deploy the same immutable digest to every replica in a release.
+   The optional build argument is `NEXT_PUBLIC_SENTRY_DSN`; leave it empty initially.
+   Builds/installations happen only in that later authorized builder. Pin all
+   infrastructure images to reviewed digests, including PostgreSQL 16 and Redis
+   7.4 family images.
 6. Record source archive hash, snapshot SHA, build inputs and resulting image
    digest. Set `STAGING_APP_IMAGE` to that digest and `DEPLOYMENT_VERSION` to the
    snapshot SHA; all three app roles use the same image. Keep the earlier staging

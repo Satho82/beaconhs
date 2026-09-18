@@ -106,6 +106,24 @@ jobs:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           persist-credentials: false
+      - name: Require private package before image build
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MANIFEST: sha256:18d290f5b0c3a026a58f6881326a41dfc4b37f7e939f1ca54f7a8636d5bc18ed
+        run: |
+          set -euo pipefail
+          package_url=https://api.github.com/users/Satho82/packages/container/uvanoo-staging-private
+          curl -q -fsS --max-time 30 -H "Authorization: Bearer $GH_TOKEN" "$package_url" \
+            | jq -e '.visibility == "private"' >/dev/null
+          for url in \
+            'https://ghcr.io/token?service=ghcr.io&scope=repository:satho82/uvanoo-staging-private:pull' \
+            "https://ghcr.io/v2/satho82/uvanoo-staging-private/manifests/$MANIFEST"; do
+            status="$(curl -q -sS --max-time 30 -o /dev/null -w '%{http_code}' "$url")"
+            case "$status" in
+              401|403) printf 'Anonymous access denied: HTTP %s\n' "$status" ;;
+              *) echo "::error::Private-package gate failed: HTTP $status"; exit 1 ;;
+            esac
+          done
       - uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c
       - uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0
         with:
@@ -119,7 +137,9 @@ jobs:
           context: .
           platforms: linux/amd64
           push: true
-          tags: ghcr.io/satho82/uvanoo-staging-app:${{ github.sha }}
+          no-cache: true
+          pull: true
+          tags: ghcr.io/satho82/uvanoo-staging-private:${{ github.sha }}
           labels: |
             org.opencontainers.image.source=https://github.com/Satho82/beaconhs
             org.opencontainers.image.revision=${{ github.sha }}
@@ -128,9 +148,27 @@ jobs:
             BUILD_NODE_HEAP_MB=8192
           # Next generates a fresh Server Actions encryption key for this build.
           # Every replica of the release must run this exact immutable digest.
+      - name: Verify candidate remains private
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MANIFEST: ${{ steps.build.outputs.digest }}
+        run: |
+          set -euo pipefail
+          package_url=https://api.github.com/users/Satho82/packages/container/uvanoo-staging-private
+          curl -q -fsS --max-time 30 -H "Authorization: Bearer $GH_TOKEN" "$package_url" \
+            | jq -e '.visibility == "private"' >/dev/null
+          for url in \
+            'https://ghcr.io/token?service=ghcr.io&scope=repository:satho82/uvanoo-staging-private:pull' \
+            "https://ghcr.io/v2/satho82/uvanoo-staging-private/manifests/$MANIFEST"; do
+            status="$(curl -q -sS --max-time 30 -o /dev/null -w '%{http_code}' "$url")"
+            case "$status" in
+              401|403) printf 'Anonymous access denied: HTTP %s\n' "$status" ;;
+              *) echo "::error::Private-package gate failed: HTTP $status"; exit 1 ;;
+            esac
+          done
       - name: Record immutable staging image
         env:
           IMAGE_DIGEST: ${{ steps.build.outputs.digest }}
           SOURCE_SHA: ${{ github.sha }}
         run: |
-          printf 'Source: `%s`\n\nImage: `ghcr.io/satho82/uvanoo-staging-app@%s`\n' "$SOURCE_SHA" "$IMAGE_DIGEST" >> "$GITHUB_STEP_SUMMARY"
+          printf 'Source: `%s`\n\nImage: `ghcr.io/satho82/uvanoo-staging-private@%s`\n' "$SOURCE_SHA" "$IMAGE_DIGEST" >> "$GITHUB_STEP_SUMMARY"

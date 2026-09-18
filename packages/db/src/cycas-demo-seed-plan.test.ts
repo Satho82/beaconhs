@@ -62,6 +62,65 @@ describe('Cycas Hospitality portfolio seed plan', () => {
     ).toEqual([{ email: accounts[0]!.email, userId: 'not-the-seed-owned-id' }])
   })
 
+  it('keeps room codes tenant-unique and every room QR target referentially valid', () => {
+    const plan = buildCycasDemoSeedPlan(anchor)
+    const hotels = Object.values(plan.hotels)
+    const rooms = hotels.flatMap((hotel) => hotel.rooms)
+    const roomKeys = new Set(rooms.map((room) => `${room.tenantId}:${room.id}`))
+    expect(new Set(rooms.map((room) => `${room.tenantId}:${room.code}`)).size).toBe(rooms.length)
+    const expectTenantUnique = (values: { tenantId: string; value: string }[]) =>
+      expect(new Set(values.map(({ tenantId, value }) => `${tenantId}:${value}`)).size).toBe(
+        values.length,
+      )
+    expectTenantUnique(
+      hotels.flatMap((hotel) =>
+        hotel.maintenanceIssues.map((issue) => ({
+          tenantId: issue.tenantId,
+          value: issue.reference,
+        })),
+      ),
+    )
+    expectTenantUnique(
+      hotels.flatMap((hotel) =>
+        hotel.workOrders.map((order) => ({
+          tenantId: order.tenantId,
+          value: order.reference,
+        })),
+      ),
+    )
+    expectTenantUnique(
+      hotels.flatMap((hotel) =>
+        hotel.equipment.map((item) => ({ tenantId: item.tenantId, value: item.assetTag })),
+      ),
+    )
+    expectTenantUnique(
+      hotels.flatMap((hotel) =>
+        hotel.inspectionTypes.map((type) => ({ tenantId: type.tenantId, value: type.name })),
+      ),
+    )
+    expectTenantUnique(
+      hotels.flatMap((hotel) =>
+        hotel.inspectionRecords.map((record) => ({
+          tenantId: record.tenantId,
+          value: record.reference,
+        })),
+      ),
+    )
+    expectTenantUnique(
+      hotels.flatMap((hotel) =>
+        hotel.documents.map((document) => ({
+          tenantId: document.tenantId,
+          value: document.key.toLowerCase(),
+        })),
+      ),
+    )
+    for (const hotel of hotels) {
+      expect(hotel.qrTargets).toHaveLength(hotel.rooms.length)
+      for (const target of hotel.qrTargets)
+        expect(roomKeys.has(`${target.tenantId}:${target.roomId}`)).toBe(true)
+    }
+  })
+
   it('contains meaningful, varied operations and H&S registry records for both hotels', () => {
     const plan = buildCycasDemoSeedPlan(anchor)
     expect(plan.expected.rooms).toEqual({ fenchurch: 33, lincoln: 33 })

@@ -320,6 +320,7 @@ async function seed() {
         .values(
           hotel.equipment.map((item) => ({
             ...item,
+            categoryId: cycasId(`equipment-category:${prefix}`),
             typeId: cycasId(`equipment-type:${prefix}`),
             metadata: { propertyId: hotel.propertyId, demoSeedKey: CYCAS_DEMO_SEED_KEY },
           })),
@@ -371,7 +372,11 @@ async function seed() {
       .onConflictDoNothing()
     await tx
       .insert(inspectionRecords)
-      .values(combine('inspectionRecords') as never)
+      .values(
+        hotels.flatMap((hotel) =>
+          hotel.inspectionRecords.map((record) => ({ ...record, customerOrgUnitId })),
+        ) as never,
+      )
       .onConflictDoNothing()
     await tx
       .insert(correctiveActions)

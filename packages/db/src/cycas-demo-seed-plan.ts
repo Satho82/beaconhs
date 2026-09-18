@@ -98,12 +98,42 @@ const permissions = {
 
 const CYCAS_DEMO_EMAIL_DOMAIN = 'cycas.demo.uvanoo.invalid'
 
-function namespaceHotelIdentities(
+function namespaceHotelPlan(
   hotel: ReturnType<typeof buildDemoHotelSeedPlan>,
   property: 'fenchurch' | 'lincoln',
 ): ReturnType<typeof buildDemoHotelSeedPlan> {
+  const codePrefix = property === 'fenchurch' ? 'OFF' : 'TLS'
+  const propertyName = property === 'fenchurch' ? 'One Fifty Fenchurch' : 'The Lincoln Suites'
   return {
     ...hotel,
+    rooms: hotel.rooms.map((room) => ({
+      ...room,
+      code: `${codePrefix}-${room.code}`,
+    })),
+    maintenanceIssues: hotel.maintenanceIssues.map((issue) => ({
+      ...issue,
+      reference: `${codePrefix}-${issue.reference}`,
+    })),
+    workOrders: hotel.workOrders.map((order) => ({
+      ...order,
+      reference: `${codePrefix}-${order.reference}`,
+    })),
+    equipment: hotel.equipment.map((item) => ({
+      ...item,
+      assetTag: `${codePrefix}-${item.assetTag}`,
+    })),
+    inspectionTypes: hotel.inspectionTypes.map((type) => ({
+      ...type,
+      name: `${propertyName} — ${type.name}`,
+    })),
+    inspectionRecords: hotel.inspectionRecords.map((record) => ({
+      ...record,
+      reference: `${codePrefix}-${record.reference}`,
+    })),
+    documents: hotel.documents.map((document) => ({
+      ...document,
+      key: `${codePrefix}-${document.key}`,
+    })),
     staff: hotel.staff.map((member) => ({
       ...member,
       email: `${property}.${member.key}@${CYCAS_DEMO_EMAIL_DOMAIN}`,
@@ -117,7 +147,7 @@ function namespaceHotelIdentities(
 
 export function buildCycasDemoSeedPlan(anchor = new Date()) {
   const tenantId = cycasId('tenant')
-  const fenchurch = namespaceHotelIdentities(
+  const fenchurch = namespaceHotelPlan(
     buildDemoHotelSeedPlan(anchor, {
       seedKey: CYCAS_DEMO_SEED_KEY,
       tenantId,
@@ -126,7 +156,7 @@ export function buildCycasDemoSeedPlan(anchor = new Date()) {
     'fenchurch',
   )
   const lincolnAnchor = new Date(anchor.getTime() + 5 * 86_400_000)
-  const lincoln = namespaceHotelIdentities(
+  const lincoln = namespaceHotelPlan(
     buildDemoHotelSeedPlan(lincolnAnchor, {
       seedKey: CYCAS_DEMO_SEED_KEY,
       tenantId,

@@ -91,6 +91,8 @@ jobs:
         run: pnpm --filter @beaconhs/db exec tsx src/migrate.ts
       - name: Prove migrations are idempotent
         run: pnpm --filter @beaconhs/db exec tsx src/migrate.ts
+      - name: Prove Cycas seed transaction, idempotency, and counts
+        run: scripts/ci/cycas-demo-seed-integration.sh
       - run: pnpm test
       - run: pnpm build
   image:

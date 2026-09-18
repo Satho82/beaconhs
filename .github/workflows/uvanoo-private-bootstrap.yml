@@ -1,0 +1,29 @@
+name: Uvanoo private registry bootstrap (no application or deployment)
+on:
+  push:
+    branches: [chore/uvanoo-private-bootstrap-20260918]
+permissions:
+  contents: read
+  packages: write
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Publish harmless scratch image
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_USER: ${{ github.actor }}
+        run: |
+          set -euo pipefail
+          export DOCKER_CONFIG="$(mktemp -d)"
+          trap 'rm -rf "$DOCKER_CONFIG"' EXIT
+          printf '%s' "$GH_TOKEN" | docker login ghcr.io -u "$GH_USER" --password-stdin
+          work="$(mktemp -d)"
+          printf 'Private registry bootstrap only. No application data.\n' > "$work/NOTICE"
+          printf 'FROM scratch\nCOPY NOTICE /NOTICE\nLABEL org.opencontainers.image.source="https://github.com/Satho82/beaconhs"\n' > "$work/Dockerfile"
+          image="ghcr.io/satho82/uvanoo-staging-private:bootstrap-${GITHUB_RUN_ID}"
+          docker build --no-cache -t "$image" "$work"
+          docker push "$image"
+          docker pull "$image"
+          docker image inspect "$image" --format '{{json .RepoDigests}}'

@@ -20,6 +20,7 @@ import { parseListParams, pickString } from '@/lib/list-params'
 import { assertTenantModuleEntitled } from '@/lib/module-entitlements/server'
 import { assertCan } from '@beaconhs/tenant'
 import { hospitalityPropertyWhere } from '@/lib/hospitality/property-access'
+import { resolveHospitalityPropertyContext } from '@/lib/hospitality/property-context'
 
 const BASE = '/hospitality/maintenance'
 
@@ -30,6 +31,7 @@ export default async function MaintenanceQueue({
 }) {
   const translateValue = await getGeneratedValueTranslations()
   const ctx = await requireRequestContext()
+  const propertyContext = await resolveHospitalityPropertyContext(ctx)
   await assertTenantModuleEntitled(ctx, 'hospitality.maintenance')
   assertCan(ctx, 'maintenance.read')
   const search = await searchParams
@@ -49,6 +51,9 @@ export default async function MaintenanceQueue({
     isNull(hospitalityBuildings.deletedAt),
     isNull(hospitalityProperties.deletedAt),
     hospitalityPropertyWhere(ctx, hospitalityProperties.id),
+    propertyContext.activePropertyId
+      ? eq(hospitalityProperties.id, propertyContext.activePropertyId)
+      : undefined,
     status ? eq(maintenanceIssues.status, status) : undefined,
     params.q
       ? or(

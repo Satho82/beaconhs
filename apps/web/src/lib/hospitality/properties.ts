@@ -62,6 +62,7 @@ async function requireParent(
 export async function listProperties(
   ctx: RequestContext,
   searchParams: Record<string, string | string[] | undefined> = {},
+  activePropertyId: string | null = null,
 ) {
   await gate(ctx)
   const params = parseListParams(searchParams, {
@@ -72,6 +73,7 @@ export async function listProperties(
   const where = and(
     eq(hospitalityProperties.tenantId, ctx.tenantId),
     hospitalityPropertyWhere(ctx, hospitalityProperties.id),
+    activePropertyId ? eq(hospitalityProperties.id, activePropertyId) : undefined,
     isNull(hospitalityProperties.deletedAt),
     params.q
       ? or(

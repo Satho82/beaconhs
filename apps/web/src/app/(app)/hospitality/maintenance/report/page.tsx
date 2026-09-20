@@ -9,6 +9,7 @@ import {
 import { PageContainer } from '@/components/page-layout'
 import { requireRequestContext } from '@/lib/auth'
 import { hospitalityPropertyWhere } from '@/lib/hospitality/property-access'
+import { resolveHospitalityPropertyContext } from '@/lib/hospitality/property-context'
 import { assertTenantModuleEntitled } from '@/lib/module-entitlements/server'
 import { assertCan } from '@beaconhs/tenant'
 import { getGeneratedValueTranslations } from '@/i18n/generated.server'
@@ -17,6 +18,7 @@ import { QuickMaintenanceForm } from './quick-maintenance-form'
 export default async function ReportMaintenancePage() {
   const t = await getGeneratedValueTranslations()
   const ctx = await requireRequestContext()
+  const propertyContext = await resolveHospitalityPropertyContext(ctx)
   await assertTenantModuleEntitled(ctx, 'hospitality.maintenance')
   assertCan(ctx, 'maintenance.create')
 
@@ -30,6 +32,9 @@ export default async function ReportMaintenancePage() {
           eq(hospitalityProperties.tenantId, ctx.tenantId),
           isNull(hospitalityProperties.deletedAt),
           propertyScope,
+          propertyContext.activePropertyId
+            ? eq(hospitalityProperties.id, propertyContext.activePropertyId)
+            : undefined,
         ),
       )
       .orderBy(asc(hospitalityProperties.name))
@@ -71,6 +76,9 @@ export default async function ReportMaintenancePage() {
           eq(hospitalityRooms.tenantId, ctx.tenantId),
           isNull(hospitalityRooms.deletedAt),
           propertyScope,
+          propertyContext.activePropertyId
+            ? eq(hospitalityProperties.id, propertyContext.activePropertyId)
+            : undefined,
         ),
       )
       .orderBy(asc(hospitalityProperties.name), asc(hospitalityRooms.code))

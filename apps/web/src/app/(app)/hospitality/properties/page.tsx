@@ -8,6 +8,7 @@ import { Button, EmptyState, PageHeader } from '@beaconhs/ui'
 import { requireRequestContext } from '@/lib/auth'
 import { listProperties } from '@/lib/hospitality/properties'
 import { loadEnabledModuleKeys } from '@/lib/module-entitlements/server'
+import { resolveHospitalityPropertyContext } from '@/lib/hospitality/property-context'
 
 /** Additive Uvanoo module; the existing tenant dashboard remains unchanged. */
 export default async function HospitalityPropertiesPage({
@@ -22,7 +23,12 @@ export default async function HospitalityPropertiesPage({
 
   const ctx = await requireRequestContext()
   const search = await searchParams
-  const { properties, total, params } = await listProperties(ctx, search)
+  const propertyContext = await resolveHospitalityPropertyContext(ctx)
+  const { properties, total, params } = await listProperties(
+    ctx,
+    search,
+    propertyContext.activePropertyId,
+  )
   const modules = await loadEnabledModuleKeys(ctx)
   return (
     <PageContainer>

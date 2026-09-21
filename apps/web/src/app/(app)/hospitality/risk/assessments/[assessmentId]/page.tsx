@@ -105,7 +105,7 @@ export default async function RiskAssessmentPage({
                         className="underline"
                         href={`/hospitality/risk/assessments/${assessmentId}/pdf?signoffId=${signoff.id}`}
                       >
-                        PDF
+                        {translateValue('PDF')}
                       </Link>
                     </>
                   )}

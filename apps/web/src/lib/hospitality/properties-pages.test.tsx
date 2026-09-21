@@ -25,6 +25,9 @@ vi.mock('@beaconhs/ui', () => ({
   Label: 'label',
 }))
 vi.mock('next/link', () => ({ default: 'a' }))
+vi.mock('next/headers', () => ({
+  cookies: async () => ({ get: () => undefined }),
+}))
 vi.mock('next/navigation', () => ({
   notFound: () => {
     throw new Error('404')
@@ -63,14 +66,18 @@ function fixture({ visible = true, manage = true, total = 0 } = {}) {
       from: (table: Parameters<typeof getTableName>[0]) => ({
         where: (sql: SQL) => {
           queries.push(dialect.sqlToQuery(sql))
-          if (fields) return Promise.resolve([{ value: total }])
-          if (getTableName(table) === 'hospitality_properties')
+          if (fields && typeof fields === 'object' && fields !== null && 'value' in fields)
+            return Promise.resolve([{ value: total }])
+          if (getTableName(table) === 'hospitality_properties') {
+            const rows = visible
+              ? [{ id, tenantId: tenant, name: 'Hotel', code: 'LON', timezone: 'UTC' }]
+              : []
             return {
-              limit: async () =>
-                visible
-                  ? [{ id, tenantId: tenant, name: 'Hotel', code: 'LON', timezone: 'UTC' }]
-                  : [],
+              limit: async () => rows,
+              orderBy: async () =>
+                rows.map(({ id: propertyId, name }) => ({ id: propertyId, name })),
             }
+          }
           return {
             orderBy: () => ({
               limit: (limit: number) => ({

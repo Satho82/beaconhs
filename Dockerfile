@@ -31,7 +31,7 @@ RUN printf '%s' "$DEPLOYMENT_VERSION" | grep -Eq '^[0-9a-f]{40}$'
 # The production type-analysis graph now exceeds V8's container default heap
 # on clean BuildKit workers. Keep the larger ceiling in the builder only; the
 # runtime image retains Node's normal memory policy.
-ARG BUILD_NODE_HEAP_MB=4096
+ARG BUILD_NODE_HEAP_MB=8192
 ENV NODE_OPTIONS=--max-old-space-size=${BUILD_NODE_HEAP_MB}
 COPY . .
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
@@ -74,6 +74,11 @@ RUN npx --yes @puppeteer/browsers@3.0.6 install chrome-headless-shell@${HEADLESS
     && shell_path="$(find /opt/chrome/chrome-headless-shell -type f -name chrome-headless-shell -perm -111 -print -quit)" \
     && test -n "$shell_path" \
     && ln -s "$shell_path" /usr/local/bin/chrome-headless-shell
+# Package managers are build/download tooling only; remove them from the final runtime.
+RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack \
+    /root/.npm /root/.cache /root/.local/share/pnpm \
+    && rm -f /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack \
+      /usr/local/bin/pnpm /usr/local/bin/pnpx
 ENV PUPPETEER_SKIP_DOWNLOAD=true
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/local/bin/chrome-headless-shell
 

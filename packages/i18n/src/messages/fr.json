@@ -9333,6 +9333,9 @@
     "m_1eef6c59affd60": "Impossible de changer d’établissement",
     "m_18f1776a92dd8c": "Établissement non valide",
     "m_1f855b2dbc6b6f": "Cet établissement ne vous est pas accessible",
-    "m_16fec8635a9da6": "Risque"
+    "m_16fec8635a9da6": "Risque",
+    "m_0115cb3283a1a3": "{value0} jours",
+    "m_0fbc6ff2021e9b": "Évaluation des risques {value1} : {value0}",
+    "m_0e563481e6ea82": "({value0} jours)"
   }
 }

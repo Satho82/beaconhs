@@ -20,6 +20,7 @@ export type ScheduledTick =
   | { kind: 'office_render_reconcile' }
   | { kind: 'journal_analysis_scan' }
   | { kind: 'operational_task_scan' }
+  | { kind: 'risk_review_scan' }
 
 let scheduledQueue: Queue<ScheduledTick> | undefined
 
@@ -38,6 +39,7 @@ const SCHEDULED_KINDS = new Set<ScheduledTick['kind']>([
   'office_render_reconcile',
   'journal_analysis_scan',
   'operational_task_scan',
+  'risk_review_scan',
 ])
 
 export function assertScheduledTick(data: ScheduledTick): void {
@@ -192,6 +194,13 @@ const SCHEDULES: Array<{
     pattern: '20 * * * *',
     jobId: 'tick:journal_analysis',
     repeatKey: 'tick-journal-analysis',
+  },
+  {
+    name: 'tick:risk_reviews',
+    data: { kind: 'risk_review_scan' },
+    pattern: '15 7 * * *',
+    jobId: 'tick:risk_reviews',
+    repeatKey: 'tick-risk-reviews',
   },
   {
     // Materialisation is idempotent at the database uniqueness boundary and

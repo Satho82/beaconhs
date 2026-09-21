@@ -2,11 +2,12 @@ import Link from 'next/link'
 import { and, eq, inArray, sql } from 'drizzle-orm'
 import { Button, EmptyState, PageHeader, Select } from '@beaconhs/ui'
 import { riskRating, RISK_LIBRARY_CATEGORIES } from '@beaconhs/db'
-import { riskHazards } from '@beaconhs/db/schema'
+import { correctiveActions, riskHazards, tenantUsers, users } from '@beaconhs/db/schema'
 import { PageContainer } from '@/components/page-layout'
 import { requireRequestContext } from '@/lib/auth'
 import { resolveHospitalityPropertyContext } from '@/lib/hospitality/property-context'
 import { listRiskAssessments, listRiskTemplates } from '@/lib/risk-assessments'
+import { daysUntilRiskReview, riskLifecycleStatus } from '@/lib/risk-lifecycle'
 import { getGeneratedValueTranslations } from '@/i18n/generated.server'
 
 type Search = Record<string, string | string[] | undefined>
@@ -29,9 +30,27 @@ export default async function RiskLibraryPage({ searchParams }: { searchParams: 
       ? (category as (typeof RISK_LIBRARY_CATEGORIES)[number])
       : undefined,
   })
-  const assessments = await listRiskAssessments(ctx, propertyContext.activePropertyId ?? undefined)
+  const allAssessments = await listRiskAssessments(
+    ctx,
+    propertyContext.activePropertyId ?? undefined,
+  )
+  const statusFilter = value(search.status)
+  const categoryFilter = value(search.assessmentCategory)
+  const dueFilter = value(search.due)
+  const assessments = allAssessments.filter(({ assessment }) => {
+    const status = riskLifecycleStatus({
+      storedStatus: assessment.status,
+      nextReviewDate: assessment.nextReviewDate,
+      reminderLeadDays: assessment.reminderLeadDays,
+    })
+    if (statusFilter && status !== statusFilter) return false
+    if (categoryFilter && assessment.adoptedTemplateSnapshot.category !== categoryFilter)
+      return false
+    if (dueFilter === 'due' && !['due_soon', 'review_due', 'overdue'].includes(status)) return false
+    return true
+  })
   const hazardScores = await ctx.db(async (tx) => {
-    const ids = assessments.map(({ assessment }) => assessment.id)
+    const ids = allAssessments.map(({ assessment }) => assessment.id)
     if (ids.length === 0) return new Map<string, number>()
     const rows = await tx
       .select({
@@ -43,6 +62,81 @@ export default async function RiskLibraryPage({ searchParams }: { searchParams: 
       .groupBy(riskHazards.assessmentId)
     return new Map(rows.map((row) => [row.assessmentId, Number(row.score)]))
   })
+
+  const highCriticalCount = [...hazardScores.values()].filter((score) => score >= 10).length
+  const allAssessmentIds = allAssessments.map(({ assessment }) => assessment.id)
+  const openCorrectiveActions =
+    allAssessmentIds.length === 0
+      ? 0
+      : await ctx.db(async (tx) => {
+          const [row] = await tx
+            .select({ value: sql<number>`count(*)` })
+            .from(correctiveActions)
+            .innerJoin(
+              riskHazards,
+              and(
+                eq(riskHazards.tenantId, correctiveActions.tenantId),
+                eq(riskHazards.id, correctiveActions.sourceEntityId),
+              ),
+            )
+            .where(
+              and(
+                eq(correctiveActions.tenantId, ctx.tenantId),
+                eq(correctiveActions.sourceEntityType, 'risk_hazard'),
+                inArray(riskHazards.assessmentId, allAssessmentIds),
+                sql`${correctiveActions.status} NOT IN ('closed','cancelled')`,
+              ),
+            )
+          return Number(row?.value ?? 0)
+        })
+
+  const responsibleIds = [
+    ...new Set(
+      assessments
+        .map(({ assessment }) => assessment.responsibleTenantUserId)
+        .filter((id): id is string => Boolean(id)),
+    ),
+  ]
+  const responsiblePeople =
+    responsibleIds.length === 0
+      ? []
+      : await ctx.db((tx) =>
+          tx
+            .select({ id: tenantUsers.id, displayName: tenantUsers.displayName, name: users.name })
+            .from(tenantUsers)
+            .innerJoin(users, eq(users.id, tenantUsers.userId))
+            .where(
+              and(eq(tenantUsers.tenantId, ctx.tenantId), inArray(tenantUsers.id, responsibleIds)),
+            ),
+        )
+  const responsibleNames = new Map(
+    responsiblePeople.map((person) => [person.id, person.displayName || person.name]),
+  )
+  const activeCount = allAssessments.filter(
+    ({ assessment }) =>
+      riskLifecycleStatus({
+        storedStatus: assessment.status,
+        nextReviewDate: assessment.nextReviewDate,
+        reminderLeadDays: assessment.reminderLeadDays,
+      }) === 'active',
+  ).length
+  const dueCount = allAssessments.filter(({ assessment }) =>
+    ['due_soon', 'review_due'].includes(
+      riskLifecycleStatus({
+        storedStatus: assessment.status,
+        nextReviewDate: assessment.nextReviewDate,
+        reminderLeadDays: assessment.reminderLeadDays,
+      }),
+    ),
+  ).length
+  const overdueCount = allAssessments.filter(
+    ({ assessment }) =>
+      riskLifecycleStatus({
+        storedStatus: assessment.status,
+        nextReviewDate: assessment.nextReviewDate,
+        reminderLeadDays: assessment.reminderLeadDays,
+      }) === 'overdue',
+  ).length
 
   return (
     <PageContainer>
@@ -107,6 +201,44 @@ export default async function RiskLibraryPage({ searchParams }: { searchParams: 
         )}
       </section>
 
+      <section className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="rounded-lg border p-4">
+          <strong>{activeCount}</strong>
+          <p className="text-sm">{translateValue('Active assessments')}</p>
+        </div>
+        <div className="rounded-lg border p-4">
+          <strong>{dueCount}</strong>
+          <p className="text-sm">{translateValue('Reviews due soon')}</p>
+        </div>
+        <div className="rounded-lg border p-4">
+          <strong>{overdueCount}</strong>
+          <p className="text-sm">{translateValue('Overdue reviews')}</p>
+        </div>
+      </section>
+      <form className="mt-6 flex flex-wrap gap-3" method="get">
+        <Select name="status" defaultValue={statusFilter}>
+          <option value="">{translateValue('All statuses')}</option>
+          {['draft', 'active', 'due_soon', 'review_due', 'overdue', 'retired'].map((item) => (
+            <option key={item} value={item}>
+              {item.replaceAll('_', ' ')}
+            </option>
+          ))}
+        </Select>
+        <Select name="assessmentCategory" defaultValue={categoryFilter}>
+          <option value="">{translateValue('All categories')}</option>
+          {RISK_LIBRARY_CATEGORIES.map((item) => (
+            <option key={item} value={item}>
+              {item.replaceAll('_', ' ')}
+            </option>
+          ))}
+        </Select>
+        <Select name="due" defaultValue={dueFilter}>
+          <option value="">{translateValue('All review dates')}</option>
+          <option value="due">{translateValue('Due or overdue')}</option>
+        </Select>
+        <Button type="submit">{translateValue('Filter register')}</Button>
+      </form>
+
       <section className="mt-10">
         <h2 className="text-xl font-semibold">{translateValue('Risk Assessments')}</h2>
         <p className="text-muted-foreground mt-1 text-sm">
@@ -124,10 +256,13 @@ export default async function RiskLibraryPage({ searchParams }: { searchParams: 
                   {[
                     'Assessment',
                     'Property',
+                    'Category',
                     'Template version',
-                    'Status',
+                    'Lifecycle status',
                     'Residual risk',
-                    'Date',
+                    'Responsible person',
+                    'Effective date',
+                    'Next review',
                   ].map((label) => (
                     <th key={label} className="px-4 py-3 font-medium">
                       {translateValue(label)}
@@ -149,12 +284,35 @@ export default async function RiskLibraryPage({ searchParams }: { searchParams: 
                         </Link>
                       </td>
                       <td className="px-4 py-3">{property.name}</td>
+                      <td className="px-4 py-3 capitalize">
+                        {assessment.adoptedTemplateSnapshot.category.replaceAll('_', ' ')}
+                      </td>
                       <td className="px-4 py-3">{assessment.adoptedTemplateVersion}</td>
-                      <td className="px-4 py-3 capitalize">{assessment.status}</td>
+                      <td className="px-4 py-3 capitalize">
+                        {riskLifecycleStatus({
+                          storedStatus: assessment.status,
+                          nextReviewDate: assessment.nextReviewDate,
+                          reminderLeadDays: assessment.reminderLeadDays,
+                        }).replaceAll('_', ' ')}
+                      </td>
                       <td className="px-4 py-3">
                         {score ? `${score} · ${riskRating(score)}` : '—'}
                       </td>
-                      <td className="px-4 py-3">{assessment.assessmentDate}</td>
+                      <td className="px-4 py-3">
+                        {assessment.responsibleTenantUserId
+                          ? responsibleNames.get(assessment.responsibleTenantUserId)
+                          : '—'}
+                      </td>
+                      <td className="px-4 py-3">{assessment.effectiveDate ?? '—'}</td>
+                      <td className="px-4 py-3">
+                        {assessment.nextReviewDate ?? '—'}{' '}
+                        {assessment.nextReviewDate ? (
+                          <span>
+                            ({daysUntilRiskReview(assessment.nextReviewDate)}{' '}
+                            {translateValue('days')})
+                          </span>
+                        ) : null}
+                      </td>
                     </tr>
                   )
                 })}

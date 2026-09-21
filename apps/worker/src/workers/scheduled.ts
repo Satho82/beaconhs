@@ -22,6 +22,7 @@ import { scanJournalAnalysis } from '../lib/journal-analysis'
 import { drainStorageObjectDeletionOutbox } from '../lib/storage-object-deletion-outbox'
 import { reconcileExpiredAttachmentUploads } from '../lib/attachment-upload-reconciler'
 import { scanOperationalTaskSchedules } from '../lib/operational-task-scanner'
+import { scanRiskReviews } from '../lib/risk-review-scanner'
 
 export async function processScheduledTick(job: Job<ScheduledTick>): Promise<void> {
   assertScheduledTick(job.data)
@@ -137,6 +138,14 @@ export async function processScheduledTick(job: Job<ScheduledTick>): Promise<voi
       if (result.errors > 0) {
         throw new Error(`Office render reconciliation had ${result.errors} enqueue error(s)`)
       }
+      return
+    }
+    case 'risk_review_scan': {
+      const result = await scanRiskReviews()
+      if (result.examined > 0)
+        console.log(
+          `[scheduled] risk_reviews: ${result.reminders} reminders / ${result.examined} due`,
+        )
       return
     }
     case 'operational_task_scan': {

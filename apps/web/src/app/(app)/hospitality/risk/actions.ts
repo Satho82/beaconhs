@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { requireRequestContext } from '@/lib/auth'
 import { requireUuidInput } from '@/lib/mutation-input'
+import { applyRiskLifecycleAction, type RiskLifecycleAction } from '@/lib/risk-lifecycle'
 import {
   adoptRiskAssessment,
   createRiskCorrectiveAction,
@@ -61,4 +62,23 @@ export async function createRiskCorrectiveActionAction(
   revalidatePath(`/hospitality/risk/assessments/${id}`)
   revalidatePath('/corrective-actions')
   return { ok: true as const, correctiveActionId: action.id }
+}
+
+export async function applyRiskLifecycleActionRequest(
+  assessmentId: string,
+  input: {
+    action: RiskLifecycleAction
+    effectiveDate: string
+    validityMonths?: number | null
+    customReviewDate?: string | null
+    reminderLeadDays: number
+    comments?: string
+  },
+) {
+  const ctx = await requireRequestContext()
+  const id = requireUuidInput(assessmentId, 'assessmentId')
+  await applyRiskLifecycleAction(ctx, id, input)
+  revalidatePath('/hospitality/risk')
+  revalidatePath(`/hospitality/risk/assessments/${id}`)
+  return { ok: true as const }
 }

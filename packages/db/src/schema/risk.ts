@@ -9,6 +9,7 @@ import {
   pgEnum,
   pgTable,
   text,
+  timestamp,
   uniqueIndex,
   uuid,
 } from 'drizzle-orm/pg-core'
@@ -32,7 +33,21 @@ export const riskTemplateCategory = pgEnum('risk_template_category', [
   'property',
   'restaurant',
 ])
-export const riskAssessmentStatus = pgEnum('risk_assessment_status', ['draft', 'active', 'retired'])
+export const riskAssessmentStatus = pgEnum('risk_assessment_status', [
+  'draft',
+  'active',
+  'due_soon',
+  'review_due',
+  'overdue',
+  'retired',
+])
+export const riskSignoffAction = pgEnum('risk_signoff_action', [
+  'adopted',
+  'reviewed',
+  're_adopted',
+  'amended',
+  'retired',
+])
 
 export type RiskTemplateHazard = {
   hazard: string
@@ -125,6 +140,13 @@ export const riskAssessments = pgTable(
     assessorTenantUserId: uuid('assessor_tenant_user_id').notNull(),
     responsibleTenantUserId: uuid('responsible_tenant_user_id'),
     assessmentDate: date('assessment_date').notNull(),
+    effectiveDate: date('effective_date'),
+    validityMonths: integer('validity_months'),
+    nextReviewDate: date('next_review_date'),
+    expiryDate: date('expiry_date'),
+    reminderLeadDays: integer('reminder_lead_days').default(30).notNull(),
+    lifecycleVersion: integer('lifecycle_version').default(1).notNull(),
+    lastReminderReviewDate: date('last_reminder_review_date'),
     status: riskAssessmentStatus('status').default('draft').notNull(),
     comments: text('comments'),
     ...timestamps,
@@ -171,6 +193,18 @@ export const riskAssessments = pgTable(
       columns: [t.tenantId, t.responsibleTenantUserId],
       foreignColumns: [tenantUsers.tenantId, tenantUsers.id],
     }),
+    validityMonthsCheck: check(
+      'risk_assessments_validity_months_check',
+      sql`${t.validityMonths} IS NULL OR ${t.validityMonths} IN (3,6,12,24)`,
+    ),
+    reminderLeadDaysCheck: check(
+      'risk_assessments_reminder_lead_days_check',
+      sql`${t.reminderLeadDays} BETWEEN 1 AND 365`,
+    ),
+    lifecycleVersionCheck: check(
+      'risk_assessments_lifecycle_version_check',
+      sql`${t.lifecycleVersion} > 0`,
+    ),
     snapshotVersionCheck: check(
       'risk_assessments_snapshot_version_check',
       sql`${t.adoptedTemplateSnapshot}->>'version' = ${t.adoptedTemplateVersion}`,
@@ -236,5 +270,57 @@ export const riskHazards = pgTable(
       'risk_hazards_residual_score_check',
       sql`${t.residualScore} = ${t.residualLikelihood} * ${t.residualSeverity}`,
     ),
+  }),
+)
+
+export const riskAssessmentSignoffs = pgTable(
+  'risk_assessment_signoffs',
+  {
+    id: id(),
+    tenantId: uuid('tenant_id')
+      .notNull()
+      .references(() => tenants.id, { onDelete: 'cascade' }),
+    propertyId: uuid('property_id').notNull(),
+    assessmentId: uuid('assessment_id').notNull(),
+    signedByTenantUserId: uuid('signed_by_tenant_user_id').notNull(),
+    signedByName: text('signed_by_name').notNull(),
+    signedByRole: text('signed_by_role').notNull(),
+    action: riskSignoffAction('action').notNull(),
+    templateVersion: text('template_version').notNull(),
+    lifecycleVersion: integer('lifecycle_version').notNull(),
+    validityMonths: integer('validity_months'),
+    effectiveDate: date('effective_date').notNull(),
+    nextReviewDate: date('next_review_date').notNull(),
+    comments: text('comments'),
+    signedAt: timestamp('signed_at', { withTimezone: true }).defaultNow().notNull(),
+    ...timestamps,
+  },
+  (t) => ({
+    tenantIdIdUx: uniqueIndex('risk_assessment_signoffs_tenant_id_id_ux').on(t.tenantId, t.id),
+    assessmentVersionUx: uniqueIndex('risk_assessment_signoffs_assessment_version_ux').on(
+      t.tenantId,
+      t.assessmentId,
+      t.lifecycleVersion,
+    ),
+    assessmentDateIdx: index('risk_assessment_signoffs_assessment_date_idx').on(
+      t.tenantId,
+      t.assessmentId,
+      t.signedAt,
+    ),
+    assessmentFk: foreignKey({
+      name: 'risk_assessment_signoffs_tenant_assessment_fk',
+      columns: [t.tenantId, t.assessmentId],
+      foreignColumns: [riskAssessments.tenantId, riskAssessments.id],
+    }),
+    propertyFk: foreignKey({
+      name: 'risk_assessment_signoffs_tenant_property_fk',
+      columns: [t.tenantId, t.propertyId],
+      foreignColumns: [hospitalityProperties.tenantId, hospitalityProperties.id],
+    }),
+    signerFk: foreignKey({
+      name: 'risk_assessment_signoffs_tenant_signer_fk',
+      columns: [t.tenantId, t.signedByTenantUserId],
+      foreignColumns: [tenantUsers.tenantId, tenantUsers.id],
+    }),
   }),
 )

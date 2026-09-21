@@ -7,8 +7,10 @@ import { PageContainer } from '@/components/page-layout'
 import { requireRequestContext } from '@/lib/auth'
 import { isUuid } from '@/lib/list-params'
 import { getRiskAssessment } from '@/lib/risk-assessments'
+import { getNewerRiskTemplate, listRiskSignoffs, riskLifecycleStatus } from '@/lib/risk-lifecycle'
 import { getGeneratedValueTranslations } from '@/i18n/generated.server'
 import { AssessmentEditor } from './assessment-editor'
+import { RiskLifecyclePanel } from './lifecycle-panel'
 
 export default async function RiskAssessmentPage({
   params,
@@ -23,6 +25,16 @@ export default async function RiskAssessmentPage({
   ])
   const record = await getRiskAssessment(ctx, assessmentId)
   if (!record) notFound()
+
+  const [signoffs, newerTemplate] = await Promise.all([
+    listRiskSignoffs(ctx, assessmentId),
+    getNewerRiskTemplate(ctx, record.assessment),
+  ])
+  const lifecycleStatus = riskLifecycleStatus({
+    storedStatus: record.assessment.status,
+    nextReviewDate: record.assessment.nextReviewDate,
+    reminderLeadDays: record.assessment.reminderLeadDays,
+  })
 
   const description = [
     record.assessment.reference,
@@ -49,7 +61,19 @@ export default async function RiskAssessmentPage({
         <Link href="/hospitality/risk">{translateValue('Back to Risk Library')}</Link>
       </Button>
       <PageHeader title={record.assessment.title} description={description} />
-      <div className="mt-6">
+      {newerTemplate && (
+        <div className="mt-6 rounded-lg border border-amber-500 p-4 font-medium">
+          {translateValue('New template version available')}: {newerTemplate.version}
+        </div>
+      )}
+      <div className="mt-6 space-y-6">
+        <RiskLifecyclePanel
+          assessmentId={record.assessment.id}
+          status={lifecycleStatus}
+          effectiveDate={record.assessment.effectiveDate}
+          nextReviewDate={record.assessment.nextReviewDate}
+          reminderLeadDays={record.assessment.reminderLeadDays}
+        />
         <AssessmentEditor
           assessment={record.assessment}
           hazards={record.hazards}
@@ -58,6 +82,20 @@ export default async function RiskAssessmentPage({
             name: person.displayName || person.name,
           }))}
         />
+        {signoffs.length > 0 && (
+          <section className="rounded-lg border p-5">
+            <h2 className="font-semibold">{translateValue('Sign-off history')}</h2>
+            <ul className="mt-3 space-y-2 text-sm">
+              {signoffs.map((signoff) => (
+                <li key={signoff.id} className="border-t pt-2 first:border-0">
+                  {signoff.action.replaceAll('_', ' ')} · {signoff.signedByName} ·{' '}
+                  {signoff.signedByRole} · {signoff.signedAt.toISOString()} ·{' '}
+                  {translateValue('Version')} {signoff.lifecycleVersion}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
       </div>
     </PageContainer>
   )

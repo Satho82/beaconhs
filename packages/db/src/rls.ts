@@ -106,6 +106,7 @@ export const TENANT_SCOPED_TABLES = [
   'risk_templates',
   'risk_assessments',
   'risk_hazards',
+  'risk_assessment_signoffs',
   'hospitality_properties',
   'hospitality_buildings',
   'hospitality_floors',

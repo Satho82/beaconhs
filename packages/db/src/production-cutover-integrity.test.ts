@@ -93,6 +93,8 @@ describe('production cutover migration integrity', () => {
       '0042_uvanoo_guest_room_reporting.sql',
       '0043_hospitality_issue_sources.sql',
       '0044_risk_assessment_foundation.sql',
+      '0045_risk_review_lifecycle.sql',
+      '0046_risk_signoff_snapshot.sql',
     ])
 
     const journal = JSON.parse(readFileSync(new URL('_journal.json', metaFolder), 'utf8')) as {
@@ -143,6 +145,8 @@ describe('production cutover migration integrity', () => {
       { idx: 41, tag: '0042_uvanoo_guest_room_reporting' },
       { idx: 42, tag: '0043_hospitality_issue_sources' },
       { idx: 43, tag: '0044_risk_assessment_foundation' },
+      { idx: 44, tag: '0045_risk_review_lifecycle' },
+      { idx: 45, tag: '0046_risk_signoff_snapshot' },
     ])
     for (let index = 1; index < journal.entries.length; index++) {
       expect(journal.entries[index]!.when).toBeGreaterThan(journal.entries[index - 1]!.when)

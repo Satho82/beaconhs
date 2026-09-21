@@ -74,7 +74,7 @@ DROP POLICY IF EXISTS tenant_write_delete ON ${table};`
   // selectable through ordinary tenant joins, but runtime roles must never be
   // able to insert, update, or delete them. Separate command policies preserve
   // that read-only global union without weakening writes.
-  if (table === 'report_definitions') {
+  if (table === 'report_definitions' || table === 'risk_templates') {
     return `${reset}
 CREATE POLICY tenant_isolation ON ${table}
   FOR SELECT
@@ -103,6 +103,9 @@ CREATE POLICY tenant_isolation ON ${table}
 // The Better-Auth tables (user, session, account, verification) are global and
 // not in this list.
 export const TENANT_SCOPED_TABLES = [
+  'risk_templates',
+  'risk_assessments',
+  'risk_hazards',
   'hospitality_properties',
   'hospitality_buildings',
   'hospitality_floors',

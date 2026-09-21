@@ -370,6 +370,40 @@ export async function updateRiskAssessment(
   })
 }
 
+export async function getRiskAssessment(ctx: RequestContext, assessmentId: string) {
+  assertCan(ctx, 'hospitality.read')
+  return ctx.db(async (tx) => {
+    const [row] = await tx
+      .select({ assessment: riskAssessments, property: hospitalityProperties })
+      .from(riskAssessments)
+      .innerJoin(
+        hospitalityProperties,
+        and(
+          eq(hospitalityProperties.tenantId, riskAssessments.tenantId),
+          eq(hospitalityProperties.id, riskAssessments.propertyId),
+        ),
+      )
+      .where(
+        and(
+          eq(riskAssessments.tenantId, ctx.tenantId),
+          eq(riskAssessments.id, assessmentId),
+          isNull(riskAssessments.deletedAt),
+        ),
+      )
+      .limit(1)
+    if (!row) return null
+    assertCanAccessProperty(ctx, row.assessment.propertyId)
+    const hazards = await tx
+      .select()
+      .from(riskHazards)
+      .where(
+        and(eq(riskHazards.tenantId, ctx.tenantId), eq(riskHazards.assessmentId, assessmentId)),
+      )
+      .orderBy(asc(riskHazards.sortOrder))
+    return { ...row, hazards }
+  })
+}
+
 export async function listRiskAssessments(ctx: RequestContext, propertyId?: string) {
   assertCan(ctx, 'hospitality.read')
   if (propertyId) assertCanAccessProperty(ctx, propertyId)

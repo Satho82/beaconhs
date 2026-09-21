@@ -179,6 +179,14 @@ export const NAV_MODULES: NavModule[] = [
     group: 'Assets & people',
   },
   {
+    key: 'hospitality-risk',
+    href: '/hospitality/risk',
+    label: 'Risk',
+    iconKey: 'alert',
+    requiredPermission: 'hospitality.read',
+    group: 'Assets & people',
+  },
+  {
     key: 'locations',
     href: '/locations',
     label: 'Locations',

@@ -316,6 +316,13 @@
       "when": 1790157600000,
       "tag": "0045_risk_review_lifecycle",
       "breakpoints": true
+    },
+    {
+      "idx": 45,
+      "version": "7",
+      "when": 1790244000000,
+      "tag": "0046_risk_signoff_snapshot",
+      "breakpoints": true
     }
   ]
 }

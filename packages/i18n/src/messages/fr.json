@@ -9336,6 +9336,10 @@
     "m_16fec8635a9da6": "Risque",
     "m_0115cb3283a1a3": "{value0} jours",
     "m_0fbc6ff2021e9b": "Évaluation des risques {value1} : {value0}",
-    "m_0e563481e6ea82": "({value0} jours)"
+    "m_0e563481e6ea82": "({value0} jours)",
+    "m_09eaef68373866": "Évaluation des risques {value0} exportée au format PDF",
+    "m_1d7c2fdda7b4e8": "Registre des risques exporté au format CSV",
+    "m_182e36fb43830a": "Bibliothèque des risques exportée au format CSV",
+    "m_1b7bfbb8d17b8c": "Registre des risques exporté au format PDF"
   }
 }

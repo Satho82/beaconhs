@@ -7,6 +7,10 @@ const sql = readFileSync(
   resolve(import.meta.dirname, '../drizzle/0045_risk_review_lifecycle.sql'),
   'utf8',
 )
+const snapshotSql = readFileSync(
+  resolve(import.meta.dirname, '../drizzle/0046_risk_signoff_snapshot.sql'),
+  'utf8',
+)
 
 describe('0045 Risk review lifecycle migration', () => {
   it('adds lifecycle fields and constrained status values', () => {
@@ -30,7 +34,12 @@ describe('0045 Risk review lifecycle migration', () => {
     expect(RLS_POLICY_SQL('risk_assessment_signoffs')).toMatch(/FORCE ROW LEVEL SECURITY/)
   })
 
+  it('adds a forward-only signed document snapshot for historical reproduction', () => {
+    expect(snapshotSql).toMatch(/ALTER TABLE "risk_assessment_signoffs"/)
+    expect(snapshotSql).toMatch(/ADD COLUMN "snapshot" jsonb/)
+  })
+
   it('contains no destructive lifecycle migration operations', () => {
-    expect(sql).not.toMatch(/DROP TABLE|DROP COLUMN|TRUNCATE|DELETE FROM/i)
+    expect(`${sql}\n${snapshotSql}`).not.toMatch(/DROP TABLE|DROP COLUMN|TRUNCATE|DELETE FROM/i)
   })
 })

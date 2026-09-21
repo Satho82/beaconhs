@@ -73,6 +73,8 @@ describe('Risk review lifecycle', () => {
       'utf8',
     )
     expect(lifecycle).toContain('insert(riskAssessmentSignoffs)')
+    expect(lifecycle).toContain('adoptedTemplateSnapshot: current.adoptedTemplateSnapshot')
+    expect(lifecycle).toContain('hazards,')
     expect(lifecycle).not.toContain('update(riskAssessmentSignoffs)')
     expect(scanner).toContain('sourceJobId')
     expect(scanner).toContain('onConflictDoNothing()')

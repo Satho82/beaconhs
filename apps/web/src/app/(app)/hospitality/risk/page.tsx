@@ -147,6 +147,24 @@ export default async function RiskLibraryPage({ searchParams }: { searchParams: 
         )}
       />
 
+      <div className="mt-4 flex flex-wrap gap-2">
+        <Button asChild variant="outline">
+          <Link href="/hospitality/risk/export.csv">
+            {translateValue('Export Risk Register CSV')}
+          </Link>
+        </Button>
+        <Button asChild variant="outline">
+          <Link href="/hospitality/risk/register/pdf">
+            {translateValue('Export Risk Register PDF')}
+          </Link>
+        </Button>
+        <Button asChild variant="outline">
+          <Link href="/hospitality/risk/library/export.csv">
+            {translateValue('Export Risk Library CSV')}
+          </Link>
+        </Button>
+      </div>
+
       <form className="mt-5 flex flex-wrap gap-3 rounded-lg border p-4" method="get">
         <input
           name="q"

@@ -59,6 +59,43 @@ export type RiskTemplateHazard = {
   residualLikelihood?: number
   residualSeverity?: number
 }
+export type RiskAssessmentSignoffSnapshot = {
+  assessment: {
+    reference: string
+    title: string
+    areaLocation: string | null
+    activityEquipment: string | null
+    assessmentDate: string
+    adoptedTemplateVersion: string
+    adoptedTemplateSnapshot: AdoptedRiskTemplateSnapshot
+    comments: string | null
+    effectiveDate: string
+    validityMonths: number | null
+    nextReviewDate: string
+    expiryDate: string
+    reminderLeadDays: number
+    status: 'active' | 'retired'
+    lifecycleVersion: number
+  }
+  hazards: Array<{
+    sortOrder: number
+    hazardDescription: string
+    harmDescription: string
+    peopleAtRisk: string[]
+    initialLikelihood: number
+    initialSeverity: number
+    initialScore: number
+    controls: string
+    additionalControls: string | null
+    residualLikelihood: number
+    residualSeverity: number
+    residualScore: number
+  }>
+  property: { name: string; address: Record<string, unknown> }
+  tenant: { name: string }
+  assessorName: string
+}
+
 export type AdoptedRiskTemplateSnapshot = {
   templateId: string
   version: string
@@ -292,6 +329,7 @@ export const riskAssessmentSignoffs = pgTable(
     effectiveDate: date('effective_date').notNull(),
     nextReviewDate: date('next_review_date').notNull(),
     comments: text('comments'),
+    snapshot: jsonb('snapshot').$type<RiskAssessmentSignoffSnapshot>(),
     signedAt: timestamp('signed_at', { withTimezone: true }).defaultNow().notNull(),
     ...timestamps,
   },

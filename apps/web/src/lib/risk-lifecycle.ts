@@ -1,10 +1,15 @@
 import { and, asc, desc, eq, gt, isNull } from 'drizzle-orm'
 import {
+  hospitalityProperties,
   riskAssessments,
   riskAssessmentSignoffs,
+  riskHazards,
   riskTemplates,
   roleAssignments,
   roles,
+  tenantUsers,
+  tenants,
+  users,
 } from '@beaconhs/db/schema'
 import { assertCan, type RequestContext } from '@beaconhs/tenant'
 import { recordAuditInTransaction } from '@/lib/audit'
@@ -126,6 +131,55 @@ export async function applyRiskLifecycleAction(
       )
       .orderBy(asc(roles.name))
     const signedByRole = roleRows.map((row) => row.name).join(', ') || 'Hospitality manager'
+    const [hazards, propertyRows, tenantRows, assessorRows] = await Promise.all([
+      tx
+        .select({
+          sortOrder: riskHazards.sortOrder,
+          hazardDescription: riskHazards.hazardDescription,
+          harmDescription: riskHazards.harmDescription,
+          peopleAtRisk: riskHazards.peopleAtRisk,
+          initialLikelihood: riskHazards.initialLikelihood,
+          initialSeverity: riskHazards.initialSeverity,
+          initialScore: riskHazards.initialScore,
+          controls: riskHazards.controls,
+          additionalControls: riskHazards.additionalControls,
+          residualLikelihood: riskHazards.residualLikelihood,
+          residualSeverity: riskHazards.residualSeverity,
+          residualScore: riskHazards.residualScore,
+        })
+        .from(riskHazards)
+        .where(
+          and(eq(riskHazards.tenantId, ctx.tenantId), eq(riskHazards.assessmentId, assessmentId)),
+        )
+        .orderBy(asc(riskHazards.sortOrder)),
+      tx
+        .select({ name: hospitalityProperties.name, address: hospitalityProperties.address })
+        .from(hospitalityProperties)
+        .where(
+          and(
+            eq(hospitalityProperties.tenantId, ctx.tenantId),
+            eq(hospitalityProperties.id, current.propertyId),
+          ),
+        )
+        .limit(1),
+      tx.select({ name: tenants.name }).from(tenants).where(eq(tenants.id, ctx.tenantId)).limit(1),
+      tx
+        .select({ name: users.name, displayName: tenantUsers.displayName })
+        .from(tenantUsers)
+        .innerJoin(users, eq(users.id, tenantUsers.userId))
+        .where(
+          and(
+            eq(tenantUsers.tenantId, ctx.tenantId),
+            eq(tenantUsers.id, current.assessorTenantUserId),
+          ),
+        )
+        .limit(1),
+    ])
+    const property = propertyRows[0]
+    const tenant = tenantRows[0]
+    const assessor = assessorRows[0]
+    if (!property || !tenant || !assessor)
+      throw new Error('Risk sign-off snapshot context is incomplete')
     const status = input.action === 'retired' ? 'retired' : 'active'
     const [updated] = await tx
       .update(riskAssessments)
@@ -159,6 +213,29 @@ export async function applyRiskLifecycleAction(
         effectiveDate: input.effectiveDate,
         nextReviewDate: dates.nextReviewDate,
         comments: input.comments?.trim() || null,
+        snapshot: {
+          assessment: {
+            reference: current.reference,
+            title: current.title,
+            areaLocation: current.areaLocation,
+            activityEquipment: current.activityEquipment,
+            assessmentDate: current.assessmentDate,
+            adoptedTemplateVersion: current.adoptedTemplateVersion,
+            adoptedTemplateSnapshot: current.adoptedTemplateSnapshot,
+            comments: current.comments,
+            effectiveDate: input.effectiveDate,
+            validityMonths: dates.validityMonths,
+            nextReviewDate: dates.nextReviewDate,
+            expiryDate: dates.expiryDate,
+            reminderLeadDays: input.reminderLeadDays,
+            status,
+            lifecycleVersion,
+          },
+          hazards,
+          property,
+          tenant,
+          assessorName: assessor.displayName || assessor.name,
+        },
       })
       .returning()
     if (!signoff) throw new Error('Risk sign-off failed')

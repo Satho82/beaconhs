@@ -9336,6 +9336,10 @@
     "m_16fec8635a9da6": "Risk",
     "m_0115cb3283a1a3": "{value0} days",
     "m_0fbc6ff2021e9b": "{value0} risk assessment {value1}",
-    "m_0e563481e6ea82": "({value0} days)"
+    "m_0e563481e6ea82": "({value0} days)",
+    "m_09eaef68373866": "Exported risk assessment {value0} to PDF",
+    "m_1d7c2fdda7b4e8": "Exported Risk Register to CSV",
+    "m_182e36fb43830a": "Exported Risk Library to CSV",
+    "m_1b7bfbb8d17b8c": "Exported Risk Register to PDF"
   }
 }

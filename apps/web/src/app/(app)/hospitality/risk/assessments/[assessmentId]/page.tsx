@@ -57,9 +57,16 @@ export default async function RiskAssessmentPage({
 
   return (
     <PageContainer>
-      <Button asChild variant="ghost" className="mb-3">
-        <Link href="/hospitality/risk">{translateValue('Back to Risk Library')}</Link>
-      </Button>
+      <div className="mb-3 flex gap-2">
+        <Button asChild variant="ghost">
+          <Link href="/hospitality/risk">{translateValue('Back to Risk Library')}</Link>
+        </Button>
+        <Button asChild variant="outline">
+          <Link href={`/hospitality/risk/assessments/${assessmentId}/pdf`}>
+            {translateValue('Print / PDF')}
+          </Link>
+        </Button>
+      </div>
       <PageHeader title={record.assessment.title} description={description} />
       {newerTemplate && (
         <div className="mt-6 rounded-lg border border-amber-500 p-4 font-medium">
@@ -91,6 +98,17 @@ export default async function RiskAssessmentPage({
                   {signoff.action.replaceAll('_', ' ')} · {signoff.signedByName} ·{' '}
                   {signoff.signedByRole} · {signoff.signedAt.toISOString()} ·{' '}
                   {translateValue('Version')} {signoff.lifecycleVersion}
+                  {signoff.snapshot && (
+                    <>
+                      {' · '}
+                      <Link
+                        className="underline"
+                        href={`/hospitality/risk/assessments/${assessmentId}/pdf?signoffId=${signoff.id}`}
+                      >
+                        PDF
+                      </Link>
+                    </>
+                  )}
                 </li>
               ))}
             </ul>

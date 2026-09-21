@@ -7,7 +7,7 @@ import { hospitalityPropertyWhere } from './property-access'
 export const ACTIVE_HOSPITALITY_PROPERTY_COOKIE = 'active_hospitality_property'
 export const ALL_PROPERTIES_CONTEXT = 'all'
 
-export type HospitalityPropertyContext = {
+type HospitalityPropertyContext = {
   activePropertyId: string | null
   properties: { id: string; name: string }[]
 }

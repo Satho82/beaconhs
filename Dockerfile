@@ -59,7 +59,7 @@ ENV NODE_ENV=production
 # (Impress for the slides import, Writer for document version renders) +
 # poppler (pdftoppm page images, pdfunite book concatenation).
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    fonts-liberation libnss3 libatk-bridge2.0-0 libcups2 \
+    fonts-liberation libpcre2-8-0 libnss3 libatk-bridge2.0-0 libcups2 \
     libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 \
     libxrandr2 libgbm1 libasound2 ca-certificates curl unzip \
     libreoffice-impress libreoffice-writer poppler-utils \

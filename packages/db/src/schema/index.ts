@@ -73,5 +73,6 @@ export * from './reference-counters'
 export * from './walkthroughs'
 export * from './domain-events'
 export * from './hospitality'
+export * from './hospitality-handover'
 
 export * from './risk'

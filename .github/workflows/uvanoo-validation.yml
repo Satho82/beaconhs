@@ -100,6 +100,11 @@ jobs:
           set -o pipefail
           pnpm --silent --filter @beaconhs/db run test:action-property-sql |
             psql -h localhost -U postgres -d beaconhs_test -X -v ON_ERROR_STOP=1
+      - name: Prove Hotel Handover RLS with rollback-only fixtures
+        env:
+          PGPASSWORD: postgres
+        run: |
+          psql -h localhost -U postgres -d beaconhs_test -X -v ON_ERROR_STOP=1 -f packages/db/src/hospitality-handover-rls.integration.sql
       - run: pnpm test
       - run: pnpm build
   image:

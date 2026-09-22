@@ -45,6 +45,18 @@ export function reportArtifactPropertyPredicate(): string {
  */
 const mode = "current_setting('app.action_scope_mode', true)"
 const ids = "coalesce(nullif(current_setting('app.action_property_ids', true), ''), '[]')::jsonb"
+export function hospitalityHandoverPropertyPredicate(): string {
+  return `(${mode} = 'tenant' OR (
+    ${mode} = 'property'
+    AND (${ids}) ? hospitality_handovers.property_id::text
+  ))`
+}
+
+export function hospitalityHandoverChildPredicate(table: string): string {
+  return `EXISTS (SELECT 1 FROM hospitality_handovers h
+    WHERE h.tenant_id=${table}.tenant_id
+      AND h.id=${table}.handover_id)`
+}
 
 // Source rows are read under the same tenant RLS. Do not trust a mutable metadata
 // hint over an authoritative parent. Unknown linked sources deliberately fail
@@ -54,6 +66,9 @@ function sourceProperty(table: string): string {
   const sourceId = `${table}.source_entity_id`
   const tenant = `${table}.tenant_id`
   return `CASE
+    WHEN ${source} = 'hospitality_handover' THEN (
+      SELECT h.property_id::text FROM hospitality_handovers h
+      WHERE h.tenant_id=${tenant} AND h.id=${sourceId})
     WHEN ${source} = 'risk_hazard' THEN (
       SELECT a.property_id::text FROM risk_hazards h
       JOIN risk_assessments a ON a.tenant_id=h.tenant_id AND a.id=h.assessment_id

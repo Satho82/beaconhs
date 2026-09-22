@@ -187,6 +187,14 @@ export const NAV_MODULES: NavModule[] = [
     group: 'Assets & people',
   },
   {
+    key: 'hospitality-handover',
+    href: '/hospitality/handover',
+    label: 'Hotel Handover',
+    iconKey: 'journal',
+    requiredPermission: 'hospitality.read',
+    group: 'Assets & people',
+  },
+  {
     key: 'locations',
     href: '/locations',
     label: 'Locations',

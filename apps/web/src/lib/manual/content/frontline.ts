@@ -734,6 +734,38 @@ On a desktop, a summary rail on the side shows the same counts at a glance.
 - If the feed looks quiet, it may just mean your access is scoped to your own records. Ask your supervisor if you think you should see more.`,
   },
   {
+    slug: 'hotel-handover',
+    title: 'Hotel Handover',
+    group: 'Everyday tasks',
+    iconKey: 'journal',
+    summary: 'Record, acknowledge, update, and carry forward property shift handovers.',
+    keywords: ['hotel handover', 'shift', 'handover', 'follow-up', 'acknowledge', 'carry forward'],
+    requiredPermission: 'hospitality.read',
+    body: `Hotel Handover is the chronological shift record for operational notes that the next team needs to see. Entries stay attached to their property and can be acknowledged, updated, carried forward, and linked to follow-up work.
+
+## Where to find it
+
+Open **Hotel Handover** in the left menu. The Global Property selector controls the feed: choose one hotel for its handover, or use the portfolio view when your role can access several properties.
+
+## Add a handover entry
+
+1. Choose the property, date and time, shift, department, and priority.
+2. Write the handover note. Add a room or location when it helps the next shift find the issue.
+3. Mark **Follow-up required** and choose an owner when somebody must act.
+4. Link an existing maintenance issue, or create a shared Corrective Action when formal tracking is needed.
+5. Save the entry, then add secure photos if they provide useful evidence.
+
+## Work the feed
+
+- Tap **Acknowledge** to show that you have read an entry.
+- Add an update instead of replacing the original note; this preserves the handover history.
+- Change follow-up status as work moves from open to in progress or completed.
+- Carry forward an unresolved important or urgent entry when it must remain visible to the next shift.
+- Use search to find notes by property, department, location, or note text.
+
+You only see properties authorised for your role. Hotel managers remain within their assigned hotel; cluster and regional roles can work across their authorised properties.`,
+  },
+  {
     slug: 'tools',
     title: 'Field tools',
     group: 'Everyday tasks',

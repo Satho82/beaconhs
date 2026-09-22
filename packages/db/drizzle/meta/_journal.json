@@ -323,6 +323,13 @@
       "when": 1790244000000,
       "tag": "0046_risk_signoff_snapshot",
       "breakpoints": true
+    },
+    {
+      "idx": 46,
+      "version": "7",
+      "when": 1790330400000,
+      "tag": "0047_hospitality_handover",
+      "breakpoints": true
     }
   ]
 }

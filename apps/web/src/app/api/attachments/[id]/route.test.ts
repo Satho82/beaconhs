@@ -7,6 +7,7 @@ const state = vi.hoisted(() => ({
   authCalls: 0,
   authenticated: true,
   actionVisible: true,
+  handoverVisible: true,
 }))
 
 vi.mock('../../../../lib/auth', () => ({
@@ -31,6 +32,9 @@ vi.mock('@beaconhs/storage', () => ({
 vi.mock('../../../../lib/action-attachment-access', () => ({
   canReadActionAttachment: async () => state.actionVisible,
 }))
+vi.mock('../../../../lib/hospitality/handover-attachment-access', () => ({
+  canReadHandoverAttachment: async () => state.handoverVisible,
+}))
 
 import { GET } from './route'
 
@@ -43,6 +47,7 @@ async function request(url: string) {
 describe('attachment capability route', () => {
   beforeEach(() => {
     state.row = null
+    state.handoverVisible = true
     state.authCalls = 0
     state.authenticated = true
     state.actionVisible = true
@@ -71,6 +76,14 @@ describe('attachment capability route', () => {
     expect(response.status).toBe(307)
     expect(response.headers.get('location')).toBe('https://storage.example/signed')
     expect(response.headers.get('referrer-policy')).toBe('no-referrer')
+  })
+
+  it('denies another property’s Handover photo even with a valid capability', async () => {
+    state.row = { r2Key: 't/tenant/other-property-handover.png' }
+    state.handoverVisible = false
+    const response = await request(attachmentUrl(ID))
+    expect(response.status).toBe(404)
+    expect(response.headers.get('location')).toBeNull()
   })
 
   it('denies another property’s Action evidence even with a valid capability', async () => {

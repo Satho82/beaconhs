@@ -63,6 +63,17 @@ export function GuestReportForm({ token, submissionId }: { token: string; submis
         />
       </Label>
       <Label>
+        {translateValue('Photo (optional)')}
+        <Input
+          name="photo"
+          type="file"
+          accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
+        />
+        <span className="text-muted-foreground mt-1 block text-xs">
+          {translateValue('Add one photo to help the hotel team. Maximum 10 MB.')}
+        </span>
+      </Label>
+      <Label>
         {translateValue('Urgency')}
         <Select name="priority" defaultValue="medium">
           <option value="low">{translateValue('Low — can wait')}</option>

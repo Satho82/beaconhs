@@ -45,6 +45,26 @@ export function reportArtifactPropertyPredicate(): string {
  */
 const mode = "current_setting('app.action_scope_mode', true)"
 const ids = "coalesce(nullif(current_setting('app.action_property_ids', true), ''), '[]')::jsonb"
+export function maintenanceIssuePropertyPredicate(): string {
+  return `(${mode} = 'tenant' OR (
+    ${mode} = 'property'
+    AND EXISTS (
+      SELECT 1 FROM hospitality_rooms r
+      JOIN hospitality_floors f ON f.tenant_id=r.tenant_id AND f.id=r.floor_id
+      JOIN hospitality_buildings b ON b.tenant_id=f.tenant_id AND b.id=f.building_id
+      WHERE r.tenant_id=maintenance_issues.tenant_id
+        AND r.id=maintenance_issues.room_id
+        AND (${ids}) ? b.property_id::text
+    )
+  ))`
+}
+
+export function maintenanceIssueAttachmentPredicate(): string {
+  return `EXISTS (SELECT 1 FROM maintenance_issues m
+    WHERE m.tenant_id=maintenance_issue_attachments.tenant_id
+      AND m.id=maintenance_issue_attachments.issue_id)`
+}
+
 export function hospitalityHandoverPropertyPredicate(): string {
   return `(${mode} = 'tenant' OR (
     ${mode} = 'property'

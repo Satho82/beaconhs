@@ -1,6 +1,8 @@
 // Uvanoo hospitality operational foundation. These records deliberately do not
 // reuse construction org_units or equipment_work_orders.
+import { sql } from 'drizzle-orm'
 import {
+  check,
   foreignKey,
   index,
   jsonb,
@@ -15,6 +17,7 @@ import {
 import { id, softDelete, timestamps } from './_helpers'
 import { tenants, tenantUsers } from './core'
 import { equipmentItems } from './equipment'
+import { attachments } from './attachments'
 
 export const hospitalityRoomStatus = pgEnum('hospitality_room_status', [
   'available',
@@ -270,6 +273,66 @@ export const maintenanceIssues = pgTable(
       columns: [t.tenantId, t.reportedByTenantUserId],
       foreignColumns: [tenantUsers.tenantId, tenantUsers.id],
     }),
+  }),
+)
+
+export const maintenanceIssueAttachments = pgTable(
+  'maintenance_issue_attachments',
+  {
+    id: id(),
+    tenantId: uuid('tenant_id')
+      .notNull()
+      .references(() => tenants.id, { onDelete: 'cascade' }),
+    issueId: uuid('issue_id').notNull(),
+    attachmentId: uuid('attachment_id').notNull(),
+    stage: text('stage').notNull(),
+    source: text('source').notNull(),
+    uploadedByTenantUserId: uuid('uploaded_by_tenant_user_id'),
+    description: text('description'),
+    ...timestamps,
+  },
+  (t) => ({
+    tenantIdId: uniqueIndex('maintenance_issue_attachments_tenant_id_id_ux').on(t.tenantId, t.id),
+    attachment: uniqueIndex('maintenance_issue_attachments_attachment_ux').on(
+      t.tenantId,
+      t.attachmentId,
+    ),
+    issueTimeline: index('maintenance_issue_attachments_issue_timeline_idx').on(
+      t.tenantId,
+      t.issueId,
+      t.createdAt,
+    ),
+    issueFk: foreignKey({
+      name: 'maintenance_issue_attachments_issue_fk',
+      columns: [t.tenantId, t.issueId],
+      foreignColumns: [maintenanceIssues.tenantId, maintenanceIssues.id],
+    }).onDelete('cascade'),
+    attachmentFk: foreignKey({
+      name: 'maintenance_issue_attachments_attachment_fk',
+      columns: [t.tenantId, t.attachmentId],
+      foreignColumns: [attachments.tenantId, attachments.id],
+    }),
+    uploaderFk: foreignKey({
+      name: 'maintenance_issue_attachments_uploader_fk',
+      columns: [t.tenantId, t.uploadedByTenantUserId],
+      foreignColumns: [tenantUsers.tenantId, tenantUsers.id],
+    }),
+    stageCheck: check(
+      'maintenance_issue_attachments_stage_check',
+      sql`${t.stage} in ('reported','before_work','after_work','completion')`,
+    ),
+    sourceCheck: check(
+      'maintenance_issue_attachments_source_check',
+      sql`${t.source} in ('staff','guest_qr')`,
+    ),
+    descriptionCheck: check(
+      'maintenance_issue_attachments_description_check',
+      sql`${t.description} is null or length(${t.description}) <= 1000`,
+    ),
+    guestCheck: check(
+      'maintenance_issue_attachments_guest_check',
+      sql`(${t.source} = 'guest_qr' and ${t.uploadedByTenantUserId} is null) or ${t.source} = 'staff'`,
+    ),
   }),
 )
 

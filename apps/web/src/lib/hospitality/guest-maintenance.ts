@@ -1,11 +1,13 @@
 import { createHash, randomBytes } from 'node:crypto'
 import { and, eq, gt, isNull, lte, or } from 'drizzle-orm'
 import {
+  attachments,
   auditLog,
   hospitalityBuildings,
   hospitalityFloors,
   hospitalityProperties,
   hospitalityRooms,
+  maintenanceIssueAttachments,
   maintenanceIssues,
   qrTargets,
   tenantModuleEntitlements,
@@ -14,6 +16,9 @@ import {
 import { db, withSuperAdmin, withTenant } from '@beaconhs/db'
 import { consumeRateLimit } from '@beaconhs/jobs/rate-limit'
 import { isUuid } from '@/lib/list-params'
+import { deleteObject, ensureBucket, newAttachmentKey, putObject } from '@beaconhs/storage'
+import { optimizeUploadedImage } from '@/lib/image-upload-optimization'
+import { uploadContentTypeError, uploadedFileHeaderError } from '@/lib/upload-policy'
 
 const TOKEN_PATTERN = /^[A-Za-z0-9_-]{43}$/
 const priorities = new Set(['low', 'medium', 'high'])
@@ -153,9 +158,39 @@ export async function resolveGuestRoomTarget(token: string, now = new Date()) {
   })
 }
 
+async function prepareGuestPhoto(tenantId: string, photo: File | null) {
+  if (!photo || photo.size === 0) return null
+  if (photo.size > 10 * 1024 * 1024) throw new Error('The photo is too large (maximum 10 MB).')
+  const contentType = photo.type.toLowerCase()
+  const typeError = uploadContentTypeError('image', contentType)
+  if (typeError) throw new Error(typeError)
+  const raw = Buffer.from(await photo.arrayBuffer())
+  const headerError = uploadedFileHeaderError('image', contentType, raw.subarray(0, 512))
+  if (headerError) throw new Error(headerError)
+  const optimized = await optimizeUploadedImage({
+    body: raw,
+    contentType,
+    filename: bounded(photo.name || 'guest-photo', 255),
+  })
+  await ensureBucket()
+  const key = newAttachmentKey({
+    tenantId,
+    kind: 'image',
+    filename: optimized.filename,
+  })
+  await putObject({
+    key,
+    body: optimized.body,
+    contentType: optimized.contentType,
+    contentDisposition: 'inline',
+  })
+  return { key, optimized }
+}
+
 export async function submitGuestMaintenanceIssue(
   input: GuestMaintenanceInput,
   fingerprint: string,
+  photo: File | null = null,
 ) {
   if (input.website) return { ok: true as const, reference: 'received' }
   const rateKey = createHash('sha256').update(`${input.token}:${fingerprint}`).digest('hex')
@@ -172,8 +207,9 @@ export async function submitGuestMaintenanceIssue(
   if (!limit.allowed) throw new Error('Too many reports were sent. Please contact reception.')
   const target = await resolveGuestRoomTarget(input.token)
   if (!target) throw new Error('This room reporting link is unavailable.')
-  return withTenant(db, target.tenantId, async (tx) => {
-    const [existing] = await tx
+
+  const existing = await withTenant(db, target.tenantId, async (tx) => {
+    const [row] = await tx
       .select({ reference: maintenanceIssues.reference })
       .from(maintenanceIssues)
       .where(
@@ -183,53 +219,92 @@ export async function submitGuestMaintenanceIssue(
         ),
       )
       .limit(1)
-    if (existing) return { ok: true as const, reference: existing.reference }
-
-    const reference =
-      `MI-${Date.now().toString(36).toUpperCase()}-` + randomBytes(3).toString('hex').toUpperCase()
-    const [issue] = await tx
-      .insert(maintenanceIssues)
-      .values({
-        tenantId: target.tenantId,
-        roomId: target.roomId,
-        reference,
-        source: 'guest_qr',
-        status: 'reported',
-        priority: input.priority,
-        summary: input.category,
-        description: input.description,
-        publicSubmissionId: input.submissionId,
-        guestName: input.guestName || null,
-        guestContact: input.guestContact || null,
-        guestContactConsent: input.contactConsent,
-      })
-      .onConflictDoNothing({
-        target: [maintenanceIssues.tenantId, maintenanceIssues.publicSubmissionId],
-      })
-      .returning({ id: maintenanceIssues.id, reference: maintenanceIssues.reference })
-    if (!issue) {
-      const [duplicate] = await tx
-        .select({ reference: maintenanceIssues.reference })
-        .from(maintenanceIssues)
-        .where(
-          and(
-            eq(maintenanceIssues.tenantId, target.tenantId),
-            eq(maintenanceIssues.publicSubmissionId, input.submissionId),
-          ),
-        )
-        .limit(1)
-      if (duplicate) return { ok: true as const, reference: duplicate.reference }
-      throw new Error('The issue could not be recorded.')
-    }
-    await tx.insert(auditLog).values({
-      tenantId: target.tenantId,
-      actorUserId: null,
-      entityType: 'maintenance_issue',
-      entityId: issue.id,
-      action: 'create',
-      summary: `Guest QR report ${issue.reference} received for room ${target.roomCode}`,
-      metadata: { source: 'guest_qr', roomId: target.roomId },
-    })
-    return { ok: true as const, reference: issue.reference }
+    return row ?? null
   })
+  if (existing) return { ok: true as const, reference: existing.reference }
+
+  const prepared = await prepareGuestPhoto(target.tenantId, photo)
+  try {
+    const outcome = await withTenant(db, target.tenantId, async (tx) => {
+      const reference =
+        `MI-${Date.now().toString(36).toUpperCase()}-` +
+        randomBytes(3).toString('hex').toUpperCase()
+      const [issue] = await tx
+        .insert(maintenanceIssues)
+        .values({
+          tenantId: target.tenantId,
+          roomId: target.roomId,
+          reference,
+          source: 'guest_qr',
+          status: 'reported',
+          priority: input.priority,
+          summary: input.category,
+          description: input.description,
+          publicSubmissionId: input.submissionId,
+          guestName: input.guestName || null,
+          guestContact: input.guestContact || null,
+          guestContactConsent: input.contactConsent,
+        })
+        .onConflictDoNothing({
+          target: [maintenanceIssues.tenantId, maintenanceIssues.publicSubmissionId],
+        })
+        .returning({ id: maintenanceIssues.id, reference: maintenanceIssues.reference })
+      if (!issue) {
+        const [duplicate] = await tx
+          .select({ reference: maintenanceIssues.reference })
+          .from(maintenanceIssues)
+          .where(
+            and(
+              eq(maintenanceIssues.tenantId, target.tenantId),
+              eq(maintenanceIssues.publicSubmissionId, input.submissionId),
+            ),
+          )
+          .limit(1)
+        if (duplicate) return { reference: duplicate.reference, discardPrepared: true }
+        throw new Error('The issue could not be recorded.')
+      }
+      if (prepared) {
+        const [attachment] = await tx
+          .insert(attachments)
+          .values({
+            tenantId: target.tenantId,
+            uploadedBy: null,
+            kind: 'image',
+            r2Key: prepared.key,
+            contentType: prepared.optimized.contentType,
+            sizeBytes: prepared.optimized.sizeBytes,
+            filename: prepared.optimized.filename,
+            width: prepared.optimized.width,
+            height: prepared.optimized.height,
+          })
+          .returning({ id: attachments.id })
+        if (!attachment) throw new Error('The photo could not be recorded.')
+        await tx.insert(maintenanceIssueAttachments).values({
+          tenantId: target.tenantId,
+          issueId: issue.id,
+          attachmentId: attachment.id,
+          stage: 'reported',
+          source: 'guest_qr',
+          uploadedByTenantUserId: null,
+        })
+      }
+      await tx.insert(auditLog).values({
+        tenantId: target.tenantId,
+        actorUserId: null,
+        entityType: 'maintenance_issue',
+        entityId: issue.id,
+        action: 'create',
+        summary: `Guest QR report ${issue.reference} received for room ${target.roomCode}`,
+        metadata: { source: 'guest_qr', roomId: target.roomId, evidence: Boolean(prepared) },
+      })
+      return { reference: issue.reference, discardPrepared: false }
+    })
+    if (prepared && outcome.discardPrepared) {
+      await deleteObject({ key: prepared.key }).catch(() => undefined)
+    }
+    return { ok: true as const, reference: outcome.reference }
+  } catch (error) {
+    if (prepared) await deleteObject({ key: prepared.key }).catch(() => undefined)
+    throw error
+  }
 }

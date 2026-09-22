@@ -128,6 +128,7 @@ export async function reportMaintenanceIssueAction(f: FormData) {
     value(f, 'description'),
     value(f, 'priority'),
     value(f, 'source') === 'front_office' ? 'front_office' : 'staff',
+    f.getAll('attachmentId').map(String),
   )
   redirect(`/hospitality/maintenance/${r.id}`)
 }

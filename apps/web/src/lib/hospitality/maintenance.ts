@@ -1,6 +1,7 @@
 import { randomBytes } from 'node:crypto'
 import { and, eq, isNull } from 'drizzle-orm'
 import {
+  maintenanceIssueAttachments,
   maintenanceIssues,
   hospitalityBuildings,
   hospitalityFloors,
@@ -11,6 +12,7 @@ import { assertCan, type RequestContext } from '@beaconhs/tenant'
 import { assertTenantModuleEntitled } from '@/lib/module-entitlements/server'
 import { recordAudit } from '@/lib/audit'
 import { assertCanAccessProperty } from '@/lib/hospitality/property-access'
+import { validateTenantImageAttachmentIdsInTx } from '@/lib/attachment-validation'
 const priorities = new Set(['low', 'medium', 'high', 'critical'])
 export const MAINTENANCE_STATUSES = [
   'reported',
@@ -52,6 +54,7 @@ export async function createRoomMaintenanceIssue(
   description: string,
   priority: string,
   source: 'staff' | 'front_office' | 'manager' | 'engineering' | 'staff_qr' = 'staff',
+  attachmentIds: readonly string[] = [],
 ) {
   await assertTenantModuleEntitled(ctx, 'hospitality.maintenance')
   assertCan(ctx, 'maintenance.create')
@@ -89,8 +92,9 @@ export async function createRoomMaintenanceIssue(
   )
   if (!room) throw new Error('No room exists in this tenant')
   assertCanAccessProperty(ctx, room.propertyId)
-  const [r] = await ctx.db((tx) =>
-    tx
+  const [r] = await ctx.db(async (tx) => {
+    const photos = await validateTenantImageAttachmentIdsInTx(tx, ctx.tenantId, attachmentIds)
+    const created = await tx
       .insert(maintenanceIssues)
       .values({
         tenantId: ctx.tenantId,
@@ -104,8 +108,22 @@ export async function createRoomMaintenanceIssue(
         source,
         reportedByTenantUserId: ctx.membership?.id ?? null,
       })
-      .returning(),
-  )
+      .returning()
+    const issue = created[0]
+    if (issue && photos.length) {
+      await tx.insert(maintenanceIssueAttachments).values(
+        photos.map((attachmentId) => ({
+          tenantId: ctx.tenantId,
+          issueId: issue.id,
+          attachmentId,
+          stage: 'reported',
+          source: 'staff',
+          uploadedByTenantUserId: ctx.membership?.id ?? null,
+        })),
+      )
+    }
+    return created
+  })
   if (!r) throw new Error('Issue creation failed')
   await recordAudit(ctx, {
     entityType: 'maintenance_issue',
@@ -204,4 +222,77 @@ export async function updateMaintenanceIssue(
     summary: `Updated maintenance issue ${r.reference}`,
   })
   return r
+}
+
+export const MAINTENANCE_EVIDENCE_STAGES = [
+  'reported',
+  'before_work',
+  'after_work',
+  'completion',
+] as const
+export type MaintenanceEvidenceStage = (typeof MAINTENANCE_EVIDENCE_STAGES)[number]
+
+export async function attachMaintenanceEvidence(
+  ctx: RequestContext,
+  issueId: string,
+  stage: MaintenanceEvidenceStage,
+  attachmentIds: readonly string[],
+  description = '',
+) {
+  await gate(ctx, true)
+  if (!MAINTENANCE_EVIDENCE_STAGES.includes(stage)) throw new Error('Invalid evidence stage')
+  if (!attachmentIds.length || attachmentIds.length > 20)
+    throw new Error('Choose evidence to attach')
+  const note = description.trim()
+  if (note.length > 1000) throw new Error('Evidence description is too long')
+  const [issue] = await ctx.db((tx) =>
+    tx
+      .select({ id: maintenanceIssues.id, propertyId: hospitalityBuildings.propertyId })
+      .from(maintenanceIssues)
+      .innerJoin(
+        hospitalityRooms,
+        and(
+          eq(hospitalityRooms.tenantId, maintenanceIssues.tenantId),
+          eq(hospitalityRooms.id, maintenanceIssues.roomId),
+        ),
+      )
+      .innerJoin(
+        hospitalityFloors,
+        and(
+          eq(hospitalityFloors.tenantId, hospitalityRooms.tenantId),
+          eq(hospitalityFloors.id, hospitalityRooms.floorId),
+        ),
+      )
+      .innerJoin(
+        hospitalityBuildings,
+        and(
+          eq(hospitalityBuildings.tenantId, hospitalityFloors.tenantId),
+          eq(hospitalityBuildings.id, hospitalityFloors.buildingId),
+        ),
+      )
+      .where(and(eq(maintenanceIssues.tenantId, ctx.tenantId), eq(maintenanceIssues.id, issueId)))
+      .limit(1),
+  )
+  if (!issue) throw new Error('No maintenance issue exists in this tenant')
+  assertCanAccessProperty(ctx, issue.propertyId)
+  await ctx.db(async (tx) => {
+    const photos = await validateTenantImageAttachmentIdsInTx(tx, ctx.tenantId, attachmentIds)
+    await tx.insert(maintenanceIssueAttachments).values(
+      photos.map((attachmentId) => ({
+        tenantId: ctx.tenantId,
+        issueId,
+        attachmentId,
+        stage,
+        source: 'staff',
+        uploadedByTenantUserId: ctx.membership?.id ?? null,
+        description: note || null,
+      })),
+    )
+  })
+  await recordAudit(ctx, {
+    entityType: 'maintenance_issue',
+    entityId: issueId,
+    action: 'update',
+    summary: `Attached ${attachmentIds.length} ${stage.replaceAll('_', ' ')} evidence item(s)`,
+  })
 }

@@ -36,7 +36,9 @@ export async function submitGuestReport(
       h.get('x-real-ip') ||
       h.get('x-forwarded-for')?.split(',')[0]?.trim() ||
       'unknown'
-    const result = await submitGuestMaintenanceIssue(input, fingerprint)
+    const candidate = form.get('photo')
+    const photo = candidate instanceof File && candidate.size > 0 ? candidate : null
+    const result = await submitGuestMaintenanceIssue(input, fingerprint, photo)
     return {
       status: 'success',
       message: 'Thank you. The hotel team has received your report.',

@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import { FileUpload, type AttachedFile } from '@/components/file-upload'
 import { Button, Input, Label, Select, Textarea } from '@beaconhs/ui'
 import { useGeneratedValueTranslations } from '@/i18n/generated'
 import { reportMaintenanceIssueAction } from '@/app/(app)/hospitality/properties/actions'
@@ -16,6 +17,7 @@ export function QuickMaintenanceForm({
   rooms: RoomOption[]
 }) {
   const t = useGeneratedValueTranslations()
+  const [photos, setPhotos] = useState<AttachedFile[]>([])
   const [propertyId, setPropertyId] = useState(properties.length === 1 ? properties[0]!.id : '')
   const availableRooms = useMemo(
     () => rooms.filter((room) => !propertyId || room.propertyId === propertyId),
@@ -77,6 +79,18 @@ export function QuickMaintenanceForm({
           <option value="critical">{t('Critical')}</option>
         </Select>
       </Label>
+      <div>
+        <p className="mb-2 text-sm font-medium">{t('Photo / evidence (optional)')}</p>
+        <FileUpload variant="photo" value={photos} onChange={setPhotos} maxFiles={10} />
+        {photos.map((photo) => (
+          <input
+            key={photo.attachmentId}
+            type="hidden"
+            name="attachmentId"
+            value={photo.attachmentId}
+          />
+        ))}
+      </div>
       <Button type="submit">{t('Submit maintenance issue')}</Button>
     </form>
   )

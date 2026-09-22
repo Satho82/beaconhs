@@ -9,10 +9,15 @@ import {
   hospitalityFloors,
   hospitalityProperties,
   hospitalityRooms,
+  attachments,
+  maintenanceIssueAttachments,
   maintenanceIssues,
   tenantUsers,
   users,
 } from '@beaconhs/db/schema'
+import { PhotoUploaderSection } from '@/components/photo-uploader-section'
+import { RawImage } from '@/components/raw-image'
+import { attachmentUrl } from '@/lib/attachment-url'
 import { PageContainer } from '@/components/page-layout'
 import { requireRequestContext } from '@/lib/auth'
 import { MAINTENANCE_STATUSES } from '@/lib/hospitality/maintenance'
@@ -20,6 +25,7 @@ import { assertTenantModuleEntitled } from '@/lib/module-entitlements/server'
 import { assertCan, can } from '@beaconhs/tenant'
 import { updateMaintenanceIssueAction } from '../../properties/actions'
 import { hospitalityPropertyWhere } from '@/lib/hospitality/property-access'
+import { attachMaintenanceEvidenceAction } from './actions'
 
 export default async function IssuePage({ params }: { params: Promise<{ issueId: string }> }) {
   const [translateHospitality, translateValue] = await Promise.all([
@@ -82,7 +88,33 @@ export default async function IssuePage({ params }: { params: Promise<{ issueId:
       .innerJoin(users, eq(users.id, tenantUsers.userId))
       .where(and(eq(tenantUsers.tenantId, ctx.tenantId), eq(tenantUsers.status, 'active')))
       .limit(250)
-    return { row, members }
+    const evidence = await tx
+      .select({
+        id: maintenanceIssueAttachments.id,
+        stage: maintenanceIssueAttachments.stage,
+        source: maintenanceIssueAttachments.source,
+        description: maintenanceIssueAttachments.description,
+        createdAt: maintenanceIssueAttachments.createdAt,
+        attachmentId: attachments.id,
+        filename: attachments.filename,
+        contentType: attachments.contentType,
+      })
+      .from(maintenanceIssueAttachments)
+      .innerJoin(
+        attachments,
+        and(
+          eq(attachments.tenantId, maintenanceIssueAttachments.tenantId),
+          eq(attachments.id, maintenanceIssueAttachments.attachmentId),
+        ),
+      )
+      .where(
+        and(
+          eq(maintenanceIssueAttachments.tenantId, ctx.tenantId),
+          eq(maintenanceIssueAttachments.issueId, issueId),
+        ),
+      )
+      .orderBy(maintenanceIssueAttachments.createdAt)
+    return { row, members, evidence }
   })
   if (!data.row) notFound()
   const { issue: r } = data.row
@@ -127,6 +159,57 @@ export default async function IssuePage({ params }: { params: Promise<{ issueId:
             </p>
           </div>
         )}
+      </section>
+      <section className="mt-4 space-y-4 rounded-lg border p-4">
+        <div>
+          <h2 className="font-semibold">{translateValue('Evidence')}</h2>
+          <p className="text-muted-foreground text-sm">
+            {translateValue('Reported, before-work, after-work and completion evidence.')}
+          </p>
+        </div>
+        {(['reported', 'before_work', 'after_work', 'completion'] as const).map((stage) => {
+          const items = data.evidence.filter((item) => item.stage === stage)
+          return (
+            <div key={stage} className="space-y-2">
+              <h3 className="text-sm font-medium">{translateValue(stage.replaceAll('_', ' '))}</h3>
+              {items.length ? (
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {items.map((item) => (
+                    <a
+                      key={item.id}
+                      href={attachmentUrl(item.attachmentId)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="overflow-hidden rounded-md border"
+                    >
+                      {item.contentType.startsWith('image/') ? (
+                        <RawImage
+                          src={attachmentUrl(item.attachmentId)}
+                          alt={item.filename}
+                          optimizationReason="authenticated"
+                          className="h-36 w-full object-cover"
+                        />
+                      ) : null}
+                      <span className="block p-2 text-xs">
+                        {item.filename} - {item.source.replaceAll('_', ' ')} -{' '}
+                        {item.createdAt.toLocaleString()}
+                      </span>
+                    </a>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-muted-foreground text-sm">
+                  {translateValue('No evidence yet.')}
+                </p>
+              )}
+              {can(ctx, 'maintenance.update') ? (
+                <PhotoUploaderSection
+                  attachAction={attachMaintenanceEvidenceAction.bind(null, r.id, stage)}
+                />
+              ) : null}
+            </div>
+          )
+        })}
       </section>
       {can(ctx, 'maintenance.update') && (
         <form

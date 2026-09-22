@@ -404,7 +404,7 @@ export const REPORT_VIEWS_SQL: string[] = [
 
   // Corrective-action projection with owner, department, group, and location
   // dimensions used by the legacy report filters.
-  `CREATE OR REPLACE VIEW report_corrective_actions AS
+  `CREATE OR REPLACE VIEW report_corrective_actions WITH (security_invoker = true) AS
    SELECT
      action.id,
      action.tenant_id,

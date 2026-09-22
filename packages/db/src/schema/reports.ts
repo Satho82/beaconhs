@@ -161,6 +161,12 @@ export const reportRunStatus = pgEnum('report_run_status', [
 export const reportRunTrigger = pgEnum('report_run_trigger', ['scheduled', 'manual'])
 
 export type ReportRunRequestSnapshot = {
+  /** Added atomically with the rendered artifact; old artifacts have no proof. */
+  artifactAuthorization?: {
+    version: 1
+    mode: 'tenant' | 'property' | 'legacy'
+    propertyIds: string[]
+  }
   scheduleName: string
   definition: {
     id: string

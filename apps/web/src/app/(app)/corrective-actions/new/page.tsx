@@ -27,6 +27,8 @@ import { pickString } from '@/lib/list-params'
 import { PageContainer } from '@/components/page-layout'
 import { RemoteSelectField } from '@/components/remote-search-select'
 import { nextReference } from '@/lib/reference'
+import { resolveHospitalityPropertyContext } from '@/lib/hospitality/property-context'
+import { assertCanAccessProperty } from '@/lib/hospitality/property-access'
 
 export async function generateMetadata() {
   const tGenerated = await getGeneratedTranslations()
@@ -58,6 +60,8 @@ async function createCA(formData: FormData) {
   const siteOrgUnitId = String(formData.get('siteOrgUnitId') ?? '').trim() || null
   const dueOn = String(formData.get('dueOn') ?? '').trim() || null
   const assignedOn = new Date().toISOString().slice(0, 10)
+  const propertyId = String(formData.get('propertyId') ?? '').trim()
+  if (propertyId) assertCanAccessProperty(ctx, propertyId)
 
   const row = await ctx.db(async (tx) => {
     const reference = await nextReference(tx, ctx.tenantId, 'corrective_action')
@@ -78,6 +82,7 @@ async function createCA(formData: FormData) {
         dueOn,
         assignedByTenantUserId: ctx.membership?.id,
         ownerTenantUserId: ctx.membership?.id,
+        metadata: propertyId ? { propertyId } : {},
       })
       .returning()
     const correctiveAction = created[0]
@@ -137,6 +142,7 @@ export default async function NewCAPage({
   const presetSourceType = pickString(sp.sourceEntityType)
   const presetSourceId = pickString(sp.sourceEntityId)
   const ctx = await requireRequestContext()
+  const propertyContext = await resolveHospitalityPropertyContext(ctx)
 
   const sourceIncident = await ctx.db(async (tx) => {
     let inc = null
@@ -172,6 +178,18 @@ export default async function NewCAPage({
         <Card>
           <CardContent className="pt-6">
             <form action={createCA} className="space-y-4">
+              {propertyContext.properties.length > 0 && (
+                <Field label={tGenerated('m_0f7a8c3e57d104')}>
+                  <Select name="propertyId" defaultValue={propertyContext.activePropertyId ?? ''}>
+                    <option value="">Choose a property</option>
+                    {propertyContext.properties.map((property) => (
+                      <option key={property.id} value={property.id}>
+                        {property.name}
+                      </option>
+                    ))}
+                  </Select>
+                </Field>
+              )}
               <input type="hidden" name="sourceEntityId" value={presetSourceId ?? ''} />
               <input type="hidden" name="sourceEntityType" value={presetSourceType ?? ''} />
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">

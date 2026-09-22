@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm'
+import { eq, sql } from 'drizzle-orm'
 import { type Database, withSuperAdmin, withTenant } from '@beaconhs/db'
 import type { AppLocale } from '@beaconhs/i18n'
 import {
@@ -79,6 +79,23 @@ export type SuperAdminContext = {
   db: <T>(fn: (tx: Database) => Promise<T>) => Promise<T>
 }
 
+/** Scope persisted with exports and applied to every authenticated transaction. */
+export function actionPropertyScope(ctx: Pick<RequestContext, 'isSuperAdmin' | 'scopes'>): {
+  mode: 'tenant' | 'property' | 'legacy'
+  propertyIds: string[]
+} {
+  const properties = assignedPropertyIds(ctx)
+  return {
+    mode:
+      properties === null
+        ? 'tenant'
+        : ctx.scopes.some((scope) => scope.type === 'properties')
+          ? 'property'
+          : 'legacy',
+    propertyIds: properties ?? [],
+  }
+}
+
 export function makeTenantContext(
   baseDb: Database,
   args: Omit<RequestContext, 'db' | 'regulatory'> & { regulatory?: RegulatoryTerminology },
@@ -86,7 +103,14 @@ export function makeTenantContext(
   return {
     ...args,
     regulatory: args.regulatory ?? DEFAULT_REGULATORY_TERMINOLOGY,
-    db: <T>(fn: (tx: Database) => Promise<T>) => withTenant(baseDb, args.tenantId, fn),
+    db: <T>(fn: (tx: Database) => Promise<T>) =>
+      withTenant(baseDb, args.tenantId, async (tx) => {
+        const { mode, propertyIds } = actionPropertyScope(args)
+        await tx.execute(sql`SELECT
+          set_config('app.action_scope_mode', ${mode}, true),
+          set_config('app.action_property_ids', ${JSON.stringify(propertyIds)}, true)`)
+        return fn(tx)
+      }),
   }
 }
 
@@ -307,7 +331,9 @@ export function canSeeProperty(ctx: RequestContext, propertyId: string): boolean
 }
 
 /** Distinct assigned properties, or null for tenant-wide/super-admin access. */
-export function assignedPropertyIds(ctx: RequestContext): string[] | null {
+export function assignedPropertyIds(
+  ctx: Pick<RequestContext, 'isSuperAdmin' | 'scopes'>,
+): string[] | null {
   if (ctx.isSuperAdmin || ctx.scopes.some((scope) => scope.type === 'tenant')) return null
   return [
     ...new Set(

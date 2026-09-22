@@ -5,6 +5,7 @@ import { attachments } from '@beaconhs/db/schema'
 import { presignGet } from '@beaconhs/storage'
 import { validateAttachmentCapability } from '../../../../lib/attachment-url'
 import { getRequestContext } from '../../../../lib/auth'
+import { canReadActionAttachment } from '../../../../lib/action-attachment-access'
 
 export const dynamic = 'force-dynamic'
 
@@ -37,6 +38,9 @@ export async function GET(
     return row ?? null
   })
   if (!attachment) return new NextResponse('Not found', { status: 404 })
+  if (!(await canReadActionAttachment(ctx, parsedId.data))) {
+    return new NextResponse('Not found', { status: 404 })
+  }
 
   const signedUrl = await presignGet({ key: attachment.r2Key, expiresInSeconds: 60 })
   const response = NextResponse.redirect(signedUrl, 307)

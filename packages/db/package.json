@@ -24,6 +24,7 @@
     "seed": "tsx --env-file=../../.env src/seed.ts",
     "seed:demo-hotel": "tsx src/seed-demo-hotel.ts",
     "test": "vitest run",
+    "test:action-property-sql": "tsx src/action-property-test-sql.ts",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist .turbo",
     "seed:cycas-demo": "tsx src/seed-cycas-demo.ts"

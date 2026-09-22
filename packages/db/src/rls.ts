@@ -1,4 +1,11 @@
 import { sql } from 'drizzle-orm'
+import {
+  actionAuditPredicate,
+  actionAssigneePredicate,
+  actionChildPredicate,
+  actionPropertyPredicate,
+  reportArtifactPropertyPredicate,
+} from './action-property-policy'
 import { superDb, type Database } from './client'
 
 // Every tenant-owned table enforces isolation with FORCE ROW LEVEL SECURITY and
@@ -17,6 +24,8 @@ export async function withTenant<T>(
 ): Promise<T> {
   return db.transaction(async (tx) => {
     await tx.execute(sql`SELECT set_config('app.tenant_id', ${tenantId}, true)`)
+    await tx.execute(sql`SELECT set_config('app.action_scope_mode', 'tenant', true),
+      set_config('app.action_property_ids', '[]', true)`)
     return fn(tx as unknown as Database)
   })
 }
@@ -92,10 +101,24 @@ CREATE POLICY tenant_write_delete ON ${table}
 `
   }
 
+  const actionScope =
+    table === 'corrective_actions'
+      ? actionPropertyPredicate()
+      : table === 'ca_photos' || table === 'ca_complete_steps'
+        ? actionChildPredicate(table)
+        : table === 'report_runs'
+          ? reportArtifactPropertyPredicate()
+          : table === 'report_run_deliveries'
+            ? 'EXISTS (SELECT 1 FROM report_runs r WHERE r.tenant_id=report_run_deliveries.tenant_id AND r.id=report_run_deliveries.run_id)'
+            : table === 'audit_log'
+              ? actionAuditPredicate()
+              : 'true'
+  const scopeSql = actionScope === 'true' ? '' : ` AND (${actionScope})`
+  const assignmentSql = table === 'corrective_actions' ? ` AND (${actionAssigneePredicate()})` : ''
   return `${reset}
 CREATE POLICY tenant_isolation ON ${table}
-  USING (tenant_id = ${TENANT_ID_SQL})
-  WITH CHECK (tenant_id = ${TENANT_ID_SQL});
+  USING (tenant_id = ${TENANT_ID_SQL}${scopeSql})
+  WITH CHECK (tenant_id = ${TENANT_ID_SQL}${scopeSql}${assignmentSql});
 `
 }
 

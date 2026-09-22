@@ -6,6 +6,7 @@ const state = vi.hoisted(() => ({
   row: null as { r2Key: string } | null,
   authCalls: 0,
   authenticated: true,
+  actionVisible: true,
 }))
 
 vi.mock('../../../../lib/auth', () => ({
@@ -27,6 +28,9 @@ vi.mock('../../../../lib/auth', () => ({
 vi.mock('@beaconhs/storage', () => ({
   presignGet: async () => 'https://storage.example/signed',
 }))
+vi.mock('../../../../lib/action-attachment-access', () => ({
+  canReadActionAttachment: async () => state.actionVisible,
+}))
 
 import { GET } from './route'
 
@@ -41,6 +45,7 @@ describe('attachment capability route', () => {
     state.row = null
     state.authCalls = 0
     state.authenticated = true
+    state.actionVisible = true
   })
 
   it('rejects ID-only and invalid capabilities before tenant lookup', async () => {
@@ -66,5 +71,13 @@ describe('attachment capability route', () => {
     expect(response.status).toBe(307)
     expect(response.headers.get('location')).toBe('https://storage.example/signed')
     expect(response.headers.get('referrer-policy')).toBe('no-referrer')
+  })
+
+  it('denies another property’s Action evidence even with a valid capability', async () => {
+    state.row = { r2Key: 't/tenant/other-property-photo.png' }
+    state.actionVisible = false
+    const response = await request(attachmentUrl(ID))
+    expect(response.status).toBe(404)
+    expect(response.headers.get('location')).toBeNull()
   })
 })

@@ -42,6 +42,7 @@ import {
 } from '@beaconhs/reports/server'
 import {
   can,
+  actionPropertyScope,
   canAccessTemplate,
   makeTenantContext,
   resolveMembershipAccess,
@@ -125,21 +126,21 @@ export async function processReportRun(job: Job<ReportRunJobData>): Promise<void
       timeStyle: 'short',
       timeZone: 'UTC',
     }).format(ctx.run.scheduledFor)} UTC`
+    const execution = await withTenant(db, tenantId, (tx) =>
+      resolveScheduledReportContext(tx, tenantId, snapshot),
+    )
     let artifact = await loadArtifact(tenantId, ctx.run.pdfAttachmentId, ctx.run.rowCount)
-
     if (!artifact) {
-      const { result, locale, requestCtx } = await withTenant(db, tenantId, async (tx) => {
-        const { catalog, locale, requestCtx } = await resolveScheduledReportContext(
-          tx,
-          tenantId,
-          snapshot,
+      const { result, locale, requestCtx } = await (async () => {
+        const { catalog, locale, requestCtx } = execution
+        const result = await requestCtx.db((scopedTx) =>
+          runBeaconReport(scopedTx, tenantId, snapshot.definition.query, catalog, {
+            maxRows: 10_000,
+            runtimeFilters: normalizeReportRuntimeFilters(snapshot.filters),
+          }),
         )
-        const result = await runBeaconReport(tx, tenantId, snapshot.definition.query, catalog, {
-          maxRows: 10_000,
-          runtimeFilters: normalizeReportRuntimeFilters(snapshot.filters),
-        })
         return { result, locale, requestCtx }
-      })
+      })()
       const rowCount = result.rowCount
       const printCredentialFronts = reportExportsCredentialFronts(snapshot.definition.layout)
       if (printCredentialFronts && !reportSupportsWalletCards(snapshot.definition.query.entity)) {
@@ -216,7 +217,17 @@ export async function processReportRun(job: Job<ReportRunJobData>): Promise<void
           if (!att) throw new Error('Failed to persist the scheduled report PDF attachment')
           const [updated] = await tx
             .update(reportRuns)
-            .set({ pdfAttachmentId: att.id, rowCount })
+            .set({
+              pdfAttachmentId: att.id,
+              rowCount,
+              requestSnapshot: {
+                ...snapshot,
+                artifactAuthorization: {
+                  version: 1,
+                  ...actionPropertyScope(requestCtx),
+                },
+              },
+            })
             .where(
               and(
                 eq(reportRuns.id, runId),
@@ -248,6 +259,20 @@ export async function processReportRun(job: Job<ReportRunJobData>): Promise<void
         if (!artifact)
           throw new Error('Concurrent report PDF persistence did not produce an artifact')
       }
+    }
+
+    const artifactVisible = await execution.requestCtx.db(async (tx) => {
+      const [row] = await tx
+        .select({ id: reportRuns.id })
+        .from(reportRuns)
+        .where(and(eq(reportRuns.tenantId, tenantId), eq(reportRuns.id, runId)))
+        .limit(1)
+      return Boolean(row)
+    })
+    if (!artifactVisible) {
+      throw new Error(
+        'Stored report authorization cannot be established for the current run-as scope; create a new run.',
+      )
     }
 
     // Resolve the immutable recipient snapshot against CURRENT active

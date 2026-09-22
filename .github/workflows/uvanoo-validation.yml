@@ -93,6 +93,13 @@ jobs:
         run: pnpm --filter @beaconhs/db exec tsx src/migrate.ts
       - name: Prove Cycas seed transaction, idempotency, and counts
         run: scripts/ci/cycas-demo-seed-integration.sh
+      - name: Prove Action property RLS with rollback-only fixtures
+        env:
+          PGPASSWORD: postgres
+        run: |
+          set -o pipefail
+          pnpm --silent --filter @beaconhs/db run test:action-property-sql |
+            psql -h localhost -U postgres -d beaconhs_test -X -v ON_ERROR_STOP=1
       - run: pnpm test
       - run: pnpm build
   image:

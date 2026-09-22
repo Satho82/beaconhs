@@ -436,6 +436,12 @@ Finding a problem only matters if someone fixes it. Corrective actions track eac
 
 Open **Corrective Actions** in the left menu, or go to [Corrective actions](/corrective-actions). The list opens on open actions. Each row shows the status and the due date — overdue ones are flagged. Use the search box and the status filter to narrow the list; tap **All statuses** to see closed ones too.
 
+## Hotel property access
+
+Hotel staff can open, change, search and export actions only for their assigned properties. Permission to read all actions means all permitted actions within those properties. Cluster managers can work across their assigned hotels. The Property Switcher changes the current view; it does not grant access to another hotel.
+
+When creating a standalone action, choose its **Property**. Actions created from a property record retain that source's property. Choose an owner who has access to that hotel. If an older action has no verifiable property, it is hidden from property-limited users until an authorised administrator resolves its source. A shared photo link does not grant access to another hotel's action.
+
 ## Completing one assigned to you
 
 1. Open the action from the list.

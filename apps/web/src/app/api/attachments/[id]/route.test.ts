@@ -9,6 +9,7 @@ const state = vi.hoisted(() => ({
   actionVisible: true,
   handoverVisible: true,
   maintenanceVisible: true,
+  incidentVisible: true,
 }))
 
 vi.mock('../../../../lib/auth', () => ({
@@ -39,6 +40,9 @@ vi.mock('../../../../lib/hospitality/maintenance-attachment-access', () => ({
 vi.mock('../../../../lib/hospitality/handover-attachment-access', () => ({
   canReadHandoverAttachment: async () => state.handoverVisible,
 }))
+vi.mock('../../../../lib/incidents/attachment-access', () => ({
+  canReadIncidentAttachment: async () => state.incidentVisible,
+}))
 
 import { GET } from './route'
 
@@ -53,6 +57,7 @@ describe('attachment capability route', () => {
     state.row = null
     state.handoverVisible = true
     state.maintenanceVisible = true
+    state.incidentVisible = true
     state.authCalls = 0
     state.authenticated = true
     state.actionVisible = true
@@ -101,6 +106,14 @@ describe('attachment capability route', () => {
   it('denies another property maintenance photo even with a valid capability', async () => {
     state.row = { r2Key: 't/tenant/other-property-maintenance.png' }
     state.maintenanceVisible = false
+    const response = await request(attachmentUrl(ID))
+    expect(response.status).toBe(404)
+    expect(response.headers.get('location')).toBeNull()
+  })
+
+  it('denies another property incident photo even with a valid capability', async () => {
+    state.row = { r2Key: 't/tenant/other-property-incident.png' }
+    state.incidentVisible = false
     const response = await request(attachmentUrl(ID))
     expect(response.status).toBe(404)
     expect(response.headers.get('location')).toBeNull()

@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { attachments } from '@beaconhs/db/schema'
 import { presignGet } from '@beaconhs/storage'
 import { validateAttachmentCapability } from '../../../../lib/attachment-url'
+import { canReadIncidentAttachment } from '../../../../lib/incidents/attachment-access'
 import { canReadMaintenanceAttachment } from '../../../../lib/hospitality/maintenance-attachment-access'
 import { canReadHandoverAttachment } from '../../../../lib/hospitality/handover-attachment-access'
 import { getRequestContext } from '../../../../lib/auth'
@@ -40,6 +41,9 @@ export async function GET(
     return row ?? null
   })
   if (!attachment) return new NextResponse('Not found', { status: 404 })
+  if (!(await canReadIncidentAttachment(ctx, parsedId.data))) {
+    return new NextResponse('Not found', { status: 404 })
+  }
   if (!(await canReadMaintenanceAttachment(ctx, parsedId.data))) {
     return new NextResponse('Not found', { status: 404 })
   }

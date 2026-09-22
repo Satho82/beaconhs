@@ -350,7 +350,10 @@ Open **Incidents** in the left menu, or go to [Incidents](/incidents).
 5. Give it a short **Title**, like "Slip on wet floor near pump 3".
 6. In **Description**, write what happened: who was there, what equipment was involved, what you saw.
 7. Fill in **Immediate action taken** — first aid given, area barricaded, equipment locked out, and so on.
-8. Tap **Submit report**.
+8. Record **External people involved**, **Witnesses**, and **Events leading up to incident** when known. Add a damage estimate and whether police were notified if relevant.
+9. Tap **Submit report**.
+
+Use the property switcher to report for the intended hotel. In Portfolio, choose the correct **Site** before submitting. The Incident list follows the selected property; Portfolio shows only your authorised properties.
 
 The quick report captures the essentials. Photos, witness statements, and the full investigation happen on the incident's page after you submit. In **Photos**, tap **Take photo or upload** to use the camera or choose pictures from your phone's photo library. Tap the pencil button to add a caption or mark up a photo. The editor keeps the photo's original shape. Large camera photos are optimized automatically when they upload. Tap the trash button to remove the wrong photo, and use the arrow buttons to change the photo order before the incident is locked.
 
@@ -359,7 +362,7 @@ The quick report captures the essentials. Photos, witness statements, and the fu
 - The incident starts as **Reported**. The right people are notified automatically.
 - An investigator may move it to investigating, dig into the causes, and record findings on the incident page.
 - Fixes get assigned as [corrective actions](/help/corrective-actions) with owners and due dates.
-- When the investigation and fixes are done, the incident is closed.
+- Move the investigation to **Pending review** before closing it. The status menu shows the available next steps. A closed incident must be **Reopened** before it returns to investigation.
 
 You can open your own reports any time from the [Incidents](/incidents) list to see their status.
 

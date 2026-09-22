@@ -45,6 +45,38 @@ export function reportArtifactPropertyPredicate(): string {
  */
 const mode = "current_setting('app.action_scope_mode', true)"
 const ids = "coalesce(nullif(current_setting('app.action_property_ids', true), ''), '[]')::jsonb"
+export function incidentPropertyPredicate(): string {
+  return `(${mode} = 'tenant' OR (
+    ${mode} = 'property'
+    AND EXISTS (
+      SELECT 1 FROM org_units site
+      WHERE site.tenant_id=incidents.tenant_id
+        AND site.id=incidents.site_org_unit_id
+        AND (${ids}) ? (site.metadata->>'hospitalityPropertyId')
+    )
+  ) OR (
+    ${mode} = 'legacy'
+    AND NOT EXISTS (
+      SELECT 1 FROM org_units site
+      WHERE site.tenant_id=incidents.tenant_id
+        AND site.id=incidents.site_org_unit_id
+        AND site.metadata->>'hospitalityPropertyId' IS NOT NULL
+    )
+  ))`
+}
+
+export function incidentChildPredicate(table: string): string {
+  return `EXISTS (SELECT 1 FROM incidents parent
+    WHERE parent.tenant_id=${table}.tenant_id
+      AND parent.id=${table}.incident_id)`
+}
+
+export function incidentInjuryTypeAssignmentPredicate(): string {
+  return `EXISTS (SELECT 1 FROM incident_injuries injury
+    WHERE injury.tenant_id=incident_injury_type_assignments.tenant_id
+      AND injury.id=incident_injury_type_assignments.injury_id)`
+}
+
 export function maintenanceIssuePropertyPredicate(): string {
   return `(${mode} = 'tenant' OR (
     ${mode} = 'property'

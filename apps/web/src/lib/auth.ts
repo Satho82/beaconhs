@@ -363,6 +363,7 @@ async function resolveImpersonation(
   if (!m) return null
 
   const { permissions, scopes } = await resolveMembershipPerms(tx, m.id)
+  if (!(await actorMayImpersonate(tx, actor, s.tenantId, m.id))) return null
   return makeTenantContext(db, {
     userId: target.id,
     tenantId: s.tenantId,

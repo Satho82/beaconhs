@@ -122,7 +122,10 @@ export function makeSuperAdminContext(baseDb: Database, userId: string): SuperAd
   }
 }
 
-export function can(ctx: RequestContext, perm: string): boolean {
+export function can(
+  ctx: Pick<RequestContext, 'isSuperAdmin' | 'permissions'>,
+  perm: string,
+): boolean {
   if (ctx.isSuperAdmin) return true
   if (ctx.permissions.has(perm)) return true
   if (readTierCovers(ctx.permissions, perm)) return true

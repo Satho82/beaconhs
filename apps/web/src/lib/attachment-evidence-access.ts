@@ -4,6 +4,7 @@ import { canReadActionAttachment } from './action-attachment-access'
 import { canReadIncidentAttachment } from './incidents/attachment-access'
 import { canReadHandoverAttachment } from './hospitality/handover-attachment-access'
 import { canReadMaintenanceAttachment } from './hospitality/maintenance-attachment-access'
+import { canReadInspectionComplianceAttachment } from './inspection-compliance-attachment-access'
 
 /** Linking or changing shared evidence requires access to every existing parent. */
 export async function canReadEvidenceAttachment(ctx: RequestContext, attachmentId: string) {
@@ -12,7 +13,8 @@ export async function canReadEvidenceAttachment(ctx: RequestContext, attachmentI
     (await canReadActionAttachment(ctx, attachmentId)) &&
     (await canReadIncidentAttachment(ctx, attachmentId)) &&
     (await canReadHandoverAttachment(ctx, attachmentId)) &&
-    (await canReadMaintenanceAttachment(ctx, attachmentId))
+    (await canReadMaintenanceAttachment(ctx, attachmentId)) &&
+    (await canReadInspectionComplianceAttachment(ctx, attachmentId))
   )
 }
 

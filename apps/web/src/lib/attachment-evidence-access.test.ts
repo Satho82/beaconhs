@@ -6,6 +6,7 @@ const state = vi.hoisted(() => ({
   incident: true,
   handover: true,
   maintenance: true,
+  inspectionCompliance: true,
   calls: 0,
 }))
 vi.mock('./action-attachment-access', () => ({
@@ -23,6 +24,9 @@ vi.mock('./hospitality/handover-attachment-access', () => ({
 vi.mock('./hospitality/maintenance-attachment-access', () => ({
   canReadMaintenanceAttachment: async () => state.maintenance,
 }))
+vi.mock('./inspection-compliance-attachment-access', () => ({
+  canReadInspectionComplianceAttachment: async () => state.inspectionCompliance,
+}))
 import {
   assertCanUseEvidenceAttachments,
   canReadEvidenceAttachment,
@@ -38,11 +42,12 @@ describe('shared evidence mutation authorization', () => {
       incident: true,
       handover: true,
       maintenance: true,
+      inspectionCompliance: true,
       calls: 0,
     })
   })
 
-  it.each(['action', 'incident', 'handover', 'maintenance'] as const)(
+  it.each(['action', 'incident', 'handover', 'maintenance', 'inspectionCompliance'] as const)(
     'rejects evidence with an inaccessible %s parent',
     async (source) => {
       state[source] = false

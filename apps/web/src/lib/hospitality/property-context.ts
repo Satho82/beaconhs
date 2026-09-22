@@ -2,11 +2,21 @@ import { cookies } from 'next/headers'
 import { and, asc, eq, isNull, sql } from 'drizzle-orm'
 import type { Database } from '@beaconhs/db'
 import { hospitalityProperties } from '@beaconhs/db/schema'
-import type { RequestContext } from '@beaconhs/tenant'
+import { actionPropertyScope, type RequestContext } from '@beaconhs/tenant'
 import { assertCanAccessProperty, hospitalityPropertyWhere } from './property-access'
 
 export const ACTIVE_HOSPITALITY_PROPERTY_COOKIE = 'active_hospitality_property'
 export const ALL_PROPERTIES_CONTEXT = 'all'
+
+/** A property-restricted author must select one authorised hotel, never Portfolio. */
+export async function requireAuthoringProperty(ctx: RequestContext): Promise<string | null> {
+  if (actionPropertyScope(ctx).mode !== 'property') return null
+  const { activePropertyId } = await resolveHospitalityPropertyContext(ctx)
+  if (!activePropertyId)
+    throw new Error('Select a hotel in the Property Switcher before creating this record.')
+  assertCanAccessProperty(ctx, activePropertyId)
+  return activePropertyId
+}
 
 /** Narrow a read transaction using the same property RLS as the request.
  * Portfolio keeps its existing permission-derived scope. The active ID must

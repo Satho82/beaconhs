@@ -28,6 +28,7 @@ import {
   validateFrequencyRecurrence,
 } from '@beaconhs/compliance'
 import { requireRequestContext } from '@/lib/auth'
+import { requireAuthoringProperty } from '@/lib/hospitality/property-context'
 import { recordAuditInTransaction } from '@/lib/audit'
 import { type RecurrenceValue, frequencyToCron } from '@/components/recurrence'
 import { parseObligationInput, type ObligationInput } from './_input'
@@ -239,6 +240,7 @@ async function setEnabledInTransaction(
 export async function createObligation(rawInput: ObligationInput): Promise<ObligationResult> {
   const ctx = await requireRequestContext()
   assertCan(ctx, 'compliance.assign')
+  const propertyId = await requireAuthoringProperty(ctx)
   const parsed = parseObligationInput(rawInput)
   if (!parsed.ok) return parsed
   const input = parsed.value
@@ -248,6 +250,7 @@ export async function createObligation(rawInput: ObligationInput): Promise<Oblig
     return { ok: false, error: 'Name is required' }
   const { ref, error } = buildTargetRef(input)
   if (error) return { ok: false, error }
+  if (propertyId) ref.propertyId = propertyId
 
   const { rows: audienceRows, error: audienceError } = buildAudienceRows(input)
   if (audienceError) return { ok: false, error: audienceError }
@@ -333,6 +336,8 @@ export async function updateObligation(
       await lockComplianceTarget(tx, ctx.tenantId, input.kind, ref)
       await lockComplianceAudienceTargets(tx, ctx.tenantId, audienceRows)
       const existing = await lockObligation(tx, ctx.tenantId, id)
+      // Editing the requirement cannot move its immutable hotel ownership.
+      if (existing.targetRef.propertyId) ref.propertyId = existing.targetRef.propertyId
       // The kind determines the subject shape, target and evaluation adapter —
       // it is fixed at creation. Delete + recreate to change it.
       if (existing.sourceModule !== input.kind)

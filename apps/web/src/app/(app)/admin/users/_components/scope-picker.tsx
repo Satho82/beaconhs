@@ -158,6 +158,8 @@ export function ScopePicker({
 
   const scope: RoleScope = useMemo(() => {
     switch (type) {
+      case 'tenant':
+        return { type }
       case 'sites':
         return { type, siteIds }
       case 'properties':

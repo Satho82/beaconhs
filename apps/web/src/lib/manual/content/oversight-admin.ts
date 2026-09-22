@@ -611,6 +611,21 @@ Pending invitations cannot be marked active by an administrator. The person must
 
 A platform-level workspace suspension blocks normal member access, pending invitations, API keys, public kiosks, live badge pages, and in-browser Word or PowerPoint editing and playback. Printed individual certificate links remain available so issued credentials can still be verified.
 
+## Assign hotel properties
+
+A role controls **what** a user can do. **Specific hotel properties** controls **where** they can do it. Property assignments are generic for every tenant; a Manager role does not grant every hotel automatically.
+
+1. Open the member's **Roles & scope** tab. Platform Super Admins can open a tenant membership from **Platform → Users** first.
+2. For an existing role, choose **Edit access scope**. The current selection is prefilled.
+3. Choose **Specific hotel properties**, then add or remove the required properties.
+4. Choose **Save access scope**. The assignment summary shows the resulting selection.
+
+Administrators need user-management permission and can delegate only properties and role permissions within their own manageable access. Properties from another tenant are rejected. Removing a property revokes access on the next request without deleting historical records.
+
+For one assigned property, the Property Switcher uses that property. For several, **Portfolio / All Properties** means only that user's assigned properties, never all hotels in the tenant.
+
+Users with hotel-property assignments must select one hotel in the Property Switcher before starting an inspection, equipment inspection, or compliance obligation. Portfolio is a read view, not an ownership choice for a new record. Existing obligations keep their original hotel when edited.
+
 ## Account security
 
 Members manage their own account name and password under **Account settings**. Tenant administrators can send an active member a password-reset email from the member's **Overview** tab, but cannot see or set the password. Tenant administrators also cannot change a member's sign-in email, mark their email verified, sign out all of their sessions, or grant platform super-admin access.

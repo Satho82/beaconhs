@@ -9,6 +9,7 @@ import { canReadMaintenanceAttachment } from '../../../../lib/hospitality/mainte
 import { canReadHandoverAttachment } from '../../../../lib/hospitality/handover-attachment-access'
 import { getRequestContext } from '../../../../lib/auth'
 import { canReadActionAttachment } from '../../../../lib/action-attachment-access'
+import { canReadInspectionComplianceAttachment } from '../../../../lib/inspection-compliance-attachment-access'
 
 export const dynamic = 'force-dynamic'
 
@@ -54,6 +55,9 @@ export async function GET(
     return new NextResponse('Not found', { status: 404 })
   }
 
+  if (!(await canReadInspectionComplianceAttachment(ctx, parsedId.data))) {
+    return new NextResponse('Not found', { status: 404 })
+  }
   const signedUrl = await presignGet({ key: attachment.r2Key, expiresInSeconds: 60 })
   const response = NextResponse.redirect(signedUrl, 307)
   response.headers.set('Cache-Control', 'private, no-store')

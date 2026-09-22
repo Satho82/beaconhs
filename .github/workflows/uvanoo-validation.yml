@@ -100,6 +100,18 @@ jobs:
           set -o pipefail
           pnpm --silent --filter @beaconhs/db run test:action-property-sql |
             psql -h localhost -U postgres -d beaconhs_test -X -v ON_ERROR_STOP=1
+      - name: Prove generic property delegation with rollback-only fixtures
+        env:
+          SUPERADMIN_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/beaconhs_test
+          UVANOO_PROPERTY_DELEGATION_INTEGRATION: '1'
+        run: pnpm --filter @beaconhs/web exec vitest run src/lib/property-delegation.integration.test.ts
+      - name: Prove Action property RLS after delegation fixtures
+        env:
+          PGPASSWORD: postgres
+        run: |
+          set -o pipefail
+          pnpm --silent --filter @beaconhs/db run test:action-property-sql |
+            psql -h localhost -U postgres -d beaconhs_test -X -v ON_ERROR_STOP=1
       - name: Prove Hotel Handover RLS with rollback-only fixtures
         env:
           PGPASSWORD: postgres
@@ -108,6 +120,7 @@ jobs:
           psql -h localhost -U postgres -d beaconhs_test -X -v ON_ERROR_STOP=1 -f packages/db/src/hospitality-metering-rls.integration.sql
           psql -h localhost -U postgres -d beaconhs_test -X -v ON_ERROR_STOP=1 -f packages/db/src/maintenance-evidence-rls.integration.sql
           psql -h localhost -U postgres -d beaconhs_test -X -v ON_ERROR_STOP=1 -f packages/db/src/incident-property-rls.integration.sql
+          psql -h localhost -U postgres -d beaconhs_test -X -v ON_ERROR_STOP=1 -f packages/db/src/inspection-compliance-property-rls.integration.sql
       - run: pnpm test
       - run: pnpm build
   image:

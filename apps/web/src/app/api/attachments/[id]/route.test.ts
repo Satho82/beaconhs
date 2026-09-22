@@ -10,6 +10,7 @@ const state = vi.hoisted(() => ({
   handoverVisible: true,
   maintenanceVisible: true,
   incidentVisible: true,
+  inspectionComplianceVisible: true,
 }))
 
 vi.mock('../../../../lib/auth', () => ({
@@ -43,6 +44,9 @@ vi.mock('../../../../lib/hospitality/handover-attachment-access', () => ({
 vi.mock('../../../../lib/incidents/attachment-access', () => ({
   canReadIncidentAttachment: async () => state.incidentVisible,
 }))
+vi.mock('../../../../lib/inspection-compliance-attachment-access', () => ({
+  canReadInspectionComplianceAttachment: async () => state.inspectionComplianceVisible,
+}))
 
 import { GET } from './route'
 
@@ -58,6 +62,7 @@ describe('attachment capability route', () => {
     state.handoverVisible = true
     state.maintenanceVisible = true
     state.incidentVisible = true
+    state.inspectionComplianceVisible = true
     state.authCalls = 0
     state.authenticated = true
     state.actionVisible = true
@@ -72,6 +77,12 @@ describe('attachment capability route', () => {
   it('keeps a valid capability tenant-scoped', async () => {
     expect((await request(attachmentUrl(ID))).status).toBe(404)
     expect(state.authCalls).toBe(1)
+  })
+
+  it('denies a previously issued capability after inspection/compliance access is removed', async () => {
+    state.row = { r2Key: 't/tenant/evidence.pdf' }
+    state.inspectionComplianceVisible = false
+    expect((await request(attachmentUrl(ID))).status).toBe(404)
   })
 
   it('requires an authenticated tenant after validating the capability', async () => {

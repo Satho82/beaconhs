@@ -102,6 +102,8 @@ export const complianceDispatchStatus = pgEnum('compliance_dispatch_status', [
 // What is being required — discriminated by sourceModule. Only the relevant keys
 // are set. (Validated in the action layer, not the DB.)
 export type ComplianceTargetRef = {
+  /** Immutable hotel ownership for property-scoped obligations. */
+  propertyId?: string
   inspectionTypeId?: string
   documentId?: string
   courseId?: string

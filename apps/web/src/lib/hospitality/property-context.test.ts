@@ -6,7 +6,13 @@ import {
   ALL_PROPERTIES_CONTEXT,
   applyActiveHospitalityPropertyScope,
   resolveActiveHospitalityProperty,
+  requireAuthoringProperty,
 } from './property-context'
+
+const preference = vi.hoisted(() => ({ value: 'all' }))
+vi.mock('next/headers', () => ({
+  cookies: async () => ({ get: () => ({ value: preference.value }) }),
+}))
 
 const fenchurch = { id: '20000000-0000-4000-8000-000000000001' }
 const lincoln = { id: '20000000-0000-4000-8000-000000000002' }
@@ -17,6 +23,41 @@ describe('hospitality property context', () => {
       isSuperAdmin: false,
       scopes: [{ type: 'properties', propertyIds }],
     }) as RequestContext
+
+  it('preserves site-based and tenant-wide authoring without requiring a hotel', async () => {
+    for (const scope of [{ type: 'sites', siteIds: ['site'] }, { type: 'tenant' }] as const) {
+      const ctx = { isSuperAdmin: false, scopes: [scope] } as unknown as RequestContext
+      expect(await requireAuthoringProperty(ctx)).toBeNull()
+    }
+  })
+
+  it('requires one authorised hotel for property-owned authoring, including empty scopes', async () => {
+    const author = (ids: string[]) =>
+      ({
+        ...context(ids),
+        tenantId: 'tenant-a',
+        db: async (run: (tx: unknown) => Promise<unknown>) =>
+          run({
+            select: () => ({
+              from: () => ({
+                where: () => ({ orderBy: async () => ids.map((id) => ({ id, name: id })) }),
+              }),
+            }),
+          }),
+      }) as RequestContext
+    preference.value = 'all'
+    expect(await requireAuthoringProperty(author([fenchurch.id]))).toBe(fenchurch.id)
+    await expect(requireAuthoringProperty(author([]))).rejects.toThrow('Select a hotel')
+    await expect(requireAuthoringProperty(author([fenchurch.id, lincoln.id]))).rejects.toThrow(
+      'Select a hotel',
+    )
+    preference.value = lincoln.id
+    expect(await requireAuthoringProperty(author([fenchurch.id, lincoln.id]))).toBe(lincoln.id)
+    preference.value = 'forged'
+    await expect(requireAuthoringProperty(author([fenchurch.id, lincoln.id]))).rejects.toThrow(
+      'Select a hotel',
+    )
+  })
 
   it('narrows a Cluster read transaction to the selected authorised hotel', async () => {
     const execute = vi.fn().mockResolvedValue([])

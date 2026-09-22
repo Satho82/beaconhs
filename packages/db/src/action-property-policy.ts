@@ -45,6 +45,42 @@ export function reportArtifactPropertyPredicate(): string {
  */
 const mode = "current_setting('app.action_scope_mode', true)"
 const ids = "coalesce(nullif(current_setting('app.action_property_ids', true), ''), '[]')::jsonb"
+/** Inspection metadata and its site must agree; neither can widen the other. */
+export function inspectionPropertyPredicate(table: string): string {
+  const hint = `${table}.metadata->>'propertyId'`
+  const site = `(SELECT u.metadata->>'hospitalityPropertyId' FROM org_units u
+    WHERE u.tenant_id=${table}.tenant_id AND u.id=${table}.site_org_unit_id)`
+  const property = `coalesce(${hint}, ${site})`
+  return `(${mode} = 'tenant' OR (
+    ${mode} = 'property'
+    AND (${ids}) ? (${property})
+    AND (${hint} IS NULL OR ${site} IS NULL OR ${hint} = ${site})
+    AND EXISTS (SELECT 1 FROM hospitality_properties p
+      WHERE p.tenant_id=${table}.tenant_id AND p.id::text=${property}
+        AND p.deleted_at IS NULL)
+  ) OR (${mode} = 'legacy' AND ${property} IS NULL))`
+}
+
+export function inspectionChildPredicate(table: string, parent: string): string {
+  return `EXISTS (SELECT 1 FROM ${parent} p
+    WHERE p.tenant_id=${table}.tenant_id AND p.id=${table}.record_id)`
+}
+
+export function compliancePropertyPredicate(): string {
+  const property = "compliance_obligations.target_ref->>'propertyId'"
+  return `(${mode} = 'tenant' OR (
+    ${mode} = 'property' AND (${ids}) ? (${property})
+    AND EXISTS (SELECT 1 FROM hospitality_properties p
+      WHERE p.tenant_id=compliance_obligations.tenant_id AND p.id::text=${property}
+        AND p.deleted_at IS NULL)
+  ) OR (${mode} = 'legacy' AND ${property} IS NULL))`
+}
+
+export function complianceChildPredicate(table: string): string {
+  return `EXISTS (SELECT 1 FROM compliance_obligations p
+    WHERE p.tenant_id=${table}.tenant_id AND p.id=${table}.obligation_id)`
+}
+
 export function incidentPropertyPredicate(): string {
   return `(${mode} = 'tenant' OR (
     ${mode} = 'property'

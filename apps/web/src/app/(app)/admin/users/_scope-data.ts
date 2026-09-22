@@ -14,6 +14,7 @@ import {
   type RoleScope,
 } from '@beaconhs/db/schema'
 import type { requireRequestContext } from '@/lib/auth'
+import { hospitalityPropertyWhere } from '@/lib/hospitality/property-access'
 
 type Ctx = Awaited<ReturnType<typeof requireRequestContext>>
 type ScopeOpt = { value: string; label: string; hint?: string }
@@ -70,7 +71,13 @@ export async function loadScopeOptions(ctx: Ctx): Promise<ScopeOptions> {
     const properties = await tx
       .select({ value: hospitalityProperties.id, label: hospitalityProperties.name })
       .from(hospitalityProperties)
-      .where(isNull(hospitalityProperties.deletedAt))
+      .where(
+        and(
+          eq(hospitalityProperties.tenantId, ctx.tenantId),
+          isNull(hospitalityProperties.deletedAt),
+          hospitalityPropertyWhere(ctx, hospitalityProperties.id),
+        ),
+      )
       .orderBy(asc(hospitalityProperties.name))
     const crewRows = await tx
       .select({ value: crews.id, label: crews.name })

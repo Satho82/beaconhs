@@ -14,6 +14,10 @@ import {
   maintenanceIssuePropertyPredicate,
   actionPropertyPredicate,
   reportArtifactPropertyPredicate,
+  inspectionPropertyPredicate,
+  inspectionChildPredicate,
+  compliancePropertyPredicate,
+  complianceChildPredicate,
 } from './action-property-policy'
 import { superDb, type Database } from './client'
 
@@ -111,47 +115,58 @@ CREATE POLICY tenant_write_delete ON ${table}
   }
 
   const actionScope =
-    table === 'corrective_actions'
-      ? actionPropertyPredicate()
-      : table === 'ca_photos' || table === 'ca_complete_steps'
-        ? actionChildPredicate(table)
-        : table === 'incidents'
-          ? incidentPropertyPredicate()
-          : table === 'incident_injury_type_assignments'
-            ? incidentInjuryTypeAssignmentPredicate()
-            : [
-                  'incident_injuries',
-                  'incident_lost_time_events',
-                  'incident_attachments',
-                  'incident_people',
-                  'incident_events',
-                  'incident_contributing_factors',
-                  'incident_root_cause_whys',
-                  'incident_preventative_steps',
-                ].includes(table)
-              ? incidentChildPredicate(table)
-              : table === 'maintenance_issues'
-                ? maintenanceIssuePropertyPredicate()
-                : table === 'maintenance_issue_attachments'
-                  ? maintenanceIssueAttachmentPredicate()
-                  : table === 'hospitality_handovers'
-                    ? hospitalityHandoverPropertyPredicate()
-                    : table === 'hospitality_meters'
-                      ? hospitalityMeterPropertyPredicate()
-                      : table === 'hospitality_meter_tariffs' ||
-                          table === 'hospitality_meter_readings'
-                        ? hospitalityMeterChildPredicate(table)
-                        : table === 'hospitality_handover_comments' ||
-                            table === 'hospitality_handover_acknowledgements' ||
-                            table === 'hospitality_handover_attachments'
-                          ? hospitalityHandoverChildPredicate(table)
-                          : table === 'report_runs'
-                            ? reportArtifactPropertyPredicate()
-                            : table === 'report_run_deliveries'
-                              ? 'EXISTS (SELECT 1 FROM report_runs r WHERE r.tenant_id=report_run_deliveries.tenant_id AND r.id=report_run_deliveries.run_id)'
-                              : table === 'audit_log'
-                                ? actionAuditPredicate()
-                                : 'true'
+    table === 'inspection_records' || table === 'equipment_inspection_records'
+      ? inspectionPropertyPredicate(table)
+      : table === 'inspection_record_attachments' || table === 'inspection_record_criteria'
+        ? inspectionChildPredicate(table, 'inspection_records')
+        : table === 'equipment_inspection_record_attachments' ||
+            table === 'equipment_inspection_record_criteria'
+          ? inspectionChildPredicate(table, 'equipment_inspection_records')
+          : table === 'compliance_obligations'
+            ? compliancePropertyPredicate()
+            : ['compliance_audience', 'compliance_dispatches', 'compliance_status'].includes(table)
+              ? complianceChildPredicate(table)
+              : table === 'corrective_actions'
+                ? actionPropertyPredicate()
+                : table === 'ca_photos' || table === 'ca_complete_steps'
+                  ? actionChildPredicate(table)
+                  : table === 'incidents'
+                    ? incidentPropertyPredicate()
+                    : table === 'incident_injury_type_assignments'
+                      ? incidentInjuryTypeAssignmentPredicate()
+                      : [
+                            'incident_injuries',
+                            'incident_lost_time_events',
+                            'incident_attachments',
+                            'incident_people',
+                            'incident_events',
+                            'incident_contributing_factors',
+                            'incident_root_cause_whys',
+                            'incident_preventative_steps',
+                          ].includes(table)
+                        ? incidentChildPredicate(table)
+                        : table === 'maintenance_issues'
+                          ? maintenanceIssuePropertyPredicate()
+                          : table === 'maintenance_issue_attachments'
+                            ? maintenanceIssueAttachmentPredicate()
+                            : table === 'hospitality_handovers'
+                              ? hospitalityHandoverPropertyPredicate()
+                              : table === 'hospitality_meters'
+                                ? hospitalityMeterPropertyPredicate()
+                                : table === 'hospitality_meter_tariffs' ||
+                                    table === 'hospitality_meter_readings'
+                                  ? hospitalityMeterChildPredicate(table)
+                                  : table === 'hospitality_handover_comments' ||
+                                      table === 'hospitality_handover_acknowledgements' ||
+                                      table === 'hospitality_handover_attachments'
+                                    ? hospitalityHandoverChildPredicate(table)
+                                    : table === 'report_runs'
+                                      ? reportArtifactPropertyPredicate()
+                                      : table === 'report_run_deliveries'
+                                        ? 'EXISTS (SELECT 1 FROM report_runs r WHERE r.tenant_id=report_run_deliveries.tenant_id AND r.id=report_run_deliveries.run_id)'
+                                        : table === 'audit_log'
+                                          ? actionAuditPredicate()
+                                          : 'true'
   const scopeSql = actionScope === 'true' ? '' : ` AND (${actionScope})`
   const assignmentSql = table === 'corrective_actions' ? ` AND (${actionAssigneePredicate()})` : ''
   return `${reset}

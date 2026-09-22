@@ -224,7 +224,7 @@ export async function addMembership(formData: FormData): Promise<void> {
         .where(and(eq(roles.id, roleId), eq(roles.tenantId, tenantId)))
         .limit(1)
       if (role) {
-        await upsertRoleAssignments(tx, [
+        await upsertRoleAssignments(ctx, tx, [
           {
             tenantId,
             tenantUserId: m.id,

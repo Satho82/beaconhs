@@ -52,6 +52,19 @@ export function hospitalityHandoverPropertyPredicate(): string {
   ))`
 }
 
+export function hospitalityMeterPropertyPredicate(): string {
+  return `(${mode} = 'tenant' OR (
+    ${mode} = 'property'
+    AND (${ids}) ? hospitality_meters.property_id::text
+  ))`
+}
+
+export function hospitalityMeterChildPredicate(table: string): string {
+  return `EXISTS (SELECT 1 FROM hospitality_meters m
+    WHERE m.tenant_id=${table}.tenant_id
+      AND m.id=${table}.meter_id)`
+}
+
 export function hospitalityHandoverChildPredicate(table: string): string {
   return `EXISTS (SELECT 1 FROM hospitality_handovers h
     WHERE h.tenant_id=${table}.tenant_id

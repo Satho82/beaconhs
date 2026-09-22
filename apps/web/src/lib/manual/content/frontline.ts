@@ -766,6 +766,33 @@ Open **Hotel Handover** in the left menu. The Global Property selector controls 
 You only see properties authorised for your role. Hotel managers remain within their assigned hotel; cluster and regional roles can work across their authorised properties.`,
   },
   {
+    slug: 'metering',
+    title: 'Metering',
+    group: 'Everyday tasks',
+    iconKey: 'chart',
+    summary: 'Configure utility meters, enter readings, and review consumption and estimated cost.',
+    keywords: ['metering', 'electricity', 'gas', 'water', 'MPAN', 'serial number', 'tariff'],
+    requiredPermission: 'hospitality.read',
+    body: `Metering keeps utility readings and estimated expenditure attached to the correct hotel.
+
+## Where to find it
+
+Open **Metering** in the left menu. Use the one Metering workspace for Overview, Enter Reading, History, Analytics, and Setup.
+
+## Enter a reading
+
+1. Choose the meter. Its name, Serial Number, MPAN where applicable, location, and unit are shown.
+2. Enter the reading value and date/time.
+3. Use **Meter reset** when the physical counter restarts; never enter a lower normal reading.
+4. Use **Correction** to replace a specific mistaken reading while retaining audit history.
+
+## Setup and tariffs
+
+Setup is manager-only. Managers configure meters, replacements, lifecycle status, and effective-dated tariffs. A reading stores the tariff and estimated expenditure that applied at that time, so later tariff changes do not rewrite history.
+
+The Global Property selector controls the visible property or authorised portfolio. Server-side property access remains authoritative.`,
+  },
+  {
     slug: 'tools',
     title: 'Field tools',
     group: 'Everyday tasks',

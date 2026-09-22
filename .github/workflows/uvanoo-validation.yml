@@ -105,6 +105,7 @@ jobs:
           PGPASSWORD: postgres
         run: |
           psql -h localhost -U postgres -d beaconhs_test -X -v ON_ERROR_STOP=1 -f packages/db/src/hospitality-handover-rls.integration.sql
+          psql -h localhost -U postgres -d beaconhs_test -X -v ON_ERROR_STOP=1 -f packages/db/src/hospitality-metering-rls.integration.sql
       - run: pnpm test
       - run: pnpm build
   image:

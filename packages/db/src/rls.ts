@@ -5,6 +5,8 @@ import {
   actionChildPredicate,
   hospitalityHandoverChildPredicate,
   hospitalityHandoverPropertyPredicate,
+  hospitalityMeterChildPredicate,
+  hospitalityMeterPropertyPredicate,
   actionPropertyPredicate,
   reportArtifactPropertyPredicate,
 } from './action-property-policy'
@@ -110,17 +112,21 @@ CREATE POLICY tenant_write_delete ON ${table}
         ? actionChildPredicate(table)
         : table === 'hospitality_handovers'
           ? hospitalityHandoverPropertyPredicate()
-          : table === 'hospitality_handover_comments' ||
-              table === 'hospitality_handover_acknowledgements' ||
-              table === 'hospitality_handover_attachments'
-            ? hospitalityHandoverChildPredicate(table)
-            : table === 'report_runs'
-              ? reportArtifactPropertyPredicate()
-              : table === 'report_run_deliveries'
-                ? 'EXISTS (SELECT 1 FROM report_runs r WHERE r.tenant_id=report_run_deliveries.tenant_id AND r.id=report_run_deliveries.run_id)'
-                : table === 'audit_log'
-                  ? actionAuditPredicate()
-                  : 'true'
+          : table === 'hospitality_meters'
+            ? hospitalityMeterPropertyPredicate()
+            : table === 'hospitality_meter_tariffs' || table === 'hospitality_meter_readings'
+              ? hospitalityMeterChildPredicate(table)
+              : table === 'hospitality_handover_comments' ||
+                  table === 'hospitality_handover_acknowledgements' ||
+                  table === 'hospitality_handover_attachments'
+                ? hospitalityHandoverChildPredicate(table)
+                : table === 'report_runs'
+                  ? reportArtifactPropertyPredicate()
+                  : table === 'report_run_deliveries'
+                    ? 'EXISTS (SELECT 1 FROM report_runs r WHERE r.tenant_id=report_run_deliveries.tenant_id AND r.id=report_run_deliveries.run_id)'
+                    : table === 'audit_log'
+                      ? actionAuditPredicate()
+                      : 'true'
   const scopeSql = actionScope === 'true' ? '' : ` AND (${actionScope})`
   const assignmentSql = table === 'corrective_actions' ? ` AND (${actionAssigneePredicate()})` : ''
   return `${reset}
@@ -148,6 +154,9 @@ export const TENANT_SCOPED_TABLES = [
   'hospitality_handover_comments',
   'hospitality_handover_acknowledgements',
   'hospitality_handover_attachments',
+  'hospitality_meters',
+  'hospitality_meter_tariffs',
+  'hospitality_meter_readings',
   'maintenance_work_orders',
   'operational_task_templates',
   'operational_task_schedules',

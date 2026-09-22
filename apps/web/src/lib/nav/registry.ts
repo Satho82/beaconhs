@@ -195,6 +195,14 @@ export const NAV_MODULES: NavModule[] = [
     group: 'Assets & people',
   },
   {
+    key: 'hospitality-metering',
+    href: '/hospitality/metering',
+    label: 'Metering',
+    iconKey: 'chart',
+    requiredPermission: 'hospitality.read',
+    group: 'Assets & people',
+  },
+  {
     key: 'locations',
     href: '/locations',
     label: 'Locations',

@@ -38,6 +38,12 @@ The additional integration tests protect all seven affected list/report/export
 entry points, all four evidence mutation integrations, selected-property scope,
 empty/forged scope rejection, and denial when any shared parent is inaccessible.
 
+The normal migrator also installs the shipped Slips, Trips and Falls platform
+template if it is absent. It uses insert-on-conflict-do-nothing: existing versions,
+including retired templates, are not overwritten, and no tenant/demo seed runs.
+This closes the upgrade-path gap where a migrated V1.1 database would otherwise
+have an empty Risk Library.
+
 ## Release boundary
 
 Automated tests and source reconciliation are not a claim of deployed UAT

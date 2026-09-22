@@ -16,7 +16,10 @@ import {
 } from '@beaconhs/db/schema'
 import { assertCan, type RequestContext } from '@beaconhs/tenant'
 import { recordAuditInTransaction } from '@/lib/audit'
-import { canReadActionAttachment } from '@/lib/action-attachment-access'
+import {
+  assertCanUseEvidenceAttachments,
+  canReadEvidenceAttachment,
+} from '@/lib/attachment-evidence-access'
 import { nextReference } from '@/lib/reference'
 import { validateTenantImageAttachmentIdsInTx } from '@/lib/attachment-validation'
 import { assertCanAccessProperty } from './property-access'
@@ -195,6 +198,7 @@ async function assertMaintenanceForProperty(
 export async function createHandover(ctx: RequestContext, input: CreateHandoverInput) {
   writeGate(ctx)
   await assertPropertyExists(ctx, input.propertyId)
+  await assertCanUseEvidenceAttachments(ctx, input.attachmentIds ?? [])
   const authorId = memberId(ctx)
   if (!Number.isFinite(input.occurredAt.getTime())) throw new Error('Date and time are invalid.')
   const department = required(input.department, 'Department', 100)
@@ -370,7 +374,7 @@ export async function attachHandoverPhotos(
   writeGate(ctx)
   await visibleHandover(ctx, handoverId)
   for (const attachmentId of attachmentIds) {
-    if (!(await canReadActionAttachment(ctx, attachmentId))) {
+    if (!(await canReadEvidenceAttachment(ctx, attachmentId))) {
       throw new Error('Photo is unavailable in this property scope.')
     }
   }

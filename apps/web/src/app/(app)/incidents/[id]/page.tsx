@@ -79,10 +79,10 @@ import {
 import { IncidentHeaderActions } from './_header-actions'
 import { isUuid, pickString } from '@/lib/list-params'
 import { attachmentUrl } from '@/lib/attachment-url'
-import { canReadIncidentAttachment } from '@/lib/incidents/attachment-access'
-import { canReadActionAttachment } from '@/lib/action-attachment-access'
-import { canReadMaintenanceAttachment } from '@/lib/hospitality/maintenance-attachment-access'
-import { canReadHandoverAttachment } from '@/lib/hospitality/handover-attachment-access'
+import {
+  assertCanUseEvidenceAttachments,
+  canReadEvidenceAttachment,
+} from '@/lib/attachment-evidence-access'
 import { parsePhotoEdits } from '@/lib/photo-edits'
 import { validateTenantImageAttachmentIdsInTx } from '@/lib/attachment-validation'
 import { requireRequestContext } from '@/lib/auth'
@@ -461,17 +461,7 @@ async function attachPhotos(incidentId: string, attachmentIds: string[]) {
   assertCan(ctx, 'incidents.update')
   if (attachmentIds.length === 0) return
   await assertCanSeeIncident(ctx, incidentId)
-  for (const attachmentId of new Set(attachmentIds)) {
-    if (
-      !isUuid(attachmentId) ||
-      !(await canReadIncidentAttachment(ctx, attachmentId)) ||
-      !(await canReadActionAttachment(ctx, attachmentId)) ||
-      !(await canReadMaintenanceAttachment(ctx, attachmentId)) ||
-      !(await canReadHandoverAttachment(ctx, attachmentId))
-    ) {
-      throw new Error('Photo not found')
-    }
-  }
+  await assertCanUseEvidenceAttachments(ctx, attachmentIds)
   await ctx.db(async (tx) => {
     const [incident] = await tx
       .select({ locked: incidents.locked })
@@ -550,14 +540,7 @@ async function updateIncidentPhoto(
       .limit(1)
       .for('update')
     if (!photo) return false
-    if (
-      !(await canReadIncidentAttachment(ctx, photo.attachmentId)) ||
-      !(await canReadActionAttachment(ctx, photo.attachmentId)) ||
-      !(await canReadMaintenanceAttachment(ctx, photo.attachmentId)) ||
-      !(await canReadHandoverAttachment(ctx, photo.attachmentId))
-    ) {
-      return false
-    }
+    if (!(await canReadEvidenceAttachment(ctx, photo.attachmentId))) return false
     await tx
       .update(incidentAttachments)
       .set({ caption: edits.caption })

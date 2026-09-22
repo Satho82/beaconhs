@@ -1,11 +1,27 @@
 import { cookies } from 'next/headers'
-import { and, asc, eq, isNull } from 'drizzle-orm'
+import { and, asc, eq, isNull, sql } from 'drizzle-orm'
+import type { Database } from '@beaconhs/db'
 import { hospitalityProperties } from '@beaconhs/db/schema'
 import type { RequestContext } from '@beaconhs/tenant'
-import { hospitalityPropertyWhere } from './property-access'
+import { assertCanAccessProperty, hospitalityPropertyWhere } from './property-access'
 
 export const ACTIVE_HOSPITALITY_PROPERTY_COOKIE = 'active_hospitality_property'
 export const ALL_PROPERTIES_CONTEXT = 'all'
+
+/** Narrow a read transaction using the same property RLS as the request.
+ * Portfolio keeps its existing permission-derived scope. The active ID must
+ * come from resolveHospitalityPropertyContext; it is never an authority grant.
+ */
+export async function applyActiveHospitalityPropertyScope(
+  ctx: RequestContext,
+  tx: Database,
+  activePropertyId: string | null,
+) {
+  if (!activePropertyId) return
+  assertCanAccessProperty(ctx, activePropertyId)
+  await tx.execute(sql`SELECT set_config('app.action_scope_mode', 'property', true),
+    set_config('app.action_property_ids', ${JSON.stringify([activePropertyId])}, true)`)
+}
 
 type HospitalityPropertyContext = {
   activePropertyId: string | null

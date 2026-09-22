@@ -37,7 +37,7 @@ import { parsePhotoEdits } from '@/lib/photo-edits'
 import { validateTenantImageAttachmentIdsInTx } from '@/lib/attachment-validation'
 import { isUuid } from '@/lib/list-params'
 import { renderCorrectiveActionSummaryEmail } from '@/lib/corrective-action-email'
-import { canReadActionAttachment } from '@/lib/action-attachment-access'
+import { canReadEvidenceAttachment } from '@/lib/attachment-evidence-access'
 
 type ActionResult = { ok: true } | { ok: false; error: string }
 
@@ -89,7 +89,7 @@ export async function attachCaPhotos(caId: string, attachmentIds: string[]): Pro
   const lockErr = assertNotLocked(ca)
   if (lockErr) return lockErr
   for (const attachmentId of attachmentIds) {
-    if (!(await canReadActionAttachment(ctx, attachmentId))) {
+    if (!(await canReadEvidenceAttachment(ctx, attachmentId))) {
       return { ok: false, error: 'Attachment is not available in your property scope.' }
     }
   }
@@ -165,6 +165,7 @@ export async function updateCaPhoto(
       .limit(1)
       .for('update')
     if (!photo) return false
+    if (!(await canReadEvidenceAttachment(ctx, photo.attachmentId))) return false
     await tx
       .update(caPhotos)
       .set({ caption: edits.caption })

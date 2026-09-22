@@ -13,6 +13,7 @@ import { assertTenantModuleEntitled } from '@/lib/module-entitlements/server'
 import { recordAudit } from '@/lib/audit'
 import { assertCanAccessProperty } from '@/lib/hospitality/property-access'
 import { validateTenantImageAttachmentIdsInTx } from '@/lib/attachment-validation'
+import { assertCanUseEvidenceAttachments } from '@/lib/attachment-evidence-access'
 const priorities = new Set(['low', 'medium', 'high', 'critical'])
 export const MAINTENANCE_STATUSES = [
   'reported',
@@ -92,6 +93,7 @@ export async function createRoomMaintenanceIssue(
   )
   if (!room) throw new Error('No room exists in this tenant')
   assertCanAccessProperty(ctx, room.propertyId)
+  await assertCanUseEvidenceAttachments(ctx, attachmentIds)
   const [r] = await ctx.db(async (tx) => {
     const photos = await validateTenantImageAttachmentIdsInTx(tx, ctx.tenantId, attachmentIds)
     const created = await tx
@@ -275,6 +277,7 @@ export async function attachMaintenanceEvidence(
   )
   if (!issue) throw new Error('No maintenance issue exists in this tenant')
   assertCanAccessProperty(ctx, issue.propertyId)
+  await assertCanUseEvidenceAttachments(ctx, attachmentIds)
   await ctx.db(async (tx) => {
     const photos = await validateTenantImageAttachmentIdsInTx(tx, ctx.tenantId, attachmentIds)
     await tx.insert(maintenanceIssueAttachments).values(

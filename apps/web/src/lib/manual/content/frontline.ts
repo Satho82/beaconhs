@@ -441,7 +441,7 @@ Open **Corrective Actions** in the left menu, or go to [Corrective actions](/cor
 
 ## Hotel property access
 
-Hotel staff can open, change, search and export actions only for their assigned properties. Permission to read all actions means all permitted actions within those properties. Cluster managers can work across their assigned hotels. The Property Switcher changes the current view; it does not grant access to another hotel.
+Hotel staff can open, change, search and export actions only for their assigned properties. Permission to read all actions means all permitted actions within those properties. Cluster managers can work across their assigned hotels. The Property Switcher narrows the Action list, reports and CSV export to the selected hotel. **Portfolio** shows your authorised properties together; it does not grant access to another hotel.
 
 When creating a standalone action, choose its **Property**. Actions created from a property record retain that source's property. Choose an owner who has access to that hotel. If an older action has no verifiable property, it is hidden from property-limited users until an authorised administrator resolves its source. A shared photo link does not grant access to another hotel's action.
 

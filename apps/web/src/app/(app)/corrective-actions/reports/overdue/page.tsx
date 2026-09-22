@@ -8,6 +8,10 @@ import { Badge, EmptyState, PageHeader } from '@beaconhs/ui'
 import { correctiveActions, orgUnits, tenantUsers, users as user } from '@beaconhs/db/schema'
 import { requireRequestContext } from '@/lib/auth'
 import { moduleScopeWhere } from '@/lib/visibility'
+import {
+  applyActiveHospitalityPropertyScope,
+  resolveHospitalityPropertyContext,
+} from '@/lib/hospitality/property-context'
 import { ListPageLayout } from '@/components/page-layout'
 import { CorrectiveActionsSubNav } from '@/components/corrective-actions-sub-nav'
 import { FilterChips } from '@/components/filter-bar'
@@ -72,11 +76,13 @@ export default async function OverdueReport({
   const assignmentFilter =
     assignmentParam === 'assigned' || assignmentParam === 'unassigned' ? assignmentParam : undefined
   const ctx = await requireRequestContext()
+  const propertyContext = await resolveHospitalityPropertyContext(ctx)
   const today = new Date().toISOString().slice(0, 10)
 
   const rows = await ctx.db(async (tx) => {
     // Per-user record visibility — same predicate as the /corrective-actions
     // list page, so a self/site-tier user only sees their slice here too.
+    await applyActiveHospitalityPropertyScope(ctx, tx, propertyContext.activePropertyId)
     const vis = await moduleScopeWhere(ctx, tx, {
       prefix: 'ca',
       ownerCols: [correctiveActions.ownerTenantUserId],

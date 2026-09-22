@@ -29,7 +29,8 @@ describe('Hotel Handover service contracts', () => {
 
   it('reuses shared Actions, secure evidence access, and transactional audit records', () => {
     expect(service).toContain("sourceEntityType: 'hospitality_handover'")
-    expect(service).toContain('canReadActionAttachment')
+    expect(service).toContain('canReadEvidenceAttachment')
+    expect(service).toContain('assertCanUseEvidenceAttachments')
     expect(service).toContain('recordAuditInTransaction')
     expect(service).toContain("entityType: 'hospitality_handover'")
     expect(attachmentAccess).toContain('withSuperAdmin')

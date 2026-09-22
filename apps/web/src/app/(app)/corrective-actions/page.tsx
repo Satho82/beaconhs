@@ -10,6 +10,10 @@ import { can } from '@beaconhs/tenant'
 import { DownloadLink } from '@/components/download-link'
 import { requireRequestContext } from '@/lib/auth'
 import { moduleScopeWhere } from '@/lib/visibility'
+import {
+  applyActiveHospitalityPropertyScope,
+  resolveHospitalityPropertyContext,
+} from '@/lib/hospitality/property-context'
 import { buildExportHref, parseListParams, pickString } from '@/lib/list-params'
 import { SearchInput } from '@/components/search-input'
 import { Pagination } from '@/components/pagination'
@@ -71,6 +75,7 @@ export default async function CorrectiveActionsPage({
   const statusFilter = statusRaw === 'all' ? undefined : statusRaw
   const sevFilter = pickString(sp.severity)
   const ctx = await requireRequestContext()
+  const propertyContext = await resolveHospitalityPropertyContext(ctx)
   // The export route accepts any read tier — mirror that here so read.all /
   // read.site-only roles still see the button.
   const canExport =
@@ -81,6 +86,7 @@ export default async function CorrectiveActionsPage({
   const { rows, total, statusCounts, sevCounts } = await ctx.db(async (tx) => {
     // Per-user record visibility: read.all → everything, read.site → my sites,
     // else → corrective actions I own.
+    await applyActiveHospitalityPropertyScope(ctx, tx, propertyContext.activePropertyId)
     const vis = await moduleScopeWhere(ctx, tx, {
       prefix: 'ca',
       ownerCols: [correctiveActions.ownerTenantUserId],

@@ -13,6 +13,10 @@ import {
 import { csvColumns, selectCsvColumns } from '@/lib/export-columns'
 import { parseListParams, pickString } from '@/lib/list-params'
 import { moduleScopeWhere } from '@/lib/visibility'
+import {
+  applyActiveHospitalityPropertyScope,
+  resolveHospitalityPropertyContext,
+} from '@/lib/hospitality/property-context'
 import { isRouterPrefetch } from '@/lib/router-prefetch'
 
 export const dynamic = 'force-dynamic'
@@ -44,6 +48,7 @@ export async function GET(req: NextRequest) {
   const statusFilter = statusRaw === 'all' ? undefined : statusRaw
   const sevFilter = pickString(sp.severity)
   const ctx = await requireExportContext()
+  const propertyContext = await resolveHospitalityPropertyContext(ctx)
 
   // Require a read tier and scope rows to it (mirrors the /corrective-actions
   // list page): all → everything, site → my sites, self → actions I own.
@@ -53,6 +58,7 @@ export async function GET(req: NextRequest) {
 
   const rows = await ctx.db(async (tx) => {
     const filters: SQL<unknown>[] = [isNull(correctiveActions.deletedAt)]
+    await applyActiveHospitalityPropertyScope(ctx, tx, propertyContext.activePropertyId)
     const vis = await moduleScopeWhere(ctx, tx, {
       prefix: 'ca',
       ownerCols: [correctiveActions.ownerTenantUserId],

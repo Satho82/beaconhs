@@ -114,6 +114,7 @@ describe('property workflow actions', () => {
       'Water drains slowly.',
       'high',
       'front_office',
+      [],
     )
   })
 

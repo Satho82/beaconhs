@@ -15,6 +15,10 @@ import type { RequestContext } from '@beaconhs/tenant'
 import type { BhqlResult } from '@beaconhs/analytics'
 import { addTrustedSystemAppResponsesEntity, runBhql } from '@beaconhs/analytics/server'
 import { resolveAnalyticsAccess } from '@/lib/analytics-access'
+import {
+  applyActiveHospitalityPropertyScope,
+  resolveHospitalityPropertyContext,
+} from '@/lib/hospitality/property-context'
 import { applyParams } from './_params'
 import { canSeePublishedInsight, getInsightRoleKeys } from './_visibility'
 import { DEFAULT_INSIGHT_LAYOUT } from './_widgets'
@@ -34,9 +38,11 @@ async function runCardCached(
   query: BhqlQuery,
   key: string,
   trustedSystemCard: boolean,
+  activePropertyId: string | null,
 ): Promise<BhqlResult> {
   return ctx.db(async (tx) => {
-    const access = await resolveAnalyticsAccess(ctx, tx)
+    await applyActiveHospitalityPropertyScope(ctx, tx, activePropertyId)
+    const access = await resolveAnalyticsAccess(ctx, tx, { activePropertyId })
     const trustScope = trustedSystemCard ? 'system' : 'user'
     const cacheKey = `${ctx.tenantId}:${access.scopeKey}:${trustScope}:${key}`
     const now = Date.now()
@@ -90,6 +96,7 @@ export async function loadDashboardCardRenders(
   } = {},
 ): Promise<CardRender[]> {
   const { paramValues = {}, paramMap = {}, params = [] } = opts
+  const { activePropertyId } = await resolveHospitalityPropertyContext(ctx)
   return Promise.all(
     cards.map(async (c) => {
       const base = {
@@ -114,6 +121,7 @@ export async function loadDashboardCardRenders(
           query,
           JSON.stringify(query),
           c.trustedSystemCard === true,
+          activePropertyId,
         )
         return { ...base, result, error: null }
       } catch (e) {

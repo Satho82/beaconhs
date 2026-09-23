@@ -45,6 +45,105 @@ export function reportArtifactPropertyPredicate(): string {
  */
 const mode = "current_setting('app.action_scope_mode', true)"
 const ids = "coalesce(nullif(current_setting('app.action_property_ids', true), ''), '[]')::jsonb"
+
+const activePropertyExists = (tenant: string, property: string) => `EXISTS (
+  SELECT 1 FROM hospitality_properties property_scope
+  WHERE property_scope.tenant_id=${tenant}
+    AND property_scope.id::text=${property}
+    AND property_scope.deleted_at IS NULL)`
+
+/** Direct hotel ownership. Property principals see assigned hotels; legacy
+ * principals cannot see newly property-owned rows. */
+export function directPropertyPredicate(table: string, column = 'property_id'): string {
+  const property = `${table}.${column}::text`
+  const activeProperty =
+    table === 'hospitality_properties'
+      ? `${table}.deleted_at IS NULL`
+      : activePropertyExists(`${table}.tenant_id`, property)
+  return `(${mode} = 'tenant' OR (
+    ${mode} = 'property'
+    AND (${ids}) ? ${property}
+    AND ${activeProperty}
+  ))`
+}
+
+/** Child rows inherit the exact property boundary of their authoritative parent. */
+export function propertyParentPredicate(
+  table: string,
+  parent: string,
+  localColumn: string,
+  parentColumn = 'id',
+): string {
+  return `EXISTS (SELECT 1 FROM ${parent} property_parent
+    WHERE property_parent.tenant_id=${table}.tenant_id
+      AND property_parent.${parentColumn}=${table}.${localColumn})`
+}
+
+/** Site-owned records resolve their hotel through the canonical org-unit metadata.
+ * Property principals fail closed for missing/unknown sites; legacy principals
+ * retain only genuinely non-hotel records. */
+export function sitePropertyPredicate(table: string, column = 'site_org_unit_id'): string {
+  const property = `(SELECT site.metadata->>'hospitalityPropertyId' FROM org_units site
+    WHERE site.tenant_id=${table}.tenant_id AND site.id=${table}.${column})`
+  return `(${mode} = 'tenant' OR (
+    ${mode} = 'property'
+    AND (${ids}) ? ${property}
+    AND ${activePropertyExists(`${table}.tenant_id`, property)}
+  ) OR (
+    ${mode} = 'legacy' AND coalesce(${property}, '') = ''
+  ))`
+}
+
+/** People are reportable for a hotel only through a current org-unit assignment. */
+export function peoplePropertyPredicate(): string {
+  return `(${mode} = 'tenant' OR (
+    ${mode} = 'property' AND EXISTS (
+      SELECT 1 FROM people_assignments assignment
+      JOIN org_units unit
+        ON unit.tenant_id=assignment.tenant_id AND unit.id=assignment.org_unit_id
+      JOIN hospitality_properties property_scope
+        ON property_scope.tenant_id=unit.tenant_id
+       AND property_scope.id::text=unit.metadata->>'hospitalityPropertyId'
+       AND property_scope.deleted_at IS NULL
+      WHERE assignment.tenant_id=people.tenant_id
+        AND assignment.person_id=people.id
+        AND assignment.valid_from <= current_date
+        AND (assignment.valid_to IS NULL OR assignment.valid_to >= current_date)
+        AND (${ids}) ? (unit.metadata->>'hospitalityPropertyId')
+    )
+  ) OR (
+    ${mode} = 'legacy' AND NOT EXISTS (
+      SELECT 1 FROM people_assignments assignment
+      JOIN org_units unit
+        ON unit.tenant_id=assignment.tenant_id AND unit.id=assignment.org_unit_id
+      WHERE assignment.tenant_id=people.tenant_id
+        AND assignment.person_id=people.id
+        AND unit.metadata->>'hospitalityPropertyId' IS NOT NULL
+        AND assignment.valid_from <= current_date
+        AND (assignment.valid_to IS NULL OR assignment.valid_to >= current_date)
+    )
+  ))`
+}
+
+/** Inventory PPE follows its current holder. Unassigned stock has no provable
+ * hotel ownership and therefore fails closed for property-restricted principals. */
+export function ppeItemPropertyPredicate(): string {
+  return `(${mode} = 'tenant' OR EXISTS (
+    SELECT 1 FROM people holder
+    WHERE holder.tenant_id=ppe_items.tenant_id
+      AND holder.id=ppe_items.current_holder_person_id
+  ))`
+}
+
+/** A persisted schedule may execute only inside the current principal's selected
+ * hotel, or across the principal's current assigned portfolio when NULL. */
+export function reportSchedulePropertyPredicate(): string {
+  const property = 'report_schedules.property_context_id::text'
+  return `(${mode} = 'tenant'
+    OR report_schedules.property_context_id IS NULL
+    OR (${mode} = 'property' AND (${ids}) ? ${property}
+      AND ${activePropertyExists('report_schedules.tenant_id', property)}))`
+}
 /** Inspection metadata and its site must agree; neither can widen the other. */
 export function inspectionPropertyPredicate(table: string): string {
   const hint = `${table}.metadata->>'propertyId'`

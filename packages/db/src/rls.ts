@@ -18,6 +18,12 @@ import {
   inspectionChildPredicate,
   compliancePropertyPredicate,
   complianceChildPredicate,
+  directPropertyPredicate,
+  peoplePropertyPredicate,
+  ppeItemPropertyPredicate,
+  propertyParentPredicate,
+  reportSchedulePropertyPredicate,
+  sitePropertyPredicate,
 } from './action-property-policy'
 import { superDb, type Database } from './client'
 
@@ -81,6 +87,70 @@ export async function withSuperAdmin<T>(
 // no tenant is set. nullif maps
 // '' → NULL so the cast is safe and the row simply does not match (no rows, not an error).
 const TENANT_ID_SQL = `nullif(current_setting('app.tenant_id', true), '')::uuid`
+
+/** Tables whose RLS proves hotel ownership for restricted reporting principals.
+ * Dynamic analytics must fail closed to this inventory instead of treating
+ * tenant isolation as property provenance. */
+export const PROPERTY_REPORTING_TABLES = new Set([
+  'hospitality_properties',
+  'hospitality_buildings',
+  'hospitality_floors',
+  'hospitality_rooms',
+  'risk_assessments',
+  'risk_hazards',
+  'risk_assessment_signoffs',
+  'maintenance_issues',
+  'maintenance_issue_attachments',
+  'maintenance_work_orders',
+  'operational_task_schedules',
+  'operational_task_occurrences',
+  'operational_task_lifecycle_events',
+  'manager_signoffs',
+  'hospitality_handovers',
+  'hospitality_handover_comments',
+  'hospitality_handover_acknowledgements',
+  'hospitality_handover_attachments',
+  'hospitality_meters',
+  'hospitality_meter_tariffs',
+  'hospitality_meter_readings',
+  'incidents',
+  'incident_injuries',
+  'incident_lost_time_events',
+  'incident_attachments',
+  'incident_people',
+  'incident_events',
+  'incident_contributing_factors',
+  'incident_root_cause_whys',
+  'incident_preventative_steps',
+  'incident_injury_type_assignments',
+  'inspection_records',
+  'inspection_record_attachments',
+  'inspection_record_criteria',
+  'equipment_inspection_records',
+  'equipment_inspection_record_attachments',
+  'equipment_inspection_record_criteria',
+  'compliance_obligations',
+  'compliance_audience',
+  'compliance_dispatches',
+  'compliance_status',
+  'corrective_actions',
+  'ca_photos',
+  'ca_complete_steps',
+  'form_responses',
+  'journal_entries',
+  'hazid_assessments',
+  'ppe_inspections',
+  'ppe_items',
+  'ppe_issues',
+  'ppe_issue_reports',
+  'equipment_items',
+  'people',
+  'people_assignments',
+  'training_records',
+  'report_schedules',
+  'report_runs',
+  'report_run_deliveries',
+])
 
 export const RLS_POLICY_SQL = (table: string) => {
   const reset = `
@@ -149,24 +219,99 @@ CREATE POLICY tenant_write_delete ON ${table}
                           ? maintenanceIssuePropertyPredicate()
                           : table === 'maintenance_issue_attachments'
                             ? maintenanceIssueAttachmentPredicate()
-                            : table === 'hospitality_handovers'
-                              ? hospitalityHandoverPropertyPredicate()
-                              : table === 'hospitality_meters'
-                                ? hospitalityMeterPropertyPredicate()
-                                : table === 'hospitality_meter_tariffs' ||
-                                    table === 'hospitality_meter_readings'
-                                  ? hospitalityMeterChildPredicate(table)
-                                  : table === 'hospitality_handover_comments' ||
-                                      table === 'hospitality_handover_acknowledgements' ||
-                                      table === 'hospitality_handover_attachments'
-                                    ? hospitalityHandoverChildPredicate(table)
-                                    : table === 'report_runs'
-                                      ? reportArtifactPropertyPredicate()
-                                      : table === 'report_run_deliveries'
-                                        ? 'EXISTS (SELECT 1 FROM report_runs r WHERE r.tenant_id=report_run_deliveries.tenant_id AND r.id=report_run_deliveries.run_id)'
-                                        : table === 'audit_log'
-                                          ? actionAuditPredicate()
-                                          : 'true'
+                            : table === 'maintenance_work_orders'
+                              ? propertyParentPredicate(table, 'maintenance_issues', 'issue_id')
+                              : table === 'hospitality_handovers'
+                                ? hospitalityHandoverPropertyPredicate()
+                                : table === 'hospitality_meters'
+                                  ? hospitalityMeterPropertyPredicate()
+                                  : table === 'hospitality_meter_tariffs' ||
+                                      table === 'hospitality_meter_readings'
+                                    ? hospitalityMeterChildPredicate(table)
+                                    : table === 'hospitality_handover_comments' ||
+                                        table === 'hospitality_handover_acknowledgements' ||
+                                        table === 'hospitality_handover_attachments'
+                                      ? hospitalityHandoverChildPredicate(table)
+                                      : table === 'risk_assessments' ||
+                                          table === 'risk_assessment_signoffs' ||
+                                          table === 'operational_task_schedules' ||
+                                          table === 'manager_signoffs' ||
+                                          table === 'hospitality_buildings'
+                                        ? directPropertyPredicate(table)
+                                        : table === 'risk_hazards'
+                                          ? propertyParentPredicate(
+                                              table,
+                                              'risk_assessments',
+                                              'assessment_id',
+                                            )
+                                          : table === 'operational_task_occurrences'
+                                            ? propertyParentPredicate(
+                                                table,
+                                                'operational_task_schedules',
+                                                'schedule_id',
+                                              )
+                                            : table === 'operational_task_lifecycle_events'
+                                              ? propertyParentPredicate(
+                                                  table,
+                                                  'operational_task_occurrences',
+                                                  'occurrence_id',
+                                                )
+                                              : table === 'hospitality_properties'
+                                                ? directPropertyPredicate(table, 'id')
+                                                : table === 'hospitality_floors'
+                                                  ? propertyParentPredicate(
+                                                      table,
+                                                      'hospitality_buildings',
+                                                      'building_id',
+                                                    )
+                                                  : table === 'hospitality_rooms'
+                                                    ? propertyParentPredicate(
+                                                        table,
+                                                        'hospitality_floors',
+                                                        'floor_id',
+                                                      )
+                                                    : table === 'form_responses' ||
+                                                        table === 'journal_entries' ||
+                                                        table === 'hazid_assessments' ||
+                                                        table === 'ppe_inspections'
+                                                      ? sitePropertyPredicate(table)
+                                                      : table === 'ppe_items'
+                                                        ? ppeItemPropertyPredicate()
+                                                        : table === 'ppe_issues' ||
+                                                            table === 'ppe_issue_reports'
+                                                          ? propertyParentPredicate(
+                                                              table,
+                                                              'ppe_items',
+                                                              'item_id',
+                                                            )
+                                                          : table === 'equipment_items'
+                                                            ? sitePropertyPredicate(
+                                                                table,
+                                                                'current_site_org_unit_id',
+                                                              )
+                                                            : table === 'people'
+                                                              ? peoplePropertyPredicate()
+                                                              : table === 'people_assignments'
+                                                                ? sitePropertyPredicate(
+                                                                    table,
+                                                                    'org_unit_id',
+                                                                  )
+                                                                : table === 'training_records'
+                                                                  ? propertyParentPredicate(
+                                                                      table,
+                                                                      'people',
+                                                                      'person_id',
+                                                                    )
+                                                                  : table === 'report_schedules'
+                                                                    ? reportSchedulePropertyPredicate()
+                                                                    : table === 'report_runs'
+                                                                      ? reportArtifactPropertyPredicate()
+                                                                      : table ===
+                                                                          'report_run_deliveries'
+                                                                        ? 'EXISTS (SELECT 1 FROM report_runs r WHERE r.tenant_id=report_run_deliveries.tenant_id AND r.id=report_run_deliveries.run_id)'
+                                                                        : table === 'audit_log'
+                                                                          ? actionAuditPredicate()
+                                                                          : 'true'
   const scopeSql = actionScope === 'true' ? '' : ` AND (${actionScope})`
   const assignmentSql = table === 'corrective_actions' ? ` AND (${actionAssigneePredicate()})` : ''
   return `${reset}

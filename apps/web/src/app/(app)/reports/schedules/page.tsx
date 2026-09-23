@@ -5,6 +5,7 @@ import { PageHeader } from '@beaconhs/ui'
 import { ListPageLayout } from '@/components/page-layout'
 import { getGeneratedTranslations } from '@/i18n/generated.server'
 import { requireRequestContext } from '@/lib/auth'
+import { reportScheduleAccessWhere } from '@/lib/report-schedule-access'
 import { ReportsSubNav } from '../_nav'
 import { loadScheduleFormData } from './_data'
 import { BeaconScheduleList } from './_schedule-list.client'
@@ -31,7 +32,7 @@ export default async function ReportSchedulesPage({
       ? or(ilike(reportSchedules.name, `%${query}%`), ilike(reportSchedules.timezone, `%${query}%`))
       : undefined,
   ].filter(Boolean)
-  const where = and(...predicates)
+  const where = reportScheduleAccessWhere(ctx, and(...predicates))
   const [{ definitions }, schedules, [totalRow]] = await Promise.all([
     loadScheduleFormData(ctx),
     ctx.db((tx) =>

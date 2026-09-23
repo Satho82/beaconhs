@@ -7,12 +7,17 @@
 import { NextResponse } from 'next/server'
 import { and, eq } from 'drizzle-orm'
 import { assertCan } from '@beaconhs/tenant'
-import { attachments, reportRuns } from '@beaconhs/db/schema'
+import { attachments, reportRuns, reportSchedules } from '@beaconhs/db/schema'
 import { requireRequestContext } from '@/lib/auth'
 import { recordAudit } from '@/lib/audit'
 import { storedPdfArtifactResponse } from '@/lib/pdf-route'
 import { isUuid } from '@/lib/list-params'
 import { isRouterPrefetch } from '@/lib/router-prefetch'
+import { reportScheduleAccessWhere } from '@/lib/report-schedule-access'
+import {
+  applyActiveHospitalityPropertyScope,
+  resolveHospitalityPropertyContext,
+} from '@/lib/hospitality/property-context'
 
 export const dynamic = 'force-dynamic'
 
@@ -33,12 +38,27 @@ export async function GET(
     return NextResponse.json({ error: 'No active tenant' }, { status: 400 })
   }
 
+  const { activePropertyId } = await resolveHospitalityPropertyContext(ctx)
   const found = await ctx.db(async (tx) => {
+    await applyActiveHospitalityPropertyScope(ctx, tx, activePropertyId)
     const [row] = await tx
       .select({ run: reportRuns, attachment: attachments })
       .from(reportRuns)
+      .innerJoin(
+        reportSchedules,
+        and(
+          eq(reportSchedules.tenantId, reportRuns.tenantId),
+          eq(reportSchedules.id, reportRuns.scheduleId),
+        ),
+      )
       .leftJoin(attachments, eq(attachments.id, reportRuns.pdfAttachmentId))
-      .where(and(eq(reportRuns.id, runId), eq(reportRuns.scheduleId, id)))
+      .where(
+        and(
+          eq(reportRuns.id, runId),
+          eq(reportRuns.scheduleId, id),
+          reportScheduleAccessWhere(ctx),
+        ),
+      )
       .limit(1)
     return row ?? null
   })

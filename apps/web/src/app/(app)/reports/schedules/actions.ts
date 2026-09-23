@@ -19,6 +19,11 @@ import { assertCan } from '@beaconhs/tenant'
 import { requireRequestContext } from '@/lib/auth'
 import { recordAudit } from '@/lib/audit'
 import { loadAuthorizedReportCatalogInTransaction } from '@/lib/report-catalog'
+import { reportScheduleAccessWhere } from '@/lib/report-schedule-access'
+import {
+  applyActiveHospitalityPropertyScope,
+  resolveHospitalityPropertyContext,
+} from '@/lib/hospitality/property-context'
 
 export async function saveSchedule(
   id: string | null,
@@ -31,7 +36,9 @@ export async function saveSchedule(
     assertBoundedReportFilters(value.filters)
     assertReportRecipientLimit(value.recipientUserIds, value.recipientEmails)
     const nextRunAt = computeNextRunAt(value)
+    const { activePropertyId } = await resolveHospitalityPropertyContext(ctx)
     const scheduleId = await ctx.db(async (tx) => {
+      await applyActiveHospitalityPropertyScope(ctx, tx, activePropertyId)
       const [definition] = await tx
         .select({ id: reportDefinitions.id, query: reportDefinitions.query })
         .from(reportDefinitions)
@@ -43,7 +50,9 @@ export async function saveSchedule(
         )
         .limit(1)
       if (!definition) throw new Error('Choose an available report.')
-      const catalog = await loadAuthorizedReportCatalogInTransaction(ctx, tx)
+      const catalog = await loadAuthorizedReportCatalogInTransaction(ctx, tx, {
+        activePropertyId,
+      })
       validateBeaconReportRuntimeFilters(
         ctx.tenantId!,
         definition.query,
@@ -52,6 +61,7 @@ export async function saveSchedule(
       )
       const fields = {
         definitionId: value.definitionId,
+        propertyContextId: activePropertyId,
         name: value.name,
         cadence: value.cadence,
         repeatEvery: value.repeatEvery,
@@ -78,7 +88,13 @@ export async function saveSchedule(
         const [updated] = await tx
           .update(reportSchedules)
           .set(fields)
-          .where(and(eq(reportSchedules.tenantId, ctx.tenantId!), eq(reportSchedules.id, id)))
+          .where(
+            reportScheduleAccessWhere(
+              ctx,
+              eq(reportSchedules.tenantId, ctx.tenantId!),
+              eq(reportSchedules.id, id),
+            ),
+          )
           .returning({ id: reportSchedules.id })
         if (!updated) throw new Error('Schedule not found.')
         return updated.id
@@ -107,11 +123,19 @@ export async function saveSchedule(
 export async function setScheduleActive(id: string, active: boolean): Promise<void> {
   const ctx = await requireRequestContext()
   assertCan(ctx, 'reports.schedule')
+  const { activePropertyId } = await resolveHospitalityPropertyContext(ctx)
   const schedule = await ctx.db(async (tx) => {
+    await applyActiveHospitalityPropertyScope(ctx, tx, activePropertyId)
     const [current] = await tx
       .select()
       .from(reportSchedules)
-      .where(and(eq(reportSchedules.tenantId, ctx.tenantId!), eq(reportSchedules.id, id)))
+      .where(
+        reportScheduleAccessWhere(
+          ctx,
+          eq(reportSchedules.tenantId, ctx.tenantId!),
+          eq(reportSchedules.id, id),
+        ),
+      )
       .limit(1)
     if (!current) throw new Error('Schedule not found.')
     const nextRunAt = active ? computeNextRunAt(current) : current.nextRunAt
@@ -119,7 +143,13 @@ export async function setScheduleActive(id: string, active: boolean): Promise<vo
     await tx
       .update(reportSchedules)
       .set({ active, nextRunAt, updatedAt: new Date() })
-      .where(and(eq(reportSchedules.tenantId, ctx.tenantId!), eq(reportSchedules.id, id)))
+      .where(
+        reportScheduleAccessWhere(
+          ctx,
+          eq(reportSchedules.tenantId, ctx.tenantId!),
+          eq(reportSchedules.id, id),
+        ),
+      )
     return current
   })
   await recordAudit(ctx, {
@@ -135,7 +165,21 @@ export async function runScheduleNow(id: string): Promise<void> {
   const ctx = await requireRequestContext()
   assertCan(ctx, 'reports.schedule')
   if (!ctx.membership) throw new Error('An active tenant membership is required.')
+  const { activePropertyId } = await resolveHospitalityPropertyContext(ctx)
   const runId = await ctx.db(async (tx) => {
+    await applyActiveHospitalityPropertyScope(ctx, tx, activePropertyId)
+    const [schedule] = await tx
+      .select({ id: reportSchedules.id })
+      .from(reportSchedules)
+      .where(
+        reportScheduleAccessWhere(
+          ctx,
+          eq(reportSchedules.tenantId, ctx.tenantId!),
+          eq(reportSchedules.id, id),
+        ),
+      )
+      .limit(1)
+    if (!schedule) throw new Error('Schedule not found.')
     const run = await claimBeaconReportRun(tx, {
       scheduleId: id,
       scheduledFor: new Date(),

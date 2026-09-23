@@ -6,6 +6,7 @@
 // compiler resolves through `columnRef`.
 
 import type { Database } from '@beaconhs/db'
+import { PROPERTY_REPORTING_TABLES } from '@beaconhs/db/rls'
 import type { ReportEntityColumn } from '@beaconhs/reports'
 import { loadBeaconCustomReportColumns } from '@beaconhs/reports/server'
 import { deriveSemanticType, type AnalyticsColumn, type AnalyticsEntity } from '../semantic'
@@ -57,10 +58,28 @@ export async function discoverEntityMapWithCustomFields(
 export async function discoverEntitiesWithScopedApps(
   tx: Database,
   apps: readonly { id: string; name: string }[],
+  options: { propertyScopeMode?: 'tenant' | 'property' | 'legacy' } = {},
 ): Promise<AnalyticsEntity[]> {
-  const base = await discoverEntitiesWithCustomFields(tx)
-  const appEntities = apps
-    .map((a) => scopedFormAppEntity(a.id, a.name))
-    .filter((e): e is AnalyticsEntity => e != null)
-  return [...base, ...appEntities]
+  const discovered = await discoverEntitiesWithCustomFields(tx)
+  const propertyRestricted =
+    options.propertyScopeMode !== undefined && options.propertyScopeMode !== 'tenant'
+  const certifiedBase = propertyRestricted ? propertyCertifiedEntities(discovered) : discovered
+  const appEntities =
+    !propertyRestricted || PROPERTY_REPORTING_TABLES.has('form_responses')
+      ? apps
+          .map((a) => scopedFormAppEntity(a.id, a.name))
+          .filter((e): e is AnalyticsEntity => e != null)
+      : []
+  return [...certifiedBase, ...appEntities]
+}
+
+/** Fail closed to tables with audited property provenance and remove joins that
+ * could escape that certified inventory. */
+export function propertyCertifiedEntities(entities: readonly AnalyticsEntity[]): AnalyticsEntity[] {
+  const base = entities.filter((entity) => PROPERTY_REPORTING_TABLES.has(entity.table))
+  const allowedKeys = new Set(base.map((entity) => entity.key))
+  return base.map((entity) => ({
+    ...entity,
+    relations: entity.relations?.filter((relation) => allowedKeys.has(relation.target)),
+  }))
 }

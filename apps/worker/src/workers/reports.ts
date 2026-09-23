@@ -7,7 +7,7 @@
 // fan out recipient emails.
 
 import type { Job } from 'bullmq'
-import { and, eq, inArray, isNull } from 'drizzle-orm'
+import { and, eq, inArray, isNull, sql } from 'drizzle-orm'
 import { discoverEntitiesWithScopedApps } from '@beaconhs/analytics/server'
 import { db, withTenant, withSuperAdmin, type Database } from '@beaconhs/db'
 import {
@@ -50,25 +50,15 @@ import {
 import { renderReportPdf, renderWalletCardsForReport } from '@beaconhs/forms-pdf'
 import {
   deleteObject,
-  getObject,
   headObject,
   newAttachmentKey,
-  presignGet,
   putObject,
   resolveTenantLogoUrl,
 } from '@beaconhs/storage'
 import { appBaseUrl } from '../lib/app-base-url'
 import { escapeHtml } from '../lib/escape-html'
 
-// Attach the rendered PDF to recipient emails up to this size; larger reports
-// fall back to the download link only (base64 inflates ~33%, and most mail
-// providers reject anything near 25 MB).
-const MAX_EMAIL_ATTACHMENT_BYTES = 10 * 1024 * 1024
 const MAX_REPORT_PDF_BYTES = 200 * 1024 * 1024
-
-// Presigned download links in the email stay valid for 7 days — the same
-// policy as hazid signed-report bundles. The run record keeps the durable copy.
-const PDF_LINK_EXPIRY_SECONDS = 7 * 24 * 3600
 
 export async function processReportRun(job: Job<ReportRunJobData>): Promise<void> {
   assertReportRunJobData(job.data)
@@ -133,12 +123,19 @@ export async function processReportRun(job: Job<ReportRunJobData>): Promise<void
     if (!artifact) {
       const { result, locale, requestCtx } = await (async () => {
         const { catalog, locale, requestCtx } = execution
-        const result = await requestCtx.db((scopedTx) =>
-          runBeaconReport(scopedTx, tenantId, snapshot.definition.query, catalog, {
+        const result = await requestCtx.db(async (scopedTx) => {
+          if (snapshot.propertyContextId) {
+            await scopedTx.execute(sql`SELECT
+              set_config('app.action_scope_mode', 'property', true),
+              set_config('app.action_property_ids', ${JSON.stringify([
+                snapshot.propertyContextId,
+              ])}, true)`)
+          }
+          return runBeaconReport(scopedTx, tenantId, snapshot.definition.query, catalog, {
             maxRows: 10_000,
             runtimeFilters: normalizeReportRuntimeFilters(snapshot.filters),
-          }),
-        )
+          })
+        })
         return { result, locale, requestCtx }
       })()
       const rowCount = result.rowCount
@@ -224,7 +221,9 @@ export async function processReportRun(job: Job<ReportRunJobData>): Promise<void
                 ...snapshot,
                 artifactAuthorization: {
                   version: 1,
-                  ...actionPropertyScope(requestCtx),
+                  ...(snapshot.propertyContextId
+                    ? { mode: 'property' as const, propertyIds: [snapshot.propertyContextId] }
+                    : actionPropertyScope(requestCtx)),
                 },
               },
             })
@@ -248,7 +247,6 @@ export async function processReportRun(job: Job<ReportRunJobData>): Promise<void
           attachmentId: persistence.attachmentId,
           filename,
           r2Key,
-          pdf: pdf.length <= MAX_EMAIL_ATTACHMENT_BYTES ? pdf : null,
           rowCount,
         }
       } else {
@@ -313,38 +311,21 @@ export async function processReportRun(job: Job<ReportRunJobData>): Promise<void
       snapshot.emailSubject?.trim() ||
       `${snapshot.scheduleName || snapshot.definition.name} — ${rangeLabel}`
     const runLink = `${appBaseUrl()}/reports/schedules/${scheduleId}/runs/${runId}`
-    const pdfLink = await presignGet({
-      key: artifact.r2Key,
-      expiresInSeconds: PDF_LINK_EXPIRY_SECONDS,
-    })
-    const attachPdf = artifact.pdf !== null
-    const footnote = attachPdf
-      ? 'The PDF is attached to this email and stored on the run record. The download link is valid for 7 days.'
-      : 'The PDF was too large to attach — use the download link (valid for 7 days) or the run record in the app.'
+    const footnote =
+      'Open the run in Uvanoo to download the report. Access is checked against your current property assignments.'
     const customMessage = snapshot.emailMessage?.trim() ?? ''
     const customHtml = customMessage
       ? `<p>${escapeHtml(customMessage).replace(/\r?\n/g, '<br/>')}</p>`
       : ''
     const html = `${customHtml}<p>Your scheduled report <strong>${escapeHtml(snapshot.scheduleName || snapshot.definition.name)}</strong> is ready.</p>
       <p>${escapeHtml(rangeLabel)}<br/>Rows: ${artifact.rowCount}</p>
-      <p><a href="${escapeHtml(runLink)}">View in app</a> &middot; <a href="${escapeHtml(pdfLink)}">Download PDF</a></p>
+      <p><a href="${escapeHtml(runLink)}">View and download in Uvanoo</a></p>
       <p style="color:#666;font-size:12px;">${footnote}</p>`
     const text = `${customMessage ? `${customMessage}\n\n` : ''}Your scheduled report "${snapshot.scheduleName || snapshot.definition.name}" is ready.
 ${rangeLabel}
 Rows: ${artifact.rowCount}
 
-View in app: ${runLink}
-Download PDF (valid for 7 days): ${pdfLink}`
-
-    const attachments_ = attachPdf
-      ? [
-          {
-            filename: artifact.filename,
-            content: artifact.pdf!.toString('base64'),
-            contentType: 'application/pdf',
-          },
-        ]
-      : undefined
+View and download in Uvanoo: ${runLink}`
     for (const delivery of deliveries) {
       if (delivery.status !== 'queued') continue
       const emailJobId = `report-email|${delivery.id}`
@@ -354,7 +335,6 @@ Download PDF (valid for 7 days): ${pdfLink}`
           subject,
           html,
           text,
-          attachments: attachments_,
           meta: { tenantId, category: 'report', reportRunDeliveryId: delivery.id },
         },
         { jobId: emailJobId },
@@ -428,7 +408,6 @@ async function loadArtifact(
   attachmentId: string
   filename: string
   r2Key: string
-  pdf: Buffer | null
   rowCount: number
 } | null> {
   if (!attachmentId || rowCount === null) return null
@@ -461,18 +440,10 @@ async function loadArtifact(
   ) {
     throw new Error('Report run PDF object metadata does not match its attachment record')
   }
-  const pdf =
-    attachment.sizeBytes <= MAX_EMAIL_ATTACHMENT_BYTES
-      ? await getObject({ key: attachment.r2Key })
-      : null
-  if (pdf && pdf.length !== attachment.sizeBytes) {
-    throw new Error('Report run PDF object size does not match its attachment record')
-  }
   return {
     attachmentId: attachment.id,
     filename: attachment.filename,
     r2Key: attachment.r2Key,
-    pdf,
     rowCount,
   }
 }
@@ -546,6 +517,15 @@ async function resolveScheduledReportContext(
     scopes: resolved.scopes,
     activeRoleId: resolved.appliedRoleId,
   })
+  const currentPropertyScope = actionPropertyScope(requestCtx)
+  if (
+    snapshot.propertyContextId &&
+    currentPropertyScope.mode !== 'tenant' &&
+    (currentPropertyScope.mode !== 'property' ||
+      !currentPropertyScope.propertyIds.includes(snapshot.propertyContextId))
+  ) {
+    throw new Error('Scheduled report property is no longer assigned to the run-as member')
+  }
   if (
     !requestCtx.isSuperAdmin &&
     !can(requestCtx, 'reports.read') &&
@@ -570,6 +550,7 @@ async function resolveScheduledReportContext(
   const sources = await discoverEntitiesWithScopedApps(
     tx,
     accessibleApps.map(({ id, name }) => ({ id, name })),
+    { propertyScopeMode: currentPropertyScope.mode },
   )
 
   return {

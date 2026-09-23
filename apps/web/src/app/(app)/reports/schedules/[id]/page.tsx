@@ -8,6 +8,7 @@ import { GeneratedText } from '@/i18n/generated'
 import { getGeneratedTranslations } from '@/i18n/generated.server'
 import { requireRequestContext } from '@/lib/auth'
 import { isUuid } from '@/lib/list-params'
+import { reportScheduleAccessWhere } from '@/lib/report-schedule-access'
 import { loadScheduleFormData } from '../_data'
 import { BeaconScheduleForm } from '../_schedule-form'
 import { toSchedule } from '../_schedule'
@@ -54,7 +55,13 @@ export default async function SchedulePage({
       const [row] = await tx
         .select()
         .from(reportSchedules)
-        .where(and(eq(reportSchedules.tenantId, ctx.tenantId!), eq(reportSchedules.id, id)))
+        .where(
+          reportScheduleAccessWhere(
+            ctx,
+            eq(reportSchedules.tenantId, ctx.tenantId!),
+            eq(reportSchedules.id, id),
+          ),
+        )
         .limit(1)
       return row ?? null
     }),

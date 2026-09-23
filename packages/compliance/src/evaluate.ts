@@ -138,7 +138,11 @@ export async function evaluateObligation(
   clock: ComplianceClock = { now: new Date(), timezone: 'UTC' },
 ): Promise<EvalResult> {
   const today = complianceDate(clock)
-  const aud = () => resolveObligationAudience(tx, tenantId, audience)
+  const propertyId =
+    typeof ob.targetRef?.propertyId === 'string' && ob.targetRef.propertyId.trim()
+      ? ob.targetRef.propertyId
+      : null
+  const aud = () => resolveObligationAudience(tx, tenantId, audience, { propertyId })
   switch (ob.sourceModule) {
     case 'training':
     case 'cert_requirement':

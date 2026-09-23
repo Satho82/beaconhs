@@ -18,7 +18,10 @@ import { PhotoUploaderSection } from '@/components/photo-uploader-section'
 import { requireRequestContext } from '@/lib/auth'
 import { getGeneratedValueTranslations } from '@/i18n/generated.server'
 import { parseListParams } from '@/lib/list-params'
-import { resolveHospitalityPropertyContext } from '@/lib/hospitality/property-context'
+import {
+  requireAuthoringProperty,
+  resolveHospitalityPropertyContext,
+} from '@/lib/hospitality/property-context'
 import {
   acknowledgeHandover,
   attachHandoverPhotos,
@@ -49,8 +52,13 @@ async function createEntry(form: FormData) {
   if (!shifts.includes(shift) || !priorities.includes(priority))
     throw new Error('Invalid handover selection.')
   const occurredAt = new Date(text(form, 'occurredAt'))
+  const propertyId = text(form, 'propertyId')
+  const requiredPropertyId = await requireAuthoringProperty(ctx)
+  if (requiredPropertyId && propertyId !== requiredPropertyId) {
+    throw new Error('Create this Handover entry in the property selected in the Property Switcher.')
+  }
   await createHandover(ctx, {
-    propertyId: text(form, 'propertyId'),
+    propertyId,
     occurredAt,
     shift,
     customShift: text(form, 'customShift') || undefined,
@@ -133,6 +141,11 @@ export default async function HandoverPage({
     ),
   ])
   const mayManage = can(ctx, 'hospitality.manage')
+  const authoringProperties = propertyContext.activePropertyId
+    ? propertyContext.properties.filter(
+        (property) => property.id === propertyContext.activePropertyId,
+      )
+    : propertyContext.properties
   const now = new Date()
   const localNow = new Date(now.getTime() - now.getTimezoneOffset() * 60_000)
     .toISOString()
@@ -161,7 +174,7 @@ export default async function HandoverPage({
                   <option value="" disabled>
                     {t('Choose a property')}
                   </option>
-                  {propertyContext.properties.map((property) => (
+                  {authoringProperties.map((property) => (
                     <option key={property.id} value={property.id}>
                       {property.name}
                     </option>

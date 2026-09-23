@@ -9,6 +9,7 @@ import {
 } from './invites'
 import { renderAuthEmail } from './auth-email-branding'
 import { getPlatformBranding } from './platform-branding'
+import { resolveAuthPublicOrigin } from './public-origin'
 
 function createAuth() {
   const databaseUrl = process.env.DATABASE_URL
@@ -16,7 +17,7 @@ function createAuth() {
     throw new Error('[auth] DATABASE_URL is required.')
   }
 
-  const baseURL = process.env.BETTER_AUTH_URL ?? 'http://localhost:3000'
+  const baseURL = resolveAuthPublicOrigin()
 
   // Alternate operator-owned origins support a hostname transition without
   // trusting arbitrary request hosts or wildcard callback destinations.

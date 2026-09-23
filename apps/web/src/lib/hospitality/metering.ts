@@ -10,8 +10,9 @@ import {
 import { assertCan, type RequestContext } from '@beaconhs/tenant'
 import { recordAuditInTransaction } from '@/lib/audit'
 import { assertCanAccessProperty } from './property-access'
+import { sameMeterDefinition, type MeterDefinition, type MeterType } from './metering-policy'
 
-export type MeterType = 'electricity' | 'gas' | 'water' | 'custom'
+export type { MeterType } from './metering-policy'
 export type ReadingType = 'normal' | 'corrected' | 'reset'
 
 type Tx = Parameters<Parameters<RequestContext['db']>[0]>[0]
@@ -136,6 +137,19 @@ export async function createMeter(
   const installed = new Date(`${input.installedAt}T00:00:00.000Z`)
   if (!Number.isFinite(installed.getTime())) throw new Error('Installation date is invalid.')
   finiteNonNegative(input.openingReading, 'Opening reading')
+  const definition: MeterDefinition = {
+    name: clean(input.name, 'Meter name'),
+    meterType: input.meterType,
+    location: clean(input.location, 'Location'),
+    serialNumber: clean(input.serialNumber, 'Serial Number'),
+    mpan,
+    measurementUnit: clean(input.measurementUnit, 'Measurement unit', 50),
+    notes: input.notes?.trim() || null,
+    installedAt: input.installedAt,
+    openingReading: input.openingReading,
+    previousMeterId: input.previousMeterId ?? null,
+    replacementDate: input.replacementDate ?? null,
+  }
   return ctx.db(async (tx) => {
     if (input.previousMeterId) {
       const [previous] = await tx
@@ -152,26 +166,52 @@ export async function createMeter(
       if (!previous || !input.replacementDate)
         throw new Error('Replacement meter details are invalid.')
     }
+    const [existing] = await tx
+      .select()
+      .from(hospitalityMeters)
+      .where(
+        and(
+          eq(hospitalityMeters.tenantId, ctx.tenantId),
+          eq(hospitalityMeters.propertyId, input.propertyId),
+          eq(hospitalityMeters.serialNumber, definition.serialNumber),
+        ),
+      )
+      .limit(1)
+    if (existing) {
+      if (sameMeterDefinition(existing, definition)) return existing
+      throw new Error('A different meter already uses this serial number at the selected property.')
+    }
     const [meter] = await tx
       .insert(hospitalityMeters)
       .values({
         tenantId: ctx.tenantId,
         propertyId: input.propertyId,
-        name: clean(input.name, 'Meter name'),
-        meterType: input.meterType,
-        location: clean(input.location, 'Location'),
-        serialNumber: clean(input.serialNumber, 'Serial Number'),
-        mpan,
-        measurementUnit: clean(input.measurementUnit, 'Measurement unit', 50),
-        notes: input.notes?.trim() || null,
-        installedAt: input.installedAt,
-        openingReading: input.openingReading,
-        previousMeterId: input.previousMeterId ?? null,
-        replacementDate: input.replacementDate ?? null,
+        ...definition,
         createdById: memberId(ctx),
       })
+      .onConflictDoNothing({
+        target: [
+          hospitalityMeters.tenantId,
+          hospitalityMeters.propertyId,
+          hospitalityMeters.serialNumber,
+        ],
+      })
       .returning()
-    if (!meter) throw new Error('Meter could not be created.')
+    if (!meter) {
+      const [concurrent] = await tx
+        .select()
+        .from(hospitalityMeters)
+        .where(
+          and(
+            eq(hospitalityMeters.tenantId, ctx.tenantId),
+            eq(hospitalityMeters.propertyId, input.propertyId),
+            eq(hospitalityMeters.serialNumber, definition.serialNumber),
+          ),
+        )
+        .limit(1)
+      if (concurrent && sameMeterDefinition(concurrent, definition)) return concurrent
+      throw new Error('A different meter already uses this serial number at the selected property.')
+    }
     await tx.insert(hospitalityMeterReadings).values({
       tenantId: ctx.tenantId,
       meterId: meter.id,

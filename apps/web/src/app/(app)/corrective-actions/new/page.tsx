@@ -27,7 +27,10 @@ import { pickString } from '@/lib/list-params'
 import { PageContainer } from '@/components/page-layout'
 import { RemoteSelectField } from '@/components/remote-search-select'
 import { nextReference } from '@/lib/reference'
-import { resolveHospitalityPropertyContext } from '@/lib/hospitality/property-context'
+import {
+  requireAuthoringProperty,
+  resolveHospitalityPropertyContext,
+} from '@/lib/hospitality/property-context'
 import { assertCanAccessProperty } from '@/lib/hospitality/property-access'
 
 export async function generateMetadata() {
@@ -61,6 +64,12 @@ async function createCA(formData: FormData) {
   const dueOn = String(formData.get('dueOn') ?? '').trim() || null
   const assignedOn = new Date().toISOString().slice(0, 10)
   const propertyId = String(formData.get('propertyId') ?? '').trim()
+  const requiredPropertyId = await requireAuthoringProperty(ctx)
+  if (requiredPropertyId && propertyId !== requiredPropertyId) {
+    throw new Error(
+      'Create this Corrective Action in the property selected in the Property Switcher.',
+    )
+  }
   if (propertyId) assertCanAccessProperty(ctx, propertyId)
 
   const row = await ctx.db(async (tx) => {
@@ -143,6 +152,11 @@ export default async function NewCAPage({
   const presetSourceId = pickString(sp.sourceEntityId)
   const ctx = await requireRequestContext()
   const propertyContext = await resolveHospitalityPropertyContext(ctx)
+  const authoringProperties = propertyContext.activePropertyId
+    ? propertyContext.properties.filter(
+        (property) => property.id === propertyContext.activePropertyId,
+      )
+    : propertyContext.properties
 
   const sourceIncident = await ctx.db(async (tx) => {
     let inc = null
@@ -178,11 +192,11 @@ export default async function NewCAPage({
         <Card>
           <CardContent className="pt-6">
             <form action={createCA} className="space-y-4">
-              {propertyContext.properties.length > 0 && (
+              {authoringProperties.length > 0 && (
                 <Field label={tGenerated('m_0f7a8c3e57d104')}>
                   <Select name="propertyId" defaultValue={propertyContext.activePropertyId ?? ''}>
                     <option value="">Choose a property</option>
-                    {propertyContext.properties.map((property) => (
+                    {authoringProperties.map((property) => (
                       <option key={property.id} value={property.id}>
                         {property.name}
                       </option>

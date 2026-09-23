@@ -52,14 +52,14 @@ Guests do not need a staff account. They scan the code, choose an issue type and
 
 ## Report a problem from Front Office
 
-1. Open **Hospitality**, choose **Maintenance queue**, then choose **+ Report maintenance issue**.
+1. Open **Maintenance queue** in the left menu, then choose **+ Report maintenance issue**.
 2. If you work at one hotel, that property is selected automatically. Portfolio users choose only from their assigned properties.
 3. Choose the room or location, describe the problem, select a priority when needed, then submit.
 4. The report enters the same maintenance queue used by guest QR and engineering reports. Front Office does not need to assign a contractor, create a work order, or enter resolution details.
 
 ## Work the maintenance queue
 
-1. Open **Hospitality**, then choose **Maintenance queue**.
+1. Open **Maintenance queue** in the left menu.
 2. Search by reference, issue, room, or property. Use **Status** to filter the queue.
 3. Open an issue to see its location, source, details, and any consented guest contact information.
 4. Move the issue through **reported**, **acknowledged**, **assigned**, **in progress**, **awaiting parts**, **completed**, and **closed**.

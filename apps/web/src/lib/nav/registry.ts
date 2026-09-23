@@ -203,6 +203,14 @@ export const NAV_MODULES: NavModule[] = [
     group: 'Assets & people',
   },
   {
+    key: 'hospitality-maintenance',
+    href: '/hospitality/maintenance',
+    label: 'Maintenance queue',
+    iconKey: 'wrench',
+    requiredPermission: 'maintenance.read',
+    group: 'Assets & people',
+  },
+  {
     key: 'locations',
     href: '/locations',
     label: 'Locations',

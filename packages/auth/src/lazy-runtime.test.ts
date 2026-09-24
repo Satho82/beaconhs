@@ -1,3 +1,4 @@
+process.env.APP_URL = 'https://app.example.test'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mocks = vi.hoisted(() => {

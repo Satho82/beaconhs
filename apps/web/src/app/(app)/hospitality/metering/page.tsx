@@ -143,6 +143,8 @@ function Chart({
   label: string
   emptyLabel: string
   unit: string
+  axisLabel: string
+  dateLabel: string
 }) {
   if (!series.length) return <p className="text-muted-foreground text-sm">{emptyLabel}</p>
 
@@ -163,7 +165,7 @@ function Chart({
         viewBox="0 0 100 100"
         className="bg-muted/20 h-56 w-full rounded border"
         role="img"
-        aria-label={`${label}. X axis: dates. Y axis: ${unit}.`}
+        aria-label={axisLabel}
       >
         <line
           x1={plot.left}
@@ -223,7 +225,7 @@ function Chart({
           )
         })}
         <text x="57" y="99" textAnchor="middle" fontSize="4" fill="currentColor">
-          Date
+          {dateLabel}
         </text>
       </svg>
     </div>
@@ -582,12 +584,20 @@ export default async function MeteringPage({
               label={t('Consumption over time')}
               emptyLabel={t('No data for this period.')}
               unit={consumptionUnit}
+              axisLabel={t(
+                'Chart with dates on the horizontal axis and measurement units on the vertical axis.',
+              )}
+              dateLabel={t('Date')}
             />
             <Chart
               series={spendSeries}
               label={t('Expenditure over time')}
               emptyLabel={t('No data for this period.')}
               unit={expenditureUnit}
+              axisLabel={t(
+                'Chart with dates on the horizontal axis and currency on the vertical axis.',
+              )}
+              dateLabel={t('Date')}
             />
             <p className="text-muted-foreground text-xs lg:col-span-2">
               {t(

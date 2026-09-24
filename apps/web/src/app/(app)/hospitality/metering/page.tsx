@@ -165,8 +165,22 @@ function Chart({
         role="img"
         aria-label={`${label}. X axis: dates. Y axis: ${unit}.`}
       >
-        <line x1={plot.left} y1={plot.top} x2={plot.left} y2={plot.bottom} stroke="currentColor" strokeWidth="0.5" />
-        <line x1={plot.left} y1={plot.bottom} x2={plot.right} y2={plot.bottom} stroke="currentColor" strokeWidth="0.5" />
+        <line
+          x1={plot.left}
+          y1={plot.top}
+          x2={plot.left}
+          y2={plot.bottom}
+          stroke="currentColor"
+          strokeWidth="0.5"
+        />
+        <line
+          x1={plot.left}
+          y1={plot.bottom}
+          x2={plot.right}
+          y2={plot.bottom}
+          stroke="currentColor"
+          strokeWidth="0.5"
+        />
         <line
           x1={plot.left}
           y1={plot.top}
@@ -196,7 +210,14 @@ function Chart({
           const index = series.indexOf(point)
           const { x } = coordinates[index]!
           return (
-            <text key={point.label} x={x} y="92" textAnchor="middle" fontSize="3.5" fill="currentColor">
+            <text
+              key={point.label}
+              x={x}
+              y="92"
+              textAnchor="middle"
+              fontSize="3.5"
+              fill="currentColor"
+            >
               {point.label}
             </text>
           )

@@ -61,6 +61,9 @@ beforeEach(() => {
   vi.resetModules()
   vi.clearAllMocks()
   process.env = { ...originalEnv }
+  delete process.env.PUBLIC_APP_URL
+  delete process.env.APP_URL
+  delete process.env.BETTER_AUTH_URL
   delete process.env.BETTER_AUTH_TRUSTED_ORIGINS
   mocks.getPlatformBranding.mockResolvedValue({})
   mocks.enqueueEmail.mockResolvedValue({ id: 'job-1' })
@@ -87,6 +90,7 @@ describe('lazy auth runtime', () => {
     process.env.BETTER_AUTH_SECRET = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
     process.env.BETTER_AUTH_URL = 'https://app.example.test'
     process.env.NODE_ENV = 'production'
+    process.env.APP_URL = 'https://app.example.test'
     const { getAuth } = await import('./server')
 
     const first = getAuth()
@@ -151,6 +155,7 @@ describe('lazy auth runtime', () => {
     process.env.DATABASE_URL = 'postgresql://app:secret@db.example.test/beaconhs'
     process.env.BETTER_AUTH_SECRET = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
     process.env.NODE_ENV = 'production'
+    process.env.APP_URL = 'https://app.example.test'
     const { getAuth } = await import('./server')
     getAuth()
 
@@ -165,6 +170,7 @@ describe('lazy auth runtime', () => {
     process.env.DATABASE_URL = 'postgresql://app:secret@db.example.test/beaconhs'
     process.env.BETTER_AUTH_SECRET = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
     process.env.NODE_ENV = 'production'
+    process.env.APP_URL = 'https://app.example.test'
     const { getAuth } = await import('./server')
     getAuth()
 

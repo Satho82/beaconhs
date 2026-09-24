@@ -207,8 +207,7 @@ describe('lazy auth runtime', () => {
 
     getAuth()
 
-    const sendResetPassword =
-      mocks.state.options?.emailAndPassword?.sendResetPassword
+    const sendResetPassword = mocks.state.options?.emailAndPassword?.sendResetPassword
 
     expect(sendResetPassword).toBeTypeOf('function')
 

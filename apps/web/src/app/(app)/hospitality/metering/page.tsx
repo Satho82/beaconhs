@@ -102,6 +102,8 @@ function money(value: number | string | null, currency: string | null) {
   if (value == null || !currency) return '-'
   return new Intl.NumberFormat('en-GB', { style: 'currency', currency }).format(Number(value))
 }
+type AnalyticsPoint = { label: string; value: number }
+
 function analyticsSeries(
   readings: Array<{
     readAt: Date
@@ -110,7 +112,7 @@ function analyticsSeries(
   }>,
   interval: string,
   field: 'consumption' | 'expenditure',
-) {
+): AnalyticsPoint[] {
   const buckets = new Map<string, number>()
   for (const item of readings) {
     const date = new Date(item.readAt)
@@ -126,32 +128,82 @@ function analyticsSeries(
     }
     buckets.set(key, (buckets.get(key) ?? 0) + Number(item[field] ?? 0))
   }
-  return [...buckets.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([, value]) => value)
+  return [...buckets.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([label, value]) => ({ label, value }))
 }
+
 function Chart({
-  values,
+  series,
   label,
   emptyLabel,
+  unit,
 }: {
-  values: number[]
+  series: AnalyticsPoint[]
   label: string
   emptyLabel: string
+  unit: string
 }) {
-  if (!values.length) return <p className="text-muted-foreground text-sm">{emptyLabel}</p>
-  const max = Math.max(...values, 1)
-  const points = values
-    .map((v, i) => `${(i / Math.max(values.length - 1, 1)) * 100},${100 - (v / max) * 90}`)
-    .join(' ')
+  if (!series.length) return <p className="text-muted-foreground text-sm">{emptyLabel}</p>
+
+  const max = Math.max(...series.map((point) => point.value), 1)
+  const plot = { left: 18, right: 96, top: 8, bottom: 82 }
+  const coordinate = (point: AnalyticsPoint, index: number) => ({
+    x: plot.left + (index / Math.max(series.length - 1, 1)) * (plot.right - plot.left),
+    y: plot.bottom - (point.value / max) * (plot.bottom - plot.top),
+  })
+  const coordinates = series.map(coordinate)
+  const points = coordinates.map(({ x, y }) => `${x},${y}`).join(' ')
+  const xLabels = series.length <= 3 ? series : [series[0]!, series[series.length - 1]!]
+
   return (
     <div>
       <p className="mb-2 text-sm font-medium">{label}</p>
       <svg
         viewBox="0 0 100 100"
-        className="bg-muted/20 h-48 w-full rounded border"
+        className="bg-muted/20 h-56 w-full rounded border"
         role="img"
-        aria-label={label}
+        aria-label={`${label}. X axis: dates. Y axis: ${unit}.`}
       >
+        <line x1={plot.left} y1={plot.top} x2={plot.left} y2={plot.bottom} stroke="currentColor" strokeWidth="0.5" />
+        <line x1={plot.left} y1={plot.bottom} x2={plot.right} y2={plot.bottom} stroke="currentColor" strokeWidth="0.5" />
+        <line
+          x1={plot.left}
+          y1={plot.top}
+          x2={plot.right}
+          y2={plot.top}
+          stroke="currentColor"
+          strokeOpacity="0.2"
+          strokeDasharray="2 2"
+          strokeWidth="0.4"
+        />
+        <text x="2" y={plot.top + 2} fontSize="4" fill="currentColor">
+          {max.toFixed(2)} {unit}
+        </text>
+        <text x="2" y={plot.bottom} fontSize="4" fill="currentColor">
+          0 {unit}
+        </text>
+        <text x="8" y="48" fontSize="4" fill="currentColor" transform="rotate(-90 8 48)">
+          {unit}
+        </text>
         <polyline fill="none" stroke="currentColor" strokeWidth="2" points={points} />
+        {coordinates.map(({ x, y }, index) => (
+          <circle key={series[index]!.label} cx={x} cy={y} r="2.2" fill="currentColor">
+            <title>{`${series[index]!.label}: ${series[index]!.value.toFixed(2)} ${unit}`}</title>
+          </circle>
+        ))}
+        {xLabels.map((point) => {
+          const index = series.indexOf(point)
+          const { x } = coordinates[index]!
+          return (
+            <text key={point.label} x={x} y="92" textAnchor="middle" fontSize="3.5" fill="currentColor">
+              {point.label}
+            </text>
+          )
+        })}
+        <text x="57" y="99" textAnchor="middle" fontSize="4" fill="currentColor">
+          Date
+        </text>
       </svg>
     </div>
   )
@@ -195,6 +247,12 @@ export default async function MeteringPage({
   )
   const consumptionSeries = analyticsSeries(analyticsReadings, interval, 'consumption')
   const spendSeries = analyticsSeries(analyticsReadings, interval, 'expenditure')
+  const measurementUnits = [...new Set(data.meters.map((meter) => meter.measurementUnit))]
+  const consumptionUnit = measurementUnits.length === 1 ? measurementUnits[0]! : 'mixed units'
+  const currencies = [
+    ...new Set(analyticsReadings.map((reading) => reading.currency).filter(Boolean)),
+  ]
+  const expenditureUnit = currencies.length === 1 ? currencies[0]! : 'mixed currencies'
 
   return (
     <PageContainer>
@@ -499,14 +557,16 @@ export default async function MeteringPage({
               </Button>
             </form>
             <Chart
-              values={consumptionSeries}
+              series={consumptionSeries}
               label={t('Consumption over time')}
               emptyLabel={t('No data for this period.')}
+              unit={consumptionUnit}
             />
             <Chart
-              values={spendSeries}
+              series={spendSeries}
               label={t('Expenditure over time')}
               emptyLabel={t('No data for this period.')}
+              unit={expenditureUnit}
             />
             <p className="text-muted-foreground text-xs lg:col-span-2">
               {t(

@@ -138,6 +138,8 @@ function Chart({
   label,
   emptyLabel,
   unit,
+  axisLabel,
+  dateLabel,
 }: {
   series: AnalyticsPoint[]
   label: string

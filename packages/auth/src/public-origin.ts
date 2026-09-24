@@ -1,6 +1,6 @@
 const BIND_HOSTS = new Set(['0.0.0.0', '::', '[::]'])
 
-export type PublicOriginEnvironment = Partial<
+type PublicOriginEnvironment = Partial<
   Pick<NodeJS.ProcessEnv, 'PUBLIC_APP_URL' | 'APP_URL' | 'BETTER_AUTH_URL' | 'NODE_ENV'>
 >
 

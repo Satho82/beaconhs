@@ -5,9 +5,9 @@ permissions:
 
 on:
   push:
-    branches: [main]
+    branches: [main, feature/uvanoo-v1.3-platform-foundation]
   pull_request:
-    branches: [main]
+    branches: [main, feature/uvanoo-v1.3-platform-foundation]
   workflow_dispatch:
 
 jobs:
@@ -95,7 +95,7 @@ jobs:
 
   deploy-dev:
     name: Deploy tested commit to dev
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
     needs: ci
     permissions:
       contents: read

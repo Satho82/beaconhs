@@ -1,0 +1,57 @@
+name: Diagnose Platform Generated Key
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with:
+          node-version: 24.18.0
+      - name: Check out the exact reported revision
+        run: |
+          git clone https://github.com/Satho82/beaconhs.git beaconhs
+          cd beaconhs
+          git checkout --detach 796aa48d09bc1e8ca5c2cc92ea312cbdb15d70f6
+      - name: Assert catalog source and canonical key
+        working-directory: beaconhs
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFileSync } from 'node:fs'
+          const source = 'Dashboard'
+          function systemMessageKey(source) {
+            let high = 0xdeadbeef
+            let low = 0x41c6ce57
+            for (let index = 0; index < source.length; index += 1) {
+              const code = source.charCodeAt(index)
+              high = Math.imul(high ^ code, 2_654_435_761)
+              low = Math.imul(low ^ code, 1_597_334_677)
+            }
+            high = Math.imul(high ^ (high >>> 16), 2_246_822_507)
+            high ^= Math.imul(low ^ (low >>> 13), 3_266_489_909)
+            low = Math.imul(low ^ (low >>> 16), 2_246_822_507)
+            low ^= Math.imul(high ^ (high >>> 13), 3_266_489_909)
+            const value = 4_294_967_296 * (2_097_151 & low) + (high >>> 0)
+            return 'm_' + value.toString(16).padStart(14, '0')
+          }
+          const key = systemMessageKey(source)
+          console.log(JSON.stringify({ source, key }))
+          for (const locale of ['en', 'es', 'fr']) {
+            const messages = JSON.parse(readFileSync('packages/i18n/src/messages/' + locale + '.json', 'utf8'))
+            console.log(JSON.stringify({ locale, present: Object.hasOwn(messages.Generated, key), value: messages.Generated[key] ?? null }))
+            if (!Object.hasOwn(messages.Generated, key)) process.exitCode = 1
+          }
+          NODE
+      - name: Install locked dependencies and validate the exact revision
+        working-directory: beaconhs
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm --filter @beaconhs/web typecheck
+          pnpm --filter @beaconhs/web test -- src/i18n/i18n-coverage.test.ts

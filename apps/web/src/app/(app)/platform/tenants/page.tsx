@@ -17,7 +17,7 @@ import {
   TableRow,
 } from '@beaconhs/ui'
 import { db, withSuperAdmin } from '@beaconhs/db'
-import { incidents, people, tenantUsers, tenants } from '@beaconhs/db/schema'
+import { auditLog, incidents, people, tenantUsers, tenants } from '@beaconhs/db/schema'
 import { requirePlatformOperator } from '@/lib/auth'
 import { setActiveTenant } from '@/lib/actions'
 import { PageContainer } from '@/components/page-layout'
@@ -26,7 +26,7 @@ import { Pagination } from '@/components/pagination'
 import { SearchInput } from '@/components/search-input'
 import { SortableTh } from '@/components/sortable-th'
 import { TableToolbar } from '@/components/table-toolbar'
-import { parseListParams, pickString } from '@/lib/list-params'
+import { isUuid, parseListParams, pickString } from '@/lib/list-params'
 
 export async function generateMetadata() {
   const tGenerated = await getGeneratedTranslations()
@@ -41,8 +41,43 @@ async function viewAs(formData: FormData) {
   'use server'
   await requirePlatformOperator()
   const tenantId = String(formData.get('tenantId') ?? '')
+  if (!isUuid(tenantId)) throw new Error('Invalid tenant.')
   await setActiveTenant(tenantId)
   redirect('/dashboard')
+}
+
+async function changeTenantStatus(formData: FormData) {
+  'use server'
+  const operator = await requirePlatformOperator()
+  const tenantId = String(formData.get('tenantId') ?? '').trim()
+  const status = String(formData.get('status') ?? '').trim()
+  if (!isUuid(tenantId) || !['active', 'suspended', 'archived'].includes(status))
+    throw new Error('Invalid tenant status change.')
+
+  await withSuperAdmin(db, async (tx) => {
+    const [before] = await tx
+      .select({ id: tenants.id, name: tenants.name, status: tenants.status })
+      .from(tenants)
+      .where(eq(tenants.id, tenantId))
+      .limit(1)
+    if (!before) throw new Error('Tenant not found.')
+    if (before.status === status) return
+
+    await tx.update(tenants).set({ status, updatedAt: new Date() }).where(eq(tenants.id, tenantId))
+    await tx.insert(auditLog).values({
+      tenantId,
+      actorUserId: operator.userId,
+      entityType: 'tenant',
+      entityId: tenantId,
+      action: 'update',
+      summary: `Changed ${before.name} status from ${before.status} to ${status}`,
+      before: { status: before.status },
+      after: { status },
+      metadata: { platformControlled: true },
+    })
+  })
+
+  revalidatePath('/platform/tenants')
 }
 
 export default async function AdminTenantsPage({
@@ -224,25 +259,47 @@ export default async function AdminTenantsPage({
                         <TableCell>
                           <GeneratedValue
                             value={
-                              tenant.status === 'active' ? (
-                                <div className="flex flex-wrap gap-2">
+                              <div className="flex flex-wrap gap-2">
+                                {tenant.status === 'active' ? (
                                   <form action={viewAs}>
                                     <input type="hidden" name="tenantId" value={tenant.id} />
                                     <Button type="submit" size="sm" variant="outline">
                                       <GeneratedText id="m_1583ec793bd336" />
                                     </Button>
                                   </form>
-                                  <Link href={`/platform/tenants/${tenant.id}/entitlements`}>
-                                    <Button type="button" size="sm" variant="outline">
-                                      {translateHospitality('m_03abc46dafbce6')}
+                                ) : null}
+                                <Link href={`/platform/tenants/${tenant.id}/entitlements`}>
+                                  <Button type="button" size="sm" variant="outline">
+                                    {translateHospitality('m_03abc46dafbce6')}
+                                  </Button>
+                                </Link>
+                                {tenant.status === 'active' ? (
+                                  <form action={changeTenantStatus}>
+                                    <input type="hidden" name="tenantId" value={tenant.id} />
+                                    <input type="hidden" name="status" value="suspended" />
+                                    <Button type="submit" size="sm" variant="outline">
+                                      Suspend
                                     </Button>
-                                  </Link>
-                                </div>
-                              ) : (
-                                <span className="text-xs text-slate-400">
-                                  <GeneratedText id="m_134f2adcabdf96" />
-                                </span>
-                              )
+                                  </form>
+                                ) : (
+                                  <form action={changeTenantStatus}>
+                                    <input type="hidden" name="tenantId" value={tenant.id} />
+                                    <input type="hidden" name="status" value="active" />
+                                    <Button type="submit" size="sm" variant="outline">
+                                      Reactivate
+                                    </Button>
+                                  </form>
+                                )}
+                                {tenant.status !== 'archived' ? (
+                                  <form action={changeTenantStatus}>
+                                    <input type="hidden" name="tenantId" value={tenant.id} />
+                                    <input type="hidden" name="status" value="archived" />
+                                    <Button type="submit" size="sm" variant="outline">
+                                      Archive
+                                    </Button>
+                                  </form>
+                                ) : null}
+                              </div>
                             }
                           />
                         </TableCell>

@@ -18,7 +18,7 @@ function assertPlatformOperator(ctx: PlatformOperator): void {
  * result is returned. Tenant administrators therefore cannot self-enable a
  * licensed hospitality capability by posting a different tenant id.
  */
-export async function listTenantModuleEntitlements(ctx: RequestContext, tenantId: string) {
+export async function listTenantModuleEntitlements(ctx: PlatformOperator, tenantId: string) {
   assertPlatformOperator(ctx)
   return withSuperAdmin(db, async (tx) => {
     const [tenant] = await tx

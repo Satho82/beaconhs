@@ -1,13 +1,13 @@
 import { GeneratedValue } from '@/i18n/generated'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { requireRequestContext } from '@/lib/auth'
+import { getPlatformOperator } from '@/lib/auth'
 
 // This is an explicit platform-only boundary. Tenant pages may use a selected
 // tenant context, but control-centre operations never rely on it for authority.
 export default async function PlatformLayout({ children }: { children: React.ReactNode }) {
-  const ctx = await requireRequestContext()
-  if (!ctx.isSuperAdmin) redirect('/admin')
+  const operator = await getPlatformOperator()
+  if (!operator) redirect('/admin')
   return (
     <GeneratedValue
       value={

@@ -65,7 +65,7 @@ async function resolvePersonId(
  * operations are cross-tenant by design, so they must not depend on an active
  * tenant cookie, membership, or property scope.
  */
-export type PlatformOperator = { userId: string; isSuperAdmin: true }
+type PlatformOperator = { userId: string; isSuperAdmin: true }
 
 export const getPlatformOperator = cache(async (): Promise<PlatformOperator | null> => {
   const session = await getAuth().api.getSession({ headers: await headers() })

@@ -22,7 +22,7 @@ export default async function PlatformLayout({ children }: { children: React.Rea
     <GeneratedValue
       value={
         <div className="min-h-full">
-          <header className="border-b border-violet-300 bg-violet-50 px-4 py-2 dark:border-violet-800/60 dark:bg-violet-950/40 sm:px-6">
+          <header className="border-b border-violet-300 bg-violet-50 px-4 py-2 sm:px-6 dark:border-violet-800/60 dark:bg-violet-950/40">
             <div className="mx-auto max-w-[1600px] space-y-2">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <Link

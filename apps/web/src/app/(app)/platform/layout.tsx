@@ -33,7 +33,9 @@ export default async function PlatformLayout({ children }: { children: React.Rea
                   {t('Uvanoo Platform Control Centre')}
                 </Link>
                 <span className="text-xs font-medium text-violet-800 dark:text-violet-200">
-                  {t('Platform context · tenant and property scope do not grant platform authority')}
+                  {t(
+                    'Platform context · tenant and property scope do not grant platform authority',
+                  )}
                 </span>
               </div>
               <nav

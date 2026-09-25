@@ -36,7 +36,10 @@ export default async function PlatformLayout({ children }: { children: React.Rea
                   {tGenerated('m_1032059f7b04bd')}
                 </span>
               </div>
-              <nav aria-label={tGenerated('m_12d1a0e90b20a6')} className="flex flex-wrap gap-3 text-sm">
+              <nav
+                aria-label={tGenerated('m_12d1a0e90b20a6')}
+                className="flex flex-wrap gap-3 text-sm"
+              >
                 {platformNavigation.map((item) => (
                   <Link
                     key={item.href}

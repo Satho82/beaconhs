@@ -72,6 +72,18 @@ export const getPlatformOperator = cache(async (): Promise<PlatformOperator | nu
   if (!session?.user?.id) return null
 
   return withSuperAdmin(db, async (tx) => {
+    // A platform operator must first leave any tenant impersonation session.
+    // Otherwise the effective tenant identity could use the real actor's
+    // platform authority to escape its server-side tenant boundary.
+    if (session.session?.token) {
+      const [impersonation] = await tx
+        .select({ targetUserId: sessions.impersonatingUserId })
+        .from(sessions)
+        .where(eq(sessions.token, session.session.token))
+        .limit(1)
+      if (impersonation?.targetUserId) return null
+    }
+
     const [user] = await tx
       .select({ id: users.id, isSuperAdmin: users.isSuperAdmin })
       .from(users)

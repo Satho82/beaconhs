@@ -93,7 +93,6 @@ export const getPlatformOperator = cache(async (): Promise<PlatformOperator | nu
   })
 })
 
-
 export async function getCurrentUserId(): Promise<string | null> {
   try {
     const session = await getAuth().api.getSession({ headers: await headers() })

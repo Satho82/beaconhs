@@ -2,6 +2,7 @@ import { getGeneratedValueTranslations, getGeneratedTranslations } from '@/i18n/
 
 import { GeneratedText, GeneratedValue } from '@/i18n/generated'
 import Link from 'next/link'
+import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { and, asc, count, desc, eq, ilike, or, sql, type SQL } from 'drizzle-orm'
 import {
@@ -50,9 +51,12 @@ async function changeTenantStatus(formData: FormData) {
   'use server'
   const operator = await requirePlatformOperator()
   const tenantId = String(formData.get('tenantId') ?? '').trim()
-  const status = String(formData.get('status') ?? '').trim()
-  if (!isUuid(tenantId) || !['active', 'suspended', 'archived'].includes(status))
-    throw new Error('Invalid tenant status change.')
+  const statusValue = String(formData.get('status') ?? '').trim()
+  const status =
+    statusValue === 'active' || statusValue === 'suspended' || statusValue === 'archived'
+      ? statusValue
+      : null
+  if (!isUuid(tenantId) || !status) throw new Error('Invalid tenant status change.')
 
   await withSuperAdmin(db, async (tx) => {
     const [before] = await tx

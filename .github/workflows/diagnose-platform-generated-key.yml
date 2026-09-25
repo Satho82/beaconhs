@@ -27,18 +27,21 @@ jobs:
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          path = Path('apps/web/src/app/(app)/platform/layout.tsx')
-          text = path.read_text()
+          layout = Path('apps/web/src/app/(app)/platform/layout.tsx')
+          layout_text = layout.read_text()
+          assert layout_text.count("m_0c7e907b633729") == 1
+          layout.write_text(layout_text.replace("m_0c7e907b633729", "m_0948bd8dc78958"))
+          tenants = Path('apps/web/src/app/(app)/platform/tenants/page.tsx')
+          tenant_text = tenants.read_text()
           replacements = {
-              "m_0c7e907b633729": "m_0948bd8dc78958",
               ">\\n                                      Suspend\\n                                    </Button>": ">\\n                                      {translateHospitality('m_1a04688da0adf6')}\\n                                    </Button>",
               ">\\n                                      Reactivate\\n                                    </Button>": ">\\n                                      {translateHospitality('m_04766a3c4e3582')}\\n                                    </Button>",
               ">\\n                                      Archive\\n                                    </Button>": ">\\n                                      {translateHospitality('m_019c0a64030688')}\\n                                    </Button>",
           }
           for old, new in replacements.items():
-              assert text.count(old) == 1, old
-              text = text.replace(old, new)
-          path.write_text(text)
+              assert tenant_text.count(old) == 1, old
+              tenant_text = tenant_text.replace(old, new)
+          tenants.write_text(tenant_text)
           PY
       - name: Assert catalog source and canonical key
         working-directory: beaconhs

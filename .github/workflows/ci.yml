@@ -91,7 +91,10 @@ jobs:
       - name: Prove migrations are idempotent
         run: pnpm --filter @beaconhs/db exec tsx src/migrate.ts
       - run: pnpm test
+      # Next.js production build exceeded the runner's default ~4 GB V8 heap.
       - run: pnpm build
+        env:
+          NODE_OPTIONS: --max-old-space-size=6144
 
   deploy-dev:
     name: Deploy tested commit to dev

@@ -16,7 +16,10 @@ export function proxy(request: NextRequest) {
   // Platform routes must be rendered outside the tenant workspace shell. This
   // header is created only at the server request boundary, never trusted from
   // client input.
-  requestHeaders.set('x-platform-route', request.nextUrl.pathname.startsWith('/platform') ? '1' : '0')
+  requestHeaders.set(
+    'x-platform-route',
+    request.nextUrl.pathname.startsWith('/platform') ? '1' : '0',
+  )
 
   const response = NextResponse.next({ request: { headers: requestHeaders } })
   response.headers.set('Content-Security-Policy', policy)

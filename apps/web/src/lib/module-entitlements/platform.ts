@@ -3,10 +3,11 @@ import 'server-only'
 import { and, eq } from 'drizzle-orm'
 import { db, withSuperAdmin } from '@beaconhs/db'
 import { auditLog, tenantModuleEntitlements, tenants } from '@beaconhs/db/schema'
-import type { RequestContext } from '@beaconhs/tenant'
 import { normalizeEntitlementChange, type EntitlementChange } from './policy'
 
-function assertPlatformOperator(ctx: RequestContext): void {
+type PlatformOperator = { userId: string; isSuperAdmin: boolean }
+
+function assertPlatformOperator(ctx: PlatformOperator): void {
   if (!ctx.isSuperAdmin)
     throw new Error('Only platform super-admins can manage module entitlements.')
 }
@@ -37,7 +38,7 @@ export async function listTenantModuleEntitlements(ctx: RequestContext, tenantId
 
 /** Platform-only enable/disable path. It cannot be called through a tenant RLS context. */
 export async function setTenantModuleEntitlement(
-  ctx: RequestContext,
+  ctx: PlatformOperator,
   tenantId: string,
   input: EntitlementChange,
 ) {

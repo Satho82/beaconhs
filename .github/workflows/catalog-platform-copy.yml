@@ -57,9 +57,12 @@ jobs:
             const reference = await github.rest.git.getRef({ owner, repo, ref: 'heads/' + branch })
             const parentSha = reference.data.object.sha
             const parent = await github.rest.git.getCommit({ owner, repo, commit_sha: parentSha })
+            const parentTree = await github.rest.git.getTree({ owner, repo, tree_sha: parent.data.tree.sha, recursive: 'true' })
             const tree = []
             for (let locale = 0; locale < files.length; locale += 1) {
-              const result = await github.rest.repos.getContent({ owner, repo, path: files[locale], ref: parentSha })
+              const entry = parentTree.data.tree.find((candidate) => candidate.path === files[locale])
+              if (!entry?.sha) throw new Error('Missing catalog: ' + files[locale])
+              const result = await github.rest.git.getBlob({ owner, repo, file_sha: entry.sha })
               const document = JSON.parse(Buffer.from(result.data.content, 'base64').toString('utf8'))
               for (const [source, translations] of Object.entries(copy)) {
                 document.Generated[systemMessageKey(source)] = translations[locale]

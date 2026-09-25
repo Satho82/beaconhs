@@ -18,7 +18,7 @@ import {
 } from '@beaconhs/ui'
 import { db, withSuperAdmin } from '@beaconhs/db'
 import { incidents, people, tenantUsers, tenants } from '@beaconhs/db/schema'
-import { getCurrentUserId } from '@/lib/auth'
+import { requirePlatformOperator } from '@/lib/auth'
 import { setActiveTenant } from '@/lib/actions'
 import { PageContainer } from '@/components/page-layout'
 import { FilterChips } from '@/components/filter-bar'
@@ -39,6 +39,7 @@ const SORTS = ['name', 'slug', 'status', 'region', 'members', 'people', 'inciden
 
 async function viewAs(formData: FormData) {
   'use server'
+  await requirePlatformOperator()
   const tenantId = String(formData.get('tenantId') ?? '')
   await setActiveTenant(tenantId)
   redirect('/dashboard')
@@ -53,8 +54,7 @@ export default async function AdminTenantsPage({
 
   const tGeneratedValue = await getGeneratedValueTranslations()
   const tGenerated = await getGeneratedTranslations()
-  const userId = await getCurrentUserId()
-  if (!userId) redirect('/login')
+  await requirePlatformOperator()
   const sp = await searchParams
   const statusParam = pickString(sp.status)
   const statusFilter =

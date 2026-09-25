@@ -95,6 +95,7 @@ jobs:
 
   deploy-dev:
     name: Deploy tested commit to dev
+    # V1.3 branch commits are validation-only; deployment remains limited to main.
     if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
     needs: ci
     permissions:

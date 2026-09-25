@@ -1,0 +1,92 @@
+name: Catalog Platform Control Centre Copy
+
+on:
+  push:
+    branches: [feature/uvanoo-v1.3-platform-foundation]
+
+permissions:
+  contents: write
+
+jobs:
+  catalog:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with:
+          node-version: 24.18.0
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Add generated catalog entries
+        run: |
+          cat > /tmp/catalog-platform-copy.ts <<'EOF'
+          import { readFileSync, writeFileSync } from 'node:fs'
+          import { systemMessageKey } from './packages/i18n/src/key.ts'
+
+          const copy = {
+            'Uvanoo Platform Control Centre': {
+              en: 'Uvanoo Platform Control Centre',
+              es: 'Centro de control de la plataforma Uvanoo',
+              fr: 'Centre de contrôle de la plateforme Uvanoo',
+            },
+            'Platform context · tenant and property scope do not grant platform authority': {
+              en: 'Platform context · tenant and property scope do not grant platform authority',
+              es: 'Contexto de plataforma · el ámbito de inquilino y propiedad no concede autoridad de plataforma',
+              fr: 'Contexte de plateforme · la portée du locataire et de la propriété n’accorde pas d’autorité de plateforme',
+            },
+            'Platform navigation': {
+              en: 'Platform navigation',
+              es: 'Navegación de la plataforma',
+              fr: 'Navigation de la plateforme',
+            },
+            'Management companies': {
+              en: 'Management companies',
+              es: 'Empresas de gestión',
+              fr: 'Sociétés de gestion',
+            },
+            'Platform users': { en: 'Platform users', es: 'Usuarios de plataforma', fr: 'Utilisateurs de la plateforme' },
+            Communications: { en: 'Communications', es: 'Comunicaciones', fr: 'Communications' },
+            Branding: { en: 'Branding', es: 'Marca', fr: 'Image de marque' },
+            'System health': { en: 'System health', es: 'Estado del sistema', fr: 'État du système' },
+            Suspend: { en: 'Suspend', es: 'Suspender', fr: 'Suspendre' },
+            Reactivate: { en: 'Reactivate', es: 'Reactivar', fr: 'Réactiver' },
+            Archive: { en: 'Archive', es: 'Archivar', fr: 'Archiver' },
+            'Invalid tenant.': { en: 'Invalid tenant.', es: 'Inquilino no válido.', fr: 'Locataire non valide.' },
+            'Invalid tenant status change.': {
+              en: 'Invalid tenant status change.',
+              es: 'Cambio de estado de inquilino no válido.',
+              fr: 'Changement de statut du locataire non valide.',
+            },
+            'Tenant not found.': { en: 'Tenant not found.', es: 'Inquilino no encontrado.', fr: 'Locataire introuvable.' },
+            'Changed {value0} status from {value1} to {value2}': {
+              en: 'Changed {value0} status from {value1} to {value2}',
+              es: 'Se cambió el estado de {value0} de {value1} a {value2}',
+              fr: 'Le statut de {value0} est passé de {value1} à {value2}',
+            },
+            'Only platform super-admins can perform this operation.': {
+              en: 'Only platform super-admins can perform this operation.',
+              es: 'Solo los superadministradores de plataforma pueden realizar esta operación.',
+              fr: 'Seuls les superadministrateurs de la plateforme peuvent effectuer cette opération.',
+            },
+          } as const
+
+          for (const locale of ['en', 'es', 'fr'] as const) {
+            const path = `packages/i18n/src/messages/${locale}.json`
+            const document = JSON.parse(readFileSync(path, 'utf8'))
+            for (const [source, translations] of Object.entries(copy)) {
+              document.Generated[systemMessageKey(source)] = translations[locale]
+            }
+            writeFileSync(path, `${JSON.stringify(document, null, 2)}\n`)
+          }
+          EOF
+          pnpm exec tsx /tmp/catalog-platform-copy.ts
+      - name: Commit catalog updates
+        run: |
+          git rm .github/workflows/catalog-platform-copy.yml
+          git add packages/i18n/src/messages/en.json packages/i18n/src/messages/es.json packages/i18n/src/messages/fr.json .github/workflows/catalog-platform-copy.yml
+          git diff --cached --check
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "fix(i18n): catalog platform control centre copy"
+          git push

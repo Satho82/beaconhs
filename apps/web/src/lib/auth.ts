@@ -93,11 +93,6 @@ export const getPlatformOperator = cache(async (): Promise<PlatformOperator | nu
   })
 })
 
-export async function requirePlatformOperator(): Promise<PlatformOperator> {
-  const operator = await getPlatformOperator()
-  if (!operator) throw new Error('Only platform super-admins can perform this operation.')
-  return operator
-}
 
 export async function getCurrentUserId(): Promise<string | null> {
   try {

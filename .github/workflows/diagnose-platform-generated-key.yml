@@ -22,6 +22,18 @@ jobs:
           git clone https://github.com/Satho82/beaconhs.git beaconhs
           cd beaconhs
           git checkout --detach 796aa48d09bc1e8ca5c2cc92ea312cbdb15d70f6
+      - name: Apply the candidate source-key correction in the cloud checkout
+        working-directory: beaconhs
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('apps/web/src/app/(app)/platform/layout.tsx')
+          text = path.read_text()
+          old = "m_0c7e907b633729"
+          new = "m_0948bd8dc78958"
+          assert text.count(old) == 1
+          path.write_text(text.replace(old, new))
+          PY
       - name: Assert catalog source and canonical key
         working-directory: beaconhs
         run: |

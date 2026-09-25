@@ -29,22 +29,40 @@ export default async function PlatformLayout({ children }: { children: React.Rea
                 aria-label="Platform navigation"
                 className="flex flex-wrap gap-x-4 gap-y-1 text-xs font-medium"
               >
-                <Link href="/platform" className="text-violet-900 hover:underline dark:text-violet-100">
+                <Link
+                  href="/platform"
+                  className="text-violet-900 hover:underline dark:text-violet-100"
+                >
                   Dashboard
                 </Link>
-                <Link href="/platform/tenants" className="text-violet-900 hover:underline dark:text-violet-100">
+                <Link
+                  href="/platform/tenants"
+                  className="text-violet-900 hover:underline dark:text-violet-100"
+                >
                   Management companies
                 </Link>
-                <Link href="/platform/users" className="text-violet-900 hover:underline dark:text-violet-100">
+                <Link
+                  href="/platform/users"
+                  className="text-violet-900 hover:underline dark:text-violet-100"
+                >
                   Platform users
                 </Link>
-                <Link href="/platform/email" className="text-violet-900 hover:underline dark:text-violet-100">
+                <Link
+                  href="/platform/email"
+                  className="text-violet-900 hover:underline dark:text-violet-100"
+                >
                   Communications
                 </Link>
-                <Link href="/platform/branding" className="text-violet-900 hover:underline dark:text-violet-100">
+                <Link
+                  href="/platform/branding"
+                  className="text-violet-900 hover:underline dark:text-violet-100"
+                >
                   Branding
                 </Link>
-                <Link href="/platform/database" className="text-violet-900 hover:underline dark:text-violet-100">
+                <Link
+                  href="/platform/database"
+                  className="text-violet-900 hover:underline dark:text-violet-100"
+                >
                   System health
                 </Link>
               </nav>

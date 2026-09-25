@@ -1,8 +1,8 @@
 name: Inspect platform formatting
 
 on:
-  push:
-    branches: [feature/uvanoo-v1.3-platform-foundation]
+  pull_request:
+    branches: [main]
 
 permissions:
   contents: read

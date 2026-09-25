@@ -1,6 +1,6 @@
 import { GeneratedValue } from '@/i18n/generated'
 import { Fragment } from 'react'
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { and, count, eq, isNull } from 'drizzle-orm'
 import { Toaster } from 'sonner'
@@ -8,6 +8,7 @@ import { db, withSuperAdmin } from '@beaconhs/db'
 import { notifications, tenants } from '@beaconhs/db/schema'
 import { can, DEFAULT_REGULATORY_TERMINOLOGY } from '@beaconhs/tenant'
 import {
+  getPlatformOperator,
   getRequestContext,
   getSessionUser,
   listAccessibleTenants,
@@ -35,6 +36,25 @@ import { resolveHospitalityPropertyContext } from '@/lib/hospitality/property-co
 export const dynamic = 'force-dynamic'
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
+  // /platform is a control-centre surface, not a tenant workspace. The proxy
+  // supplies this server-only route marker so client headers cannot forge it.
+  if ((await headers()).get('x-platform-route') === '1') {
+    const operator = await getPlatformOperator()
+    if (!operator) {
+      const sessionUser = await getSessionUser()
+      redirect(sessionUser ? '/auth/continue' : '/login')
+    }
+    return (
+      <ThemeProvider>
+        <BackNavProviders>
+          <GeneratedValue value={children} />
+        </BackNavProviders>
+        <Toaster richColors position="top-right" />
+        <ConfirmRoot />
+      </ThemeProvider>
+    )
+  }
+
   const ctx = await getRequestContext()
   if (!ctx) {
     const sessionUser = await getSessionUser()

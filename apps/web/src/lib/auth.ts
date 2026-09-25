@@ -60,6 +60,33 @@ async function resolvePersonId(
   return row?.id ?? null
 }
 
+/**
+ * Resolves platform authority directly from the signed-in identity. Platform
+ * operations are cross-tenant by design, so they must not depend on an active
+ * tenant cookie, membership, or property scope.
+ */
+export type PlatformOperator = { userId: string; isSuperAdmin: true }
+
+export const getPlatformOperator = cache(async (): Promise<PlatformOperator | null> => {
+  const session = await getAuth().api.getSession({ headers: await headers() })
+  if (!session?.user?.id) return null
+
+  return withSuperAdmin(db, async (tx) => {
+    const [user] = await tx
+      .select({ id: users.id, isSuperAdmin: users.isSuperAdmin })
+      .from(users)
+      .where(eq(users.id, session.user.id))
+      .limit(1)
+    return user?.isSuperAdmin ? { userId: user.id, isSuperAdmin: true } : null
+  })
+})
+
+export async function requirePlatformOperator(): Promise<PlatformOperator> {
+  const operator = await getPlatformOperator()
+  if (!operator) throw new Error('Only platform super-admins can perform this operation.')
+  return operator
+}
+
 export async function getCurrentUserId(): Promise<string | null> {
   try {
     const session = await getAuth().api.getSession({ headers: await headers() })

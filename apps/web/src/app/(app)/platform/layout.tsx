@@ -25,7 +25,10 @@ export default async function PlatformLayout({ children }: { children: React.Rea
                   Platform context · tenant and property scope do not grant platform authority
                 </span>
               </div>
-              <nav aria-label="Platform navigation" className="flex flex-wrap gap-x-4 gap-y-1 text-xs font-medium">
+              <nav
+                aria-label="Platform navigation"
+                className="flex flex-wrap gap-x-4 gap-y-1 text-xs font-medium"
+              >
                 <Link href="/platform" className="text-violet-900 hover:underline dark:text-violet-100">
                   Dashboard
                 </Link>

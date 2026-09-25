@@ -10,7 +10,7 @@ import { db, withSuperAdmin } from '@beaconhs/db'
 import { auditLog, tenants } from '@beaconhs/db/schema'
 import { LOCALE_OPTIONS, normalizeLocalePolicy } from '@beaconhs/i18n'
 import { seedLiftPlanTemplate } from '@beaconhs/db/seed/lift-plan-template'
-import { requireRequestContext } from '@/lib/auth'
+import { requirePlatformOperator } from '@/lib/auth'
 import { PageContainer } from '@/components/page-layout'
 
 export async function generateMetadata() {
@@ -34,9 +34,8 @@ async function createTenant(formData: FormData): Promise<void> {
   // A server action is a POST endpoint — the /platform layout's super-admin
   // redirect protects the page render, NOT this action. Re-check here, or any
   // authenticated tenant member could create tenants (this bypasses RLS below).
-  const ctx = await requireRequestContext()
-  if (!ctx.isSuperAdmin) throw new Error('Only platform super-admins can create tenants.')
-  const userId = ctx.userId
+  const operator = await requirePlatformOperator()
+  const userId = operator.userId
 
   const name = String(formData.get('name') ?? '').trim()
   const customSlug = String(formData.get('slug') ?? '').trim() || null

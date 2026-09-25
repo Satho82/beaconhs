@@ -13,6 +13,19 @@ describe('scheduled report source authorization contract', () => {
     expect(workerSource).toContain('loadBeaconReportCatalog(tx, sources)')
   })
 
+  it('revalidates the selected property and narrows execution to it', () => {
+    expect(workerSource).toContain('resolveScheduledReportContext')
+    expect(workerSource).toContain('propertyContextId')
+    expect(workerSource).toContain("set_config('app.action_property_ids'")
+    expect(workerSource).toContain('propertyScopeMode')
+  })
+
+  it('keeps scheduled exports behind authenticated access', () => {
+    expect(workerSource).not.toContain('presignGet')
+    expect(workerSource).not.toMatch(/attachments\s*:/)
+    expect(workerSource).toContain('report run')
+  })
+
   it('does not fall back to the static report-only source inventory', () => {
     expect(workerSource).not.toMatch(/loadBeaconReportCatalog\(tx\)(?!,)/)
   })

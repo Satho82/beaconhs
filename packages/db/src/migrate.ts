@@ -7,6 +7,7 @@ import { RLS_POLICY_SQL, TENANT_SCOPED_TABLES } from './rls'
 import { REPORT_VIEWS_SQL } from './views'
 import { STATS_SQL, STATS_HIGH_VOLUME_TABLES } from './stats'
 import { BUILTIN_ROLES, PERMISSION_CATALOGUE } from './schema'
+import { installStandardRiskLibrary } from './risk-library-install'
 import {
   readMigrationFiles,
   validateMigrationState,
@@ -464,6 +465,9 @@ async function main() {
 
     console.log('▶ Verifying security data invariants…')
     await assertKioskPinHashes(maintenanceDb)
+
+    console.log('▶ Installing missing standard Risk Library templates…')
+    await installStandardRiskLibrary(maintenanceDb)
 
     console.log('▶ Converging role permissions…')
     await convergeRolePermissions(maintenanceDb)

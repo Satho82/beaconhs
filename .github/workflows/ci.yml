@@ -5,9 +5,9 @@ permissions:
 
 on:
   push:
-    branches: [main]
+    branches: [main, feature/uvanoo-v1.3-platform-foundation]
   pull_request:
-    branches: [main]
+    branches: [main, feature/uvanoo-v1.3-platform-foundation]
   workflow_dispatch:
 
 jobs:
@@ -95,7 +95,8 @@ jobs:
 
   deploy-dev:
     name: Deploy tested commit to dev
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    # V1.3 branch commits, including generated-i18n updates, are validation-only; deployment remains limited to main and production is never selected here.
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
     needs: ci
     permissions:
       contents: read

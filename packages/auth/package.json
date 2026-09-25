@@ -9,7 +9,9 @@
     ".": "./src/index.ts",
     "./server": "./src/server.ts",
     "./client": "./src/client.ts",
-    "./invites": "./src/invites.ts"
+    "./invites": "./src/invites.ts",
+    "./platform-branding": "./src/platform-branding.ts",
+    "./auth-email-branding": "./src/auth-email-branding.ts"
   },
   "scripts": {
     "test": "vitest run",

@@ -3,7 +3,7 @@ import { getGeneratedValueTranslations, getGeneratedTranslations } from '@/i18n/
 import { GeneratedText, GeneratedValue } from '@/i18n/generated'
 import Link from 'next/link'
 import { AlertTriangle } from 'lucide-react'
-import { and, asc, count, desc, eq, ilike, inArray, isNull, or, type SQL } from 'drizzle-orm'
+import { and, asc, count, desc, eq, ilike, inArray, isNull, or, sql, type SQL } from 'drizzle-orm'
 import { Button, EmptyState, PageHeader } from '@beaconhs/ui'
 import { incidentPeople, incidents, orgUnits, people } from '@beaconhs/db/schema'
 import { can } from '@beaconhs/tenant'
@@ -19,6 +19,7 @@ import { ListPageLayout } from '@/components/page-layout'
 import { TableToolbar } from '@/components/table-toolbar'
 import { listIncidentClassifications } from './_actions'
 import { IncidentsRecordsTable, type IncidentsTableRow } from './_records-table'
+import { resolveHospitalityPropertyContext } from '@/lib/hospitality/property-context'
 
 export async function generateMetadata() {
   const tGenerated = await getGeneratedTranslations()
@@ -62,6 +63,7 @@ export default async function IncidentsPage({
   const statusFilter = pickString(sp.status)
 
   const ctx = await requireRequestContext()
+  const { activePropertyId } = await resolveHospitalityPropertyContext(ctx)
   // The export route accepts any read tier — mirror that here so read.all /
   // read.site-only roles still see the button.
   const canExport =
@@ -81,6 +83,15 @@ export default async function IncidentsPage({
     })
     const filters: SQL<unknown>[] = [isNull(incidents.deletedAt)]
     if (vis) filters.push(vis)
+    const activePropertyWhere = activePropertyId
+      ? sql<boolean>`exists (
+          select 1 from org_units incident_site
+          where incident_site.tenant_id = ${incidents.tenantId}
+            and incident_site.id = ${incidents.siteOrgUnitId}
+            and incident_site.metadata->>'hospitalityPropertyId' = ${activePropertyId}
+        )`
+      : undefined
+    if (activePropertyWhere) filters.push(activePropertyWhere)
     if (params.q) {
       const term = `%${params.q}%`
       const cond = or(
@@ -120,7 +131,7 @@ export default async function IncidentsPage({
       .limit(params.perPage)
       .offset((params.page - 1) * params.perPage)
 
-    const facetWhere = and(isNull(incidents.deletedAt), vis)
+    const facetWhere = and(isNull(incidents.deletedAt), vis, activePropertyWhere)
     const types = await tx
       .select({ type: incidents.type, c: count() })
       .from(incidents)

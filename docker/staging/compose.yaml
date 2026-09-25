@@ -1,0 +1,259 @@
+# PREPARATION TEMPLATE. No automatic database/storage provisioning or routing.
+# Read README.md before any future use. No external resources or production networks.
+name: uvanoo-staging
+services:
+  uvanoo-staging-web:
+    image: ${STAGING_APP_IMAGE:?Set staging image digest}
+    platform: linux/amd64
+    profiles:
+      - staging
+    restart: 'no'
+    environment:
+      NODE_ENV: production
+      APP_URL: ${APP_URL:?Set staging HTTPS origin}
+      BETTER_AUTH_URL: ${BETTER_AUTH_URL:?Set same staging HTTPS origin}
+      INTERNAL_WEB_URL: http://uvanoo-staging-web:3000
+      DATABASE_URL: postgresql://uvanoo_staging_app:${STAGING_APP_PASSWORD:?Set staging
+        app password}@uvanoo-staging-postgres:5432/uvanoo_staging
+      SUPERADMIN_DATABASE_URL: postgresql://uvanoo_staging_super:${STAGING_SUPER_PASSWORD:?Set
+        staging maintenance password}@uvanoo-staging-postgres:5432/uvanoo_staging
+      REDIS_URL: redis://uvanoo-staging-redis:6379
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?Set staging auth secret}
+      ATTACHMENT_CAPABILITY_SECRET: ${ATTACHMENT_CAPABILITY_SECRET:?Set staging attachment
+        secret}
+      R2_ENDPOINT: http://uvanoo-staging-minio:9000
+      R2_ACCOUNT_ID: local
+      R2_BUCKET: uvanoo-staging-private
+      R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID:?Set staging bucket user}
+      R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY:?Set staging bucket password}
+      R2_PRIVATE_BUCKET_CONFIRMED: 'false'
+      EMAIL_CAPTURE_MODE: uvanoo-staging-mailpit
+      SMTP_HOST: uvanoo-staging-mailpit
+      SMTP_PORT: '1025'
+      SMTP_FROM: Uvanoo Staging <noreply@staging.example.invalid>
+      COLLABORA_URL: ''
+      COLLABORA_WOPI_URL: ''
+      VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:-}
+      VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:-}
+      VAPID_SUBJECT: ${VAPID_SUBJECT:-mailto:ops@staging.example.invalid}
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      SENTRY_ENVIRONMENT: staging
+      APP_VERSION: ${DEPLOYMENT_VERSION:?Set immutable snapshot Git SHA}
+      APP_ROLE: web
+      HOSTNAME: 0.0.0.0
+    networks:
+      - uvanoo-staging
+    depends_on:
+      uvanoo-staging-postgres:
+        condition: service_healthy
+      uvanoo-staging-redis:
+        condition: service_healthy
+      uvanoo-staging-minio:
+        condition: service_started
+      uvanoo-staging-mailpit:
+        condition: service_started
+    ports:
+      - 127.0.0.1:13000:3000
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - --fail
+        - --silent
+        - http://127.0.0.1:3000/api/health/ready
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+  uvanoo-staging-worker:
+    image: ${STAGING_APP_IMAGE:?Set staging image digest}
+    platform: linux/amd64
+    profiles:
+      - staging
+    restart: 'no'
+    environment:
+      NODE_ENV: production
+      APP_URL: ${APP_URL:?Set staging HTTPS origin}
+      BETTER_AUTH_URL: ${BETTER_AUTH_URL:?Set same staging HTTPS origin}
+      INTERNAL_WEB_URL: http://uvanoo-staging-web:3000
+      DATABASE_URL: postgresql://uvanoo_staging_app:${STAGING_APP_PASSWORD:?Set staging
+        app password}@uvanoo-staging-postgres:5432/uvanoo_staging
+      SUPERADMIN_DATABASE_URL: postgresql://uvanoo_staging_super:${STAGING_SUPER_PASSWORD:?Set
+        staging maintenance password}@uvanoo-staging-postgres:5432/uvanoo_staging
+      REDIS_URL: redis://uvanoo-staging-redis:6379
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?Set staging auth secret}
+      ATTACHMENT_CAPABILITY_SECRET: ${ATTACHMENT_CAPABILITY_SECRET:?Set staging attachment
+        secret}
+      R2_ENDPOINT: http://uvanoo-staging-minio:9000
+      R2_ACCOUNT_ID: local
+      R2_BUCKET: uvanoo-staging-private
+      R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID:?Set staging bucket user}
+      R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY:?Set staging bucket password}
+      R2_PRIVATE_BUCKET_CONFIRMED: 'false'
+      EMAIL_CAPTURE_MODE: uvanoo-staging-mailpit
+      SMTP_HOST: uvanoo-staging-mailpit
+      SMTP_PORT: '1025'
+      SMTP_FROM: Uvanoo Staging <noreply@staging.example.invalid>
+      COLLABORA_URL: ''
+      COLLABORA_WOPI_URL: ''
+      VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:-}
+      VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:-}
+      VAPID_SUBJECT: ${VAPID_SUBJECT:-mailto:ops@staging.example.invalid}
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      SENTRY_ENVIRONMENT: staging
+      APP_VERSION: ${DEPLOYMENT_VERSION:?Set immutable snapshot Git SHA}
+      APP_ROLE: worker
+    networks:
+      - uvanoo-staging
+    depends_on:
+      uvanoo-staging-postgres:
+        condition: service_healthy
+      uvanoo-staging-redis:
+        condition: service_healthy
+      uvanoo-staging-minio:
+        condition: service_started
+      uvanoo-staging-mailpit:
+        condition: service_started
+  uvanoo-staging-scheduler:
+    image: ${STAGING_APP_IMAGE:?Set staging image digest}
+    platform: linux/amd64
+    profiles:
+      - staging
+    restart: 'no'
+    environment:
+      NODE_ENV: production
+      APP_URL: ${APP_URL:?Set staging HTTPS origin}
+      BETTER_AUTH_URL: ${BETTER_AUTH_URL:?Set same staging HTTPS origin}
+      INTERNAL_WEB_URL: http://uvanoo-staging-web:3000
+      DATABASE_URL: postgresql://uvanoo_staging_app:${STAGING_APP_PASSWORD:?Set staging
+        app password}@uvanoo-staging-postgres:5432/uvanoo_staging
+      SUPERADMIN_DATABASE_URL: postgresql://uvanoo_staging_super:${STAGING_SUPER_PASSWORD:?Set
+        staging maintenance password}@uvanoo-staging-postgres:5432/uvanoo_staging
+      REDIS_URL: redis://uvanoo-staging-redis:6379
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?Set staging auth secret}
+      ATTACHMENT_CAPABILITY_SECRET: ${ATTACHMENT_CAPABILITY_SECRET:?Set staging attachment
+        secret}
+      R2_ENDPOINT: http://uvanoo-staging-minio:9000
+      R2_ACCOUNT_ID: local
+      R2_BUCKET: uvanoo-staging-private
+      R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID:?Set staging bucket user}
+      R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY:?Set staging bucket password}
+      R2_PRIVATE_BUCKET_CONFIRMED: 'false'
+      EMAIL_CAPTURE_MODE: uvanoo-staging-mailpit
+      SMTP_HOST: uvanoo-staging-mailpit
+      SMTP_PORT: '1025'
+      SMTP_FROM: Uvanoo Staging <noreply@staging.example.invalid>
+      COLLABORA_URL: ''
+      COLLABORA_WOPI_URL: ''
+      VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:-}
+      VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY:-}
+      VAPID_SUBJECT: ${VAPID_SUBJECT:-mailto:ops@staging.example.invalid}
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      SENTRY_ENVIRONMENT: staging
+      APP_VERSION: ${DEPLOYMENT_VERSION:?Set immutable snapshot Git SHA}
+      APP_ROLE: scheduler
+    networks:
+      - uvanoo-staging
+    depends_on:
+      uvanoo-staging-postgres:
+        condition: service_healthy
+      uvanoo-staging-redis:
+        condition: service_healthy
+      uvanoo-staging-minio:
+        condition: service_started
+      uvanoo-staging-mailpit:
+        condition: service_started
+  uvanoo-staging-postgres:
+    image: postgres:16
+    profiles:
+      - staging
+    restart: 'no'
+    environment:
+      POSTGRES_USER: uvanoo_staging_bootstrap
+      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD: ${STAGING_POSTGRES_PASSWORD:?Set unique staging bootstrap
+        password}
+    volumes:
+      - uvanoo-staging-postgres:/var/lib/postgresql/data
+    networks:
+      - uvanoo-staging
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U uvanoo_staging_bootstrap -d postgres
+      interval: 10s
+      timeout: 5s
+      retries: 10
+  uvanoo-staging-redis:
+    image: redis:7.4
+    profiles:
+      - staging
+    restart: 'no'
+    command:
+      - redis-server
+      - --appendonly
+      - 'yes'
+      - --maxmemory-policy
+      - noeviction
+    volumes:
+      - uvanoo-staging-redis:/data
+    networks:
+      - uvanoo-staging
+    healthcheck:
+      test:
+        - CMD
+        - redis-cli
+        - ping
+      interval: 10s
+      timeout: 5s
+      retries: 10
+  uvanoo-staging-minio:
+    image: ${STAGING_MINIO_IMAGE:?Select reviewed MinIO image digest}
+    profiles:
+      - staging
+    restart: 'no'
+    command:
+      - server
+      - /data
+      - --console-address
+      - :9001
+    environment:
+      MINIO_ROOT_USER: uvanoo_staging_root
+      MINIO_ROOT_PASSWORD: ${STAGING_MINIO_ROOT_PASSWORD:?Set unique staging storage
+        admin password}
+    volumes:
+      - uvanoo-staging-minio:/data
+    networks:
+      - uvanoo-staging
+  uvanoo-staging-mailpit:
+    image: ${STAGING_MAILPIT_IMAGE:?Select reviewed Mailpit image digest}
+    profiles:
+      - staging
+    restart: 'no'
+    ports:
+      - 127.0.0.1:18025:8025
+    networks:
+      - uvanoo-staging
+  uvanoo-staging-storage-init:
+    image: ${STAGING_APP_IMAGE:?Set staging image digest}
+    platform: linux/amd64
+    profiles:
+      - staging-init
+    restart: 'no'
+    environment:
+      R2_ENDPOINT: http://uvanoo-staging-minio:9000
+      R2_ACCOUNT_ID: local
+      R2_BUCKET: uvanoo-staging-private
+      R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID:?Set staging bucket user}
+      R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY:?Set staging bucket password}
+      R2_PRIVATE_BUCKET_CONFIRMED: 'false'
+      APP_ROLE: storage-init
+    networks:
+      - uvanoo-staging
+networks:
+  uvanoo-staging:
+    internal: true
+volumes:
+  uvanoo-staging-postgres: {}
+  uvanoo-staging-redis: {}
+  uvanoo-staging-minio: {}

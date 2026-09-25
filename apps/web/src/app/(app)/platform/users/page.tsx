@@ -12,9 +12,11 @@ import {
   exists,
   ilike,
   inArray,
+  getTableName,
   notExists,
   or,
   sql,
+  type AnyColumn,
   type SQL,
 } from 'drizzle-orm'
 import { Badge, DetailHeader, EmptyState } from '@beaconhs/ui'
@@ -106,7 +108,13 @@ export default async function PlatformUsersPage({
   const { accounts, memberships, total, identityCount, multiCount } = await withSuperAdmin(
     db,
     async (tx) => {
-      const membershipCount = sql<number>`(select count(*) from ${tenantUsers} where ${tenantUsers.userId} = ${users.id})`
+      const qualified = (column: AnyColumn): SQL =>
+        sql.raw(`"${getTableName(column.table)}"."${column.name}"`)
+      const membershipCount = sql<number>`(
+        select count(*)
+        from ${tenantUsers}
+        where ${qualified(tenantUsers.userId)} = ${qualified(users.id)}
+      )`
       const search: SQL<unknown> | undefined = listParams.q
         ? or(
             ilike(users.name, `%${listParams.q}%`),

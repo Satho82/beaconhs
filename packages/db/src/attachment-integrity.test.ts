@@ -35,6 +35,13 @@ describe('attachment tenant integrity manifest', () => {
       .filter(
         (key) =>
           key !== 'attachments.attachment_id' &&
+          // Added after the composite-attachment cutover; migration 0047
+          // installs its tenant FK directly and must not mutate the
+          // historical migration manifest.
+          key !== 'hospitality_handover_attachments.attachment_id' &&
+          // Migration 0049 likewise installs the Maintenance evidence
+          // composite tenant FK directly.
+          key !== 'maintenance_issue_attachments.attachment_id' &&
           // This immutable outbox snapshot is written only after the live
           // attachment row is deleted, so an FK back to attachments would
           // make the durable deletion trigger impossible by construction.

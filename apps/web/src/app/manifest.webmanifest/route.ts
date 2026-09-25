@@ -9,6 +9,7 @@
 // an already-installed app. Icons stay global (a tenant logoUrl is an arbitrary
 // image, not a square/maskable icon set).
 
+import { PRODUCT_NAME } from '@/lib/brand'
 import { NextResponse } from 'next/server'
 import { eq } from 'drizzle-orm'
 import { db, withSuperAdmin } from '@beaconhs/db'
@@ -25,7 +26,7 @@ const ICONS = [
 ]
 
 export async function GET() {
-  let name = 'BeaconHS'
+  let name: string = PRODUCT_NAME
   let themeColor = '#1B2B4A'
 
   try {

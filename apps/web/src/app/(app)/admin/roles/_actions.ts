@@ -31,6 +31,11 @@ import { requireRequestContext } from '@/lib/auth'
 import { recordAudit, recordAuditInTransaction } from '@/lib/audit'
 import { isUuid } from '@/lib/list-params'
 import { upsertRoleAssignments } from '@/lib/role-assignment-upsert'
+import {
+  assertDelegablePermissions,
+  assertManageableMember,
+  assertManageableRole,
+} from '@/lib/access-delegation'
 import { parseRoleScope } from '../users/_scope-data'
 import {
   DashboardLayoutInputSchema,
@@ -262,6 +267,7 @@ export async function createRole(formData: FormData): Promise<void> {
   const name = String(formData.get('name') ?? '').trim()
   const description = String(formData.get('description') ?? '').trim() || null
   const permissions = readPermissions(formData)
+  assertDelegablePermissions(ctx, permissions)
   if (!name) {
     redirect(`/admin/roles/new?error=${encodeURIComponent('Give the role a name.')}`)
   }
@@ -339,6 +345,9 @@ export async function bulkUpdateRoleAssignments(formData: FormData): Promise<voi
     )
     const skipped = membershipIds.length - eligibleMembers.length
     const eligibleIds = eligibleMembers.map((member) => member.id)
+    for (const membershipId of eligibleIds) {
+      await assertManageableMember(tx, ctx, ctx.tenantId, membershipId)
+    }
     if (eligibleIds.length === 0) {
       return { changed: 0, skipped, changedIds: [] as string[], roleName: role.name }
     }
@@ -368,6 +377,7 @@ export async function bulkUpdateRoleAssignments(formData: FormData): Promise<voi
     if (operation === 'replace') {
       await tx.delete(roleAssignments).where(inArray(roleAssignments.tenantUserId, eligibleIds))
       const changedIds = await upsertRoleAssignments(
+        ctx,
         tx,
         eligibleIds.map((membershipId) => ({
           tenantId: ctx.tenantId,
@@ -408,6 +418,7 @@ export async function bulkUpdateRoleAssignments(formData: FormData): Promise<voi
     }
 
     const changedIds = await upsertRoleAssignments(
+      ctx,
       tx,
       eligibleIds.map((membershipId) => ({
         tenantId: ctx.tenantId,
@@ -502,6 +513,7 @@ export async function addRoleMembers(formData: FormData): Promise<void> {
     if (eligibleIds.length === 0) return { roleName: role.name, changedIds: [] as string[] }
 
     const changedIds = await upsertRoleAssignments(
+      ctx,
       tx,
       eligibleIds.map((membershipId) => ({
         tenantId: ctx.tenantId,
@@ -560,7 +572,7 @@ export async function updateRoleMemberScope(formData: FormData): Promise<void> {
       .for('update')
     if (!row) return null
     if (row.userId === ctx.userId || (!ctx.isSuperAdmin && row.isSuperAdmin)) return null
-    const changedIds = await upsertRoleAssignments(tx, [
+    const changedIds = await upsertRoleAssignments(ctx, tx, [
       {
         tenantId: ctx.tenantId,
         tenantUserId: row.membershipId,
@@ -609,6 +621,7 @@ export async function removeRoleMember(formData: FormData): Promise<void> {
       .for('update')
     if (!row) return null
     if (row.userId === ctx.userId || (!ctx.isSuperAdmin && row.isSuperAdmin)) return null
+    await assertManageableMember(tx, ctx, ctx.tenantId, row.membershipId)
     const [deleted] = await tx
       .delete(roleAssignments)
       .where(eq(roleAssignments.id, assignmentId))
@@ -671,7 +684,11 @@ export async function updateRolePermissions(formData: FormData): Promise<void> {
   const permissions =
     before.isBuiltIn && before.key === 'tenant_admin' ? ALL_PERMISSIONS : readPermissions(formData)
 
-  await ctx.db((tx) => tx.update(roles).set({ permissions }).where(eq(roles.id, id)))
+  await ctx.db(async (tx) => {
+    await assertManageableRole(tx, ctx, ctx.tenantId, id)
+    assertDelegablePermissions(ctx, permissions)
+    await tx.update(roles).set({ permissions }).where(eq(roles.id, id))
+  })
   await sanitiseSavedDashboardForRole(ctx, {
     id,
     key: before.key,
@@ -703,6 +720,7 @@ export async function duplicateRole(formData: FormData): Promise<void> {
     return r ?? null
   })
   if (!source) return
+  assertDelegablePermissions(ctx, source.permissions)
   const name = `${source.name} (copy)`
   const key = await uniqueKey(ctx, name)
   const [row] = await ctx.db(async (tx) => {

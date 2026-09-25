@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm'
+import { eq, sql } from 'drizzle-orm'
 import { type Database, withSuperAdmin, withTenant } from '@beaconhs/db'
 import type { AppLocale } from '@beaconhs/i18n'
 import {
@@ -79,6 +79,23 @@ export type SuperAdminContext = {
   db: <T>(fn: (tx: Database) => Promise<T>) => Promise<T>
 }
 
+/** Scope persisted with exports and applied to every authenticated transaction. */
+export function actionPropertyScope(ctx: Pick<RequestContext, 'isSuperAdmin' | 'scopes'>): {
+  mode: 'tenant' | 'property' | 'legacy'
+  propertyIds: string[]
+} {
+  const properties = assignedPropertyIds(ctx)
+  return {
+    mode:
+      properties === null
+        ? 'tenant'
+        : ctx.scopes.some((scope) => scope.type === 'properties')
+          ? 'property'
+          : 'legacy',
+    propertyIds: properties ?? [],
+  }
+}
+
 export function makeTenantContext(
   baseDb: Database,
   args: Omit<RequestContext, 'db' | 'regulatory'> & { regulatory?: RegulatoryTerminology },
@@ -86,7 +103,14 @@ export function makeTenantContext(
   return {
     ...args,
     regulatory: args.regulatory ?? DEFAULT_REGULATORY_TERMINOLOGY,
-    db: <T>(fn: (tx: Database) => Promise<T>) => withTenant(baseDb, args.tenantId, fn),
+    db: <T>(fn: (tx: Database) => Promise<T>) =>
+      withTenant(baseDb, args.tenantId, async (tx) => {
+        const { mode, propertyIds } = actionPropertyScope(args)
+        await tx.execute(sql`SELECT
+          set_config('app.action_scope_mode', ${mode}, true),
+          set_config('app.action_property_ids', ${JSON.stringify(propertyIds)}, true)`)
+        return fn(tx)
+      }),
   }
 }
 
@@ -98,7 +122,10 @@ export function makeSuperAdminContext(baseDb: Database, userId: string): SuperAd
   }
 }
 
-export function can(ctx: RequestContext, perm: string): boolean {
+export function can(
+  ctx: Pick<RequestContext, 'isSuperAdmin' | 'permissions'>,
+  perm: string,
+): boolean {
   if (ctx.isSuperAdmin) return true
   if (ctx.permissions.has(perm)) return true
   if (readTierCovers(ctx.permissions, perm)) return true
@@ -296,13 +323,43 @@ export function canSeeSite(ctx: RequestContext, siteId: string | null): boolean 
   return false
 }
 
+/** True when the context may access a hospitality property inside its active tenant. */
+export function canSeeProperty(ctx: RequestContext, propertyId: string): boolean {
+  if (ctx.isSuperAdmin) return true
+  return ctx.scopes.some(
+    (scope) =>
+      scope.type === 'tenant' ||
+      (scope.type === 'properties' && scope.propertyIds.includes(propertyId)),
+  )
+}
+
+/** Distinct assigned properties, or null for tenant-wide/super-admin access. */
+export function assignedPropertyIds(
+  ctx: Pick<RequestContext, 'isSuperAdmin' | 'scopes'>,
+): string[] | null {
+  if (ctx.isSuperAdmin || ctx.scopes.some((scope) => scope.type === 'tenant')) return null
+  return [
+    ...new Set(
+      ctx.scopes.flatMap((scope) => (scope.type === 'properties' ? scope.propertyIds : [])),
+    ),
+  ]
+}
+
 // The single widest scope the user holds — used by older site/self gates.
 // Newer record lists should prefer recordVisibilityWhere(), which unions ALL of
 // the user's scopes (own + people + team + sites) rather than collapsing to one.
 export function selfOnlyFilter(ctx: RequestContext): RoleScope {
   if (ctx.isSuperAdmin) return { type: 'tenant' }
   let widest: RoleScope | null = null
-  const order = { tenant: 6, sites: 5, team: 4, crews: 3, people: 2, self: 1 } as const
+  const order = {
+    tenant: 7,
+    properties: 6,
+    sites: 5,
+    team: 4,
+    crews: 3,
+    people: 2,
+    self: 1,
+  } as const
   for (const s of ctx.scopes) {
     if (!widest || order[s.type] > order[widest.type]) widest = s
   }

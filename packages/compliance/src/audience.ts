@@ -11,6 +11,7 @@
 import { and, eq, gte, inArray, isNull, lte, or, sql } from 'drizzle-orm'
 import type { Database } from '@beaconhs/db'
 import {
+  orgUnits,
   people,
   peopleAssignments,
   personGroupMemberships,
@@ -36,6 +37,7 @@ export async function resolveObligationAudience(
   tx: Database,
   tenantId: string,
   audience: AudienceItem[],
+  options: { propertyId?: string | null } = {},
 ): Promise<ResolvedMember[]> {
   if (audience.length === 0) return []
   const byId = new Map<string, string | null>()
@@ -43,10 +45,28 @@ export async function resolveObligationAudience(
     for (const r of rows) byId.set(r.id, r.userId)
   }
 
+  const propertyAudience = options.propertyId
+    ? sql<boolean>`EXISTS (
+        SELECT 1
+        FROM people_assignments property_assignment
+        JOIN org_units property_unit
+          ON property_unit.tenant_id=property_assignment.tenant_id
+         AND property_unit.id=property_assignment.org_unit_id
+        WHERE property_assignment.tenant_id=${people.tenantId}
+          AND property_assignment.person_id=${people.id}
+          AND property_assignment.valid_from <= current_date
+          AND (
+            property_assignment.valid_to IS NULL
+            OR property_assignment.valid_to >= current_date
+          )
+          AND property_unit.metadata->>'hospitalityPropertyId'=${options.propertyId}
+      )`
+    : undefined
   const baseActive = and(
     eq(people.tenantId, tenantId),
     eq(people.status, 'active'),
     isNull(people.deletedAt),
+    propertyAudience,
   )
 
   if (audience.some((a) => a.kind === 'everyone')) {

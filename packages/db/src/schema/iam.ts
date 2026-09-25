@@ -41,7 +41,8 @@ export const roles = pgTable(
 // Scope JSON shape — the configurable record-visibility window for a role
 // assignment. Resolved into a query predicate by recordVisibilityWhere().
 //   { type: 'tenant' }                                  — everybody in the tenant
-//   { type: 'sites', siteIds: [...] }                   — records at these sites
+//   { type: 'sites', siteIds: [...] }                   — records at these construction sites
+//   { type: 'properties', propertyIds: [...] }           — records at these hotel properties
 //   { type: 'team', departmentIds: [...], groupIds: [...] } — a department: own + people in these departments/groups
 //   { type: 'people', personIds: [...] }                — own + a hand-picked set of people
 //   { type: 'crews', crewIds: [...] }
@@ -49,6 +50,7 @@ export const roles = pgTable(
 export type RoleScope =
   | { type: 'tenant' }
   | { type: 'sites'; siteIds: string[] }
+  | { type: 'properties'; propertyIds: string[] }
   | { type: 'team'; departmentIds: string[]; groupIds: string[] }
   | { type: 'people'; personIds: string[] }
   | { type: 'crews'; crewIds: string[] }
@@ -211,6 +213,17 @@ export const PERMISSION_CATALOGUE = [
   'equipment.inspect',
   'equipment.workorder.create',
   'equipment.workorder.close',
+  // Uvanoo hospitality operations.
+  'hospitality.read',
+  'hospitality.manage',
+  'maintenance.read',
+  'maintenance.create',
+  'maintenance.update',
+  'maintenance.verify',
+  'operational_tasks.read',
+  'operational_tasks.manage',
+  'operational_tasks.complete',
+  'hospitality.signoff.complete',
   // PPE
   'ppe.read.all',
   'ppe.manage',

@@ -21,6 +21,8 @@ import { reconcileOfficeRenders } from '../lib/office-render-reconciler'
 import { scanJournalAnalysis } from '../lib/journal-analysis'
 import { drainStorageObjectDeletionOutbox } from '../lib/storage-object-deletion-outbox'
 import { reconcileExpiredAttachmentUploads } from '../lib/attachment-upload-reconciler'
+import { scanOperationalTaskSchedules } from '../lib/operational-task-scanner'
+import { scanRiskReviews } from '../lib/risk-review-scanner'
 
 export async function processScheduledTick(job: Job<ScheduledTick>): Promise<void> {
   assertScheduledTick(job.data)
@@ -135,6 +137,29 @@ export async function processScheduledTick(job: Job<ScheduledTick>): Promise<voi
       }
       if (result.errors > 0) {
         throw new Error(`Office render reconciliation had ${result.errors} enqueue error(s)`)
+      }
+      return
+    }
+    case 'risk_review_scan': {
+      const result = await scanRiskReviews()
+      if (result.examined > 0)
+        console.log(
+          `[scheduled] risk_reviews: ${result.reminders} reminders / ${result.examined} due`,
+        )
+      return
+    }
+    case 'operational_task_scan': {
+      const slotMs = job.timestamp + (job.opts.delay ?? 0)
+      const result = await scanOperationalTaskSchedules(
+        Number.isFinite(slotMs) ? new Date(slotMs) : new Date(),
+      )
+      if (result.created > 0 || result.overdue > 0 || result.errors > 0) {
+        console.log(
+          `[scheduled] operational_tasks: ${result.created} occurrences / ${result.overdue} overdue from ${result.schedules} schedules / ${result.errors} errors`,
+        )
+      }
+      if (result.errors > 0) {
+        throw new Error(`Operational task scan completed with ${result.errors} schedule error(s)`)
       }
       return
     }

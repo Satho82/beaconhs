@@ -56,6 +56,7 @@ import {
   ppeTypeInspectionCriteria,
   ppeTypes,
   reportDefinitions,
+  riskTemplates,
   roles,
   tenants,
   tenantUsers,
@@ -95,12 +96,36 @@ import { seedLiftPlanTemplate } from './seed/lift-plan-template'
 import { seedFormPdfTemplates, seedPdfTemplates } from './seed/pdf-templates'
 import { BEACON_REPORT_SEEDS } from './seed/report-definitions'
 import { seedToolboxTemplate } from './seed/toolbox-template'
+import { SLIPS_TRIPS_TEMPLATE } from './risk-library'
 
 async function main() {
   const { db, sql: pg } = createSuperClient()
   console.log('▶ Seeding…')
 
   await db.transaction(async (tx) => {
+    await tx
+      .insert(riskTemplates)
+      .values(SLIPS_TRIPS_TEMPLATE)
+      .onConflictDoUpdate({
+        target: [riskTemplates.title, riskTemplates.version],
+        targetWhere: isNull(riskTemplates.tenantId),
+        set: {
+          description: SLIPS_TRIPS_TEMPLATE.description,
+          category: SLIPS_TRIPS_TEMPLATE.category,
+          state: SLIPS_TRIPS_TEMPLATE.state,
+          areaGuidance: SLIPS_TRIPS_TEMPLATE.areaGuidance,
+          activityEquipmentGuidance: SLIPS_TRIPS_TEMPLATE.activityEquipmentGuidance,
+          hazards: [...SLIPS_TRIPS_TEMPLATE.hazards],
+          peopleAtRiskGuidance: [...SLIPS_TRIPS_TEMPLATE.peopleAtRiskGuidance],
+          standardControls: [...SLIPS_TRIPS_TEMPLATE.standardControls],
+          furtherActionGuidance: SLIPS_TRIPS_TEMPLATE.furtherActionGuidance,
+          initialRiskGuidance: SLIPS_TRIPS_TEMPLATE.initialRiskGuidance,
+          residualRiskGuidance: SLIPS_TRIPS_TEMPLATE.residualRiskGuidance,
+          reviewGuidance: SLIPS_TRIPS_TEMPLATE.reviewGuidance,
+          updatedAt: new Date(),
+        },
+      })
+
     // --- Super-admin ----------------------------------------------------
     const adminId = randomUUID()
     const inserted = await tx

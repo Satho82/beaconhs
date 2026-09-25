@@ -4,7 +4,12 @@ import { z } from 'zod'
 import { attachments } from '@beaconhs/db/schema'
 import { presignGet } from '@beaconhs/storage'
 import { validateAttachmentCapability } from '../../../../lib/attachment-url'
+import { canReadIncidentAttachment } from '../../../../lib/incidents/attachment-access'
+import { canReadMaintenanceAttachment } from '../../../../lib/hospitality/maintenance-attachment-access'
+import { canReadHandoverAttachment } from '../../../../lib/hospitality/handover-attachment-access'
 import { getRequestContext } from '../../../../lib/auth'
+import { canReadActionAttachment } from '../../../../lib/action-attachment-access'
+import { canReadInspectionComplianceAttachment } from '../../../../lib/inspection-compliance-attachment-access'
 
 export const dynamic = 'force-dynamic'
 
@@ -37,7 +42,22 @@ export async function GET(
     return row ?? null
   })
   if (!attachment) return new NextResponse('Not found', { status: 404 })
+  if (!(await canReadIncidentAttachment(ctx, parsedId.data))) {
+    return new NextResponse('Not found', { status: 404 })
+  }
+  if (!(await canReadMaintenanceAttachment(ctx, parsedId.data))) {
+    return new NextResponse('Not found', { status: 404 })
+  }
+  if (!(await canReadHandoverAttachment(ctx, parsedId.data))) {
+    return new NextResponse('Not found', { status: 404 })
+  }
+  if (!(await canReadActionAttachment(ctx, parsedId.data))) {
+    return new NextResponse('Not found', { status: 404 })
+  }
 
+  if (!(await canReadInspectionComplianceAttachment(ctx, parsedId.data))) {
+    return new NextResponse('Not found', { status: 404 })
+  }
   const signedUrl = await presignGet({ key: attachment.r2Key, expiresInSeconds: 60 })
   const response = NextResponse.redirect(signedUrl, 307)
   response.headers.set('Cache-Control', 'private, no-store')

@@ -1,6 +1,6 @@
 import { GeneratedValue } from '@/i18n/generated'
 import { Fragment } from 'react'
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { and, count, eq, isNull } from 'drizzle-orm'
 import { Toaster } from 'sonner'
@@ -8,6 +8,7 @@ import { db, withSuperAdmin } from '@beaconhs/db'
 import { notifications, tenants } from '@beaconhs/db/schema'
 import { can, DEFAULT_REGULATORY_TERMINOLOGY } from '@beaconhs/tenant'
 import {
+  getPlatformOperator,
   getRequestContext,
   getSessionUser,
   listAccessibleTenants,
@@ -26,6 +27,7 @@ import { resolveNavGroups } from '@/lib/nav/resolve'
 import { resolveWalkthroughs } from '@/lib/walkthroughs/service'
 import { RegulatoryTerminologyProvider } from '@/components/regulatory-terminology'
 import { getPlatformBranding } from '@/lib/platform-branding-config'
+import { resolveHospitalityPropertyContext } from '@/lib/hospitality/property-context'
 
 // Every page in the authenticated app shell requires the per-request context
 // (auth + tenant + RLS-scoped DB), so none can be statically prerendered.
@@ -34,6 +36,25 @@ import { getPlatformBranding } from '@/lib/platform-branding-config'
 export const dynamic = 'force-dynamic'
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
+  // /platform is a control-centre surface, not a tenant workspace. The proxy
+  // supplies this server-only route marker so client headers cannot forge it.
+  if ((await headers()).get('x-platform-route') === '1') {
+    const operator = await getPlatformOperator()
+    if (!operator) {
+      const sessionUser = await getSessionUser()
+      redirect(sessionUser ? '/auth/continue' : '/login')
+    }
+    return (
+      <ThemeProvider>
+        <BackNavProviders>
+          <GeneratedValue value={children} />
+        </BackNavProviders>
+        <Toaster richColors position="top-right" />
+        <ConfirmRoot />
+      </ThemeProvider>
+    )
+  }
+
   const ctx = await getRequestContext()
   if (!ctx) {
     const sessionUser = await getSessionUser()
@@ -43,33 +64,43 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   const defaultCollapsed = (await cookies()).get('sidebar_collapsed')?.value === '1'
 
-  const [tenant, available, roles, unread, navGroups, sessionUser, walkthroughs, platformBranding] =
-    await Promise.all([
-      withSuperAdmin(db, async (tx) => {
-        const [t] = await tx
-          .select({ id: tenants.id, name: tenants.name, riskMatrix: tenants.riskMatrix })
-          .from(tenants)
-          .where(eq(tenants.id, ctx.tenantId))
-          .limit(1)
-        return t
-      }),
-      listAccessibleTenants(),
-      listActiveTenantRoles(),
-      ctx.db(async (tx) => {
-        const [row] = await tx
-          .select({ c: count() })
-          .from(notifications)
-          .where(and(eq(notifications.userId, ctx.userId), isNull(notifications.readAt)))
-        return Number(row?.c ?? 0)
-      }),
-      // Build the sidebar from the registry + this tenant's saved nav config,
-      // filtered to what this user is permitted to open.
-      ctx.db((tx) => resolveNavGroups(ctx, tx)),
-      getSessionUser(),
-      // Guided tours this user may launch + the first-run auto-start pick.
-      ctx.db((tx) => resolveWalkthroughs(ctx, tx)),
-      getPlatformBranding(),
-    ])
+  const [
+    tenant,
+    available,
+    roles,
+    unread,
+    navGroups,
+    sessionUser,
+    walkthroughs,
+    platformBranding,
+    propertyContext,
+  ] = await Promise.all([
+    withSuperAdmin(db, async (tx) => {
+      const [t] = await tx
+        .select({ id: tenants.id, name: tenants.name, riskMatrix: tenants.riskMatrix })
+        .from(tenants)
+        .where(eq(tenants.id, ctx.tenantId))
+        .limit(1)
+      return t
+    }),
+    listAccessibleTenants(),
+    listActiveTenantRoles(),
+    ctx.db(async (tx) => {
+      const [row] = await tx
+        .select({ c: count() })
+        .from(notifications)
+        .where(and(eq(notifications.userId, ctx.userId), isNull(notifications.readAt)))
+      return Number(row?.c ?? 0)
+    }),
+    // Build the sidebar from the registry + this tenant's saved nav config,
+    // filtered to what this user is permitted to open.
+    ctx.db((tx) => resolveNavGroups(ctx, tx)),
+    getSessionUser(),
+    // Guided tours this user may launch + the first-run auto-start pick.
+    ctx.db((tx) => resolveWalkthroughs(ctx, tx)),
+    getPlatformBranding(),
+    resolveHospitalityPropertyContext(ctx),
+  ])
   if (!tenant) redirect('/login')
 
   // The account menu shows the real signed-in account. Prefer the tenant display
@@ -116,6 +147,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           availableTenants={available}
           availableRoles={roles}
           activeRole={activeRole}
+          propertyContext={propertyContext}
           unreadCount={unread}
           defaultCollapsed={defaultCollapsed}
           impersonation={impersonation}

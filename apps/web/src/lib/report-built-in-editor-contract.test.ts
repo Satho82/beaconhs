@@ -103,7 +103,7 @@ describe('unified AppKit report contract', () => {
   })
 
   it('uses the same authorized source inventory as Insights, including scoped Builder apps', () => {
-    expect(reportCatalog).toContain('resolveAnalyticsAccess(ctx, tx)')
+    expect(reportCatalog).toContain('resolveAnalyticsAccess(ctx, tx, options)')
     expect(reportCatalog).toContain('loadBeaconReportCatalog(tx, access.entities)')
     expect(editor).toContain('loadAuthorizedReportCatalog(ctx)')
     expect(runPage).toContain('loadAuthorizedReportCatalog(ctx)')

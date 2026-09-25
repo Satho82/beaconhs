@@ -1,3 +1,4 @@
+import { TRAINING_TAB_PERMISSIONS } from '@/lib/training-access'
 import { getGeneratedValueTranslations, getGeneratedTranslations } from '@/i18n/generated.server'
 
 import { GeneratedText, GeneratedValue } from '@/i18n/generated'
@@ -8,7 +9,7 @@ import { GeneratedText, GeneratedValue } from '@/i18n/generated'
 // config at /training/skills/types.
 
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
+import { redirect } from 'next/navigation'
 import { FileText, Star } from 'lucide-react'
 import {
   and,
@@ -81,17 +82,10 @@ export default async function SkillsPage({
   const skillFilter = pickString(sp.skill)
   const ctx = await requireRequestContext()
   const canManage = canManageModule(ctx, 'training')
-  // Skills are person-scoped credentials: viewing the list requires a training
-  // read tier (mirrors /training/records). Managers see everything — they edit
-  // any assignment; read.self holders are scoped to their own rows below. No
-  // qualifying permission at all → 404.
-  if (
-    !ctx.isSuperAdmin &&
-    !canManage &&
-    !can(ctx, 'training.read.all') &&
-    !can(ctx, 'training.read.self')
-  )
-    notFound()
+  // List denials return to the accessible catalogue; detail routes still hide private records.
+  if (!TRAINING_TAB_PERMISSIONS.skills.some((permission) => can(ctx, permission))) {
+    redirect('/training/courses')
+  }
   const now = new Date()
   const nowMs = now.getTime()
   const today = now.toISOString().slice(0, 10)

@@ -17,6 +17,7 @@ import { ServiceWorkerRegistrar } from './service-worker-registrar'
 import { ImpersonationBanner } from './impersonation-banner'
 import { AppScrollReset } from './app-scroll-reset'
 import type { PlatformBranding } from '@/lib/platform-branding-config'
+import { HospitalityPropertySwitcher } from './hospitality-property-switcher'
 
 type Ctx = {
   isSuperAdmin: boolean
@@ -33,6 +34,7 @@ export function AppShell({
   availableTenants,
   availableRoles,
   activeRole,
+  propertyContext,
   unreadCount,
   defaultCollapsed = false,
   impersonation = null,
@@ -52,6 +54,7 @@ export function AppShell({
   availableRoles: { id: string; name: string; key: string }[]
   /** The role the user is currently acting under (`id: null` = all roles). */
   activeRole: { id: string | null; name: string }
+  propertyContext: { activePropertyId: string | null; properties: { id: string; name: string }[] }
   unreadCount: number
   /** Persisted sidebar-collapsed preference (from the `sidebar_collapsed` cookie). */
   defaultCollapsed?: boolean
@@ -108,6 +111,7 @@ export function AppShell({
               isSuperAdmin={ctx.isSuperAdmin}
             />
             <RoleSwitcher current={activeRole} available={availableRoles} />
+            <HospitalityPropertySwitcher {...propertyContext} />
             <GeneratedValue value={ctx.isSuperAdmin ? <PlatformMenu /> : null} />
             <div className="hidden flex-1 justify-center md:flex">
               <GlobalSearch />

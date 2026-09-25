@@ -20,6 +20,7 @@ import {
 } from '@beaconhs/db/schema'
 import { assertCan, type RequestContext } from '@beaconhs/tenant'
 import { requireRequestContext } from '@/lib/auth'
+import { requireAuthoringProperty } from '@/lib/hospitality/property-context'
 import { recordAuditInTransaction } from '@/lib/audit'
 import { validateTenantImageAttachmentIdsInTx } from '@/lib/attachment-validation'
 import { materializeEquipmentTypeEvidence } from '@/lib/compliance-type-evidence'
@@ -142,6 +143,7 @@ async function withLockedRecordMutation(
 export async function startEquipmentInspection(formData: FormData) {
   const ctx = await requireRequestContext()
   assertCan(ctx, 'equipment.inspect')
+  const propertyId = await requireAuthoringProperty(ctx)
   const typeId = String(formData.get('typeId') ?? '').trim()
   const targetMode = formData.get('targetMode') === 'rental' ? 'rental' : 'registered'
   const equipmentItemIdRaw = String(formData.get('equipmentItemId') ?? '').trim()
@@ -254,6 +256,7 @@ export async function startEquipmentInspection(formData: FormData) {
         reference,
         inspectionTypeId: typeId,
         equipmentItemId: item?.id ?? null,
+        metadata: propertyId ? { propertyId } : {},
         equipmentNameSnapshot: item?.name ?? rentalName,
         rentalProvider: targetMode === 'rental' ? rentalProvider || null : null,
         isRental: targetMode === 'rental',

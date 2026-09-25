@@ -240,7 +240,7 @@ export function LogoMark({ animated, draw, className, ...rest }: LogoProps) {
 export function Logo({ animated, draw, branding, className, ...rest }: LogoProps) {
   const mode: Mode = draw ? 'draw' : animated ? 'loop' : 'static'
   const customLogo = branding?.logoUrl?.trim()
-  const customName = branding?.productName?.trim()
+  const customName = branding?.productName?.trim() || PRODUCT_NAME
 
   if (customLogo) {
     return (
@@ -267,7 +267,7 @@ export function Logo({ animated, draw, branding, className, ...rest }: LogoProps
       <g transform="translate(0 5)">
         <MarkArt mode={mode} />
       </g>
-      {customName ? (
+      {customName !== 'BeaconHS' ? (
         <text
           x={WORD_X}
           y={WORD_Y + 70 * WORD_SCALE}

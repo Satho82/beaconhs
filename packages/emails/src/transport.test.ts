@@ -863,3 +863,47 @@ describe('sendVia (SMTP)', () => {
     expect(nodemailerMock.createTransport).not.toHaveBeenCalled()
   })
 })
+
+describe('operator-controlled staging email capture', () => {
+  afterEach(() => vi.unstubAllEnvs())
+
+  it('captures external provider email at the fixed Mailpit service without provider credentials', async () => {
+    vi.stubEnv('EMAIL_CAPTURE_MODE', 'uvanoo-staging-mailpit')
+    nodemailerMock.sendMail.mockResolvedValue({ messageId: 'captured-1' })
+    nodemailerMock.createTransport.mockReturnValue({ sendMail: nodemailerMock.sendMail })
+    await expect(
+      sendVia(
+        { provider: 'resend', apiKey: 'must-not-be-sent', from: 'sender@example.com' },
+        INPUT,
+      ),
+    ).resolves.toEqual({ id: 'captured-1' })
+    expect(nodemailerMock.createTransport).toHaveBeenCalledWith({
+      host: 'uvanoo-staging-mailpit',
+      port: 1025,
+      secure: false,
+      ignoreTLS: true,
+      connectionTimeout: 30_000,
+      greetingTimeout: 30_000,
+      socketTimeout: 30_000,
+    })
+    expect(nodemailerMock.resolvePublicHost).not.toHaveBeenCalled()
+  })
+
+  it('rejects a capture transport without the operator setting', async () => {
+    vi.stubEnv('EMAIL_CAPTURE_MODE', '')
+    await expect(
+      sendVia(
+        {
+          provider: 'smtp',
+          mode: 'staging-capture',
+          host: 'uvanoo-staging-mailpit',
+          port: 1025,
+          secure: false,
+          from: 'sender@example.com',
+        },
+        INPUT,
+      ),
+    ).rejects.toThrow('operator-configured Mailpit service')
+    expect(nodemailerMock.createTransport).not.toHaveBeenCalled()
+  })
+})

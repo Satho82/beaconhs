@@ -33,6 +33,7 @@ import { durablePublication, id, timestamps } from './_helpers'
 import { attachments } from './attachments'
 import { tenantUsers, tenants } from './core'
 import { roles } from './iam'
+import { hospitalityProperties } from './hospitality'
 
 // --- Definitions ---------------------------------------------------------
 
@@ -77,6 +78,8 @@ export const reportSchedules = pgTable(
       .notNull()
       .references(() => tenants.id, { onDelete: 'cascade' }),
     definitionId: uuid('definition_id').notNull(),
+    /** Selected hotel at schedule authoring; null means the run-as principal's current portfolio. */
+    propertyContextId: uuid('property_context_id'),
     name: text('name').notNull(),
     cadence: reportCadence('cadence').notNull(),
     // Repeat every N cadence periods, anchored to startsOn when present.
@@ -117,6 +120,10 @@ export const reportSchedules = pgTable(
     tenantIdx: index('report_schedules_tenant_idx').on(t.tenantId),
     activeIdx: index('report_schedules_active_idx').on(t.active, t.nextRunAt),
     definitionIdx: index('report_schedules_definition_idx').on(t.definitionId),
+    propertyContextIdx: index('report_schedules_property_context_idx').on(
+      t.tenantId,
+      t.propertyContextId,
+    ),
     runAsTenantUserIdx: index('report_schedules_run_as_tenant_user_idx').on(t.runAsTenantUserId),
     runAsRoleIdx: index('report_schedules_run_as_role_idx').on(t.runAsRoleId),
     repeatEveryCheck: check(
@@ -136,6 +143,11 @@ export const reportSchedules = pgTable(
       columns: [t.tenantId, t.runAsTenantUserId],
       foreignColumns: [tenantUsers.tenantId, tenantUsers.id],
       name: 'report_schedules_tenant_run_as_user_fk',
+    }).onDelete('restrict'),
+    propertyContextFk: foreignKey({
+      columns: [t.tenantId, t.propertyContextId],
+      foreignColumns: [hospitalityProperties.tenantId, hospitalityProperties.id],
+      name: 'report_schedules_tenant_property_context_fk',
     }).onDelete('restrict'),
     runAsRoleFk: foreignKey({
       columns: [t.tenantId, t.runAsRoleId],
@@ -161,7 +173,15 @@ export const reportRunStatus = pgEnum('report_run_status', [
 export const reportRunTrigger = pgEnum('report_run_trigger', ['scheduled', 'manual'])
 
 export type ReportRunRequestSnapshot = {
+  /** Added atomically with the rendered artifact; old artifacts have no proof. */
+  artifactAuthorization?: {
+    version: 1
+    mode: 'tenant' | 'property' | 'legacy'
+    propertyIds: string[]
+  }
   scheduleName: string
+  /** Selected hotel, or null for the run-as principal's current portfolio. */
+  propertyContextId: string | null
   definition: {
     id: string
     slug: string

@@ -12,6 +12,10 @@ import { runBeaconReport } from '@beaconhs/reports/server'
 import { requireRequestContext } from '@/lib/auth'
 import { loadAuthorizedReportCatalogInTransaction } from '@/lib/report-catalog'
 import { loadDefinitionById } from '../_definitions'
+import {
+  applyActiveHospitalityPropertyScope,
+  resolveHospitalityPropertyContext,
+} from '@/lib/hospitality/property-context'
 
 export async function runReportWithControls(
   definitionId: string,
@@ -23,7 +27,9 @@ export async function runReportWithControls(
     if (controls.filters) assertBoundedReportFilters(controls.filters)
     const definition = await loadDefinitionById(ctx.tenantId!, definitionId)
     if (!definition) throw new Error('Report not found.')
+    const { activePropertyId } = await resolveHospitalityPropertyContext(ctx)
     const result = await ctx.db(async (tx) => {
+      await applyActiveHospitalityPropertyScope(ctx, tx, activePropertyId)
       const catalog = await loadAuthorizedReportCatalogInTransaction(ctx, tx)
       const entity = reportEntity(catalog, definition.query.entity)
       if (!entity) throw new Error('The report data source is no longer available.')

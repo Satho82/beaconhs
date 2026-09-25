@@ -241,18 +241,45 @@ describe('analytics Builder authorization policy', () => {
       activeRoleId: 'worker-role',
       effectiveRoleKeys: new Set(['worker']),
       templateIds: [ALLOWED_ID],
+      propertyScopeMode: 'property',
+      assignedPropertyIds: ['property-1', 'property-2'],
+      activePropertyId: null,
     })
     const manager = analyticsAccessScopeKey({
       activeRoleId: 'manager-role',
       effectiveRoleKeys: new Set(['manager']),
       templateIds: [ALLOWED_ID],
+      propertyScopeMode: 'property',
+      assignedPropertyIds: ['property-1', 'property-2'],
+      activePropertyId: null,
     })
     const revoked = analyticsAccessScopeKey({
       activeRoleId: 'worker-role',
       effectiveRoleKeys: new Set(['worker']),
       templateIds: [],
+      propertyScopeMode: 'property',
+      assignedPropertyIds: ['property-1', 'property-2'],
+      activePropertyId: null,
+    })
+    const narrowed = analyticsAccessScopeKey({
+      activeRoleId: 'worker-role',
+      effectiveRoleKeys: new Set(['worker']),
+      templateIds: [ALLOWED_ID],
+      propertyScopeMode: 'property',
+      assignedPropertyIds: ['property-1', 'property-2'],
+      activePropertyId: 'property-1',
+    })
+    const assignmentRemoved = analyticsAccessScopeKey({
+      activeRoleId: 'worker-role',
+      effectiveRoleKeys: new Set(['worker']),
+      templateIds: [ALLOWED_ID],
+      propertyScopeMode: 'property',
+      assignedPropertyIds: ['property-1'],
+      activePropertyId: null,
     })
     expect(worker).not.toBe(manager)
     expect(worker).not.toBe(revoked)
+    expect(worker).not.toBe(narrowed)
+    expect(worker).not.toBe(assignmentRemoved)
   })
 })

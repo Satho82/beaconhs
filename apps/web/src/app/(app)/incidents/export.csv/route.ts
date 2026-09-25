@@ -13,6 +13,10 @@ import {
 import { csvColumns, selectCsvColumns } from '@/lib/export-columns'
 import { parseListParams, pickString } from '@/lib/list-params'
 import { moduleScopeWhere } from '@/lib/visibility'
+import {
+  applyActiveHospitalityPropertyScope,
+  resolveHospitalityPropertyContext,
+} from '@/lib/hospitality/property-context'
 import { isRouterPrefetch } from '@/lib/router-prefetch'
 
 export const dynamic = 'force-dynamic'
@@ -33,6 +37,7 @@ export async function GET(req: NextRequest) {
   const typeFilter = pickString(sp.type)
   const statusFilter = pickString(sp.status)
   const ctx = await requireExportContext()
+  const propertyContext = await resolveHospitalityPropertyContext(ctx)
 
   // Require a read tier and scope rows to it (mirrors the /incidents list page):
   // all → everything, site → my sites, self → incidents I reported.
@@ -47,6 +52,7 @@ export async function GET(req: NextRequest) {
   const rows = await ctx.db(async (tx) => {
     // Mirror the /incidents list page: archived (soft-deleted) rows never export.
     const filters: SQL<unknown>[] = [isNull(incidents.deletedAt)]
+    await applyActiveHospitalityPropertyScope(ctx, tx, propertyContext.activePropertyId)
     const vis = await moduleScopeWhere(ctx, tx, {
       prefix: 'incidents',
       ownerCols: [incidents.reportedByTenantUserId],

@@ -20,6 +20,7 @@
     "db:push:ci": "pnpm --filter @beaconhs/db push:ci",
     "db:studio": "pnpm --filter @beaconhs/db studio",
     "db:seed": "pnpm --filter @beaconhs/db seed",
+    "db:seed:demo-hotel": "pnpm --filter @beaconhs/db seed:demo-hotel",
     "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,md,json}\"",
     "clean": "turbo run clean && rm -rf node_modules"
@@ -31,5 +32,20 @@
     "prettier-plugin-tailwindcss": "^0.8.0",
     "turbo": "^2.10.5",
     "typescript": "^6.0.3"
+  },
+  "pnpm": {
+    "overrides": {
+      "brace-expansion@1": "1.1.18",
+      "brace-expansion@2": "2.1.4",
+      "brace-expansion@5": "5.0.9",
+      "undici@7": "7.29.0",
+      "nanoid@3": "3.3.18",
+      "nanoid@5": "5.1.16",
+      "browserslist@4": "4.28.7",
+      "nanoid@4": "5.1.16",
+      "lodash-es@4": "4.18.1",
+      "@tiptap/extension-bubble-menu": "3.30.5",
+      "@tiptap/extension-floating-menu": "3.30.5"
+    }
   }
 }

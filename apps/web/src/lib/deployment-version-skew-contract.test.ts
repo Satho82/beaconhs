@@ -16,13 +16,10 @@ describe('self-hosted Next.js version-skew protection', () => {
     expect(devWorkflow).toContain('DEPLOYMENT_VERSION=${{ github.sha }}')
   })
 
-  it('uses one protected Server Action encryption key across dev builds', () => {
-    expect(dockerfile).toContain('--mount=type=secret,id=next_server_actions_key,required=true')
-    expect(dockerfile).toContain(
-      'NEXT_SERVER_ACTIONS_ENCRYPTION_KEY="$(cat /run/secrets/next_server_actions_key)"',
-    )
-    expect(devWorkflow).toContain(
-      'next_server_actions_key=${{ secrets.DEV_NEXT_SERVER_ACTIONS_ENCRYPTION_KEY }}',
-    )
+  it('uses a fresh framework-generated Server Action key in each immutable image', () => {
+    expect(dockerfile).not.toContain('next_server_actions_key')
+    expect(dockerfile).not.toContain('NEXT_SERVER_ACTIONS_ENCRYPTION_KEY=')
+    expect(devWorkflow).not.toContain('next_server_actions_key')
+    expect(devWorkflow).not.toContain('DEV_NEXT_SERVER_ACTIONS_ENCRYPTION_KEY')
   })
 })

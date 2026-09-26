@@ -34,7 +34,7 @@ export default async function PlatformTenantCommunicationsPage({
         />
         <section className="rounded-lg border bg-white p-5 text-sm dark:bg-slate-900">
           <p>
-            Tenant communications use the existing provider policy and notification systems. This Platform view intentionally never renders provider credentials, API keys, or connection strings.
+            Tenant communications use the existing provider policy and notification systems. This Platform view intentionally {'never renders provider credentials, API keys, or connection strings'}.
           </p>
           <p className="mt-3 text-slate-500">
             Provider configuration remains available in the existing tenant and platform settings

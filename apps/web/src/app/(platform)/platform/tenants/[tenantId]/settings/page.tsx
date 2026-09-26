@@ -1,34 +1,34 @@
-import Link from "next/link";
-import { eq } from "drizzle-orm";
-import { notFound } from "next/navigation";
-import { Button, DetailHeader, Input, Label, Select } from "@beaconhs/ui";
-import { db, withSuperAdmin } from "@beaconhs/db";
-import { tenants } from "@beaconhs/db/schema";
-import { requirePlatformOperator } from "@/lib/auth";
-import { isUuid } from "@/lib/list-params";
-import { PageContainer } from "@/components/page-layout";
-import { saveTenantPlatformSettings } from "../_actions";
+import Link from 'next/link'
+import { eq } from 'drizzle-orm'
+import { notFound } from 'next/navigation'
+import { Button, DetailHeader, Input, Label, Select } from '@beaconhs/ui'
+import { db, withSuperAdmin } from '@beaconhs/db'
+import { tenants } from '@beaconhs/db/schema'
+import { requirePlatformOperator } from '@/lib/auth'
+import { isUuid } from '@/lib/list-params'
+import { PageContainer } from '@/components/page-layout'
+import { saveTenantPlatformSettings } from '../_actions'
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic'
 export default async function PlatformTenantSettingsPage({
   params,
 }: {
-  params: Promise<{ tenantId: string }>;
+  params: Promise<{ tenantId: string }>
 }) {
-  await requirePlatformOperator();
-  const { tenantId } = await params;
-  if (!isUuid(tenantId)) notFound();
+  await requirePlatformOperator()
+  const { tenantId } = await params
+  if (!isUuid(tenantId)) notFound()
   const [tenant] = await withSuperAdmin(db, (tx) =>
     tx.select().from(tenants).where(eq(tenants.id, tenantId)).limit(1),
-  );
-  if (!tenant) notFound();
+  )
+  if (!tenant) notFound()
   return (
     <PageContainer>
       <div className="mx-auto max-w-2xl space-y-5">
         <DetailHeader
           back={{
             href: `/platform/tenants/${tenantId}`,
-            label: "Back to tenant",
+            label: 'Back to tenant',
           }}
           title={`${tenant.name} settings`}
           subtitle="Tenant metadata and locale defaults. Sensitive changes are platform-audited."
@@ -44,10 +44,7 @@ export default async function PlatformTenantSettingsPage({
           </Label>
           <Label>
             Default language
-            <Select
-              name="defaultLanguage"
-              defaultValue={tenant.defaultLanguage}
-            >
+            <Select name="defaultLanguage" defaultValue={tenant.defaultLanguage}>
               <option value="en">English</option>
               <option value="fr">French</option>
               <option value="es">Spanish</option>
@@ -60,5 +57,5 @@ export default async function PlatformTenantSettingsPage({
         </Link>
       </div>
     </PageContainer>
-  );
+  )
 }

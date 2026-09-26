@@ -1,6 +1,6 @@
-import Link from "next/link";
-import { desc, eq } from "drizzle-orm";
-import { notFound } from "next/navigation";
+import Link from 'next/link'
+import { desc, eq } from 'drizzle-orm'
+import { notFound } from 'next/navigation'
 import {
   Button,
   DetailHeader,
@@ -11,47 +11,47 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@beaconhs/ui";
-import { db, withSuperAdmin } from "@beaconhs/db";
-import { platformAuditLog, tenants, users } from "@beaconhs/db/schema";
-import { requirePlatformOperator } from "@/lib/auth";
-import { isUuid } from "@/lib/list-params";
-import { PageContainer } from "@/components/page-layout";
+} from '@beaconhs/ui'
+import { db, withSuperAdmin } from '@beaconhs/db'
+import { platformAuditLog, tenants, users } from '@beaconhs/db/schema'
+import { requirePlatformOperator } from '@/lib/auth'
+import { isUuid } from '@/lib/list-params'
+import { PageContainer } from '@/components/page-layout'
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic'
 
 export default async function PlatformTenantAuditPage({
   params,
 }: {
-  params: Promise<{ tenantId: string }>;
+  params: Promise<{ tenantId: string }>
 }) {
-  await requirePlatformOperator();
-  const { tenantId } = await params;
-  if (!isUuid(tenantId)) notFound();
+  await requirePlatformOperator()
+  const { tenantId } = await params
+  if (!isUuid(tenantId)) notFound()
   const data = await withSuperAdmin(db, async (tx) => {
     const [tenant] = await tx
       .select({ name: tenants.name })
       .from(tenants)
       .where(eq(tenants.id, tenantId))
-      .limit(1);
-    if (!tenant) return null;
+      .limit(1)
+    if (!tenant) return null
     const rows = await tx
       .select({ audit: platformAuditLog, actor: users })
       .from(platformAuditLog)
       .leftJoin(users, eq(users.id, platformAuditLog.actorUserId))
       .where(eq(platformAuditLog.entityId, tenantId))
       .orderBy(desc(platformAuditLog.occurredAt))
-      .limit(100);
-    return { tenant, rows };
-  });
-  if (!data) notFound();
+      .limit(100)
+    return { tenant, rows }
+  })
+  if (!data) notFound()
   return (
     <PageContainer>
       <div className="space-y-5">
         <DetailHeader
           back={{
             href: `/platform/tenants/${tenantId}`,
-            label: "Back to tenant",
+            label: 'Back to tenant',
           }}
           title={`${data.tenant.name} platform audit`}
           subtitle="Platform lifecycle and sensitive administration events."
@@ -71,12 +71,10 @@ export default async function PlatformTenantAuditPage({
             <TableBody>
               {data.rows.map(({ audit, actor }) => (
                 <TableRow key={audit.id}>
-                  <TableCell>
-                    {audit.occurredAt?.toLocaleString() ?? "—"}
-                  </TableCell>
-                  <TableCell>{actor?.email ?? "System"}</TableCell>
+                  <TableCell>{audit.occurredAt?.toLocaleString() ?? '—'}</TableCell>
+                  <TableCell>{actor?.email ?? 'System'}</TableCell>
                   <TableCell>{audit.action}</TableCell>
-                  <TableCell>{audit.summary ?? "—"}</TableCell>
+                  <TableCell>{audit.summary ?? '—'}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -87,5 +85,5 @@ export default async function PlatformTenantAuditPage({
         </Link>
       </div>
     </PageContainer>
-  );
+  )
 }

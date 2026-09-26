@@ -9,8 +9,12 @@ import {
   discoverEntitiesWithScopedApps,
   runBhql,
 } from '@beaconhs/analytics/server'
-import type { RequestContext } from '@beaconhs/tenant'
+import { actionPropertyScope, type RequestContext } from '@beaconhs/tenant'
 import { getEffectiveRoleKeys } from './effective-roles'
+import {
+  applyActiveHospitalityPropertyScope,
+  resolveHospitalityPropertyContext,
+} from './hospitality/property-context'
 import {
   accessibleAnalyticsTemplates,
   analyticsAccessScopeKey,
@@ -27,6 +31,7 @@ type AnalyticsAccess = {
 export async function resolveAnalyticsAccess(
   ctx: RequestContext,
   tx: Database,
+  options: { activePropertyId?: string | null } = {},
 ): Promise<AnalyticsAccess> {
   const [templates, roleKeys] = await Promise.all([
     tx
@@ -43,10 +48,12 @@ export async function resolveAnalyticsAccess(
     getEffectiveRoleKeys(ctx, tx),
   ])
   const accessible = accessibleAnalyticsTemplates(ctx, templates, roleKeys)
+  const propertyScope = actionPropertyScope(ctx)
   const entities = removeRawBuilderEntities(
     await discoverEntitiesWithScopedApps(
       tx,
       accessible.map(({ id, name }) => ({ id, name })),
+      { propertyScopeMode: propertyScope.mode },
     ),
   )
   return {
@@ -56,6 +63,9 @@ export async function resolveAnalyticsAccess(
       activeRoleId: ctx.activeRoleId,
       effectiveRoleKeys: roleKeys,
       templateIds: accessible.map((template) => template.id),
+      propertyScopeMode: propertyScope.mode,
+      assignedPropertyIds: propertyScope.propertyIds,
+      activePropertyId: options.activePropertyId ?? null,
     }),
   }
 }
@@ -65,8 +75,10 @@ export async function runAuthorizedBhql(
   query: BhqlQuery | unknown,
   opts: { maxRows?: number; trustedSystemCard?: boolean } = {},
 ): Promise<BhqlResult> {
+  const { activePropertyId } = await resolveHospitalityPropertyContext(ctx)
   return ctx.db(async (tx) => {
-    const access = await resolveAnalyticsAccess(ctx, tx)
+    await applyActiveHospitalityPropertyScope(ctx, tx, activePropertyId)
+    const access = await resolveAnalyticsAccess(ctx, tx, { activePropertyId })
     const entityMap = opts.trustedSystemCard
       ? addTrustedSystemAppResponsesEntity(access.entityMap)
       : access.entityMap

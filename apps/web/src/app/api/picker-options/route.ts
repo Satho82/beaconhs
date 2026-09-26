@@ -54,7 +54,7 @@ import {
   users,
 } from '@beaconhs/db/schema'
 import { primaryPersonTitleName } from '@beaconhs/db'
-import { can, type RequestContext } from '@beaconhs/tenant'
+import { actionPropertyScope, can, type RequestContext } from '@beaconhs/tenant'
 import { getRequestContext } from '../../../lib/auth'
 import { getEffectiveRoleKeys } from '../../../lib/effective-roles'
 import { moduleAdminByKey } from '../../../lib/module-admin/registry'
@@ -1372,6 +1372,16 @@ async function loadOptions(
             input.selected ? eq(orgUnits.id, input.selected) : undefined,
           )
         : undefined
+      const incidentScope = lookup === 'incident-sites' ? actionPropertyScope(ctx) : null
+      const incidentPropertyWhere =
+        incidentScope?.mode === 'property'
+          ? inArray(
+              sql<string>`${orgUnits.metadata}->>'hospitalityPropertyId'`,
+              incidentScope.propertyIds,
+            )
+          : incidentScope?.mode === 'legacy'
+            ? sql`${orgUnits.metadata}->>'hospitalityPropertyId' is null`
+            : undefined
       const rows = await tx
         .select({
           id: orgUnits.id,
@@ -1380,7 +1390,7 @@ async function loadOptions(
           level: orgUnits.level,
         })
         .from(orgUnits)
-        .where(and(isNull(orgUnits.deletedAt), match))
+        .where(and(isNull(orgUnits.deletedAt), incidentPropertyWhere, match))
         .orderBy(
           ...(input.selected ? [desc(sql`${orgUnits.id} = ${input.selected}`)] : []),
           asc(orgUnits.level),

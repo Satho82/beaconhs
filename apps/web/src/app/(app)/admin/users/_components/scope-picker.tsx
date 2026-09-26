@@ -32,6 +32,11 @@ const TYPE_OPTIONS: { value: ScopeType; label: string; help: string }[] = [
     help: 'Their own records plus records at the chosen sites.',
   },
   {
+    value: 'properties',
+    label: 'Specific hotel properties',
+    help: 'Access is limited to the chosen hotel properties.',
+  },
+  {
     value: 'team',
     label: 'Department or group',
     help: 'Their own records plus people in the chosen departments or groups.',
@@ -115,6 +120,7 @@ export function ScopePicker({
   name = 'scope',
   defaultScope,
   sites,
+  properties,
   crews,
   departments,
   groups,
@@ -123,6 +129,7 @@ export function ScopePicker({
   name?: string
   defaultScope?: RoleScope
   sites: ScopeOption[]
+  properties: ScopeOption[]
   crews: ScopeOption[]
   departments: ScopeOption[]
   groups: ScopeOption[]
@@ -132,6 +139,9 @@ export function ScopePicker({
   const [type, setType] = useState<ScopeType>(defaultScope?.type ?? 'self')
   const [siteIds, setSiteIds] = useState<string[]>(
     defaultScope?.type === 'sites' ? defaultScope.siteIds : [],
+  )
+  const [propertyIds, setPropertyIds] = useState<string[]>(
+    defaultScope?.type === 'properties' ? defaultScope.propertyIds : [],
   )
   const [crewIds, setCrewIds] = useState<string[]>(
     defaultScope?.type === 'crews' ? defaultScope.crewIds : [],
@@ -148,8 +158,12 @@ export function ScopePicker({
 
   const scope: RoleScope = useMemo(() => {
     switch (type) {
+      case 'tenant':
+        return { type }
       case 'sites':
         return { type, siteIds }
+      case 'properties':
+        return { type, propertyIds }
       case 'crews':
         return { type, crewIds }
       case 'people':
@@ -161,7 +175,7 @@ export function ScopePicker({
       default:
         return { type: 'self' }
     }
-  }, [type, siteIds, crewIds, personIds, departmentIds, groupIds])
+  }, [type, siteIds, propertyIds, crewIds, personIds, departmentIds, groupIds])
 
   const help = TYPE_OPTIONS.find((t) => t.value === type)?.help
 
@@ -199,6 +213,19 @@ export function ScopePicker({
               onChange={setSiteIds}
               placeholder={tGenerated('m_11118293bef568')}
               sheetTitle="Select sites"
+            />
+          ) : null
+        }
+      />
+      <GeneratedValue
+        value={
+          type === 'properties' ? (
+            <MultiChipSelect
+              options={properties}
+              value={propertyIds}
+              onChange={setPropertyIds}
+              placeholder={tGenerated('m_00baafc63952b1')}
+              sheetTitle={tGenerated('m_00baafc63952b1')}
             />
           ) : null
         }

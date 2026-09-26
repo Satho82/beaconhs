@@ -1,9 +1,9 @@
+import { TRAINING_TAB_PERMISSIONS } from '@/lib/training-access'
 import { getGeneratedValueTranslations, getGeneratedTranslations } from '@/i18n/generated.server'
 
 import { GeneratedText, GeneratedValue } from '@/i18n/generated'
-// Dedicated /training/records list page. The /training landing page is the
-// rolled-up dashboard; this is the flat, paginated, bulk-actionable list of
-// every training_record row scoped to the tenant.
+// Dedicated certificate list, scoped to the tenant and the viewer.
+// The Training landing route chooses this list only for viewers with read access.
 //
 // The list supports the same patterns as the other entity pages:
 //   - Search by employee name / employee# / course code or name
@@ -12,7 +12,7 @@ import { GeneratedText, GeneratedValue } from '@/i18n/generated'
 //   - Filter chip "Expired" toggle
 //   - Sort by completedOn / expiresOn / source / employee / course
 
-import { notFound } from 'next/navigation'
+import { redirect } from 'next/navigation'
 import { Award } from 'lucide-react'
 import {
   and,
@@ -85,12 +85,10 @@ export default async function TrainingRecordsPage({
   const personFilter = pickString(sp.person)
   const courseFilter = pickString(sp.course)
   const ctx = await requireRequestContext()
-  // Access control: viewing certificates requires a training-read permission.
-  // read.all (or super-admin) sees the whole tenant; read.self is scoped to the
-  // viewer's own person by moduleScopeWhere below. No training-read permission
-  // at all → 404, mirroring the find_training_records assistant-tool gate.
-  if (!ctx.isSuperAdmin && !can(ctx, 'training.read.all') && !can(ctx, 'training.read.self'))
-    notFound()
+  // List denials return to the accessible catalogue; detail routes still hide private records.
+  if (!TRAINING_TAB_PERMISSIONS.records.some((permission) => can(ctx, permission))) {
+    redirect('/training/courses')
+  }
   // Bulk-action availability — the floating bar and row checkboxes render only
   // when the viewer can act. Renew/Revoke need training.record.create; bulk CSV
   // export is restricted to all-viewers (a self-only viewer must not export

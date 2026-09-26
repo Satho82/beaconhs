@@ -1,0 +1,551 @@
+// Uvanoo hospitality operational foundation. These records deliberately do not
+// reuse construction org_units or equipment_work_orders.
+import { sql } from 'drizzle-orm'
+import {
+  check,
+  foreignKey,
+  index,
+  jsonb,
+  pgEnum,
+  pgTable,
+  text,
+  timestamp,
+  uniqueIndex,
+  uuid,
+  boolean,
+} from 'drizzle-orm/pg-core'
+import { id, softDelete, timestamps } from './_helpers'
+import { tenants, tenantUsers } from './core'
+import { equipmentItems } from './equipment'
+import { attachments } from './attachments'
+
+export const hospitalityRoomStatus = pgEnum('hospitality_room_status', [
+  'available',
+  'occupied',
+  'out_of_service',
+  'maintenance',
+  'blocked',
+])
+export const qrTargetKind = pgEnum('qr_target_kind', ['room', 'asset'])
+export const maintenanceIssueStatus = pgEnum('maintenance_issue_status', [
+  'reported',
+  'triaged',
+  'work_ordered',
+  'cancelled',
+  'acknowledged',
+  'assigned',
+  'in_progress',
+  'awaiting_parts',
+  'completed',
+  'closed',
+])
+export const maintenanceIssueSource = pgEnum('maintenance_issue_source', [
+  'staff',
+  'front_office',
+  'manager',
+  'engineering',
+  'staff_qr',
+  'guest_qr',
+  'inspection',
+  'scheduled_task',
+  'api_integration',
+])
+export const maintenanceWorkOrderStatus = pgEnum('maintenance_work_order_status', [
+  'open',
+  'assigned',
+  'in_progress',
+  'awaiting_parts',
+  'completed',
+  'verified',
+  'closed',
+  'cancelled',
+])
+export const operationalTaskStatus = pgEnum('operational_task_status', [
+  'open',
+  'in_progress',
+  'completed',
+  'overdue',
+  'escalated',
+  'waived',
+  'cancelled',
+])
+export const operationalTaskLifecycleStage = pgEnum('operational_task_lifecycle_stage', [
+  'upcoming_reminder',
+  'due_notification',
+  'overdue_notification',
+  'manager_notification',
+  'escalated',
+])
+export const managerSignoffKind = pgEnum('manager_signoff_kind', ['weekly', 'monthly'])
+export const tenantModuleEntitlementState = pgEnum('tenant_module_entitlement_state', [
+  'enabled',
+  'disabled',
+])
+
+export const hospitalityProperties = pgTable(
+  'hospitality_properties',
+  {
+    id: id(),
+    tenantId: uuid('tenant_id')
+      .notNull()
+      .references(() => tenants.id, { onDelete: 'cascade' }),
+    name: text('name').notNull(),
+    code: text('code').notNull(),
+    timezone: text('timezone').notNull(),
+    address: jsonb('address').$type<Record<string, string>>().default({}).notNull(),
+    metadata: jsonb('metadata').$type<Record<string, unknown>>().default({}).notNull(),
+    ...timestamps,
+    ...softDelete,
+  },
+  (t) => ({
+    tenantCode: uniqueIndex('hospitality_properties_tenant_code_ux').on(t.tenantId, t.code),
+    tenantIdId: uniqueIndex('hospitality_properties_tenant_id_id_ux').on(t.tenantId, t.id),
+    tenant: index('hospitality_properties_tenant_idx').on(t.tenantId),
+  }),
+)
+
+export const hospitalityBuildings = pgTable(
+  'hospitality_buildings',
+  {
+    id: id(),
+    tenantId: uuid('tenant_id')
+      .notNull()
+      .references(() => tenants.id, { onDelete: 'cascade' }),
+    propertyId: uuid('property_id').notNull(),
+    name: text('name').notNull(),
+    code: text('code').notNull(),
+    metadata: jsonb('metadata').$type<Record<string, unknown>>().default({}).notNull(),
+    ...timestamps,
+    ...softDelete,
+  },
+  (t) => ({
+    tenantPropertyCode: uniqueIndex('hospitality_buildings_property_code_ux').on(
+      t.tenantId,
+      t.propertyId,
+      t.code,
+    ),
+    tenantIdId: uniqueIndex('hospitality_buildings_tenant_id_id_ux').on(t.tenantId, t.id),
+    propertyFk: foreignKey({
+      name: 'hospitality_buildings_tenant_property_fk',
+      columns: [t.tenantId, t.propertyId],
+      foreignColumns: [hospitalityProperties.tenantId, hospitalityProperties.id],
+    }).onDelete('cascade'),
+  }),
+)
+
+export const hospitalityFloors = pgTable(
+  'hospitality_floors',
+  {
+    id: id(),
+    tenantId: uuid('tenant_id')
+      .notNull()
+      .references(() => tenants.id, { onDelete: 'cascade' }),
+    buildingId: uuid('building_id').notNull(),
+    name: text('name').notNull(),
+    code: text('code').notNull(),
+    sortOrder: text('sort_order').notNull().default('0'),
+    metadata: jsonb('metadata').$type<Record<string, unknown>>().default({}).notNull(),
+    ...timestamps,
+    ...softDelete,
+  },
+  (t) => ({
+    tenantBuildingCode: uniqueIndex('hospitality_floors_building_code_ux').on(
+      t.tenantId,
+      t.buildingId,
+      t.code,
+    ),
+    tenantIdId: uniqueIndex('hospitality_floors_tenant_id_id_ux').on(t.tenantId, t.id),
+    buildingFk: foreignKey({
+      name: 'hospitality_floors_tenant_building_fk',
+      columns: [t.tenantId, t.buildingId],
+      foreignColumns: [hospitalityBuildings.tenantId, hospitalityBuildings.id],
+    }).onDelete('cascade'),
+  }),
+)
+
+export const hospitalityRooms = pgTable(
+  'hospitality_rooms',
+  {
+    id: id(),
+    tenantId: uuid('tenant_id')
+      .notNull()
+      .references(() => tenants.id, { onDelete: 'cascade' }),
+    floorId: uuid('floor_id').notNull(),
+    code: text('code').notNull(),
+    name: text('name'),
+    roomType: text('room_type'),
+    status: hospitalityRoomStatus('status').default('available').notNull(),
+    metadata: jsonb('metadata').$type<Record<string, unknown>>().default({}).notNull(),
+    ...timestamps,
+    ...softDelete,
+  },
+  (t) => ({
+    tenantCode: uniqueIndex('hospitality_rooms_tenant_code_ux').on(t.tenantId, t.code),
+    tenantIdId: uniqueIndex('hospitality_rooms_tenant_id_id_ux').on(t.tenantId, t.id),
+    floorFk: foreignKey({
+      name: 'hospitality_rooms_tenant_floor_fk',
+      columns: [t.tenantId, t.floorId],
+      foreignColumns: [hospitalityFloors.tenantId, hospitalityFloors.id],
+    }).onDelete('cascade'),
+  }),
+)
+
+export const qrTargets = pgTable(
+  'qr_targets',
+  {
+    id: id(),
+    tenantId: uuid('tenant_id')
+      .notNull()
+      .references(() => tenants.id, { onDelete: 'cascade' }),
+    token: text('token').notNull(),
+    kind: qrTargetKind('kind').notNull(),
+    roomId: uuid('room_id'),
+    equipmentItemId: uuid('equipment_item_id'),
+    isActive: boolean('is_active').default(true).notNull(),
+    ...timestamps,
+  },
+  (t) => ({
+    token: uniqueIndex('qr_targets_token_ux').on(t.token),
+    room: uniqueIndex('qr_targets_room_ux').on(t.tenantId, t.roomId),
+    roomFk: foreignKey({
+      name: 'qr_targets_tenant_room_fk',
+      columns: [t.tenantId, t.roomId],
+      foreignColumns: [hospitalityRooms.tenantId, hospitalityRooms.id],
+    }),
+    equipmentFk: foreignKey({
+      name: 'qr_targets_tenant_equipment_fk',
+      columns: [t.tenantId, t.equipmentItemId],
+      foreignColumns: [equipmentItems.tenantId, equipmentItems.id],
+    }),
+  }),
+)
+
+export const maintenanceIssues = pgTable(
+  'maintenance_issues',
+  {
+    id: id(),
+    tenantId: uuid('tenant_id')
+      .notNull()
+      .references(() => tenants.id, { onDelete: 'cascade' }),
+    roomId: uuid('room_id'),
+    equipmentItemId: uuid('equipment_item_id'),
+    reference: text('reference').notNull(),
+    status: maintenanceIssueStatus('status').default('reported').notNull(),
+    priority: text('priority').default('medium').notNull(),
+    source: maintenanceIssueSource('source').default('staff').notNull(),
+    summary: text('summary').notNull(),
+    description: text('description'),
+    reportedByTenantUserId: uuid('reported_by_tenant_user_id'),
+    publicSubmissionId: uuid('public_submission_id'),
+    guestName: text('guest_name'),
+    guestContact: text('guest_contact'),
+    guestContactConsent: boolean('guest_contact_consent').default(false).notNull(),
+    assignedToTenantUserId: uuid('assigned_to_tenant_user_id'),
+    completedAt: timestamp('completed_at', { withTimezone: true }),
+    completedByTenantUserId: uuid('completed_by_tenant_user_id'),
+    resolutionNotes: text('resolution_notes'),
+    ...timestamps,
+  },
+  (t) => ({
+    tenantRef: uniqueIndex('maintenance_issues_tenant_reference_ux').on(t.tenantId, t.reference),
+    tenantIdId: uniqueIndex('maintenance_issues_tenant_id_id_ux').on(t.tenantId, t.id),
+    publicSubmission: uniqueIndex('maintenance_issues_public_submission_ux').on(
+      t.tenantId,
+      t.publicSubmissionId,
+    ),
+    tenantStatusCreated: index('maintenance_issues_tenant_status_created_idx').on(
+      t.tenantId,
+      t.status,
+      t.createdAt,
+    ),
+    roomFk: foreignKey({
+      name: 'maintenance_issues_tenant_room_fk',
+      columns: [t.tenantId, t.roomId],
+      foreignColumns: [hospitalityRooms.tenantId, hospitalityRooms.id],
+    }),
+    equipmentFk: foreignKey({
+      name: 'maintenance_issues_tenant_equipment_fk',
+      columns: [t.tenantId, t.equipmentItemId],
+      foreignColumns: [equipmentItems.tenantId, equipmentItems.id],
+    }),
+    reporterFk: foreignKey({
+      name: 'maintenance_issues_tenant_reporter_fk',
+      columns: [t.tenantId, t.reportedByTenantUserId],
+      foreignColumns: [tenantUsers.tenantId, tenantUsers.id],
+    }),
+  }),
+)
+
+export const maintenanceIssueAttachments = pgTable(
+  'maintenance_issue_attachments',
+  {
+    id: id(),
+    tenantId: uuid('tenant_id')
+      .notNull()
+      .references(() => tenants.id, { onDelete: 'cascade' }),
+    issueId: uuid('issue_id').notNull(),
+    attachmentId: uuid('attachment_id').notNull(),
+    stage: text('stage').notNull(),
+    source: text('source').notNull(),
+    uploadedByTenantUserId: uuid('uploaded_by_tenant_user_id'),
+    description: text('description'),
+    ...timestamps,
+  },
+  (t) => ({
+    tenantIdId: uniqueIndex('maintenance_issue_attachments_tenant_id_id_ux').on(t.tenantId, t.id),
+    attachment: uniqueIndex('maintenance_issue_attachments_attachment_ux').on(
+      t.tenantId,
+      t.attachmentId,
+    ),
+    issueTimeline: index('maintenance_issue_attachments_issue_timeline_idx').on(
+      t.tenantId,
+      t.issueId,
+      t.createdAt,
+    ),
+    issueFk: foreignKey({
+      name: 'maintenance_issue_attachments_issue_fk',
+      columns: [t.tenantId, t.issueId],
+      foreignColumns: [maintenanceIssues.tenantId, maintenanceIssues.id],
+    }).onDelete('cascade'),
+    attachmentFk: foreignKey({
+      name: 'maintenance_issue_attachments_attachment_fk',
+      columns: [t.tenantId, t.attachmentId],
+      foreignColumns: [attachments.tenantId, attachments.id],
+    }),
+    uploaderFk: foreignKey({
+      name: 'maintenance_issue_attachments_uploader_fk',
+      columns: [t.tenantId, t.uploadedByTenantUserId],
+      foreignColumns: [tenantUsers.tenantId, tenantUsers.id],
+    }),
+    stageCheck: check(
+      'maintenance_issue_attachments_stage_check',
+      sql`${t.stage} in ('reported','before_work','after_work','completion')`,
+    ),
+    sourceCheck: check(
+      'maintenance_issue_attachments_source_check',
+      sql`${t.source} in ('staff','guest_qr')`,
+    ),
+    descriptionCheck: check(
+      'maintenance_issue_attachments_description_check',
+      sql`${t.description} is null or length(${t.description}) <= 1000`,
+    ),
+    guestCheck: check(
+      'maintenance_issue_attachments_guest_check',
+      sql`(${t.source} = 'guest_qr' and ${t.uploadedByTenantUserId} is null) or ${t.source} = 'staff'`,
+    ),
+  }),
+)
+
+export const maintenanceWorkOrders = pgTable(
+  'maintenance_work_orders',
+  {
+    id: id(),
+    tenantId: uuid('tenant_id')
+      .notNull()
+      .references(() => tenants.id, { onDelete: 'cascade' }),
+    issueId: uuid('issue_id').notNull(),
+    reference: text('reference').notNull(),
+    status: maintenanceWorkOrderStatus('status').default('open').notNull(),
+    assignedToTenantUserId: uuid('assigned_to_tenant_user_id'),
+    verifiedByTenantUserId: uuid('verified_by_tenant_user_id'),
+    completedAt: timestamp('completed_at', { withTimezone: true }),
+    verifiedAt: timestamp('verified_at', { withTimezone: true }),
+    closedAt: timestamp('closed_at', { withTimezone: true }),
+    actionTaken: text('action_taken'),
+    ...timestamps,
+  },
+  (t) => ({
+    tenantRef: uniqueIndex('maintenance_work_orders_tenant_reference_ux').on(
+      t.tenantId,
+      t.reference,
+    ),
+    issue: uniqueIndex('maintenance_work_orders_issue_ux').on(t.tenantId, t.issueId),
+    issueFk: foreignKey({
+      name: 'maintenance_work_orders_tenant_issue_fk',
+      columns: [t.tenantId, t.issueId],
+      foreignColumns: [maintenanceIssues.tenantId, maintenanceIssues.id],
+    }).onDelete('cascade'),
+  }),
+)
+
+export const operationalTaskTemplates = pgTable(
+  'operational_task_templates',
+  {
+    id: id(),
+    tenantId: uuid('tenant_id')
+      .notNull()
+      .references(() => tenants.id, { onDelete: 'cascade' }),
+    title: text('title').notNull(),
+    instructions: text('instructions'),
+    requiresEvidence: boolean('requires_evidence').default(false).notNull(),
+    ...timestamps,
+    ...softDelete,
+  },
+  (t) => ({
+    tenantIdId: uniqueIndex('operational_task_templates_tenant_id_id_ux').on(t.tenantId, t.id),
+  }),
+)
+export const operationalTaskSchedules = pgTable(
+  'operational_task_schedules',
+  {
+    id: id(),
+    tenantId: uuid('tenant_id')
+      .notNull()
+      .references(() => tenants.id, { onDelete: 'cascade' }),
+    templateId: uuid('template_id').notNull(),
+    propertyId: uuid('property_id').notNull(),
+    timezone: text('timezone').notNull(),
+    recurrence: jsonb('recurrence').$type<Record<string, unknown>>().notNull(),
+    startsAt: timestamp('starts_at', { withTimezone: true }).notNull(),
+    isActive: boolean('is_active').default(true).notNull(),
+    assignedToTenantUserId: uuid('assigned_to_tenant_user_id'),
+    ...timestamps,
+  },
+  (t) => ({
+    tenantIdId: uniqueIndex('operational_task_schedules_tenant_id_id_ux').on(t.tenantId, t.id),
+    templateFk: foreignKey({
+      name: 'operational_task_schedules_tenant_template_fk',
+      columns: [t.tenantId, t.templateId],
+      foreignColumns: [operationalTaskTemplates.tenantId, operationalTaskTemplates.id],
+    }),
+    propertyFk: foreignKey({
+      name: 'operational_task_schedules_tenant_property_fk',
+      columns: [t.tenantId, t.propertyId],
+      foreignColumns: [hospitalityProperties.tenantId, hospitalityProperties.id],
+    }),
+    assigneeFk: foreignKey({
+      name: 'operational_task_schedules_tenant_assignee_fk',
+      columns: [t.tenantId, t.assignedToTenantUserId],
+      foreignColumns: [tenantUsers.tenantId, tenantUsers.id],
+    }),
+  }),
+)
+export const operationalTaskOccurrences = pgTable(
+  'operational_task_occurrences',
+  {
+    id: id(),
+    tenantId: uuid('tenant_id')
+      .notNull()
+      .references(() => tenants.id, { onDelete: 'cascade' }),
+    scheduleId: uuid('schedule_id').notNull(),
+    occurrenceAt: timestamp('occurrence_at', { withTimezone: true }).notNull(),
+    dueAt: timestamp('due_at', { withTimezone: true }).notNull(),
+    status: operationalTaskStatus('status').default('open').notNull(),
+    assignedToTenantUserId: uuid('assigned_to_tenant_user_id'),
+    completedAt: timestamp('completed_at', { withTimezone: true }),
+    completedByTenantUserId: uuid('completed_by_tenant_user_id'),
+    completionNotes: text('completion_notes'),
+    ...timestamps,
+  },
+  (t) => ({
+    tenantIdId: uniqueIndex('operational_task_occurrences_tenant_id_id_ux').on(t.tenantId, t.id),
+    occurrence: uniqueIndex('operational_task_occurrences_schedule_occurrence_ux').on(
+      t.tenantId,
+      t.scheduleId,
+      t.occurrenceAt,
+    ),
+    scheduleFk: foreignKey({
+      name: 'operational_task_occurrences_tenant_schedule_fk',
+      columns: [t.tenantId, t.scheduleId],
+      foreignColumns: [operationalTaskSchedules.tenantId, operationalTaskSchedules.id],
+    }).onDelete('cascade'),
+    assigneeFk: foreignKey({
+      name: 'operational_task_occurrences_tenant_assignee_fk',
+      columns: [t.tenantId, t.assignedToTenantUserId],
+      foreignColumns: [tenantUsers.tenantId, tenantUsers.id],
+    }),
+    completerFk: foreignKey({
+      name: 'operational_task_occurrences_tenant_completer_fk',
+      columns: [t.tenantId, t.completedByTenantUserId],
+      foreignColumns: [tenantUsers.tenantId, tenantUsers.id],
+    }),
+  }),
+)
+export const operationalTaskLifecycleEvents = pgTable(
+  'operational_task_lifecycle_events',
+  {
+    id: id(),
+    tenantId: uuid('tenant_id')
+      .notNull()
+      .references(() => tenants.id, { onDelete: 'cascade' }),
+    occurrenceId: uuid('occurrence_id').notNull(),
+    stage: operationalTaskLifecycleStage('stage').notNull(),
+    recipientUserId: text('recipient_user_id'),
+    processedAt: timestamp('processed_at', { withTimezone: true }).defaultNow().notNull(),
+    metadata: jsonb('metadata').$type<Record<string, unknown>>().default({}).notNull(),
+    ...timestamps,
+  },
+  (t) => ({
+    stage: uniqueIndex('operational_task_lifecycle_events_stage_ux').on(
+      t.tenantId,
+      t.occurrenceId,
+      t.stage,
+      t.recipientUserId,
+    ),
+    occurrenceFk: foreignKey({
+      name: 'operational_task_lifecycle_events_tenant_occurrence_fk',
+      columns: [t.tenantId, t.occurrenceId],
+      foreignColumns: [operationalTaskOccurrences.tenantId, operationalTaskOccurrences.id],
+    }).onDelete('cascade'),
+  }),
+)
+
+export const managerSignoffs = pgTable(
+  'manager_signoffs',
+  {
+    id: id(),
+    tenantId: uuid('tenant_id')
+      .notNull()
+      .references(() => tenants.id, { onDelete: 'cascade' }),
+    propertyId: uuid('property_id').notNull(),
+    kind: managerSignoffKind('kind').notNull(),
+    periodStart: timestamp('period_start', { withTimezone: true }).notNull(),
+    periodEnd: timestamp('period_end', { withTimezone: true }).notNull(),
+    summary: jsonb('summary').$type<Record<string, unknown>>().notNull(),
+    comments: text('comments'),
+    confirmedAt: timestamp('confirmed_at', { withTimezone: true }).notNull(),
+    confirmedByTenantUserId: uuid('confirmed_by_tenant_user_id').notNull(),
+    ...timestamps,
+  },
+  (t) => ({
+    period: uniqueIndex('manager_signoffs_period_ux').on(
+      t.tenantId,
+      t.propertyId,
+      t.kind,
+      t.periodStart,
+      t.periodEnd,
+    ),
+    propertyFk: foreignKey({
+      name: 'manager_signoffs_tenant_property_fk',
+      columns: [t.tenantId, t.propertyId],
+      foreignColumns: [hospitalityProperties.tenantId, hospitalityProperties.id],
+    }),
+    confirmerFk: foreignKey({
+      name: 'manager_signoffs_tenant_confirmer_fk',
+      columns: [t.tenantId, t.confirmedByTenantUserId],
+      foreignColumns: [tenantUsers.tenantId, tenantUsers.id],
+    }),
+  }),
+)
+
+export const tenantModuleEntitlements = pgTable(
+  'tenant_module_entitlements',
+  {
+    id: id(),
+    tenantId: uuid('tenant_id')
+      .notNull()
+      .references(() => tenants.id, { onDelete: 'cascade' }),
+    moduleKey: text('module_key').notNull(),
+    state: tenantModuleEntitlementState('state').default('enabled').notNull(),
+    effectiveFrom: timestamp('effective_from', { withTimezone: true }),
+    effectiveUntil: timestamp('effective_until', { withTimezone: true }),
+    changedByUserId: text('changed_by_user_id'),
+    ...timestamps,
+  },
+  (t) => ({
+    tenantModule: uniqueIndex('tenant_module_entitlements_tenant_module_ux').on(
+      t.tenantId,
+      t.moduleKey,
+    ),
+  }),
+)

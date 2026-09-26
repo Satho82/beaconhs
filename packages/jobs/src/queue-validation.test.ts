@@ -55,6 +55,7 @@ describe('queue payload validation', () => {
   })
 
   it('validates durable ids on push, report, and scheduled work', () => {
+    expect(() => assertScheduledTick({ kind: 'operational_task_scan' })).not.toThrow()
     expect(() =>
       assertPushJobData({
         tenantId: TENANT_ID,

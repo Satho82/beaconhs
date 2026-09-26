@@ -42,10 +42,16 @@ export function analyticsAccessScopeKey(args: {
   activeRoleId?: string | null
   effectiveRoleKeys: ReadonlySet<string>
   templateIds: readonly string[]
+  propertyScopeMode: 'tenant' | 'property' | 'legacy'
+  assignedPropertyIds: readonly string[]
+  activePropertyId: string | null
 }): string {
   return JSON.stringify({
     role: args.activeRoleId ?? 'all',
     roleKeys: [...args.effectiveRoleKeys].sort(),
     templates: [...args.templateIds].sort(),
+    propertyScopeMode: args.propertyScopeMode,
+    assignedPropertyIds: [...args.assignedPropertyIds].sort(),
+    activePropertyId: args.activePropertyId,
   })
 }

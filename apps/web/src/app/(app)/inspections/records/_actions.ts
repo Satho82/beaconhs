@@ -14,6 +14,7 @@ import { assertCan } from '@beaconhs/tenant'
 import { recordModuleFlowEvent } from '@beaconhs/events'
 import { materializeEvidenceTargetObligations } from '@beaconhs/compliance'
 import { requireRequestContext } from '@/lib/auth'
+import { requireAuthoringProperty } from '@/lib/hospitality/property-context'
 import { recordAuditInTransaction } from '@/lib/audit'
 import { isUuid } from '@/lib/list-params'
 import { assertCanManageModule } from '@/lib/module-admin/guard'
@@ -31,6 +32,7 @@ import {
 export async function startInspection(formData: FormData) {
   const ctx = await requireRequestContext()
   assertCan(ctx, 'inspections.create')
+  const propertyId = await requireAuthoringProperty(ctx)
   const typeId = String(formData.get('typeId') ?? '').trim()
   if (!isUuid(typeId)) throw new Error('Inspection type is invalid')
 
@@ -60,6 +62,7 @@ export async function startInspection(formData: FormData) {
         status: 'draft',
         occurredAt,
         foremanPersonIds: [],
+        metadata: propertyId ? { propertyId } : {},
         inspectorTenantUserId: ctx.membership?.id ?? null,
       })
       .returning()

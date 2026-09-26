@@ -8,16 +8,19 @@ import {
   crews,
   departments,
   orgUnits,
+  hospitalityProperties,
   people,
   personGroups,
   type RoleScope,
 } from '@beaconhs/db/schema'
 import type { requireRequestContext } from '@/lib/auth'
+import { hospitalityPropertyWhere } from '@/lib/hospitality/property-access'
 
 type Ctx = Awaited<ReturnType<typeof requireRequestContext>>
 type ScopeOpt = { value: string; label: string; hint?: string }
 export type ScopeOptions = {
   sites: ScopeOpt[]
+  properties: ScopeOpt[]
   crews: ScopeOpt[]
   departments: ScopeOpt[]
   groups: ScopeOpt[]
@@ -39,6 +42,8 @@ export function parseRoleScope(raw: string): RoleScope {
         return { type: 'self' }
       case 'sites':
         return { type: 'sites', siteIds: strArray(v.siteIds) }
+      case 'properties':
+        return { type: 'properties', propertyIds: strArray(v.propertyIds) }
       case 'crews':
         return { type: 'crews', crewIds: strArray(v.crewIds) }
       case 'people':
@@ -63,6 +68,17 @@ export async function loadScopeOptions(ctx: Ctx): Promise<ScopeOptions> {
       .from(orgUnits)
       .where(and(eq(orgUnits.level, 'site'), isNull(orgUnits.deletedAt)))
       .orderBy(asc(orgUnits.name))
+    const properties = await tx
+      .select({ value: hospitalityProperties.id, label: hospitalityProperties.name })
+      .from(hospitalityProperties)
+      .where(
+        and(
+          eq(hospitalityProperties.tenantId, ctx.tenantId),
+          isNull(hospitalityProperties.deletedAt),
+          hospitalityPropertyWhere(ctx, hospitalityProperties.id),
+        ),
+      )
+      .orderBy(asc(hospitalityProperties.name))
     const crewRows = await tx
       .select({ value: crews.id, label: crews.name })
       .from(crews)
@@ -87,6 +103,7 @@ export async function loadScopeOptions(ctx: Ctx): Promise<ScopeOptions> {
       .orderBy(asc(people.lastName), asc(people.firstName))
     return {
       sites,
+      properties,
       crews: crewRows,
       departments: departmentOpts,
       groups,
@@ -113,6 +130,8 @@ export function describeScope(scope: RoleScope, opts: ScopeOptions): string {
       return 'Own records only'
     case 'sites':
       return `Sites — ${names(scope.siteIds, opts.sites)}`
+    case 'properties':
+      return `Hotel properties — ${names(scope.propertyIds, opts.properties)}`
     case 'crews':
       return `Crews — ${names(scope.crewIds, opts.crews)}`
     case 'people':

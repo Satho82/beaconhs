@@ -71,6 +71,31 @@ After `pnpm db:seed`, sign in as `admin@beaconhs.local`. Use the **Magic link**
 tab on the login form — the link will arrive in Mailpit at
 <http://localhost:8025>.
 
+## Uvanoo Demo Hotel dataset
+
+The hotel dataset is separate from the generic seed and never runs automatically. It is
+idempotent, uses deterministic seed-owned IDs, and refuses to touch a same-slug tenant
+unless that tenant carries the `uvanoo-demo-hotel-v1` ownership marker.
+
+For a local development database:
+
+```bash
+UVANOO_DEMO_SEED_TARGET=development \
+UVANOO_DEMO_SEED_CONFIRM=SEED_UVANOO_DEMO_HOTEL_DEVELOPMENT \
+pnpm db:seed:demo-hotel
+```
+
+For an explicitly configured staging environment, use target `staging` and confirmation
+`SEED_UVANOO_DEMO_HOTEL_STAGING`. The guard additionally requires
+`SENTRY_ENVIRONMENT=staging` and a database named exactly `uvanoo_staging`. Any missing,
+unknown, or production target is rejected. `UVANOO_DEMO_SEED_DRY_RUN=1` prints the
+expected count contract without opening a database connection; set
+`UVANOO_DEMO_SEED_ANCHOR` to an ISO timestamp when a reproducible time window is needed.
+
+The script creates user identities and RBAC memberships, but deliberately does not create
+shared passwords. Use the existing secure authentication/invitation flow for interactive
+sign-in.
+
 ## What is included
 
 The workspace contains the complete web app, worker, scheduler, database

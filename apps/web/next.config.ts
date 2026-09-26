@@ -54,8 +54,13 @@ const nextConfig: NextConfig = {
     'puppeteer-core',
     '@aws-sdk/client-s3',
     '@aws-sdk/s3-request-presigner',
-    // jsdom-backed sanitizer — keep it (and jsdom) out of the Next bundle.
+    // Node/SSR uses the jsdom-backed sanitizer; browser builds use its DOM-only
+    // conditional export. Keep isomorphic-dompurify in this app's runtime
+    // dependencies: Next can externalize it only if it resolves from apps/web
+    // to the same package as the shared forms/email imports.
     'isomorphic-dompurify',
+    'jsdom',
+    'canvas',
     // DOCX generation (jszip etc.) — Node-only, used in the export route.
     '@turbodocx/html-to-docx',
     // DOCX → HTML import (mammoth) — Node-only, used in createDocument.

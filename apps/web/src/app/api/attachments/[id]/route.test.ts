@@ -6,6 +6,11 @@ const state = vi.hoisted(() => ({
   row: null as { r2Key: string } | null,
   authCalls: 0,
   authenticated: true,
+  actionVisible: true,
+  handoverVisible: true,
+  maintenanceVisible: true,
+  incidentVisible: true,
+  inspectionComplianceVisible: true,
 }))
 
 vi.mock('../../../../lib/auth', () => ({
@@ -27,6 +32,21 @@ vi.mock('../../../../lib/auth', () => ({
 vi.mock('@beaconhs/storage', () => ({
   presignGet: async () => 'https://storage.example/signed',
 }))
+vi.mock('../../../../lib/action-attachment-access', () => ({
+  canReadActionAttachment: async () => state.actionVisible,
+}))
+vi.mock('../../../../lib/hospitality/maintenance-attachment-access', () => ({
+  canReadMaintenanceAttachment: async () => state.maintenanceVisible,
+}))
+vi.mock('../../../../lib/hospitality/handover-attachment-access', () => ({
+  canReadHandoverAttachment: async () => state.handoverVisible,
+}))
+vi.mock('../../../../lib/incidents/attachment-access', () => ({
+  canReadIncidentAttachment: async () => state.incidentVisible,
+}))
+vi.mock('../../../../lib/inspection-compliance-attachment-access', () => ({
+  canReadInspectionComplianceAttachment: async () => state.inspectionComplianceVisible,
+}))
 
 import { GET } from './route'
 
@@ -39,8 +59,13 @@ async function request(url: string) {
 describe('attachment capability route', () => {
   beforeEach(() => {
     state.row = null
+    state.handoverVisible = true
+    state.maintenanceVisible = true
+    state.incidentVisible = true
+    state.inspectionComplianceVisible = true
     state.authCalls = 0
     state.authenticated = true
+    state.actionVisible = true
   })
 
   it('rejects ID-only and invalid capabilities before tenant lookup', async () => {
@@ -52,6 +77,12 @@ describe('attachment capability route', () => {
   it('keeps a valid capability tenant-scoped', async () => {
     expect((await request(attachmentUrl(ID))).status).toBe(404)
     expect(state.authCalls).toBe(1)
+  })
+
+  it('denies a previously issued capability after inspection/compliance access is removed', async () => {
+    state.row = { r2Key: 't/tenant/evidence.pdf' }
+    state.inspectionComplianceVisible = false
+    expect((await request(attachmentUrl(ID))).status).toBe(404)
   })
 
   it('requires an authenticated tenant after validating the capability', async () => {
@@ -66,5 +97,36 @@ describe('attachment capability route', () => {
     expect(response.status).toBe(307)
     expect(response.headers.get('location')).toBe('https://storage.example/signed')
     expect(response.headers.get('referrer-policy')).toBe('no-referrer')
+  })
+
+  it('denies another property’s Handover photo even with a valid capability', async () => {
+    state.row = { r2Key: 't/tenant/other-property-handover.png' }
+    state.handoverVisible = false
+    const response = await request(attachmentUrl(ID))
+    expect(response.status).toBe(404)
+    expect(response.headers.get('location')).toBeNull()
+  })
+
+  it('denies another property’s Action evidence even with a valid capability', async () => {
+    state.row = { r2Key: 't/tenant/other-property-photo.png' }
+    state.actionVisible = false
+    const response = await request(attachmentUrl(ID))
+    expect(response.status).toBe(404)
+    expect(response.headers.get('location')).toBeNull()
+  })
+  it('denies another property maintenance photo even with a valid capability', async () => {
+    state.row = { r2Key: 't/tenant/other-property-maintenance.png' }
+    state.maintenanceVisible = false
+    const response = await request(attachmentUrl(ID))
+    expect(response.status).toBe(404)
+    expect(response.headers.get('location')).toBeNull()
+  })
+
+  it('denies another property incident photo even with a valid capability', async () => {
+    state.row = { r2Key: 't/tenant/other-property-incident.png' }
+    state.incidentVisible = false
+    const response = await request(attachmentUrl(ID))
+    expect(response.status).toBe(404)
+    expect(response.headers.get('location')).toBeNull()
   })
 })

@@ -1,8 +1,9 @@
+import { TRAINING_TAB_PERMISSIONS } from '@/lib/training-access'
 import { getGeneratedValueTranslations, getGeneratedTranslations } from '@/i18n/generated.server'
 
 import { GeneratedText, GeneratedValue } from '@/i18n/generated'
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
+import { redirect } from 'next/navigation'
 import { ArrowRight, ClipboardCheck } from 'lucide-react'
 import { and, asc, count, desc, eq, ilike, isNull, ne, or, sql, type SQL } from 'drizzle-orm'
 import {
@@ -93,19 +94,11 @@ export default async function AssessmentsPage({
   const dateFrom = parseCalendarDate(dateFromRaw)
   const dateTo = parseCalendarDate(dateToRaw)
   const ctx = await requireRequestContext()
-  // Attempts are person-scoped records: viewing them requires a training read
-  // tier. Proctors (training.record.create / training.class.manage) run
-  // attempts for other people, so either staff permission grants all-visibility;
-  // read.self holders are scoped to their own attempts by moduleScopeWhere
-  // below. No qualifying permission at all → 404, mirroring /training/records.
+  // List denials return to the accessible catalogue; detail routes still hide private records.
   const isProctor = can(ctx, 'training.record.create') || can(ctx, 'training.class.manage')
-  if (
-    !ctx.isSuperAdmin &&
-    !isProctor &&
-    !can(ctx, 'training.read.all') &&
-    !can(ctx, 'training.read.self')
-  )
-    notFound()
+  if (!TRAINING_TAB_PERMISSIONS.assessments.some((permission) => can(ctx, permission))) {
+    redirect('/training/courses')
+  }
 
   const { rows, total, statusCounts } = await ctx.db(async (tx) => {
     const vis = isProctor

@@ -7,7 +7,7 @@ const generatedSource = readFileSync(new URL('../i18n/generated.tsx', import.met
 
 describe('root brand provider contract', () => {
   it('keeps the brand splash independent from the application i18n provider', () => {
-    expect(PRODUCT_NAME).toBe('BeaconHS')
+    expect(PRODUCT_NAME).toBe('Uvanoo Portal')
     expect(logoSource).not.toContain('useGeneratedTranslations')
     expect(logoSource.match(/aria-label=\{PRODUCT_NAME\}/g)).toHaveLength(1)
     expect(logoSource).toContain('aria-label={customName || PRODUCT_NAME}')

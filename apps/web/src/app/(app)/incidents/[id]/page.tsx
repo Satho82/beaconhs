@@ -79,6 +79,10 @@ import {
 import { IncidentHeaderActions } from './_header-actions'
 import { isUuid, pickString } from '@/lib/list-params'
 import { attachmentUrl } from '@/lib/attachment-url'
+import {
+  assertCanUseEvidenceAttachments,
+  canReadEvidenceAttachment,
+} from '@/lib/attachment-evidence-access'
 import { parsePhotoEdits } from '@/lib/photo-edits'
 import { validateTenantImageAttachmentIdsInTx } from '@/lib/attachment-validation'
 import { requireRequestContext } from '@/lib/auth'
@@ -114,6 +118,7 @@ import {
 import { moduleFlowCommand, recordDomainEvent, recordModuleFlowEvent } from '@beaconhs/events'
 import { incidentStatusChangedEvent } from '@beaconhs/integrations'
 import { SeverityBadge, StatusBadge } from '../_badges'
+import { canTransitionIncident, type IncidentStatus } from '@/lib/incidents/lifecycle'
 
 export const dynamic = 'force-dynamic'
 
@@ -190,6 +195,9 @@ async function updateStatus(formData: FormData) {
       .limit(1)
       .for('update')
     if (!row || row.status === status) return null
+    if (!canTransitionIncident(row.status as IncidentStatus, status as IncidentStatus)) {
+      throw new Error(`Invalid incident status transition: ${row.status} to ${status}`)
+    }
     await tx
       .update(incidents)
       .set({
@@ -453,6 +461,7 @@ async function attachPhotos(incidentId: string, attachmentIds: string[]) {
   assertCan(ctx, 'incidents.update')
   if (attachmentIds.length === 0) return
   await assertCanSeeIncident(ctx, incidentId)
+  await assertCanUseEvidenceAttachments(ctx, attachmentIds)
   await ctx.db(async (tx) => {
     const [incident] = await tx
       .select({ locked: incidents.locked })
@@ -531,6 +540,7 @@ async function updateIncidentPhoto(
       .limit(1)
       .for('update')
     if (!photo) return false
+    if (!(await canReadEvidenceAttachment(ctx, photo.attachmentId))) return false
     await tx
       .update(incidentAttachments)
       .set({ caption: edits.caption })
@@ -1822,7 +1832,9 @@ export default async function IncidentDetailPage({
             <IncidentHeaderActions
               id={id}
               status={incident.status}
-              statuses={STATUSES}
+              statuses={STATUSES.filter((status) =>
+                canTransitionIncident(incident.status as IncidentStatus, status),
+              )}
               locked={locked}
               canManage={canManage}
               pdfHref={`${basePath}/pdf`}

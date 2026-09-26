@@ -260,6 +260,104 @@
       "when": 1789045551344,
       "tag": "0037_platform_branding",
       "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1789070400000,
+      "tag": "0038_uvanoo_hospitality_foundation",
+      "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1789156800000,
+      "tag": "0039_uvanoo_maintenance_issue_lifecycle",
+      "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "7",
+      "when": 1789243200000,
+      "tag": "0040_uvanoo_operational_diary_completion",
+      "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1789329600000,
+      "tag": "0041_uvanoo_operational_task_lifecycle",
+      "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1789416000000,
+      "tag": "0042_uvanoo_guest_room_reporting",
+      "breakpoints": true
+    },
+    {
+      "idx": 42,
+      "version": "7",
+      "when": 1789502400000,
+      "tag": "0043_hospitality_issue_sources",
+      "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "7",
+      "when": 1790071200000,
+      "tag": "0044_risk_assessment_foundation",
+      "breakpoints": true
+    },
+    {
+      "idx": 44,
+      "version": "7",
+      "when": 1790157600000,
+      "tag": "0045_risk_review_lifecycle",
+      "breakpoints": true
+    },
+    {
+      "idx": 45,
+      "version": "7",
+      "when": 1790244000000,
+      "tag": "0046_risk_signoff_snapshot",
+      "breakpoints": true
+    },
+    {
+      "idx": 46,
+      "version": "7",
+      "when": 1790330400000,
+      "tag": "0047_hospitality_handover",
+      "breakpoints": true
+    },
+    {
+      "idx": 47,
+      "version": "7",
+      "when": 1790416800000,
+      "tag": "0048_hospitality_metering",
+      "breakpoints": true
+    },
+    {
+      "idx": 48,
+      "version": "7",
+      "when": 1790503200000,
+      "tag": "0049_maintenance_issue_evidence",
+      "breakpoints": true
+    },
+    {
+      "idx": 49,
+      "version": "7",
+      "when": 1790589600000,
+      "tag": "0050_report_property_context",
+      "breakpoints": true
+    },
+    {
+      "idx": 50,
+      "version": "7",
+      "when": 1790676000000,
+      "tag": "0051_platform_audit",
+      "breakpoints": true
     }
   ]
 }

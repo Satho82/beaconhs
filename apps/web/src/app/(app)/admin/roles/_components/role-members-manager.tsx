@@ -167,6 +167,7 @@ export function RoleMembersManager({
 
               <ScopePicker
                 sites={scopeOptions.sites}
+                properties={scopeOptions.properties}
                 crews={scopeOptions.crews}
                 departments={scopeOptions.departments}
                 groups={scopeOptions.groups}
@@ -295,6 +296,7 @@ export function RoleMembersManager({
                               <ScopePicker
                                 defaultScope={m.scope}
                                 sites={scopeOptions.sites}
+                                properties={scopeOptions.properties}
                                 crews={scopeOptions.crews}
                                 departments={scopeOptions.departments}
                                 groups={scopeOptions.groups}

@@ -1,3 +1,5 @@
+import { TRAINING_TAB_PERMISSIONS } from '../training-access'
+
 // Declarative registry of per-module ADMINISTRATION surfaces (config, taxonomies,
 // records, settings). One entry per module. Pure data — no server imports — so
 // both server pages and client nav can import it. Mirrors lib/nav/registry.ts.
@@ -24,7 +26,13 @@ type AdminSection = {
   permission?: string
 }
 
-export type ModuleAdminTab = { key: string; label: string; href: string; permission?: string }
+export type ModuleAdminTab = {
+  key: string
+  label: string
+  href: string
+  permission?: string
+  requiredAnyPermission?: readonly string[]
+}
 
 export type ModuleAdmin = {
   /** Matches a NAV_MODULES key (lib/nav/registry.ts): 'journals', 'incidents', … */
@@ -486,11 +494,26 @@ export const MODULE_ADMIN: ModuleAdmin[] = [
     tabs: [
       // Two credential lists: Certificates = training records (completed or
       // uploaded); Skills = held competencies tied to an issuing authority.
-      { key: 'records', label: 'Certificates', href: '/training/records' },
-      { key: 'skills', label: 'Skills', href: '/training/skills' },
+      {
+        key: 'records',
+        label: 'Certificates',
+        href: '/training/records',
+        requiredAnyPermission: TRAINING_TAB_PERMISSIONS.records,
+      },
+      {
+        key: 'skills',
+        label: 'Skills',
+        href: '/training/skills',
+        requiredAnyPermission: TRAINING_TAB_PERMISSIONS.skills,
+      },
       { key: 'courses', label: 'Courses', href: '/training/courses' },
       { key: 'classes', label: 'Classes', href: '/training/classes' },
-      { key: 'assessments', label: 'Assessments', href: '/training/assessments' },
+      {
+        key: 'assessments',
+        label: 'Assessments',
+        href: '/training/assessments',
+        requiredAnyPermission: TRAINING_TAB_PERMISSIONS.assessments,
+      },
       // No Reports tab — training reporting lives in the global /reports
       // builder (incl. the seeded "CWB welder roster" custom definition). The
       // coverage matrix lives in Insights (seeded "Training — Certificate

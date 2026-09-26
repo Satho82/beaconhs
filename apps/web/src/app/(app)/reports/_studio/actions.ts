@@ -18,6 +18,10 @@ import { requireRequestContext } from '@/lib/auth'
 import { recordAuditInTransaction } from '@/lib/audit'
 import { isUuid } from '@/lib/list-params'
 import { loadAuthorizedReportCatalogInTransaction } from '@/lib/report-catalog'
+import {
+  applyActiveHospitalityPropertyScope,
+  resolveHospitalityPropertyContext,
+} from '@/lib/hospitality/property-context'
 
 export async function previewReportDefinition(
   definition: CustomReportDefinition,
@@ -25,7 +29,9 @@ export async function previewReportDefinition(
   const ctx = await requireRequestContext()
   assertCan(ctx, 'reports.builder')
   assertCustomReportDefinition(definition)
+  const { activePropertyId } = await resolveHospitalityPropertyContext(ctx)
   return ctx.db(async (tx) => {
+    await applyActiveHospitalityPropertyScope(ctx, tx, activePropertyId)
     const catalog = await loadAuthorizedReportCatalogInTransaction(ctx, tx)
     validateDefinition(definition, ctx.tenantId!, catalog)
     return runBeaconReport(tx, ctx.tenantId!, definition.query, catalog, {

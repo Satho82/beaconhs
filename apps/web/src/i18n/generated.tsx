@@ -6,19 +6,25 @@ import { generatedMessageKey } from './generated-key'
 export type GeneratedMessageKey = keyof AppMessages['Generated']
 export type GeneratedMessageValues = Record<string, unknown>
 
-export function useGeneratedTranslations() {
+export type GeneratedTranslator = (
+  key: GeneratedMessageKey,
+  values?: GeneratedMessageValues,
+) => string
+export type GeneratedValueTranslator = <Value>(value: Value) => Value
+
+export function useGeneratedTranslations(): GeneratedTranslator {
   const translate = useTranslations('Generated')
-  return useCallback(
+  return useCallback<GeneratedTranslator>(
     (key: GeneratedMessageKey, values?: GeneratedMessageValues): string =>
       translate(key, values as never),
     [translate],
   )
 }
 
-export function useGeneratedValueTranslations() {
+export function useGeneratedValueTranslations(): GeneratedValueTranslator {
   const messages = useMessages() as { Generated?: Record<string, unknown> }
   const translate = useGeneratedTranslations()
-  return useCallback(
+  return useCallback<GeneratedValueTranslator>(
     <Value,>(value: Value): Value => {
       if (typeof value !== 'string') return value
       const key = generatedMessageKey(value) as GeneratedMessageKey
@@ -29,7 +35,7 @@ export function useGeneratedValueTranslations() {
 }
 
 /** Resolve exact catalog copy without ICU parsing (for translated Markdown and other rich source). */
-export function useGeneratedRawValueTranslations() {
+export function useGeneratedRawValueTranslations(): (value: string) => string {
   const messages = useMessages() as { Generated?: Record<string, unknown> }
   return useCallback(
     (value: string): string => {

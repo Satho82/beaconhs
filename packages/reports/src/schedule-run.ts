@@ -35,6 +35,7 @@ function beaconReportRunStore(tx: Database): ReportRunStore<BeaconRunDefinition,
         tenantId: row.schedule.tenantId,
         scheduleId: row.schedule.id,
         scheduleName: row.schedule.name,
+        propertyContextId: row.schedule.propertyContextId,
         definition: {
           id: row.definition.id,
           slug: row.definition.slug,

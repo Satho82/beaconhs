@@ -38,6 +38,7 @@ import { recordAudit, recordAuditInTransaction } from '@/lib/audit'
 import { IMPERSONATION_TTL_MS } from '@/lib/impersonation'
 import { sendMembershipInviteEmail } from '@/lib/invite-email'
 import { upsertRoleAssignments } from '@/lib/role-assignment-upsert'
+import { assertDelegablePermissions, assertManageableMember } from '@/lib/access-delegation'
 import { parseRoleScope } from './_scope-data'
 
 const PERMISSIONS = new Set<string>(PERMISSION_CATALOGUE as unknown as string[])
@@ -83,6 +84,7 @@ async function requireUserAdmin(action: string): Promise<Ctx> {
 /** Load a membership + its account, or redirect back with an error. */
 async function loadMember(ctx: Ctx, membershipId: string) {
   const row = await ctx.db(async (tx) => {
+    await assertManageableMember(tx, ctx, ctx.tenantId, membershipId)
     const [m] = await tx
       .select({ membership: tenantUsers, account: users, tenantStatus: tenants.status })
       .from(tenantUsers)
@@ -185,7 +187,7 @@ export async function inviteUser(formData: FormData): Promise<void> {
         .where(eq(roles.id, roleId))
         .limit(1)
       if (role) {
-        await upsertRoleAssignments(tx, [
+        await upsertRoleAssignments(ctx, tx, [
           {
             tenantId: ctx.tenantId,
             tenantUserId: m.id,
@@ -253,6 +255,7 @@ export async function resendInvite(formData: FormData): Promise<void> {
   const membershipId = String(formData.get('membershipId') ?? '')
   if (!membershipId) return
   const invite = await ctx.db(async (tx) => {
+    await assertManageableMember(tx, ctx, ctx.tenantId, membershipId)
     const [row] = await tx
       .select({ membership: tenantUsers, account: users, tenant: tenants })
       .from(tenantUsers)
@@ -371,6 +374,7 @@ export async function setMemberStatus(formData: FormData): Promise<void> {
   if (!membershipId || (status !== 'active' && status !== 'suspended')) return
 
   const result = await ctx.db(async (tx) => {
+    await assertManageableMember(tx, ctx, ctx.tenantId, membershipId)
     const [member] = await tx
       .select({ membership: tenantUsers, account: users })
       .from(tenantUsers)
@@ -436,6 +440,7 @@ export async function removeMember(formData: FormData): Promise<void> {
   if (!membershipId) return
 
   const result = await ctx.db(async (tx) => {
+    await assertManageableMember(tx, ctx, ctx.tenantId, membershipId)
     const [member] = await tx
       .select({ membership: tenantUsers, account: users })
       .from(tenantUsers)
@@ -493,7 +498,7 @@ export async function assignRole(formData: FormData): Promise<void> {
       .where(eq(roles.id, roleId))
       .limit(1)
     if (!role) return
-    const changedIds = await upsertRoleAssignments(tx, [
+    const changedIds = await upsertRoleAssignments(ctx, tx, [
       {
         tenantId: ctx.tenantId,
         tenantUserId: membershipId,
@@ -522,6 +527,7 @@ export async function removeAssignment(formData: FormData): Promise<void> {
   const assignmentId = String(formData.get('assignmentId') ?? '')
   if (!membershipId || !assignmentId) return
   const removed = await ctx.db(async (tx) => {
+    await assertManageableMember(tx, ctx, ctx.tenantId, membershipId)
     const [membership] = await tx
       .select({ userId: tenantUsers.userId })
       .from(tenantUsers)
@@ -561,6 +567,8 @@ export async function setPermissionOverride(formData: FormData): Promise<void> {
     return
   }
   const applied = await ctx.db(async (tx) => {
+    await assertManageableMember(tx, ctx, ctx.tenantId, membershipId)
+    assertDelegablePermissions(ctx, [permission])
     const [membership] = await tx
       .select({ id: tenantUsers.id })
       .from(tenantUsers)
@@ -592,16 +600,18 @@ export async function clearPermissionOverride(formData: FormData): Promise<void>
   const membershipId = String(formData.get('membershipId') ?? '')
   const permission = String(formData.get('permission') ?? '').trim()
   if (!membershipId || !permission) return
-  await ctx.db((tx) =>
-    tx
+  await ctx.db(async (tx) => {
+    await assertManageableMember(tx, ctx, ctx.tenantId, membershipId)
+    assertDelegablePermissions(ctx, [permission])
+    await tx
       .delete(userPermissionOverrides)
       .where(
         and(
           eq(userPermissionOverrides.tenantUserId, membershipId),
           eq(userPermissionOverrides.permission, permission),
         ),
-      ),
-  )
+      )
+  })
   await recordAudit(ctx, {
     entityType: 'tenant_user',
     entityId: membershipId,

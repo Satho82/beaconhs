@@ -49,6 +49,28 @@ function transactionCapture() {
 }
 
 describe('recordAuditInTransaction', () => {
+  it('stamps bulk Action exports with resolved scope, overriding any supplied stamp', async () => {
+    const capture = transactionCapture()
+    await recordAuditInTransaction(
+      capture.tx,
+      context({ scopes: [{ type: 'properties', propertyIds: ['fenchurch'] }] }),
+      {
+        entityType: 'corrective_action',
+        action: 'export',
+        metadata: { actionAuthorization: { version: 1, mode: 'tenant', propertyIds: [] } },
+      },
+    )
+    expect(capture.captured().values).toMatchObject({
+      metadata: {
+        actionAuthorization: {
+          version: 1,
+          mode: 'property',
+          propertyIds: ['fenchurch'],
+        },
+      },
+    })
+  })
+
   it('writes through the supplied transaction with the ordinary actor', async () => {
     const capture = transactionCapture()
 

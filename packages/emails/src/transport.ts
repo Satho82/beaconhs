@@ -218,6 +218,15 @@ export type EmailTransport =
       from: string
       replyTo?: string
     }
+  | {
+      provider: 'smtp'
+      mode: 'staging-capture'
+      host: 'uvanoo-staging-mailpit'
+      port: 1025
+      secure: false
+      from: string
+      replyTo?: string
+    }
 
 /** Format a `Name <email>` sender, or null when no email is set. */
 function formatFrom(name?: string, email?: string): string | null {
@@ -489,6 +498,24 @@ export async function sendVia(
   const normalizedInput = normalizeEmailDeliveryInput(input, {
     requireSingleRecipient: !options?.allowMultipleRecipients,
   })
+  // Operator-controlled capture cannot be enabled by database provider settings.
+  // Every provider is redirected to this fixed staging service without credentials.
+  if (process.env.EMAIL_CAPTURE_MODE === 'uvanoo-staging-mailpit') {
+    return sendSmtp(
+      {
+        provider: 'smtp',
+        mode: 'staging-capture',
+        host: 'uvanoo-staging-mailpit',
+        port: 1025,
+        secure: false,
+        from,
+        replyTo,
+      },
+      normalizedInput,
+      from,
+      replyTo,
+    )
+  }
   switch (transport.provider) {
     case 'resend':
       return sendResend(transport, normalizedInput, from, replyTo)
@@ -683,7 +710,25 @@ async function sendSmtp(
     t.mode === 'database' ? [t.password ?? '', t.username ?? ''].filter(Boolean) : []
   let connectionOptions: Record<string, unknown>
 
-  if (t.mode === 'local-dev') {
+  if (t.mode === 'staging-capture') {
+    if (
+      process.env.EMAIL_CAPTURE_MODE !== 'uvanoo-staging-mailpit' ||
+      t.host !== 'uvanoo-staging-mailpit' ||
+      t.port !== 1025 ||
+      t.secure
+    ) {
+      throw new Error('SMTP: staging capture requires the operator-configured Mailpit service')
+    }
+    connectionOptions = {
+      host: 'uvanoo-staging-mailpit',
+      port: 1025,
+      secure: false,
+      ignoreTLS: true,
+      connectionTimeout: TRANSPORT_TIMEOUT_MS,
+      greetingTimeout: TRANSPORT_TIMEOUT_MS,
+      socketTimeout: TRANSPORT_TIMEOUT_MS,
+    }
+  } else if (t.mode === 'local-dev') {
     if (process.env.NODE_ENV !== 'development') {
       throw new Error('SMTP: local-dev transport is forbidden outside development mode')
     }

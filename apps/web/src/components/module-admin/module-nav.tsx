@@ -34,8 +34,13 @@ export async function ModuleNav({ moduleKey, active }: { moduleKey: string; acti
   const ctx = await getRequestContext()
   const canManage = ctx ? canManageModule(ctx, moduleKey) : false
   const visibleTabs = ctx
-    ? m.tabs.filter((tab) => !tab.permission || canManage || can(ctx, tab.permission))
-    : m.tabs.filter((tab) => !tab.permission)
+    ? m.tabs.filter(
+        (tab) =>
+          (!tab.permission || canManage || can(ctx, tab.permission)) &&
+          (!tab.requiredAnyPermission ||
+            tab.requiredAnyPermission.some((permission) => can(ctx, permission))),
+      )
+    : m.tabs.filter((tab) => !tab.permission && !tab.requiredAnyPermission)
   return (
     <ModuleSubNav
       tabs={visibleTabs}

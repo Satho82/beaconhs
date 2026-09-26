@@ -1,7 +1,7 @@
 import { auditLog, users as user } from '@beaconhs/db/schema'
 import type { Database } from '@beaconhs/db'
 import { and, asc, count, desc, eq, ilike, or } from 'drizzle-orm'
-import type { RequestContext } from '@beaconhs/tenant'
+import { actionPropertyScope, type RequestContext } from '@beaconhs/tenant'
 import type { AuditAction } from '@beaconhs/audit'
 
 type RecordAuditEvent = {
@@ -61,7 +61,12 @@ export async function recordAuditInTransaction(
     summary,
     before: evt.before ?? null,
     after: evt.after ?? null,
-    metadata,
+    metadata: {
+      ...metadata,
+      ...(evt.entityType === 'corrective_action' && !evt.entityId
+        ? { actionAuthorization: { version: 1, ...actionPropertyScope(ctx) } }
+        : {}),
+    },
   })
   await (evt.dedupKey
     ? insert.onConflictDoNothing({ target: [auditLog.tenantId, auditLog.dedupKey] })

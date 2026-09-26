@@ -1,50 +1,19 @@
-import { eq } from 'drizzle-orm'
-import { db, withSuperAdmin } from '@beaconhs/db'
-import { platformSettings, PLATFORM_SETTINGS_ID } from '@beaconhs/db/schema'
+import { PHASE_PRODUCTION_BUILD } from 'next/constants'
+import {
+  getPlatformBranding as getRuntimePlatformBranding,
+  savePlatformBranding,
+  type PlatformBranding,
+} from '@beaconhs/auth/platform-branding'
 
-export type PlatformBranding = {
-  productName?: string
-  logoUrl?: string
-  primaryColor?: string
-}
+export { getRuntimePlatformBranding as getPlatformBranding, savePlatformBranding }
+export type { PlatformBranding }
 
-function normalizeBranding(value: unknown): PlatformBranding {
-  if (!value || typeof value !== 'object') return {}
-  const raw = value as Record<string, unknown>
-
-  return {
-    productName: typeof raw.productName === 'string' ? raw.productName : undefined,
-    logoUrl: typeof raw.logoUrl === 'string' ? raw.logoUrl : undefined,
-    primaryColor: typeof raw.primaryColor === 'string' ? raw.primaryColor : undefined,
-  }
-}
-
-export async function getPlatformBranding(): Promise<PlatformBranding> {
-  return withSuperAdmin(db, async (tx) => {
-    const [row] = await tx
-      .select({ branding: platformSettings.branding })
-      .from(platformSettings)
-      .where(eq(platformSettings.id, PLATFORM_SETTINGS_ID))
-      .limit(1)
-
-    return normalizeBranding(row?.branding)
-  })
-}
-
-export async function savePlatformBranding(branding: PlatformBranding): Promise<void> {
-  const next: PlatformBranding = {
-    productName: branding.productName?.trim() || undefined,
-    logoUrl: branding.logoUrl?.trim() || undefined,
-    primaryColor: branding.primaryColor?.trim() || undefined,
-  }
-
-  await withSuperAdmin(db, async (tx) => {
-    await tx
-      .insert(platformSettings)
-      .values({ id: PLATFORM_SETTINGS_ID, branding: next })
-      .onConflictDoUpdate({
-        target: platformSettings.id,
-        set: { branding: next },
-      })
-  })
+/**
+ * Next prerenders the root error shell during `next build`. Platform branding is
+ * runtime configuration, so that shell uses the product defaults rather than
+ * materialising the privileged database client in the build process.
+ */
+export async function getRootPlatformBranding(): Promise<PlatformBranding> {
+  if (process.env.NEXT_PHASE === PHASE_PRODUCTION_BUILD) return {}
+  return getRuntimePlatformBranding()
 }

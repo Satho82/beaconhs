@@ -9,6 +9,8 @@ import { and, eq } from 'drizzle-orm'
 import type { Database } from '@beaconhs/db'
 import { tenantUsers } from '@beaconhs/db/schema'
 import { resolveMembershipAccess } from '@beaconhs/tenant'
+import { ForbiddenError } from '@beaconhs/tenant'
+import { assertManageableMember } from './access-delegation'
 
 // How long a "view as" session stays live before it auto-expires and the
 // overlay collapses back to the real admin. Renewed by starting again.
@@ -55,6 +57,7 @@ export async function actorMayImpersonate(
   tx: Database,
   actor: { id: string; isSuperAdmin: boolean },
   pinnedTenantId: string,
+  targetMembershipId?: string,
 ): Promise<boolean> {
   if (actor.isSuperAdmin) return true
   const [m] = await tx
@@ -69,6 +72,20 @@ export async function actorMayImpersonate(
     )
     .limit(1)
   if (!m) return false
-  const { permissions } = await resolveMembershipPerms(tx, m.id)
-  return permsHas(permissions, 'admin.users.impersonate')
+  const { permissions, scopes } = await resolveMembershipPerms(tx, m.id)
+  if (!permsHas(permissions, 'admin.users.impersonate')) return false
+  if (targetMembershipId) {
+    try {
+      await assertManageableMember(
+        tx,
+        { isSuperAdmin: false, tenantId: pinnedTenantId, permissions, scopes },
+        pinnedTenantId,
+        targetMembershipId,
+      )
+    } catch (error) {
+      if (error instanceof ForbiddenError) return false
+      throw error
+    }
+  }
+  return true
 }

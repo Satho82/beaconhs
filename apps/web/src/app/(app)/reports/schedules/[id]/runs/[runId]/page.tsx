@@ -11,7 +11,12 @@ import { GeneratedText } from '@/i18n/generated'
 import { getGeneratedTranslations } from '@/i18n/generated.server'
 import { requireRequestContext } from '@/lib/auth'
 import { isUuid } from '@/lib/list-params'
-import { toSchedule } from '../../../page'
+import { reportScheduleAccessWhere } from '@/lib/report-schedule-access'
+import {
+  applyActiveHospitalityPropertyScope,
+  resolveHospitalityPropertyContext,
+} from '@/lib/hospitality/property-context'
+import { toSchedule } from '../../../_schedule'
 
 export default async function RunDetailPage({
   params,
@@ -23,8 +28,10 @@ export default async function RunDetailPage({
   const tGenerated = await getGeneratedTranslations()
   const ctx = await requireRequestContext()
   assertCan(ctx, 'reports.read')
+  const { activePropertyId } = await resolveHospitalityPropertyContext(ctx)
 
   const row = await ctx.db(async (tx) => {
+    await applyActiveHospitalityPropertyScope(ctx, tx, activePropertyId)
     const [result] = await tx
       .select({
         run: reportRuns,
@@ -59,6 +66,7 @@ export default async function RunDetailPage({
           eq(reportRuns.tenantId, ctx.tenantId!),
           eq(reportRuns.scheduleId, id),
           eq(reportRuns.id, runId),
+          reportScheduleAccessWhere(ctx),
         ),
       )
       .limit(1)

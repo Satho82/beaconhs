@@ -4,7 +4,7 @@
 import { and, asc, count, desc, eq, gte, inArray, isNotNull, isNull, lte, sql } from 'drizzle-orm'
 import { htmlToSnippet } from '@beaconhs/forms-core'
 import type { Database } from '@beaconhs/db'
-import type { RequestContext } from '@beaconhs/tenant'
+import { actionPropertyScope, type RequestContext } from '@beaconhs/tenant'
 import {
   complianceObligations,
   complianceStatus,
@@ -37,6 +37,10 @@ import { resolveComplianceLink } from '../compliance/_resolve-link'
 import { templateAccessWhere } from '../apps/_lib/access'
 import { moduleScope } from '../feed/_data'
 import { resolvePpeInspectionDue, type PpeInspectionState } from '@/lib/ppe-inspection-due'
+import {
+  applyActiveHospitalityPropertyScope,
+  resolveHospitalityPropertyContext,
+} from '@/lib/hospitality/property-context'
 
 /**
  * One 12-element series of monthly values, oldest -> newest. Used to draw the
@@ -350,8 +354,11 @@ export async function loadDashboardMetrics(
   const startOfMonthIso = startOfMonth.toISOString().slice(0, 10)
   const ninetyIso = ninetyDaysAhead.toISOString().slice(0, 10)
   const thirtyIso = thirtyDaysAhead.toISOString().slice(0, 10)
+  const { activePropertyId } = await resolveHospitalityPropertyContext(ctx)
+  const propertyRestricted = actionPropertyScope(ctx).mode !== 'tenant'
 
   return await ctx.db(async (tx) => {
+    await applyActiveHospitalityPropertyScope(ctx, tx, activePropertyId)
     const effectiveRoleKeys = await getEffectiveRoleKeys(ctx, tx)
     const [
       incRow,
@@ -480,14 +487,16 @@ export async function loadDashboardMetrics(
     const headcount = Number(peopleCount?.c ?? 0)
 
     // --- Vehicle log status ---------------------------------------------
-    const [vehicleLogRow] = await tx
-      .select({
-        loggedDays: count(),
-        importedDays: sql<number>`COUNT(*) FILTER (WHERE ${truckLogEntries.importStatus} = 'imported')::int`,
-        conflictDays: sql<number>`COUNT(*) FILTER (WHERE ${truckLogEntries.importStatus} = 'conflict')::int`,
-        businessKm: sql<number>`COALESCE(SUM(${truckLogEntries.businessKm}), 0)::int`,
-        personalKm: sql<number>`COALESCE(SUM(${truckLogEntries.personalKm}), 0)::int`,
-        totalKm: sql<number>`COALESCE(SUM(CASE
+    const [vehicleLogRow] = propertyRestricted
+      ? [undefined]
+      : await tx
+          .select({
+            loggedDays: count(),
+            importedDays: sql<number>`COUNT(*) FILTER (WHERE ${truckLogEntries.importStatus} = 'imported')::int`,
+            conflictDays: sql<number>`COUNT(*) FILTER (WHERE ${truckLogEntries.importStatus} = 'conflict')::int`,
+            businessKm: sql<number>`COALESCE(SUM(${truckLogEntries.businessKm}), 0)::int`,
+            personalKm: sql<number>`COALESCE(SUM(${truckLogEntries.personalKm}), 0)::int`,
+            totalKm: sql<number>`COALESCE(SUM(CASE
           WHEN ${truckLogEntries.kmDriven} IS NOT NULL THEN ${truckLogEntries.kmDriven}
           WHEN ${truckLogEntries.businessKm} IS NOT NULL OR ${truckLogEntries.personalKm} IS NOT NULL
             THEN COALESCE(${truckLogEntries.businessKm}, 0) + COALESCE(${truckLogEntries.personalKm}, 0)
@@ -495,14 +504,14 @@ export async function loadDashboardMetrics(
             THEN GREATEST(${truckLogEntries.endOdometer} - ${truckLogEntries.startOdometer}, 0)
           ELSE 0
         END), 0)::int`,
-      })
-      .from(truckLogEntries)
-      .where(
-        and(
-          gte(truckLogEntries.entryDate, startOfMonthIso),
-          lte(truckLogEntries.entryDate, todayIso),
-        ),
-      )
+          })
+          .from(truckLogEntries)
+          .where(
+            and(
+              gte(truckLogEntries.entryDate, startOfMonthIso),
+              lte(truckLogEntries.entryDate, todayIso),
+            ),
+          )
     const vehicleLogStatus = {
       loggedDays: Number(vehicleLogRow?.loggedDays ?? 0),
       importedDays: Number(vehicleLogRow?.importedDays ?? 0),
@@ -547,14 +556,18 @@ export async function loadDashboardMetrics(
       .groupBy(sql`to_char(${incidents.occurredAt}, 'YYYY-MM')`)
 
     // Real hours worked per month, from recorded periods (bucketed by start month).
-    const hoursMonthly = await tx
-      .select({
-        bucket: sql<string>`to_char(${incidentHoursPeriods.periodStart}, 'YYYY-MM')`,
-        h: sql<number>`COALESCE(SUM(${incidentHoursPeriods.totalHours}), 0)::float`,
-      })
-      .from(incidentHoursPeriods)
-      .where(gte(incidentHoursPeriods.periodStart, twentyFourMonthsAgo.toISOString().slice(0, 10)))
-      .groupBy(sql`to_char(${incidentHoursPeriods.periodStart}, 'YYYY-MM')`)
+    const hoursMonthly = propertyRestricted
+      ? []
+      : await tx
+          .select({
+            bucket: sql<string>`to_char(${incidentHoursPeriods.periodStart}, 'YYYY-MM')`,
+            h: sql<number>`COALESCE(SUM(${incidentHoursPeriods.totalHours}), 0)::float`,
+          })
+          .from(incidentHoursPeriods)
+          .where(
+            gte(incidentHoursPeriods.periodStart, twentyFourMonthsAgo.toISOString().slice(0, 10)),
+          )
+          .groupBy(sql`to_char(${incidentHoursPeriods.periodStart}, 'YYYY-MM')`)
 
     // Build month-key list for the last 24 months, oldest -> newest. `YYYY-MM`.
     const monthKeys: string[] = []

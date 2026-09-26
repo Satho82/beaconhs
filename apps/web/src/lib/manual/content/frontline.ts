@@ -350,7 +350,10 @@ Open **Incidents** in the left menu, or go to [Incidents](/incidents).
 5. Give it a short **Title**, like "Slip on wet floor near pump 3".
 6. In **Description**, write what happened: who was there, what equipment was involved, what you saw.
 7. Fill in **Immediate action taken** — first aid given, area barricaded, equipment locked out, and so on.
-8. Tap **Submit report**.
+8. Record **External people involved**, **Witnesses**, and **Events leading up to incident** when known. Add a damage estimate and whether police were notified if relevant.
+9. Tap **Submit report**.
+
+Use the property switcher to report for the intended hotel. In Portfolio, choose the correct **Site** before submitting. The Incident list follows the selected property; Portfolio shows only your authorised properties.
 
 The quick report captures the essentials. Photos, witness statements, and the full investigation happen on the incident's page after you submit. In **Photos**, tap **Take photo or upload** to use the camera or choose pictures from your phone's photo library. Tap the pencil button to add a caption or mark up a photo. The editor keeps the photo's original shape. Large camera photos are optimized automatically when they upload. Tap the trash button to remove the wrong photo, and use the arrow buttons to change the photo order before the incident is locked.
 
@@ -359,7 +362,7 @@ The quick report captures the essentials. Photos, witness statements, and the fu
 - The incident starts as **Reported**. The right people are notified automatically.
 - An investigator may move it to investigating, dig into the causes, and record findings on the incident page.
 - Fixes get assigned as [corrective actions](/help/corrective-actions) with owners and due dates.
-- When the investigation and fixes are done, the incident is closed.
+- Move the investigation to **Pending review** before closing it. The status menu shows the available next steps. A closed incident must be **Reopened** before it returns to investigation.
 
 You can open your own reports any time from the [Incidents](/incidents) list to see their status.
 
@@ -435,6 +438,12 @@ Finding a problem only matters if someone fixes it. Corrective actions track eac
 ## Where to find it
 
 Open **Corrective Actions** in the left menu, or go to [Corrective actions](/corrective-actions). The list opens on open actions. Each row shows the status and the due date — overdue ones are flagged. Use the search box and the status filter to narrow the list; tap **All statuses** to see closed ones too.
+
+## Hotel property access
+
+Hotel staff can open, change, search and export actions only for their assigned properties. Permission to read all actions means all permitted actions within those properties. Cluster managers can work across their assigned hotels. The Property Switcher narrows the Action list, reports and CSV export to the selected hotel. **Portfolio** shows your authorised properties together; it does not grant access to another hotel.
+
+When creating a standalone action, choose its **Property**. Actions created from a property record retain that source's property. Choose an owner who has access to that hotel. If an older action has no verifiable property, it is hidden from property-limited users until an authorised administrator resolves its source. A shared photo link does not grant access to another hotel's action.
 
 ## Completing one assigned to you
 
@@ -726,6 +735,65 @@ On a desktop, a summary rail on the side shows the same counts at a glance.
 
 - The feed is read-only. To act on something, tap through to the record itself.
 - If the feed looks quiet, it may just mean your access is scoped to your own records. Ask your supervisor if you think you should see more.`,
+  },
+  {
+    slug: 'hotel-handover',
+    title: 'Hotel Handover',
+    group: 'Everyday tasks',
+    iconKey: 'journal',
+    summary: 'Record, acknowledge, update, and carry forward property shift handovers.',
+    keywords: ['hotel handover', 'shift', 'handover', 'follow-up', 'acknowledge', 'carry forward'],
+    requiredPermission: 'hospitality.read',
+    body: `Hotel Handover is the chronological shift record for operational notes that the next team needs to see. Entries stay attached to their property and can be acknowledged, updated, carried forward, and linked to follow-up work.
+
+## Where to find it
+
+Open **Hotel Handover** in the left menu. The Global Property selector controls the feed: choose one hotel for its handover, or use the portfolio view when your role can access several properties.
+
+## Add a handover entry
+
+1. Choose the property, date and time, shift, department, and priority.
+2. Write the handover note. Add a room or location when it helps the next shift find the issue.
+3. Mark **Follow-up required** and choose an owner when somebody must act.
+4. Link an existing maintenance issue, or create a shared Corrective Action when formal tracking is needed.
+5. Save the entry, then add secure photos if they provide useful evidence.
+
+## Work the feed
+
+- Tap **Acknowledge** to show that you have read an entry.
+- Add an update instead of replacing the original note; this preserves the handover history.
+- Change follow-up status as work moves from open to in progress or completed.
+- Carry forward an unresolved important or urgent entry when it must remain visible to the next shift.
+- Use search to find notes by property, department, location, or note text.
+
+You only see properties authorised for your role. Hotel managers remain within their assigned hotel; cluster and regional roles can work across their authorised properties.`,
+  },
+  {
+    slug: 'metering',
+    title: 'Metering',
+    group: 'Everyday tasks',
+    iconKey: 'chart',
+    summary: 'Configure utility meters, enter readings, and review consumption and estimated cost.',
+    keywords: ['metering', 'electricity', 'gas', 'water', 'MPAN', 'serial number', 'tariff'],
+    requiredPermission: 'hospitality.read',
+    body: `Metering keeps utility readings and estimated expenditure attached to the correct hotel.
+
+## Where to find it
+
+Open **Metering** in the left menu. Use the one Metering workspace for Overview, Enter Reading, History, Analytics, and Setup.
+
+## Enter a reading
+
+1. Choose the meter. Its name, Serial Number, MPAN where applicable, location, and unit are shown.
+2. Enter the reading value and date/time.
+3. Use **Meter reset** when the physical counter restarts; never enter a lower normal reading.
+4. Use **Correction** to replace a specific mistaken reading while retaining audit history.
+
+## Setup and tariffs
+
+Setup is manager-only. Managers configure meters, replacements, lifecycle status, and effective-dated tariffs. A reading stores the tariff and estimated expenditure that applied at that time, so later tariff changes do not rewrite history.
+
+The Global Property selector controls the visible property or authorised portfolio. Server-side property access remains authoritative.`,
   },
   {
     slug: 'tools',

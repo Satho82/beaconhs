@@ -2,6 +2,7 @@ import { GeneratedText, GeneratedValue } from '@/i18n/generated'
 import { getGeneratedTranslations } from '@/i18n/generated.server'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
+import { and, asc, eq, inArray, isNull, sql } from 'drizzle-orm'
 import {
   Alert,
   AlertDescription,
@@ -15,7 +16,7 @@ import {
   Select,
   Textarea,
 } from '@beaconhs/ui'
-import { incidents } from '@beaconhs/db/schema'
+import { incidents, orgUnits } from '@beaconhs/db/schema'
 import { moduleFlowCommand, recordDomainEvent } from '@beaconhs/events'
 import { incidentCreatedEvent } from '@beaconhs/integrations'
 import { requireRequestContext } from '@/lib/auth'
@@ -25,6 +26,7 @@ import { nextReference } from '@/lib/reference'
 import { PageContainer } from '@/components/page-layout'
 import { RemoteSelectField } from '@/components/remote-search-select'
 import { OccurredAtField } from './_occurred-at-field'
+import { resolveHospitalityPropertyContext } from '@/lib/hospitality/property-context'
 
 export async function generateMetadata() {
   const tGenerated = await getGeneratedTranslations()
@@ -55,6 +57,11 @@ async function reportIncident(formData: FormData) {
   const location = String(formData.get('location') ?? '').trim() || null
   const weather = String(formData.get('weather') ?? '').trim() || null
   const immediateActionTaken = String(formData.get('immediateActionTaken') ?? '').trim() || null
+  const externalPeopleInvolved = String(formData.get('externalPeopleInvolved') ?? '').trim() || null
+  const witnesses = String(formData.get('witnesses') ?? '').trim() || null
+  const eventsLeadingUp = String(formData.get('eventsLeadingUp') ?? '').trim() || null
+  const damageEstimateRaw = String(formData.get('damageEstimate') ?? '').trim()
+  const policeNotified = formData.get('policeNotified') === 'true'
 
   if (!TYPES.includes(type)) throw new Error('Invalid type')
   if (!SEVERITIES.includes(severity)) throw new Error('Invalid severity')
@@ -62,6 +69,10 @@ async function reportIncident(formData: FormData) {
   if (!occurredAtRaw) throw new Error('Occurred date/time is required')
   const occurredAt = new Date(occurredAtRaw)
   if (Number.isNaN(occurredAt.getTime())) throw new Error('Invalid occurred date')
+  const damageEstimate = damageEstimateRaw ? Number(damageEstimateRaw) : null
+  if (damageEstimate !== null && (!Number.isFinite(damageEstimate) || damageEstimate < 0)) {
+    throw new Error('Damage estimate must be a non-negative number')
+  }
 
   const [row] = await ctx.db(async (tx) => {
     const reference = await nextReference(tx, ctx.tenantId, 'incident')
@@ -80,6 +91,11 @@ async function reportIncident(formData: FormData) {
         location,
         weather,
         immediateActionTaken,
+        externalPeopleInvolved,
+        witnesses,
+        eventsLeadingUp,
+        damageEstimate: damageEstimate === null ? null : damageEstimate.toFixed(2),
+        policeNotified,
         reportedByTenantUserId: ctx.membership?.id ?? null,
       })
       .returning()
@@ -130,7 +146,26 @@ async function reportIncident(formData: FormData) {
 
 export default async function NewIncidentPage() {
   const tGenerated = await getGeneratedTranslations()
-  await requireRequestContext()
+  const ctx = await requireRequestContext()
+  const propertyContext = await resolveHospitalityPropertyContext(ctx)
+  const propertyIds = propertyContext.activePropertyId
+    ? [propertyContext.activePropertyId]
+    : propertyContext.properties.map((property) => property.id)
+  const hospitalitySites = propertyIds.length
+    ? await ctx.db((tx) =>
+        tx
+          .select({ id: orgUnits.id, name: orgUnits.name })
+          .from(orgUnits)
+          .where(
+            and(
+              eq(orgUnits.tenantId, ctx.tenantId),
+              isNull(orgUnits.deletedAt),
+              inArray(sql<string>`${orgUnits.metadata}->>'hospitalityPropertyId'`, propertyIds),
+            ),
+          )
+          .orderBy(asc(orgUnits.name)),
+      )
+    : []
   return (
     <PageContainer>
       <div className="max-w-3xl space-y-6">
@@ -172,14 +207,24 @@ export default async function NewIncidentPage() {
                   <OccurredAtField name="occurredAt" />
                 </Field>
                 <Field label={tGenerated('m_020146dd3d3d5a')}>
-                  <RemoteSelectField
-                    lookup="incident-sites"
-                    name="siteOrgUnitId"
-                    placeholder={tGenerated('m_015c668f21e7b9')}
-                    searchPlaceholder={tGenerated('m_1931aa93098220')}
-                    sheetTitle="Select a site"
-                    emptyLabel="—"
-                  />
+                  {hospitalitySites.length ? (
+                    <Select name="siteOrgUnitId" defaultValue={hospitalitySites[0]?.id}>
+                      {hospitalitySites.map((site) => (
+                        <option key={site.id} value={site.id}>
+                          {site.name}
+                        </option>
+                      ))}
+                    </Select>
+                  ) : (
+                    <RemoteSelectField
+                      lookup="incident-sites"
+                      name="siteOrgUnitId"
+                      placeholder={tGenerated('m_015c668f21e7b9')}
+                      searchPlaceholder={tGenerated('m_1931aa93098220')}
+                      sheetTitle="Select a site"
+                      emptyLabel="—"
+                    />
+                  )}
                 </Field>
                 <Field label={tGenerated('m_0decefd558c355')} required className="sm:col-span-2">
                   <Input name="title" required placeholder={tGenerated('m_07b6683aca592d')} />
@@ -203,6 +248,24 @@ export default async function NewIncidentPage() {
                     rows={3}
                     placeholder={tGenerated('m_08cccd47bcda61')}
                   />
+                </Field>
+                <Field label={tGenerated('m_03283bb876874a')} className="sm:col-span-2">
+                  <Textarea name="externalPeopleInvolved" rows={2} />
+                </Field>
+                <Field label={tGenerated('m_0c5ffecfcfc329')} className="sm:col-span-2">
+                  <Textarea name="witnesses" rows={2} />
+                </Field>
+                <Field label={tGenerated('m_19b47bcc915bf0')} className="sm:col-span-2">
+                  <Textarea name="eventsLeadingUp" rows={3} />
+                </Field>
+                <Field label={tGenerated('m_131a237455e430')}>
+                  <Input name="damageEstimate" type="number" min="0" step="0.01" />
+                </Field>
+                <Field label={tGenerated('m_1fec1e8f5877cf')}>
+                  <Select name="policeNotified" defaultValue="false">
+                    <option value="false">No</option>
+                    <option value="true">Yes</option>
+                  </Select>
                 </Field>
               </div>
               <div className="flex items-center justify-end gap-2">

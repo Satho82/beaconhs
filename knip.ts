@@ -4,11 +4,18 @@ const config: KnipConfig = {
   $schema: 'https://unpkg.com/knip@5/schema.json',
   workspaces: {
     '.': {
-      entry: ['deploy/collabora-branding.js'],
+      entry: ['deploy/collabora-branding.js', 'scripts/check-sanitizer-boundary.mjs'],
+      // The sanitizer audit resolves these through apps/web's createRequire.
+      ignoreDependencies: ['next', 'jsdom'],
     },
     'apps/web': {
+      // Next externalizes the shared sanitizer through this runtime dependency.
+      ignoreDependencies: ['isomorphic-dompurify'],
       entry: [
         'public/sw.js',
+        'src/**/*.test.{ts,tsx}',
+        'scripts/**/*.test.ts',
+        'scripts/i18n-runtime-audit.ts',
         'scripts/backfill-credential-outputs.ts',
         'scripts/cleanup-rassaun-credential-designs.ts',
         'scripts/backfill-private-attachment-urls.ts',
@@ -29,7 +36,7 @@ const config: KnipConfig = {
       ignoreDependencies: ['qrcode'],
     },
     'packages/db': {
-      entry: ['src/scripts/reseed-lift-plan.ts'],
+      entry: ['src/scripts/reseed-lift-plan.ts', 'src/forward-migration-cli.ts'],
     },
     'packages/sync': {
       ignoreDependencies: ['mssql'],

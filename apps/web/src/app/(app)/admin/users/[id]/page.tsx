@@ -490,6 +490,22 @@ export default async function AdminUserDetailPage({
                                         )}
                                       />
                                     </div>
+                                    <details className="mt-2">
+                                      <summary className="cursor-pointer text-sm">
+                                        <GeneratedValue value="Edit access scope" />
+                                      </summary>
+                                      <form action={assignRole} className="mt-3 space-y-3">
+                                        <input type="hidden" name="membershipId" value={id} />
+                                        <input type="hidden" name="roleId" value={a.role.id} />
+                                        <ScopePicker
+                                          defaultScope={a.assignment.scope as RoleScope}
+                                          {...scopeOptions}
+                                        />
+                                        <Button type="submit" size="sm">
+                                          <GeneratedValue value="Save access scope" />
+                                        </Button>
+                                      </form>
+                                    </details>
                                   </div>
                                   <form action={removeAssignment}>
                                     <input type="hidden" name="membershipId" value={id} />
@@ -541,6 +557,7 @@ export default async function AdminUserDetailPage({
                       </div>
                       <ScopePicker
                         sites={scopeOptions.sites}
+                        properties={scopeOptions.properties}
                         crews={scopeOptions.crews}
                         departments={scopeOptions.departments}
                         groups={scopeOptions.groups}

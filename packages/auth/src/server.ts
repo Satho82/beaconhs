@@ -7,6 +7,9 @@ import {
   inviteGrantFromCallbackURL,
   INVITE_LINK_TTL_SECONDS,
 } from './invites'
+import { renderAuthEmail } from './auth-email-branding'
+import { getPlatformBranding } from './platform-branding'
+import { resolveAuthPublicOrigin } from './public-origin'
 
 function createAuth() {
   const databaseUrl = process.env.DATABASE_URL
@@ -14,7 +17,29 @@ function createAuth() {
     throw new Error('[auth] DATABASE_URL is required.')
   }
 
-  const baseURL = process.env.BETTER_AUTH_URL ?? 'http://localhost:3000'
+  const baseURL = resolveAuthPublicOrigin()
+
+  // Alternate operator-owned origins support a hostname transition without
+  // trusting arbitrary request hosts or wildcard callback destinations.
+  const additionalOrigins = (process.env.BETTER_AUTH_TRUSTED_ORIGINS ?? '')
+    .split(',')
+    .map((value) => value.trim())
+    .filter(Boolean)
+  for (const origin of additionalOrigins) {
+    let parsed: URL
+    try {
+      parsed = new URL(origin)
+    } catch {
+      throw new Error('[auth] BETTER_AUTH_TRUSTED_ORIGINS must contain exact HTTP(S) origins.')
+    }
+    if (
+      !['http:', 'https:'].includes(parsed.protocol) ||
+      parsed.origin !== origin ||
+      origin.includes('*')
+    ) {
+      throw new Error('[auth] BETTER_AUTH_TRUSTED_ORIGINS must contain exact HTTP(S) origins.')
+    }
+  }
 
   // BETTER_AUTH_SECRET signs sessions AND seals stored provider API keys.
   // Runtime initialization fails closed in production; a Next build merely
@@ -46,9 +71,11 @@ function createAuth() {
       // (`/api/auth/reset-password/<token>?callbackURL=/reset-password`), which
       // validates the token and forwards the user to our /reset-password page.
       sendResetPassword: async ({ user, url }) => {
-        const subject = 'Reset your Uvanoo Portal password'
-        const text = `A password reset was requested for your Uvanoo Portal account.\n\nSet a new password:\n\n${url}\n\nThis link expires in 1 hour. If you didn't request it, ignore this email — your password won't change.`
-        const html = `<p>A password reset was requested for your Uvanoo Portal account.</p><p><a href="${escapeHtml(url)}">Set a new password</a></p><p>This link expires in 1 hour. If you didn't request it, ignore this email — your password won't change.</p>`
+        const { subject, text, html } = renderAuthEmail({
+          kind: 'password-reset',
+          url,
+          branding: await getPlatformBranding(),
+        })
         await sendAuthEmail({ to: user.email, subject, html, text, label: 'password-reset' })
       },
     },
@@ -68,15 +95,12 @@ function createAuth() {
             typeof metadata?.tenantName === 'string' && metadata.tenantName.trim()
               ? metadata.tenantName.trim()
               : 'your organization'
-          const subject = invite
-            ? `You're invited to ${tenantName} in Uvanoo Portal`
-            : 'Sign in to Uvanoo Portal'
-          const text = invite
-            ? `You've been invited to join ${tenantName} in Uvanoo Portal.\n\nAccept the invitation and sign in:\n\n${url}\n\nThis one-time link expires in 15 minutes. If you weren't expecting this invitation, ignore this email.`
-            : `Click this link to sign in to Uvanoo Portal:\n\n${url}\n\nThis one-time link expires in 15 minutes. If you didn't request it, ignore this email.`
-          const html = invite
-            ? `<p>You've been invited to join <strong>${escapeHtml(tenantName)}</strong> in Uvanoo Portal.</p><p><a href="${escapeHtml(url)}">Accept the invitation and sign in</a></p><p>This one-time link expires in 15 minutes.</p>`
-            : `<p>Click <a href="${escapeHtml(url)}">here</a> to sign in to Uvanoo Portal.</p><p>This one-time link expires in 15 minutes.</p>`
+          const { subject, text, html } = renderAuthEmail({
+            kind: invite ? 'invite' : 'magic-link',
+            url,
+            tenantName,
+            branding: await getPlatformBranding(),
+          })
           await sendAuthEmail({
             to: email,
             subject,
@@ -121,7 +145,7 @@ function createAuth() {
         return {}
       },
     },
-    trustedOrigins: [baseURL],
+    trustedOrigins: [...new Set([baseURL, ...additionalOrigins])],
   })
 }
 

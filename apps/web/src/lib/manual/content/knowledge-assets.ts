@@ -36,7 +36,7 @@ Your company assigns you courses — online lessons, quizzes, and classroom sess
 
 ## Where to find it
 
-Open **Training** in the left menu. You will see tabs for **Certificates**, **Courses**, **Classes**, and more. For your own stuff, the fastest path is [My Workspace](/my): tap the **Training** tile for your courses and records, or the **Wallet** tile for your credential cards.
+Open **Training** in the left menu. You will see **Courses** and **Classes**, plus any record tabs your role can open. For your own stuff, the fastest path is [My Workspace](/my): tap the **Training** tile for your courses and records, or the **Wallet** tile for your credential cards.
 
 ## Take an assigned course
 
@@ -49,7 +49,9 @@ Open **Training** in the left menu. You will see tabs for **Certificates**, **Co
 
 ## Check your certificates and expiry dates
 
-1. Open **Training** in the left menu. It lands on the **Certificates** tab.
+Only tabs your role can open are shown. **Certificates**, **Skills**, and **Assessments** need the matching access. If you need a hidden tab, ask your administrator. Opening a restricted list link returns you to **Courses**.
+
+1. Open **Training** in the left menu. If your role can view training records, it opens **Certificates**. Otherwise it opens **Courses**.
 2. Each row shows the **Course**, when it was **Completed**, and when it **Expires**.
 3. Expired tickets show a red **Expired** badge. If you were retrained, the old certificate shows **Superseded** instead — only your newest certificate per course counts.
 4. Open a certificate. On the desktop table, select **View**. Then open **Cards & certificates**.

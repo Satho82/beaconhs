@@ -35,7 +35,7 @@ import {
   LIFT_PLAN_TEMPLATE_NAME,
   seedLiftPlanTemplate,
 } from '@beaconhs/db/seed/lift-plan-template'
-import { requireRequestContext } from '@/lib/auth'
+import { requirePlatformOperator } from '@/lib/auth'
 import { PageContainer } from '@/components/page-layout'
 import { FilterChips } from '@/components/filter-bar'
 import { Pagination } from '@/components/pagination'
@@ -57,8 +57,7 @@ async function seedOne(formData: FormData): Promise<void> {
   'use server'
   // POST endpoint not covered by the /platform layout gate — re-check; this
   // bypasses RLS to write into an arbitrary tenant.
-  const ctx = await requireRequestContext()
-  if (!ctx.isSuperAdmin) throw new Error('Only platform super-admins can seed templates.')
+  await requirePlatformOperator()
   const tenantId = String(formData.get('tenantId') ?? '').trim()
   if (!tenantId) return
 
@@ -70,8 +69,7 @@ async function seedOne(formData: FormData): Promise<void> {
 
 async function seedAll(): Promise<void> {
   'use server'
-  const ctx = await requireRequestContext()
-  if (!ctx.isSuperAdmin) throw new Error('Only platform super-admins can seed templates.')
+  await requirePlatformOperator()
 
   await withSuperAdmin(db, async (tx) => {
     const all = await tx.select({ id: tenants.id }).from(tenants)
@@ -88,8 +86,7 @@ export default async function SeedTemplatesPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
   const tGenerated = await getGeneratedTranslations()
-  const ctx = await requireRequestContext()
-  if (!ctx.isSuperAdmin) redirect('/admin')
+  await requirePlatformOperator()
   const sp = await searchParams
   const stateParam = pickString(sp.state)
   const stateFilter = stateParam === 'seeded' || stateParam === 'missing' ? stateParam : undefined

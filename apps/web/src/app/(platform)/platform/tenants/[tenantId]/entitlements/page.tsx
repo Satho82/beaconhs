@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { Button, DetailHeader, Input, Label, Select } from '@beaconhs/ui'
 import { PageContainer } from '@/components/page-layout'
-import { requireRequestContext } from '@/lib/auth'
+import { requirePlatformOperator } from '@/lib/auth'
 import { MODULE_CATALOGUE } from '@/lib/module-entitlements/catalogue'
 import { listTenantModuleEntitlements } from '@/lib/module-entitlements/platform'
 import { saveTenantModuleEntitlementAction } from './_actions'
@@ -21,9 +21,9 @@ export default async function TenantEntitlementsPage({
   const { tenantId } = await params
   if (!isUuid(tenantId)) notFound()
 
-  const ctx = await requireRequestContext()
+  const operator = await requirePlatformOperator()
 
-  const { tenant, rows } = await listTenantModuleEntitlements(ctx, tenantId)
+  const { tenant, rows } = await listTenantModuleEntitlements(operator, tenantId)
   const rowsByKey = new Map(rows.map((row) => [row.moduleKey, row]))
 
   return (

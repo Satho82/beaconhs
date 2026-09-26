@@ -58,16 +58,31 @@
     "yourTenants": "Your tenants"
   },
   "PlatformNav": {
-    "overview": "Overview",
-    "tenants": "Tenants",
+    "overview": "Dashboard",
+    "tenants": "Tenants / Management Companies",
     "createTenant": "Create tenant",
-    "users": "Users",
+    "users": "Platform Users",
     "platformEmail": "Platform email",
     "smsProvider": "SMS provider",
     "aiProvider": "AI provider",
     "emailLog": "Email log",
     "smsLog": "SMS log",
-    "databaseMaintenance": "Database maintenance"
+    "databaseMaintenance": "Database maintenance",
+    "templateLibrary": "Template Library",
+    "platformBranding": "Platform Branding",
+    "controlCentre": "Platform Control Centre",
+    "dashboard": "Dashboard",
+    "managementCompanies": "Tenants / Management Companies",
+    "propertiesOverview": "Properties Overview",
+    "platformUsers": "Platform Users",
+    "plansSubscriptions": "Plans & Subscriptions",
+    "modulesEntitlements": "Modules & Entitlements",
+    "productConfiguration": "Product Configuration",
+    "integrations": "Integrations",
+    "communications": "Communications",
+    "platformSettings": "Platform Settings",
+    "auditLogs": "Audit & Logs",
+    "systemHealth": "System Health"
   },
   "Nav": {
     "groups": {

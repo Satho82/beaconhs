@@ -22,7 +22,7 @@ import {
 import { Badge, DetailHeader, EmptyState } from '@beaconhs/ui'
 import { db, withSuperAdmin } from '@beaconhs/db'
 import { tenantUsers, tenants, users } from '@beaconhs/db/schema'
-import { getCurrentUserId, getRequestContext } from '@/lib/auth'
+import { requirePlatformOperator } from '@/lib/auth'
 import { formatDate } from '@/lib/datetime'
 import { PageContainer } from '@/components/page-layout'
 import { SortTh } from '@/components/sortable-th'
@@ -88,11 +88,10 @@ export default async function PlatformUsersPage({
   const tGeneratedValue = await getGeneratedValueTranslations()
   const tGenerated = await getGeneratedTranslations()
   // The /platform layout already gates super-admin; this just needs a session.
-  const userId = await getCurrentUserId()
-  if (!userId) redirect('/login')
-  const requestContext = await getRequestContext()
-  const timeZone = requestContext?.timezone ?? 'UTC'
-  const locale = requestContext?.locale ?? 'en'
+  const operator = await requirePlatformOperator()
+  const userId = operator.userId
+  const timeZone = operator.timezone
+  const locale = operator.locale
 
   const sp = await searchParams
   const listParams = parseListParams(sp, {

@@ -2,20 +2,12 @@
 
 import { revalidatePath } from 'next/cache'
 import { getGeneratedTranslations } from '@/i18n/generated.server'
-import type { RequestContext } from '@beaconhs/tenant'
-import { requireRequestContext } from '@/lib/auth'
-import { recordAudit } from '@/lib/audit'
+import { requirePlatformOperator } from '@/lib/auth'
+import { recordPlatformAudit } from '@/lib/platform-audit'
 import { savePlatformBranding } from '@/lib/platform-branding-config'
 
-function gatePlatform(ctx: RequestContext) {
-  if (!ctx.isSuperAdmin) {
-    throw new Error('Only platform super-admins can change platform branding.')
-  }
-}
-
 export async function savePlatformBrandingAction(formData: FormData) {
-  const ctx = await requireRequestContext()
-  gatePlatform(ctx)
+  const operator = await requirePlatformOperator()
   const tGenerated = await getGeneratedTranslations()
 
   const productName = String(formData.get('productName') ?? '').trim()
@@ -53,7 +45,7 @@ export async function savePlatformBrandingAction(formData: FormData) {
     primaryColor,
   })
 
-  await recordAudit(ctx, {
+  await recordPlatformAudit(operator, {
     entityType: 'platform',
     action: 'update',
     summary: tGenerated('m_15176e3aae0a5c'),

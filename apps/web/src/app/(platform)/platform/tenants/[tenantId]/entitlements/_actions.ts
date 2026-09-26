@@ -2,7 +2,7 @@
 
 import { normalizeEntitlementChange } from '@/lib/module-entitlements/policy'
 import { revalidatePath } from 'next/cache'
-import { requireRequestContext } from '@/lib/auth'
+import { requirePlatformOperator } from '@/lib/auth'
 import { setTenantModuleEntitlement } from '@/lib/module-entitlements/platform'
 
 function optionalDate(value: FormDataEntryValue | null): Date | null {
@@ -14,11 +14,11 @@ function optionalDate(value: FormDataEntryValue | null): Date | null {
 }
 
 export async function saveTenantModuleEntitlementAction(formData: FormData) {
-  const ctx = await requireRequestContext()
+  const operator = await requirePlatformOperator()
   const tenantId = String(formData.get('tenantId') ?? '').trim()
   if (!tenantId) throw new Error('Tenant is required.')
   await setTenantModuleEntitlement(
-    ctx,
+    operator,
     tenantId,
     normalizeEntitlementChange({
       moduleKey: String(formData.get('moduleKey') ?? ''),

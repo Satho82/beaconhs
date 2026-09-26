@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { getAuth } from '@beaconhs/auth'
 import { db, withSuperAdmin, type Database } from '@beaconhs/db'
 import { resolveLocalePreferences } from '@beaconhs/i18n'
+import type { AppLocale } from '@beaconhs/i18n'
 import {
   people,
   roleAssignments,
@@ -65,7 +66,14 @@ async function resolvePersonId(
  * operations are cross-tenant by design, so they must not depend on an active
  * tenant cookie, membership, or property scope.
  */
-type PlatformOperator = { userId: string; isSuperAdmin: true }
+export type PlatformOperator = {
+  userId: string
+  isSuperAdmin: true
+  name: string
+  email: string
+  locale: AppLocale
+  timezone: string
+}
 
 export const getPlatformOperator = cache(async (): Promise<PlatformOperator | null> => {
   const session = await getAuth().api.getSession({ headers: await headers() })
@@ -85,13 +93,35 @@ export const getPlatformOperator = cache(async (): Promise<PlatformOperator | nu
     }
 
     const [user] = await tx
-      .select({ id: users.id, isSuperAdmin: users.isSuperAdmin })
+      .select({
+        id: users.id,
+        isSuperAdmin: users.isSuperAdmin,
+        name: users.name,
+        email: users.email,
+        timezone: users.timezone,
+      })
       .from(users)
       .where(eq(users.id, session.user.id))
       .limit(1)
-    return user?.isSuperAdmin ? { userId: user.id, isSuperAdmin: true } : null
+    return user?.isSuperAdmin
+      ? {
+          userId: user.id,
+          isSuperAdmin: true,
+          name: user.name,
+          email: user.email,
+          locale: 'en',
+          timezone: user.timezone,
+        }
+      : null
   })
 })
+
+/** Server-action guard for deployment-wide operations. */
+export async function requirePlatformOperator(): Promise<PlatformOperator> {
+  const operator = await getPlatformOperator()
+  if (!operator) throw new Error('Only platform super-admins can manage global users.')
+  return operator
+}
 
 export async function getCurrentUserId(): Promise<string | null> {
   try {

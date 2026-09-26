@@ -24,23 +24,19 @@ import { revalidatePath } from 'next/cache'
 import { and, eq } from 'drizzle-orm'
 import { db, withSuperAdmin, type Database } from '@beaconhs/db'
 import { auditLog, roles, tenantUsers, tenants, users } from '@beaconhs/db/schema'
-import { assertNotImpersonating } from '@beaconhs/tenant'
 import { materializeUserIdentityAudienceObligations } from '@beaconhs/compliance'
 import { nextInviteGenerationDate } from '@beaconhs/auth/invites'
-import { requireRequestContext } from '@/lib/auth'
-import { recordAudit } from '@/lib/audit'
+import { requirePlatformOperator } from '@/lib/auth'
+import { recordPlatformAudit } from '@/lib/platform-audit'
 import { setActiveTenant } from '@/lib/actions'
 import { sendMembershipInviteEmail } from '@/lib/invite-email'
 import { upsertRoleAssignments } from '@/lib/role-assignment-upsert'
 
-type Ctx = Awaited<ReturnType<typeof requireRequestContext>>
+type Ctx = Awaited<ReturnType<typeof requirePlatformOperator>>
 
 /** Platform actions are reserved for super-admins — no tenant permission applies. */
 async function gate(): Promise<Ctx> {
-  const ctx = await requireRequestContext()
-  assertNotImpersonating(ctx, 'platform identity administration')
-  if (!ctx.isSuperAdmin) throw new Error('Only platform super-admins can manage global users.')
-  return ctx
+  return requirePlatformOperator()
 }
 
 function userPath(userId: string): string {
@@ -107,7 +103,7 @@ export async function updateIdentity(formData: FormData): Promise<void> {
   })
   if (!before) backToUser(userId, { error: 'User not found.' })
 
-  await recordAudit(ctx, {
+  await recordPlatformAudit(ctx, {
     entityType: 'platform',
     action: 'update',
     summary: `Updated identity for ${before.email} (platform)`,
@@ -146,7 +142,7 @@ export async function setSuperAdmin(formData: FormData): Promise<void> {
 
   // Granting/revoking platform-wide access is the most privileged mutation in
   // the system — it must never be forensically invisible.
-  await recordAudit(ctx, {
+  await recordPlatformAudit(ctx, {
     entityType: 'platform',
     action: 'update',
     summary: `${value ? 'Granted' : 'Revoked'} super-admin for ${target.email} (platform)`,

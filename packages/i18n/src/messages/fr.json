@@ -58,16 +58,31 @@
     "yourTenants": "Vos locataires"
   },
   "PlatformNav": {
-    "overview": "Aperçu",
-    "tenants": "Locataires",
+    "overview": "Tableau de bord",
+    "tenants": "Locataires / Sociétés de gestion",
     "createTenant": "Créer un locataire",
-    "users": "Utilisateurs",
+    "users": "Utilisateurs de la plateforme",
     "platformEmail": "Courriel de la plateforme",
     "smsProvider": "Fournisseur SMS",
     "aiProvider": "Fournisseur d’IA",
     "emailLog": "Journal des courriels",
     "smsLog": "Journal des SMS",
-    "databaseMaintenance": "Maintenance de la base de données"
+    "databaseMaintenance": "Maintenance de la base de données",
+    "templateLibrary": "Bibliothèque de modèles",
+    "platformBranding": "Image de marque de la plateforme",
+    "controlCentre": "Centre de contrôle de la plateforme",
+    "dashboard": "Tableau de bord",
+    "managementCompanies": "Locataires / Sociétés de gestion",
+    "propertiesOverview": "Vue d’ensemble des propriétés",
+    "platformUsers": "Utilisateurs de la plateforme",
+    "plansSubscriptions": "Forfaits et abonnements",
+    "modulesEntitlements": "Modules et droits",
+    "productConfiguration": "Configuration du produit",
+    "integrations": "Intégrations",
+    "communications": "Communications",
+    "platformSettings": "Paramètres de la plateforme",
+    "auditLogs": "Audit et journaux",
+    "systemHealth": "État du système"
   },
   "Nav": {
     "groups": {

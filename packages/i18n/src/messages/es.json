@@ -58,16 +58,31 @@
     "yourTenants": "Tus inquilinos"
   },
   "PlatformNav": {
-    "overview": "Resumen",
-    "tenants": "Inquilinos",
+    "overview": "Panel",
+    "tenants": "Inquilinos / Empresas gestoras",
     "createTenant": "Crear inquilino",
-    "users": "Usuarios",
+    "users": "Usuarios de la plataforma",
     "platformEmail": "Correo de la plataforma",
     "smsProvider": "Proveedor de SMS",
     "aiProvider": "Proveedor de IA",
     "emailLog": "Registro de correo",
     "smsLog": "Registro de SMS",
-    "databaseMaintenance": "Mantenimiento de la base de datos"
+    "databaseMaintenance": "Mantenimiento de la base de datos",
+    "templateLibrary": "Biblioteca de plantillas",
+    "platformBranding": "Marca de la plataforma",
+    "controlCentre": "Centro de control de la plataforma",
+    "dashboard": "Panel",
+    "managementCompanies": "Inquilinos / Empresas gestoras",
+    "propertiesOverview": "Resumen de propiedades",
+    "platformUsers": "Usuarios de la plataforma",
+    "plansSubscriptions": "Planes y suscripciones",
+    "modulesEntitlements": "Módulos y derechos",
+    "productConfiguration": "Configuración del producto",
+    "integrations": "Integraciones",
+    "communications": "Comunicaciones",
+    "platformSettings": "Configuración de la plataforma",
+    "auditLogs": "Auditoría y registros",
+    "systemHealth": "Estado del sistema"
   },
   "Nav": {
     "groups": {

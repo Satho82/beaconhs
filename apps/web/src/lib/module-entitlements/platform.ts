@@ -3,13 +3,8 @@ import 'server-only'
 import { and, eq } from 'drizzle-orm'
 import { db, withSuperAdmin } from '@beaconhs/db'
 import { auditLog, tenantModuleEntitlements, tenants } from '@beaconhs/db/schema'
-import type { RequestContext } from '@beaconhs/tenant'
+import type { PlatformOperator } from '@/lib/auth'
 import { normalizeEntitlementChange, type EntitlementChange } from './policy'
-
-function assertPlatformOperator(ctx: RequestContext): void {
-  if (!ctx.isSuperAdmin)
-    throw new Error('Only platform super-admins can manage module entitlements.')
-}
 
 /**
  * Platform-only read. The tenant id is deliberately an argument only here,
@@ -17,8 +12,7 @@ function assertPlatformOperator(ctx: RequestContext): void {
  * result is returned. Tenant administrators therefore cannot self-enable a
  * licensed hospitality capability by posting a different tenant id.
  */
-export async function listTenantModuleEntitlements(ctx: RequestContext, tenantId: string) {
-  assertPlatformOperator(ctx)
+export async function listTenantModuleEntitlements(operator: PlatformOperator, tenantId: string) {
   return withSuperAdmin(db, async (tx) => {
     const [tenant] = await tx
       .select({ id: tenants.id, name: tenants.name })
@@ -37,11 +31,10 @@ export async function listTenantModuleEntitlements(ctx: RequestContext, tenantId
 
 /** Platform-only enable/disable path. It cannot be called through a tenant RLS context. */
 export async function setTenantModuleEntitlement(
-  ctx: RequestContext,
+  operator: PlatformOperator,
   tenantId: string,
   input: EntitlementChange,
 ) {
-  assertPlatformOperator(ctx)
   const change = normalizeEntitlementChange(input)
   return withSuperAdmin(db, async (tx) => {
     const [tenant] = await tx
@@ -62,16 +55,16 @@ export async function setTenantModuleEntitlement(
       .limit(1)
     const [row] = await tx
       .insert(tenantModuleEntitlements)
-      .values({ tenantId, ...change, changedByUserId: ctx.userId })
+      .values({ tenantId, ...change, changedByUserId: operator.userId })
       .onConflictDoUpdate({
         target: [tenantModuleEntitlements.tenantId, tenantModuleEntitlements.moduleKey],
-        set: { ...change, changedByUserId: ctx.userId, updatedAt: new Date() },
+        set: { ...change, changedByUserId: operator.userId, updatedAt: new Date() },
       })
       .returning()
     if (!row) throw new Error('Unable to save module entitlement.')
     await tx.insert(auditLog).values({
       tenantId,
-      actorUserId: ctx.userId,
+      actorUserId: operator.userId,
       entityType: 'tenant_module_entitlement',
       entityId: row.id,
       action: 'update',

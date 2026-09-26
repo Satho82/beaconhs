@@ -3,17 +3,9 @@
 import { revalidatePath } from 'next/cache'
 import { enqueueScheduled } from '@beaconhs/jobs'
 import { MAINTENANCE_TABLES, type DbTableSetting } from '@beaconhs/db'
-import type { RequestContext } from '@beaconhs/tenant'
-import { requireRequestContext } from '@/lib/auth'
-import { recordAudit } from '@/lib/audit'
+import { requirePlatformOperator } from '@/lib/auth'
+import { recordPlatformAudit } from '@/lib/platform-audit'
 import { saveDbMaintenanceRetention } from '@/lib/db-maintenance-config'
-
-// Authorization is also enforced by /platform/layout.tsx (super-admin only); the
-// per-action gate is defence in depth for these deployment-wide mutations.
-function gatePlatform(ctx: RequestContext) {
-  if (!ctx.isSuperAdmin)
-    throw new Error('Only platform super-admins can change database maintenance settings.')
-}
 
 // Parse one retention window per maintained table from the form. Each input is
 // named `retention_<table>`; blank, "never", or "0" → null (keep forever);
@@ -35,11 +27,10 @@ function parseRetention(fd: FormData): Record<string, DbTableSetting> {
 }
 
 export async function savePlatformDatabase(formData: FormData) {
-  const ctx = await requireRequestContext()
-  gatePlatform(ctx)
+  const operator = await requirePlatformOperator()
   const tables = parseRetention(formData)
   await saveDbMaintenanceRetention(tables)
-  await recordAudit(ctx, {
+  await recordPlatformAudit(operator, {
     entityType: 'platform',
     action: 'update',
     summary: 'Updated database maintenance retention windows',
@@ -51,14 +42,13 @@ export async function savePlatformDatabase(formData: FormData) {
 }
 
 export async function runMaintenanceNow(): Promise<{ ok: boolean; message: string }> {
-  const ctx = await requireRequestContext()
-  gatePlatform(ctx)
+  const operator = await requirePlatformOperator()
   await enqueueScheduled(
     'manual:db_maintenance',
     { kind: 'db_maintenance', trigger: 'manual' },
     { jobId: `manual:db_maintenance:${Date.now()}` },
   )
-  await recordAudit(ctx, {
+  await recordPlatformAudit(operator, {
     entityType: 'platform',
     action: 'update',
     summary: 'Triggered a manual database maintenance run',

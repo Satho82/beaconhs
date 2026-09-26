@@ -4,7 +4,7 @@ import { GeneratedText, GeneratedValue } from '@/i18n/generated'
 import { AlertTriangle, CheckCircle2, Database } from 'lucide-react'
 import { Button, Card, CardContent, DetailHeader, Input, cn } from '@beaconhs/ui'
 import { MAINTENANCE_TABLES, resolveRetentionDays } from '@beaconhs/db'
-import { getRequestContext } from '@/lib/auth'
+import { requirePlatformOperator } from '@/lib/auth'
 import { formatDateTime } from '@/lib/datetime'
 import { PageContainer } from '@/components/page-layout'
 import {
@@ -36,9 +36,9 @@ export default async function PlatformDatabasePage() {
     getMaintenanceTableSizes(),
   ])
   const sizeByTable = new Map<string, MaintenanceTableSize>(sizes.map((s) => [s.table, s]))
-  const requestContext = await getRequestContext()
-  const timeZone = requestContext?.timezone ?? 'UTC'
-  const locale = requestContext?.locale ?? 'en'
+  const operator = await requirePlatformOperator()
+  const timeZone = operator.timezone
+  const locale = operator.locale
   const numberFmt = new Intl.NumberFormat(locale)
   const lastRun = settings.lastRun
 

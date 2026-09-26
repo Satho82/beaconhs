@@ -17,7 +17,7 @@ import {
 } from '@beaconhs/ui'
 import { db, withSuperAdmin } from '@beaconhs/db'
 import { roleAssignments, roles, tenantUsers, tenants, users } from '@beaconhs/db/schema'
-import { getCurrentUserId, getRequestContext } from '@/lib/auth'
+import { requirePlatformOperator } from '@/lib/auth'
 import { formatDate } from '@/lib/datetime'
 import { PageContainer } from '@/components/page-layout'
 import { ConfirmButton } from '@/components/confirm-button'
@@ -27,6 +27,7 @@ import { SearchInput } from '@/components/search-input'
 import { SortTh } from '@/components/sortable-th'
 import { TableToolbar } from '@/components/table-toolbar'
 import { parseListParams, pickString } from '@/lib/list-params'
+import { isUuid } from '@/lib/list-params'
 import { AddMembershipForm } from '../_components/add-membership-form'
 import {
   openMembershipInTenant,
@@ -61,11 +62,11 @@ export default async function PlatformUserDetailPage({
   const tGeneratedValue = await getGeneratedValueTranslations()
   const tGenerated = await getGeneratedTranslations()
   const { id } = await params
-  const sessionUserId = await getCurrentUserId()
-  if (!sessionUserId) redirect('/login')
-  const requestContext = await getRequestContext()
-  const timeZone = requestContext?.timezone ?? 'UTC'
-  const locale = requestContext?.locale ?? 'en'
+  if (!isUuid(id)) notFound()
+  const operator = await requirePlatformOperator()
+  const sessionUserId = operator.userId
+  const timeZone = operator.timezone
+  const locale = operator.locale
   const sp = await searchParams
   const error = typeof sp.error === 'string' ? sp.error : undefined
   const notice = typeof sp.notice === 'string' ? sp.notice : undefined

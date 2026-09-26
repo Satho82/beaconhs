@@ -19,6 +19,7 @@ import { requirePlatformOperator } from '@/lib/auth'
 import { isUuid } from '@/lib/list-params'
 import { PageContainer } from '@/components/page-layout'
 import { ConfirmButton } from '@/components/confirm-button'
+import { getGeneratedTranslations } from '@/i18n/generated.server'
 import { changeTenantLifecycle } from './_actions'
 
 export const dynamic = 'force-dynamic'
@@ -28,6 +29,7 @@ export default async function PlatformTenantPage({
 }: {
   params: Promise<{ tenantId: string }>
 }) {
+  const tGenerated = await getGeneratedTranslations()
   await requirePlatformOperator()
   const { tenantId } = await params
   if (!isUuid(tenantId)) notFound()
@@ -73,32 +75,31 @@ export default async function PlatformTenantPage({
     <PageContainer>
       <div className="space-y-6">
         <DetailHeader
-          back={{ href: '/platform/tenants', label: 'Back to tenants' }}
+          back={{ href: '/platform/tenants', label: tGenerated('m_1ae3d6b35d64a6') }}
           title={tenant.name}
           subtitle={`${tenant.slug} · ${tenant.region}`}
           actions={
             <div className="flex flex-wrap gap-2">
               <Link href={`/platform/tenants/${tenantId}/entitlements`}>
-                <Button variant="outline">Modules</Button>
+                <Button variant="outline">{tGenerated('m_03abc46dafbce6')}</Button>
               </Link>
               <form action={changeTenantLifecycle}>
                 <input type="hidden" name="tenantId" value={tenantId} />
                 <input type="hidden" name="status" value={next} />
                 <ConfirmButton
-                  message={`Confirm that you want to ${next === 'active' ? 'reactivate or restore' : 'suspend'} this tenant.`}
+                  message={tGenerated('m_193e1503bfd6c3', {
+                    value0: tGenerated(next === 'active' ? 'm_0c7f9f5175d662' : 'm_1a04688da0adf6'),
+                  })}
                 >
-                  {next === 'active' ? 'Reactivate / restore' : 'Suspend'}
+                  {tGenerated(next === 'active' ? 'm_0c7f9f5175d662' : 'm_1a04688da0adf6')}
                 </ConfirmButton>
               </form>
               {tenant.status !== 'archived' ? (
                 <form action={changeTenantLifecycle}>
                   <input type="hidden" name="tenantId" value={tenantId} />
                   <input type="hidden" name="status" value="archived" />
-                  <ConfirmButton
-                    variant="destructive"
-                    message="Archive this tenant? Its data will be retained and it can be restored later."
-                  >
-                    Archive
+                  <ConfirmButton variant="destructive" message={tGenerated('m_040f3aeedd17f1')}>
+                    {tGenerated('m_019c0a64030688')}
                   </ConfirmButton>
                 </form>
               ) : null}
@@ -107,15 +108,21 @@ export default async function PlatformTenantPage({
         />
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {[
-            ['Status', tenant.status],
-            ['Properties', String(data.propertyCount)],
-            ['Members', String(data.memberCount)],
-            ['People', String(data.personCount)],
+            [tGenerated('m_0b9da892d6faf0'), tenant.status],
+            [tGenerated('m_008a1e78d9023f'), String(data.propertyCount)],
+            [tGenerated('m_0ef3898622f868'), String(data.memberCount)],
+            [tGenerated('m_1e9ca6c7397706'), String(data.personCount)],
           ].map(([label, value]) => (
             <div key={label} className="rounded-lg border bg-white p-4 dark:bg-slate-900">
               <p className="text-xs text-slate-500">{label}</p>
               <p className="mt-1 text-lg font-semibold">
-                <Badge variant={label === 'Status' && value === 'active' ? 'success' : 'secondary'}>
+                <Badge
+                  variant={
+                    label === tGenerated('m_0b9da892d6faf0') && value === 'active'
+                      ? 'success'
+                      : 'secondary'
+                  }
+                >
                   {value}
                 </Badge>
               </p>
@@ -124,64 +131,58 @@ export default async function PlatformTenantPage({
         </div>
         <div className="grid gap-6 lg:grid-cols-2">
           <section className="rounded-lg border bg-white p-5 dark:bg-slate-900">
-            <h2 className="font-semibold">Tenant administration</h2>
-            <p className="mt-1 text-sm text-slate-500">
-              Tenant branding, locale defaults, and communications stay isolated from platform-wide
-              settings.
-            </p>
+            <h2 className="font-semibold">{tGenerated('m_02390870f084f4')}</h2>
+            <p className="mt-1 text-sm text-slate-500">{tGenerated('m_0a1d2a87f379d5')}</p>
             <div className="mt-4 flex flex-wrap gap-2">
               <Link href={`/platform/tenants/${tenantId}/properties`}>
-                <Button variant="outline">Settings</Button>
+                <Button variant="outline">{tGenerated('m_151769a9fde954')}</Button>
               </Link>
               <Link href={`/platform/tenants/${tenantId}/users`}>
-                <Button variant="outline">Users</Button>
+                <Button variant="outline">{tGenerated('m_1324d0c784a75e')}</Button>
               </Link>
               <Link href={`/platform/tenants/${tenantId}/properties`}>
-                <Button variant="outline">Properties</Button>
+                <Button variant="outline">{tGenerated('m_008a1e78d9023f')}</Button>
               </Link>
               <Link href={`/platform/tenants/${tenantId}/usage`}>
-                <Button variant="outline">Usage</Button>
+                <Button variant="outline">{tGenerated('m_0ae3b4ff7213f7')}</Button>
               </Link>
               <Link href={`/platform/tenants/${tenantId}/audit`}>
-                <Button variant="outline">Audit</Button>
+                <Button variant="outline">{tGenerated('m_1d28c8cb329851')}</Button>
               </Link>
               <Link href={`/platform/tenants/${tenantId}/settings`}>
-                <Button variant="outline">Settings</Button>
+                <Button variant="outline">{tGenerated('m_151769a9fde954')}</Button>
               </Link>
               <Link href={`/platform/tenants/${tenantId}/branding`}>
-                <Button variant="outline">Branding</Button>
+                <Button variant="outline">{tGenerated('m_009d942e2e5b0f')}</Button>
               </Link>
               <Link href={`/platform/tenants/${tenantId}/communications`}>
-                <Button variant="outline">Communications</Button>
+                <Button variant="outline">{tGenerated('m_1ed5f249bf011f')}</Button>
               </Link>
             </div>
           </section>
           <section className="rounded-lg border bg-white p-5 dark:bg-slate-900">
-            <h2 className="font-semibold">Subscription and templates</h2>
-            <p className="mt-1 text-sm text-slate-500">
-              Commercial rules are deferred. Existing module entitlements and template provisioning
-              remain available.
-            </p>
+            <h2 className="font-semibold">{tGenerated('m_0077675f6d0926')}</h2>
+            <p className="mt-1 text-sm text-slate-500">{tGenerated('m_10c853125c3097')}</p>
             <div className="mt-4">
               <Link href={`/platform/tenants/${tenantId}/entitlements`}>
-                <Button variant="outline">Manage module entitlements</Button>
+                <Button variant="outline">{tGenerated('m_161a074d5201d2')}</Button>
               </Link>
             </div>
           </section>
         </div>
         <section className="rounded-lg border bg-white p-5 dark:bg-slate-900">
-          <h2 className="font-semibold">Recent platform audit activity</h2>
+          <h2 className="font-semibold">{tGenerated('m_181b32011bc7eb')}</h2>
           {data.audit.length === 0 ? (
             <div className="mt-3">
-              <EmptyState title="No platform activity recorded for this tenant yet." />
+              <EmptyState title={tGenerated('m_123750c9022b4a')} />
             </div>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>When</TableHead>
-                  <TableHead>Action</TableHead>
-                  <TableHead>Summary</TableHead>
+                  <TableHead>{tGenerated('m_13cc128f69897c')}</TableHead>
+                  <TableHead>{tGenerated('m_0bad495a7046e9')}</TableHead>
+                  <TableHead>{tGenerated('m_031c356c80b70f')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

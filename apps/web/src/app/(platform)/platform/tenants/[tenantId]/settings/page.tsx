@@ -7,6 +7,7 @@ import { tenants } from '@beaconhs/db/schema'
 import { requirePlatformOperator } from '@/lib/auth'
 import { isUuid } from '@/lib/list-params'
 import { PageContainer } from '@/components/page-layout'
+import { getGeneratedTranslations } from '@/i18n/generated.server'
 import { saveTenantPlatformSettings } from '../_actions'
 
 export const dynamic = 'force-dynamic'
@@ -15,6 +16,7 @@ export default async function PlatformTenantSettingsPage({
 }: {
   params: Promise<{ tenantId: string }>
 }) {
+  const tGenerated = await getGeneratedTranslations()
   await requirePlatformOperator()
   const { tenantId } = await params
   if (!isUuid(tenantId)) notFound()
@@ -28,10 +30,10 @@ export default async function PlatformTenantSettingsPage({
         <DetailHeader
           back={{
             href: `/platform/tenants/${tenantId}`,
-            label: 'Back to tenant',
+            label: tGenerated('m_137b646c00feff'),
           }}
-          title={`${tenant.name} settings`}
-          subtitle="Tenant metadata and locale defaults. Sensitive changes are platform-audited."
+          title={tGenerated('m_17de16677ef69f', { value0: tenant.name })}
+          subtitle={tGenerated('m_13d929777accaa')}
         />
         <form
           action={saveTenantPlatformSettings}
@@ -39,21 +41,21 @@ export default async function PlatformTenantSettingsPage({
         >
           <input type="hidden" name="tenantId" value={tenantId} />
           <Label>
-            Region
+            {tGenerated('m_1de0752c52bdd4')}
             <Input name="region" defaultValue={tenant.region} required />
           </Label>
           <Label>
-            Default language
+            {tGenerated('m_1a07c774d6ca11')}
             <Select name="defaultLanguage" defaultValue={tenant.defaultLanguage}>
               <option value="en">English</option>
               <option value="fr">French</option>
               <option value="es">Spanish</option>
             </Select>
           </Label>
-          <Button type="submit">Save settings</Button>
+          <Button type="submit">{tGenerated('m_0bdcc953ae29cd')}</Button>
         </form>
         <Link href={`/platform/tenants/${tenantId}`}>
-          <Button variant="outline">Back to tenant</Button>
+          <Button variant="outline">{tGenerated('m_137b646c00feff')}</Button>
         </Link>
       </div>
     </PageContainer>

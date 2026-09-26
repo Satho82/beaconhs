@@ -245,7 +245,7 @@ export default async function AdminTenantsPage({
                                   </form>
                                   <Link href={`/platform/tenants/${tenant.id}`}>
                                     <Button type="button" size="sm" variant="outline">
-                                      {'Open'}
+                                      <GeneratedText id="m_107ab58c3c38bc" />
                                     </Button>
                                   </Link>
                                 </div>

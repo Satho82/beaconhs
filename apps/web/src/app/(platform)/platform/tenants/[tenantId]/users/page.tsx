@@ -20,6 +20,7 @@ import { isUuid, pickString } from '@/lib/list-params'
 import { PageContainer } from '@/components/page-layout'
 import { SearchInput } from '@/components/search-input'
 import { TableToolbar } from '@/components/table-toolbar'
+import { getGeneratedTranslations } from '@/i18n/generated.server'
 
 export const dynamic = 'force-dynamic'
 
@@ -30,6 +31,7 @@ export default async function PlatformTenantUsersPage({
   params: Promise<{ tenantId: string }>
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
+  const tGenerated = await getGeneratedTranslations()
   await requirePlatformOperator()
   const { tenantId } = await params
   if (!isUuid(tenantId)) notFound()
@@ -58,24 +60,24 @@ export default async function PlatformTenantUsersPage({
         <DetailHeader
           back={{
             href: `/platform/tenants/${tenantId}`,
-            label: 'Back to tenant',
+            label: tGenerated('m_137b646c00feff'),
           }}
-          title={`${data.tenant.name} users`}
-          subtitle="Memberships are tenant-scoped; people may belong to multiple properties."
+          title={tGenerated('m_0c189be0010dcc', { value0: data.tenant.name })}
+          subtitle={tGenerated('m_09e068a48ef311')}
         />
         <TableToolbar>
-          <SearchInput placeholder="Search users" />
+          <SearchInput placeholder={tGenerated('m_086b4fc4bde8f5')} />
         </TableToolbar>
         {data.rows.length === 0 ? (
-          <EmptyState title="No memberships found." />
+          <EmptyState title={tGenerated('m_07295baa7ba277')} />
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Locale</TableHead>
+                <TableHead>{tGenerated('m_02b18d5c7f6f2d')}</TableHead>
+                <TableHead>{tGenerated('m_00a0ba9938bdff')}</TableHead>
+                <TableHead>{tGenerated('m_0b9da892d6faf0')}</TableHead>
+                <TableHead>{tGenerated('m_0e732f319c37c9')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -88,14 +90,16 @@ export default async function PlatformTenantUsersPage({
                       {membership.status}
                     </Badge>
                   </TableCell>
-                  <TableCell>{membership.localeOverride ?? 'Tenant default'}</TableCell>
+                  <TableCell>
+                    {membership.localeOverride ?? tGenerated('m_1a6597dd1c00f3')}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         )}
         <Link href={`/platform/tenants/${tenantId}`}>
-          <Button variant="outline">Back to tenant</Button>
+          <Button variant="outline">{tGenerated('m_137b646c00feff')}</Button>
         </Link>
       </div>
     </PageContainer>

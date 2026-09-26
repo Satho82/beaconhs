@@ -7,6 +7,11 @@ import { tenants } from '@beaconhs/db/schema'
 import { requirePlatformOperator } from '@/lib/auth'
 import { isUuid } from '@/lib/list-params'
 import { PageContainer } from '@/components/page-layout'
+import { GeneratedText } from '@/i18n/generated'
+import { getGeneratedTranslations, getGeneratedValueTranslations } from '@/i18n/generated.server'
+
+const PROVIDER_CREDENTIALS_BOUNDARY =
+  'never renders provider credentials, API keys, or connection strings'
 
 export const dynamic = 'force-dynamic'
 export default async function PlatformTenantCommunicationsPage({
@@ -14,6 +19,8 @@ export default async function PlatformTenantCommunicationsPage({
 }: {
   params: Promise<{ tenantId: string }>
 }) {
+  const tGenerated = await getGeneratedTranslations()
+  const tGeneratedValue = await getGeneratedValueTranslations()
   await requirePlatformOperator()
   const { tenantId } = await params
   if (!isUuid(tenantId)) notFound()
@@ -27,22 +34,24 @@ export default async function PlatformTenantCommunicationsPage({
         <DetailHeader
           back={{
             href: `/platform/tenants/${tenantId}`,
-            label: 'Back to tenant',
+            label: tGenerated('m_137b646c00feff'),
           }}
-          title={`${tenant.name} communications`}
-          subtitle="Safe communications configuration foundation."
+          title={tGenerated('m_1f69ac7060f842', { value0: tenant.name })}
+          subtitle={tGenerated('m_1c96536d65a117')}
         />
         <section className="rounded-lg border bg-white p-5 text-sm dark:bg-slate-900">
           <p>
-            Tenant communications use the existing provider policy and notification systems. This Platform view intentionally {'never renders provider credentials, API keys, or connection strings'}.
+            <GeneratedText id="m_09908c92ac5925" /> {tGeneratedValue(PROVIDER_CREDENTIALS_BOUNDARY)}
+            .
           </p>
           <p className="mt-3 text-slate-500">
-            Provider configuration remains available in the existing tenant and platform settings
-            surfaces.
+            <GeneratedText id="m_18bb2a72930fbb" />
           </p>
         </section>
         <Link href={`/platform/tenants/${tenantId}`}>
-          <Button variant="outline">Back to tenant</Button>
+          <Button variant="outline">
+            <GeneratedText id="m_137b646c00feff" />
+          </Button>
         </Link>
       </div>
     </PageContainer>

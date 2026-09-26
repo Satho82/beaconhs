@@ -1,4 +1,5 @@
 import { getGeneratedTranslations } from '@/i18n/generated.server'
+import { getLocale } from 'next-intl/server'
 
 import { GeneratedText, useGeneratedTranslations, GeneratedValue } from '@/i18n/generated'
 import Link from 'next/link'
@@ -10,6 +11,7 @@ import { db, withSuperAdmin } from '@beaconhs/db'
 import { auditLog, tenants } from '@beaconhs/db/schema'
 import { recordPlatformAudit } from '@/lib/platform-audit'
 import { LOCALE_OPTIONS, normalizeLocalePolicy } from '@beaconhs/i18n'
+import { translateSystemCopy } from '@beaconhs/i18n/messages'
 import { seedLiftPlanTemplate } from '@beaconhs/db/seed/lift-plan-template'
 import { requirePlatformOperator } from '@/lib/auth'
 import { PageContainer } from '@/components/page-layout'
@@ -32,6 +34,7 @@ function slugify(s: string): string {
 
 async function createTenant(formData: FormData): Promise<void> {
   'use server'
+  const locale = await getLocale()
   // A server action is a POST endpoint — the /platform layout's super-admin
   // redirect protects the page render, NOT this action. Re-check here, or any
   // authenticated tenant member could create tenants (this bypasses RLS below).
@@ -96,7 +99,7 @@ async function createTenant(formData: FormData): Promise<void> {
       entityType: 'tenant',
       entityId: createdTenant.id,
       action: 'create',
-      summary: `Created tenant ${name}`,
+      summary: translateSystemCopy(locale, 'Created tenant {value0}', { value0: name }),
       after: { name, slug, region },
     })
 

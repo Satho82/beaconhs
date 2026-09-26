@@ -1,7 +1,9 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { getLocale } from 'next-intl/server'
 import { eq } from 'drizzle-orm'
+import { translateSystemCopy } from '@beaconhs/i18n/messages'
 import { db, withSuperAdmin } from '@beaconhs/db'
 import { tenants } from '@beaconhs/db/schema'
 import { requirePlatformOperator } from '@/lib/auth'
@@ -12,6 +14,7 @@ const lifecycleStates = new Set(['active', 'suspended', 'archived'])
 
 /** Platform-only tenant lifecycle mutation. Tenant rows are retained permanently. */
 export async function changeTenantLifecycle(formData: FormData): Promise<void> {
+  const locale = await getLocale()
   const operator = await requirePlatformOperator()
   const tenantId = String(formData.get('tenantId') ?? '')
   const status = String(formData.get('status') ?? '')
@@ -38,7 +41,15 @@ export async function changeTenantLifecycle(formData: FormData): Promise<void> {
     entityType: 'tenant',
     entityId: changed.id,
     action: `lifecycle.${status}`,
-    summary: `${status === 'active' ? 'Activated or restored' : status === 'suspended' ? 'Suspended' : 'Archived'} tenant ${changed.name}`,
+    summary: translateSystemCopy(locale, '{value0} tenant {value1}', {
+      value0:
+        status === 'active'
+          ? translateSystemCopy(locale, 'Activated or restored')
+          : status === 'suspended'
+            ? translateSystemCopy(locale, 'Suspended')
+            : translateSystemCopy(locale, 'Archived'),
+      value1: changed.name,
+    }),
     after: { status: changed.status },
   })
   revalidatePath('/platform/tenants')
@@ -47,6 +58,7 @@ export async function changeTenantLifecycle(formData: FormData): Promise<void> {
 
 /** Sensitive tenant defaults are edited at platform scope and always audited. */
 export async function saveTenantPlatformSettings(formData: FormData): Promise<void> {
+  const locale = await getLocale()
   const operator = await requirePlatformOperator()
   const tenantId = String(formData.get('tenantId') ?? '')
   const region = String(formData.get('region') ?? '').trim()
@@ -70,7 +82,9 @@ export async function saveTenantPlatformSettings(formData: FormData): Promise<vo
     entityType: 'tenant',
     entityId: changed.id,
     action: 'settings.update',
-    summary: `Updated platform settings for ${changed.name}`,
+    summary: translateSystemCopy(locale, 'Updated platform settings for {value0}', {
+      value0: changed.name,
+    }),
     after: { region: changed.region, defaultLanguage: changed.defaultLanguage },
   })
   revalidatePath(`/platform/tenants/${tenantId}`)

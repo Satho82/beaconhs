@@ -19,6 +19,7 @@ import { isUuid, pickString } from '@/lib/list-params'
 import { PageContainer } from '@/components/page-layout'
 import { SearchInput } from '@/components/search-input'
 import { TableToolbar } from '@/components/table-toolbar'
+import { getGeneratedTranslations } from '@/i18n/generated.server'
 
 export const dynamic = 'force-dynamic'
 
@@ -30,6 +31,7 @@ export default async function PlatformTenantPropertiesPage({
   params: Promise<{ tenantId: string }>
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
+  const tGenerated = await getGeneratedTranslations()
   await requirePlatformOperator()
   const { tenantId } = await params
   if (!isUuid(tenantId)) notFound()
@@ -66,23 +68,23 @@ export default async function PlatformTenantPropertiesPage({
         <DetailHeader
           back={{
             href: `/platform/tenants/${tenantId}`,
-            label: 'Back to tenant',
+            label: tGenerated('m_137b646c00feff'),
           }}
-          title={`${data.tenant.name} properties`}
-          subtitle="Read-only platform visibility; property context is not required."
+          title={tGenerated('m_06695810862661', { value0: data.tenant.name })}
+          subtitle={tGenerated('m_0a75d98b8226b6')}
         />
         <TableToolbar>
-          <SearchInput placeholder="Search properties" />
+          <SearchInput placeholder={tGenerated('m_156ed186e78b53')} />
         </TableToolbar>
         {data.rows.length === 0 ? (
-          <EmptyState title="No properties found." />
+          <EmptyState title={tGenerated('m_0b61b4e57e2c10')} />
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Property</TableHead>
-                <TableHead>Code</TableHead>
-                <TableHead>Address</TableHead>
+                <TableHead>{tGenerated('m_0f7a8c3e57d104')}</TableHead>
+                <TableHead>{tGenerated('m_0570e24c85cf95')}</TableHead>
+                <TableHead>{tGenerated('m_02d326d09a4cc1')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -101,7 +103,7 @@ export default async function PlatformTenantPropertiesPage({
           </Table>
         )}
         <Link href={`/platform/tenants/${tenantId}`}>
-          <Button variant="outline">Back to tenant</Button>
+          <Button variant="outline">{tGenerated('m_137b646c00feff')}</Button>
         </Link>
       </div>
     </PageContainer>

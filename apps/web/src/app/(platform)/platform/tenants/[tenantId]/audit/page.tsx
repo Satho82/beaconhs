@@ -17,6 +17,7 @@ import { platformAuditLog, tenants, users } from '@beaconhs/db/schema'
 import { requirePlatformOperator } from '@/lib/auth'
 import { isUuid } from '@/lib/list-params'
 import { PageContainer } from '@/components/page-layout'
+import { getGeneratedTranslations } from '@/i18n/generated.server'
 
 export const dynamic = 'force-dynamic'
 
@@ -25,6 +26,7 @@ export default async function PlatformTenantAuditPage({
 }: {
   params: Promise<{ tenantId: string }>
 }) {
+  const tGenerated = await getGeneratedTranslations()
   await requirePlatformOperator()
   const { tenantId } = await params
   if (!isUuid(tenantId)) notFound()
@@ -51,28 +53,28 @@ export default async function PlatformTenantAuditPage({
         <DetailHeader
           back={{
             href: `/platform/tenants/${tenantId}`,
-            label: 'Back to tenant',
+            label: tGenerated('m_137b646c00feff'),
           }}
-          title={`${data.tenant.name} platform audit`}
-          subtitle="Platform lifecycle and sensitive administration events."
+          title={tGenerated('m_1245c352841dec', { value0: data.tenant.name })}
+          subtitle={tGenerated('m_05677b8a5f2c80')}
         />
         {data.rows.length === 0 ? (
-          <EmptyState title="No platform audit activity recorded for this tenant yet." />
+          <EmptyState title={tGenerated('m_023cb62b4c49be')} />
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>When</TableHead>
-                <TableHead>Actor</TableHead>
-                <TableHead>Action</TableHead>
-                <TableHead>Summary</TableHead>
+                <TableHead>{tGenerated('m_13cc128f69897c')}</TableHead>
+                <TableHead>{tGenerated('m_163dfc4f85857d')}</TableHead>
+                <TableHead>{tGenerated('m_0bad495a7046e9')}</TableHead>
+                <TableHead>{tGenerated('m_031c356c80b70f')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {data.rows.map(({ audit, actor }) => (
                 <TableRow key={audit.id}>
                   <TableCell>{audit.occurredAt?.toLocaleString() ?? '—'}</TableCell>
-                  <TableCell>{actor?.email ?? 'System'}</TableCell>
+                  <TableCell>{actor?.email ?? tGenerated('m_08f7a859552ffa')}</TableCell>
                   <TableCell>{audit.action}</TableCell>
                   <TableCell>{audit.summary ?? '—'}</TableCell>
                 </TableRow>
@@ -81,7 +83,7 @@ export default async function PlatformTenantAuditPage({
           </Table>
         )}
         <Link href={`/platform/tenants/${tenantId}`}>
-          <Button variant="outline">Back to tenant</Button>
+          <Button variant="outline">{tGenerated('m_137b646c00feff')}</Button>
         </Link>
       </div>
     </PageContainer>

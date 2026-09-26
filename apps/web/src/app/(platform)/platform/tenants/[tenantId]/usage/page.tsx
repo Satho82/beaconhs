@@ -7,6 +7,10 @@ import { attachments, orgUnits, people, tenantUsers, tenants } from '@beaconhs/d
 import { requirePlatformOperator } from '@/lib/auth'
 import { isUuid } from '@/lib/list-params'
 import { PageContainer } from '@/components/page-layout'
+import { getGeneratedTranslations, getGeneratedValueTranslations } from '@/i18n/generated.server'
+
+const USAGE_SUBTITLE =
+  'Factual operational counts only. Plans, pricing, and commercial limits are not part of Phase 1C.'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,6 +19,8 @@ export default async function PlatformTenantUsagePage({
 }: {
   params: Promise<{ tenantId: string }>
 }) {
+  const tGenerated = await getGeneratedTranslations()
+  const tGeneratedValue = await getGeneratedValueTranslations()
   await requirePlatformOperator()
   const { tenantId } = await params
   if (!isUuid(tenantId)) notFound()
@@ -46,10 +52,10 @@ export default async function PlatformTenantUsagePage({
     return {
       tenant,
       metrics: [
-        ['Memberships', members],
-        ['People', persons],
-        ['Properties', properties],
-        ['Attachments', files],
+        [tGenerated('m_1e4c74d78e5d05'), members],
+        [tGenerated('m_1e9ca6c7397706'), persons],
+        [tGenerated('m_008a1e78d9023f'), properties],
+        [tGenerated('m_014ac1a664bf4b'), files],
       ] as const,
     }
   })
@@ -60,10 +66,10 @@ export default async function PlatformTenantUsagePage({
         <DetailHeader
           back={{
             href: `/platform/tenants/${tenantId}`,
-            label: 'Back to tenant',
+            label: tGenerated('m_137b646c00feff'),
           }}
-          title={`${data.tenant.name} usage`}
-          subtitle="Factual operational counts only. Plans, pricing, and commercial limits are not part of Phase 1C."
+          title={tGenerated('m_0587a1b5e457ac', { value0: data.tenant.name })}
+          subtitle={tGeneratedValue(USAGE_SUBTITLE)}
         />
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {data.metrics.map(([label, row]) => (
@@ -74,7 +80,7 @@ export default async function PlatformTenantUsagePage({
           ))}
         </div>
         <Link href={`/platform/tenants/${tenantId}`}>
-          <Button variant="outline">Back to tenant</Button>
+          <Button variant="outline">{tGenerated('m_137b646c00feff')}</Button>
         </Link>
       </div>
     </PageContainer>

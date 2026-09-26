@@ -152,13 +152,13 @@ export default async function PlatformTenantPage({
               from platform-wide settings.
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
-              <Link href={`/admin/settings`}>
+              <Link href={`/platform/tenants/${tenantId}/properties`}>
                 <Button variant="outline">Settings</Button>
               </Link>
-              <Link href={`/admin/users`}>
+              <Link href={`/platform/tenants/${tenantId}/users`}>
                 <Button variant="outline">Users</Button>
               </Link>
-              <Link href={`/locations`}>
+              <Link href={`/platform/tenants/${tenantId}/properties`}>
                 <Button variant="outline">Properties</Button>
               </Link>
             </div>

@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 const ACTION_FILES = [
   '../app/(app)/admin/users/_actions.ts',
   '../app/(app)/admin/roles/_actions.ts',
-  '../app/(app)/platform/users/_actions.ts',
+  '../app/(platform)/platform/users/_actions.ts',
 ] as const
 
 describe('role-assignment action contract', () => {

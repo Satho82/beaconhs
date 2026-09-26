@@ -167,6 +167,9 @@ export default async function PlatformTenantPage({
               <Link href={`/platform/tenants/${tenantId}/audit`}>
                 <Button variant="outline">Audit</Button>
               </Link>
+              <Link href={`/platform/tenants/${tenantId}/settings`}>
+                <Button variant="outline">Settings</Button>
+              </Link>
             </div>
           </section>
           <section className="rounded-lg border bg-white p-5 dark:bg-slate-900">

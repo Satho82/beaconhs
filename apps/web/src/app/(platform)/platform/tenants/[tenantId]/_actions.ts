@@ -44,3 +44,41 @@ export async function changeTenantLifecycle(formData: FormData): Promise<void> {
   revalidatePath("/platform/tenants");
   revalidatePath(`/platform/tenants/${tenantId}`);
 }
+
+/** Sensitive tenant defaults are edited at platform scope and always audited. */
+export async function saveTenantPlatformSettings(
+  formData: FormData,
+): Promise<void> {
+  const operator = await requirePlatformOperator();
+  const tenantId = String(formData.get("tenantId") ?? "");
+  const region = String(formData.get("region") ?? "").trim();
+  const defaultLanguage = String(formData.get("defaultLanguage") ?? "").trim();
+  if (
+    !isUuid(tenantId) ||
+    !region ||
+    !["en", "fr", "es"].includes(defaultLanguage)
+  )
+    throw new Error("Invalid tenant settings request.");
+  const [changed] = await withSuperAdmin(db, async (tx) =>
+    tx
+      .update(tenants)
+      .set({ region, defaultLanguage, updatedAt: new Date() })
+      .where(eq(tenants.id, tenantId))
+      .returning({
+        id: tenants.id,
+        name: tenants.name,
+        region: tenants.region,
+        defaultLanguage: tenants.defaultLanguage,
+      }),
+  );
+  if (!changed) throw new Error("Tenant not found.");
+  await recordPlatformAudit(operator, {
+    entityType: "tenant",
+    entityId: changed.id,
+    action: "settings.update",
+    summary: `Updated platform settings for ${changed.name}`,
+    after: { region: changed.region, defaultLanguage: changed.defaultLanguage },
+  });
+  revalidatePath(`/platform/tenants/${tenantId}`);
+  revalidatePath(`/platform/tenants/${tenantId}/settings`);
+}

@@ -2,10 +2,7 @@ import 'server-only'
 
 import { randomUUID } from 'node:crypto'
 import { deleteObject, ensureBucket, getObject, putObject } from '@beaconhs/storage'
-import {
-  isPlatformBrandAssetKey,
-  type PlatformBrandAssetKind,
-} from './platform-brand-asset-url'
+import { isPlatformBrandAssetKey, type PlatformBrandAssetKind } from './platform-brand-asset-url'
 
 const MAX_BRAND_ASSET_BYTES = 2 * 1024 * 1024
 const IMAGE_CONTENT_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp'])

@@ -4,17 +4,14 @@ import { randomUUID } from 'node:crypto'
 import { deleteObject, ensureBucket, getObject, putObject } from '@beaconhs/storage'
 import {
   isPlatformBrandAssetKey,
-  platformBrandAssetUrl,
   type PlatformBrandAssetKind,
 } from './platform-brand-asset-url'
-
-export { isPlatformBrandAssetKey, platformBrandAssetUrl }
 
 const MAX_BRAND_ASSET_BYTES = 2 * 1024 * 1024
 const IMAGE_CONTENT_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp'])
 const FAVICON_CONTENT_TYPES = new Set(['image/png', 'image/x-icon', 'image/vnd.microsoft.icon'])
 
-export type BrandAssetKind = PlatformBrandAssetKind
+type BrandAssetKind = PlatformBrandAssetKind
 
 function isPng(bytes: Uint8Array) {
   return (

@@ -5,6 +5,14 @@ import { staticSecurityHeaders } from './src/lib/security-headers'
 
 const nextConfig: NextConfig = {
   output: 'standalone',
+  experimental: {
+    // Sentry adds a webpack hook, which disables Next's automatic build worker.
+    // Keep compilation in the dedicated worker to lower peak build-process memory.
+    webpackBuildWorker: true,
+    // Keep the Webpack production build below GitHub Actions' practical memory ceiling.
+    // Next documents this as a low-risk peak-memory reduction with a small compile-time tradeoff.
+    webpackMemoryOptimizations: true,
+  },
   deploymentId: process.env.DEPLOYMENT_VERSION,
   reactStrictMode: true,
   poweredByHeader: false,

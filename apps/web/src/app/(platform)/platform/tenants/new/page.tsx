@@ -1,4 +1,5 @@
 import { getGeneratedTranslations } from '@/i18n/generated.server'
+import { getLocale } from 'next-intl/server'
 
 import { GeneratedText, useGeneratedTranslations, GeneratedValue } from '@/i18n/generated'
 import Link from 'next/link'
@@ -8,7 +9,9 @@ import { revalidatePath } from 'next/cache'
 import { Button, Input, Label, PageHeader, Select } from '@beaconhs/ui'
 import { db, withSuperAdmin } from '@beaconhs/db'
 import { auditLog, tenants } from '@beaconhs/db/schema'
+import { recordPlatformAudit } from '@/lib/platform-audit'
 import { LOCALE_OPTIONS, normalizeLocalePolicy } from '@beaconhs/i18n'
+import { translateSystemCopy } from '@beaconhs/i18n/messages'
 import { seedLiftPlanTemplate } from '@beaconhs/db/seed/lift-plan-template'
 import { requirePlatformOperator } from '@/lib/auth'
 import { PageContainer } from '@/components/page-layout'
@@ -31,6 +34,7 @@ function slugify(s: string): string {
 
 async function createTenant(formData: FormData): Promise<void> {
   'use server'
+  const locale = await getLocale()
   // A server action is a POST endpoint — the /platform layout's super-admin
   // redirect protects the page render, NOT this action. Re-check here, or any
   // authenticated tenant member could create tenants (this bypasses RLS below).
@@ -51,7 +55,7 @@ async function createTenant(formData: FormData): Promise<void> {
     ),
   })
 
-  await withSuperAdmin(db, async (tx) => {
+  const createdTenant = await withSuperAdmin(db, async (tx) => {
     const [created] = await tx
       .insert(tenants)
       .values({
@@ -86,8 +90,18 @@ async function createTenant(formData: FormData): Promise<void> {
       // inside the same transaction so a seeder failure rolls back the
       // tenant create — we never want a half-provisioned tenant.
       await seedLiftPlanTemplate(tx, created.id)
+      return created
     }
+    return undefined
   })
+  if (createdTenant?.id)
+    await recordPlatformAudit(operator, {
+      entityType: 'tenant',
+      entityId: createdTenant.id,
+      action: 'create',
+      summary: translateSystemCopy(locale, 'Created tenant {value0}', { value0: name }),
+      after: { name, slug, region },
+    })
 
   revalidatePath('/platform/tenants')
   redirect('/platform/tenants')

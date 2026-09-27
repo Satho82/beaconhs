@@ -91,15 +91,32 @@ jobs:
       - name: Prove migrations are idempotent
         run: pnpm --filter @beaconhs/db exec tsx src/migrate.ts
       - run: pnpm test
-      # Next.js production build exceeded the runner's default ~4 GB V8 heap.
-      - run: pnpm build
+
+  build:
+    name: Production build
+    needs: ci
+    runs-on: ubuntu-latest
+    steps:
+      # Build on a fresh runner: Next/Webpack no longer competes with the
+      # database, Redis, and test-process memory held by the quality gate.
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: 24.18.0
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # Keep a bounded V8 heap below the hosted runner's physical-memory limit.
+      - run: pnpm --filter @beaconhs/web build
         env:
           NODE_OPTIONS: --max-old-space-size=6144
 
   deploy-dev:
     name: Deploy tested commit to dev
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-    needs: ci
+    needs: build
     permissions:
       contents: read
       packages: write

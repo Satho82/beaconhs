@@ -62,7 +62,7 @@ export function parseGuestMaintenanceInput(input: Record<string, unknown>): Gues
     submissionId: bounded(input.submissionId, 40),
     category: bounded(input.category, 80),
     description: bounded(input.description, 2_000),
-    priority: bounded(input.priority, 16),
+    priority: bounded(input.priority, 16) || 'medium',
     guestName: bounded(input.guestName, 120),
     guestContact: bounded(input.guestContact, 240),
     contactConsent: input.contactConsent === true || input.contactConsent === 'on',

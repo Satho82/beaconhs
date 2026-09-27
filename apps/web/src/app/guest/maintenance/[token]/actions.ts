@@ -24,7 +24,7 @@ export async function submitGuestReport(
       submissionId: value(form, 'submissionId'),
       category: value(form, 'category'),
       description: value(form, 'description'),
-      priority: value(form, 'priority'),
+      priority: 'medium',
       guestName: value(form, 'guestName'),
       guestContact: value(form, 'guestContact'),
       contactConsent: form.get('contactConsent') === 'on',

@@ -21,11 +21,24 @@ export type PlatformEmailBranding = {
   authEmail?: AuthEmailCopy
 }
 
+export type PlatformAnalytics = {
+  enabled?: boolean
+  googleTagId?: string
+}
+
+const GOOGLE_MEASUREMENT_ID = /^G-[A-Z0-9]{6,}$/
+
 /** Product identity shared by public pages and platform-authentication emails. */
 export type PlatformBranding = {
   productName?: string
   logoUrl?: string
+  /** Private storage object key for an administrator-uploaded logo. */
+  logoKey?: string
+  /** Private storage object key for an administrator-uploaded favicon. */
+  faviconKey?: string
+  faviconContentType?: string
   primaryColor?: string
+  analytics?: PlatformAnalytics
   email?: PlatformEmailBranding
 }
 
@@ -70,11 +83,28 @@ export function normalizePlatformBranding(value: unknown): PlatformBranding {
     supportEmail: optionalString(rawEmail.supportEmail),
     ...(Object.keys(authEmail).length ? { authEmail } : {}),
   }
+  const rawAnalytics =
+    raw.analytics && typeof raw.analytics === 'object'
+      ? (raw.analytics as Record<string, unknown>)
+      : {}
+  const candidateGoogleTagId = optionalString(rawAnalytics.googleTagId)?.toUpperCase()
+  const googleTagId =
+    candidateGoogleTagId && GOOGLE_MEASUREMENT_ID.test(candidateGoogleTagId)
+      ? candidateGoogleTagId
+      : undefined
+  const analytics: PlatformAnalytics = {
+    enabled: rawAnalytics.enabled === true && Boolean(googleTagId),
+    ...(googleTagId ? { googleTagId } : {}),
+  }
 
   return {
     productName: optionalString(raw.productName),
     logoUrl: optionalString(raw.logoUrl),
+    logoKey: optionalString(raw.logoKey),
+    faviconKey: optionalString(raw.faviconKey),
+    faviconContentType: optionalString(raw.faviconContentType),
     primaryColor: optionalString(raw.primaryColor),
+    ...(analytics.enabled || analytics.googleTagId ? { analytics } : {}),
     ...(Object.values(email).some(Boolean) ? { email } : {}),
   }
 }

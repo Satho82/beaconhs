@@ -9,6 +9,7 @@ import { SplashScreen } from '@/components/brand-splash'
 import { getGeneratedTranslations } from '@/i18n/generated.server'
 import { PRODUCT_NAME } from '@/lib/brand'
 import { getRootPlatformBranding } from '@/lib/platform-branding-config'
+import { platformBrandAssetUrl } from '@/lib/platform-brand-asset-url'
 
 export async function generateMetadata(): Promise<Metadata> {
   const [tGenerated, branding] = await Promise.all([
@@ -23,6 +24,9 @@ export async function generateMetadata(): Promise<Metadata> {
     // crossorigin="use-credentials" — without it the browser fetches the manifest
     // without the session cookie and the per-tenant branding can't be resolved.
     applicationName: productName,
+    icons: branding.faviconKey
+      ? { icon: platformBrandAssetUrl('favicon', branding.faviconKey) }
+      : undefined,
     appleWebApp: {
       capable: true,
       statusBarStyle: 'default',
@@ -64,6 +68,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     getRootPlatformBranding(),
   ])
   const nonce = headerStore.get('x-nonce') ?? undefined
+  const googleTagId = branding.analytics?.enabled ? branding.analytics.googleTagId : undefined
   return (
     <html lang={locale} className="h-full" suppressHydrationWarning>
       <head>
@@ -73,6 +78,21 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           suppressHydrationWarning
           dangerouslySetInnerHTML={{ __html: THEME_INIT }}
         />
+        {googleTagId ? (
+          <>
+            <script
+              async
+              nonce={nonce}
+              src={`https://www.googletagmanager.com/gtag/js?id=${googleTagId}`}
+            />
+            <script
+              nonce={nonce}
+              dangerouslySetInnerHTML={{
+                __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)};gtag('js',new Date());gtag('config',${JSON.stringify(googleTagId)});`,
+              }}
+            />
+          </>
+        ) : null}
       </head>
       <body className="h-full overflow-hidden bg-slate-50 text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100">
         <NextIntlClientProvider locale={locale} messages={messages} timeZone={timeZone}>

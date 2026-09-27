@@ -109,7 +109,7 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       # Keep a bounded V8 heap below the hosted runner's physical-memory limit.
-      - run: pnpm build
+      - run: pnpm --filter @beaconhs/web build
         env:
           NODE_OPTIONS: --max-old-space-size=6144
 

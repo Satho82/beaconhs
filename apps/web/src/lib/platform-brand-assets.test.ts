@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { isPlatformBrandAssetKey, platformBrandAssetUrl } from './platform-brand-asset-url'
-import { validatePlatformBrandAsset } from './platform-brand-assets'
+import { validatePlatformBrandAsset } from './platform-brand-asset-validation'
 
 const png = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10])
 const jpeg = new Uint8Array([255, 216, 255, 0])

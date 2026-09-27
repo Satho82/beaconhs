@@ -5,6 +5,11 @@ import { staticSecurityHeaders } from './src/lib/security-headers'
 
 const nextConfig: NextConfig = {
   output: 'standalone',
+  experimental: {
+    // Keep the Webpack production build below GitHub Actions' practical memory ceiling.
+    // Next documents this as a low-risk peak-memory reduction with a small compile-time tradeoff.
+    webpackMemoryOptimizations: true,
+  },
   deploymentId: process.env.DEPLOYMENT_VERSION,
   reactStrictMode: true,
   poweredByHeader: false,

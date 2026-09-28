@@ -14,8 +14,8 @@ describe('tenant branding action contract', () => {
     expect(source).toContain('storeTenantBrandAsset')
     expect(source).toContain('deleteTenantBrandAsset')
     expect(source).toContain('...old')
-    expect(source).toContain("tenantId, kind: 'logo'")
-    expect(source).toContain("tenantId, kind: 'letterhead'")
+    expect(source).toMatch(/storeTenantBrandAsset\(\{\s*tenantId,\s*kind: 'logo'/)
+    expect(source).toMatch(/storeTenantBrandAsset\(\{\s*tenantId,\s*kind: 'letterhead'/)
   })
 
   it('validates HEX, audits changes, and returns safe UI outcomes', () => {

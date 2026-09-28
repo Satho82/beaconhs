@@ -75,6 +75,9 @@ export const users = pgTable(
     name: text('name').notNull(),
     image: text('image'),
     isSuperAdmin: boolean('isSuperAdmin').default(false).notNull(),
+    // A disabled identity is retained for audit/history and may retain tenant
+    // memberships, but is denied a request context everywhere.
+    disabledAt: timestamp('disabled_at', { withTimezone: true }),
     timezone: text('timezone').default('America/Toronto').notNull(),
     createdAt: timestamp('createdAt', { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp('updatedAt', { withTimezone: true }).defaultNow().notNull(),

@@ -21,9 +21,9 @@
 
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
-import { and, eq } from 'drizzle-orm'
+import { and, eq, isNull, ne, sql } from 'drizzle-orm'
 import { db, withSuperAdmin, type Database } from '@beaconhs/db'
-import { auditLog, roles, tenantUsers, tenants, users } from '@beaconhs/db/schema'
+import { auditLog, roles, sessions, tenantUsers, tenants, users } from '@beaconhs/db/schema'
 import { materializeUserIdentityAudienceObligations } from '@beaconhs/compliance'
 import { nextInviteGenerationDate } from '@beaconhs/auth/invites'
 import { requirePlatformOperator } from '@/lib/auth'
@@ -153,6 +153,59 @@ export async function setSuperAdmin(formData: FormData): Promise<void> {
   revalidatePath(userPath(userId))
   revalidatePath('/platform/users')
   backToUser(userId, { notice: value ? 'Granted super-admin.' : 'Revoked super-admin.' })
+}
+
+/** Disable or restore the global login identity without deleting any history. */
+export async function setIdentityDisabled(formData: FormData): Promise<void> {
+  const ctx = await gate()
+  const userId = String(formData.get('userId') ?? '')
+  const disabled = String(formData.get('disabled') ?? '') === 'on'
+  if (!userId) return
+  if (userId === ctx.userId && disabled) {
+    backToUser(userId, { error: "You can't disable your own platform identity." })
+  }
+
+  const result = await withSuperAdmin(db, async (tx) => {
+    const [target] = await tx
+      .select({
+        email: users.email,
+        isSuperAdmin: users.isSuperAdmin,
+        disabledAt: users.disabledAt,
+      })
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1)
+    if (!target) return { error: 'User not found.' } as const
+    if (Boolean(target.disabledAt) === disabled)
+      return { error: 'That identity status has already changed.' } as const
+    if (disabled && target.isSuperAdmin) {
+      const [remaining] = await tx
+        .select({ count: sql<number>`count(*)::int` })
+        .from(users)
+        .where(and(eq(users.isSuperAdmin, true), isNull(users.disabledAt), ne(users.id, userId)))
+      if ((remaining?.count ?? 0) === 0) {
+        return { error: 'Keep at least one active platform super-admin.' } as const
+      }
+    }
+    const disabledAt = disabled ? new Date() : null
+    await tx.update(users).set({ disabledAt, updatedAt: new Date() }).where(eq(users.id, userId))
+    if (disabled) await tx.delete(sessions).where(eq(sessions.userId, userId))
+    return { target, disabledAt } as const
+  })
+  if ('error' in result) backToUser(userId, { error: result.error })
+  await recordPlatformAudit(ctx, {
+    entityType: 'platform',
+    action: result.disabledAt ? 'identity.disable' : 'identity.restore',
+    summary: `${result.disabledAt ? 'Disabled' : 'Restored'} identity for ${result.target.email} (platform)`,
+    before: { disabledAt: result.target.disabledAt },
+    after: { disabledAt: result.disabledAt },
+    metadata: { via: 'platform', targetUserId: userId },
+  })
+  revalidatePath(userPath(userId))
+  revalidatePath('/platform/users')
+  backToUser(userId, {
+    notice: result.disabledAt ? 'Global identity disabled.' : 'Global identity restored.',
+  })
 }
 
 // --- memberships ----------------------------------------------------------

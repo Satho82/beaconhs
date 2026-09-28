@@ -7,13 +7,13 @@ import { SmartBackLink } from '@/components/smart-back-link'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { Button, Input, Label, PageHeader, Select } from '@beaconhs/ui'
-import { db, withSuperAdmin } from '@beaconhs/db'
+import { db, provisionTenantBaseline, withSuperAdmin } from '@beaconhs/db'
 import { auditLog, tenants } from '@beaconhs/db/schema'
 import { recordPlatformAudit } from '@/lib/platform-audit'
 import { LOCALE_OPTIONS, normalizeLocalePolicy } from '@beaconhs/i18n'
 import { translateSystemCopy } from '@beaconhs/i18n/messages'
-import { seedLiftPlanTemplate } from '@beaconhs/db/seed/lift-plan-template'
 import { requirePlatformOperator } from '@/lib/auth'
+import { MODULE_CATALOGUE } from '@/lib/module-entitlements/catalogue'
 import { PageContainer } from '@/components/page-layout'
 
 export async function generateMetadata() {
@@ -68,9 +68,16 @@ async function createTenant(formData: FormData): Promise<void> {
       })
       .returning({ id: tenants.id })
     if (created) {
+      // Provision only tenant-neutral platform baseline configuration. This is
+      // transactional: a tenant is never left half-provisioned, and it never
+      // fabricates people, properties, rooms, or operational history.
+      const baseline = await provisionTenantBaseline(tx, {
+        tenantId: created.id,
+        moduleKeys: MODULE_CATALOGUE.map((module) => module.key),
+        changedByUserId: userId,
+      })
       // Audit row lives in the *new* tenant's audit_log so the activity timeline
-      // shows "tenant created" on day-one. Super-admin actions otherwise have
-      // no natural home in any tenant's log.
+      // records both creation and the complete day-one baseline.
       await tx.insert(auditLog).values({
         tenantId: created.id,
         actorUserId: userId,
@@ -84,13 +91,10 @@ async function createTenant(formData: FormData): Promise<void> {
           region,
           defaultLanguage: languagePolicy.defaultLocale,
           enabledLanguages: languagePolicy.enabledLocales,
+          baseline,
         },
       })
-      // Seed every built-in form template that's required on day-one. Done
-      // inside the same transaction so a seeder failure rolls back the
-      // tenant create — we never want a half-provisioned tenant.
-      await seedLiftPlanTemplate(tx, created.id)
-      return created
+      return { ...created, baseline }
     }
     return undefined
   })
@@ -100,7 +104,7 @@ async function createTenant(formData: FormData): Promise<void> {
       entityId: createdTenant.id,
       action: 'create',
       summary: translateSystemCopy(locale, 'Created tenant {value0}', { value0: name }),
-      after: { name, slug, region },
+      after: { name, slug, region, baseline: createdTenant.baseline },
     })
 
   revalidatePath('/platform/tenants')

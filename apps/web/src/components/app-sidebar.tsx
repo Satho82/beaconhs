@@ -22,15 +22,19 @@ export function AppSidebar({
   groups,
   defaultCollapsed = false,
   platformBranding,
+  deploymentVersion,
 }: {
   groups: SidebarNavGroup[]
   defaultCollapsed?: boolean
   platformBranding?: PlatformBranding
+  /** Immutable runtime identity supplied by the deployment, never package.json. */
+  deploymentVersion?: string
 }) {
   const tGeneratedValue = useGeneratedValueTranslations()
   const [collapsed, setCollapsed] = useState(defaultCollapsed)
   const t = useTranslations('Shell')
   const navGroups = useNavGroups(groups)
+  const versionLabel = deploymentVersion?.trim() || 'dev'
 
   const toggle = useCallback(() => {
     setCollapsed((c) => {
@@ -94,7 +98,7 @@ export function AppSidebar({
                     <GeneratedText id="m_0c85098694b405" />
                   </span>
                   <Badge variant="secondary" className="font-mono text-[10px]">
-                    <GeneratedText id="m_155b48f51ba2b4" />
+                    <GeneratedValue value={versionLabel} />
                   </Badge>
                 </div>
               </div>

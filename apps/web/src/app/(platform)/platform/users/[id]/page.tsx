@@ -33,6 +33,7 @@ import {
   openMembershipInTenant,
   removeMembership,
   resendInvite,
+  setIdentityDisabled,
   setMembershipStatus,
   setSuperAdmin,
   updateIdentity,
@@ -373,6 +374,39 @@ export default async function PlatformUserDetailPage({
                           )
                         }
                       />
+                    </ConfirmButton>
+                  </form>
+                </div>
+              </div>
+              <div className="rounded-md border border-slate-200 p-3 dark:border-slate-800">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
+                      Global identity access
+                    </p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      {account.disabledAt
+                        ? 'This person cannot sign in. Their historical records remain intact.'
+                        : 'Disabling signs this person out everywhere without removing their history or memberships.'}
+                    </p>
+                  </div>
+                  <form action={setIdentityDisabled}>
+                    <input type="hidden" name="userId" value={account.id} />
+                    <input
+                      type="hidden"
+                      name="disabled"
+                      value={account.disabledAt ? 'off' : 'on'}
+                    />
+                    <ConfirmButton
+                      type="submit"
+                      variant={account.disabledAt ? 'outline' : 'destructive'}
+                      message={
+                        account.disabledAt
+                          ? `Restore sign-in access for ${account.name}?`
+                          : `Disable sign-in access for ${account.name}? Their history and tenant memberships will remain.`
+                      }
+                    >
+                      {account.disabledAt ? 'Restore identity' : 'Disable identity'}
                     </ConfirmButton>
                   </form>
                 </div>

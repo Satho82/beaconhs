@@ -6,6 +6,8 @@ import {
   type ReportLayout,
   type ReportRule,
 } from '@braedonsaunders/appkit-reports'
+import type { Database } from '../client'
+import { reportDefinitions } from '../schema'
 
 const ACTIVE_PEOPLE: ReportRule = { field: 'person_status', op: 'eq', value: 'active' }
 
@@ -879,3 +881,33 @@ for (const definition of BEACON_REPORT_SEEDS) {
 export const EXPECTED_BEACON_REPORT_SEED_KEYS = BEACON_REPORT_SEEDS.map(
   (definition) => definition.seedKey,
 )
+
+/**
+ * Adds only missing platform report definitions for one tenant. Definitions
+ * remain ordinary tenant-owned records after this point, so a repair never
+ * overwrites a tenant's edit, deletion, or chosen publication state.
+ */
+export async function seedReportDefinitionsForTenant(
+  tx: Pick<Database, 'insert'>,
+  tenantId: string,
+): Promise<void> {
+  await tx
+    .insert(reportDefinitions)
+    .values(
+      BEACON_REPORT_SEEDS.map((definition) => ({
+        tenantId,
+        seedKey: definition.seedKey,
+        slug: definition.slug,
+        name: definition.name,
+        description: definition.description,
+        category: definition.category,
+        query: definition.query,
+        layout: definition.layout,
+        state: definition.state,
+        tags: definition.tags ?? [],
+      })),
+    )
+    // seed_key is protected by a partial unique index; no explicit target lets
+    // Postgres honour that index as well as a tenant's chosen slug.
+    .onConflictDoNothing()
+}

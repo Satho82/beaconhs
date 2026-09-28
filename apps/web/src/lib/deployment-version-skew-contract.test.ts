@@ -7,6 +7,8 @@ const devWorkflow = readFileSync(
   new URL('../../../../.github/workflows/deploy-dev.yml', import.meta.url),
   'utf8',
 )
+const sidebar = readFileSync(new URL('../components/app-sidebar.tsx', import.meta.url), 'utf8')
+const appLayout = readFileSync(new URL('../app/(app)/layout.tsx', import.meta.url), 'utf8')
 
 describe('self-hosted Next.js version-skew protection', () => {
   it('embeds the immutable deployment version into the Next.js build', () => {
@@ -21,5 +23,11 @@ describe('self-hosted Next.js version-skew protection', () => {
     expect(dockerfile).not.toContain('NEXT_SERVER_ACTIONS_ENCRYPTION_KEY=')
     expect(devWorkflow).not.toContain('next_server_actions_key')
     expect(devWorkflow).not.toContain('DEV_NEXT_SERVER_ACTIONS_ENCRYPTION_KEY')
+  })
+
+  it('shows the immutable runtime version rather than the package development version', () => {
+    expect(sidebar).toContain("const versionLabel = deploymentVersion?.trim() || 'dev'")
+    expect(sidebar).not.toContain('<GeneratedText id="m_155b48f51ba2b4" />')
+    expect(appLayout).toContain('process.env.APP_VERSION ?? process.env.DEPLOYMENT_VERSION')
   })
 })

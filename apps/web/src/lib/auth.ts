@@ -99,11 +99,12 @@ export const getPlatformOperator = cache(async (): Promise<PlatformOperator | nu
         name: users.name,
         email: users.email,
         timezone: users.timezone,
+        disabledAt: users.disabledAt,
       })
       .from(users)
       .where(eq(users.id, session.user.id))
       .limit(1)
-    return user?.isSuperAdmin
+    return user?.isSuperAdmin && !user.disabledAt
       ? {
           userId: user.id,
           isSuperAdmin: true,
@@ -225,7 +226,7 @@ export const getRequestContext = cache(async (): Promise<RequestContext | null> 
   // still tenant-scoped via makeTenantContext.
   return await withSuperAdmin(db, async (tx) => {
     const [u] = await tx.select().from(users).where(eq(users.id, userId)).limit(1)
-    if (!u) return null
+    if (!u || u.disabledAt) return null
 
     // Impersonation overlay: when this admin session is "viewing as" another
     // user, resolve the WHOLE request as the target (their tenant, their real

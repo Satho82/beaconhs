@@ -6,6 +6,9 @@
 // description, schema }. Add new canonical templates by appending here — the
 // gallery and seed both pick them up automatically.
 
+import { and, eq } from 'drizzle-orm'
+import type { Database } from './client'
+import { formTemplates, formTemplateVersions } from './schema'
 import type { FormSchemaV1 } from './schema/forms'
 
 type CanonicalTemplate = {
@@ -190,4 +193,55 @@ export const CANONICAL_TEMPLATES: CanonicalTemplate[] = [
 
 export function getCanonicalTemplate(key: string): CanonicalTemplate | undefined {
   return CANONICAL_TEMPLATES.find((t) => t.key === key)
+}
+
+type TemplateSeedTx = Pick<Database, 'select' | 'insert'>
+
+/**
+ * Makes the platform-owned, property-independent Builder templates available
+ * to one tenant. These are configuration, not sample operational records.
+ * Existing tenant copies are deliberately never overwritten.
+ */
+export async function seedCanonicalTemplatesForTenant(
+  tx: TemplateSeedTx,
+  tenantId: string,
+): Promise<number> {
+  let inserted = 0
+  for (const canonical of CANONICAL_TEMPLATES) {
+    const existing = await tx
+      .select({ id: formTemplates.id })
+      .from(formTemplates)
+      .where(and(eq(formTemplates.tenantId, tenantId), eq(formTemplates.key, canonical.key)))
+      .limit(1)
+    if (existing[0]) continue
+
+    const created = await tx
+      .insert(formTemplates)
+      .values({
+        tenantId,
+        key: canonical.key,
+        name: canonical.name,
+        category: canonical.category,
+        moduleBinding: canonical.moduleBinding,
+        description: canonical.description,
+        status: 'published',
+        createdBy: null,
+      })
+      .onConflictDoNothing({ target: [formTemplates.tenantId, formTemplates.key] })
+      .returning({ id: formTemplates.id })
+    const template = created[0]
+    if (!template) continue
+
+    await tx.insert(formTemplateVersions).values({
+      tenantId,
+      templateId: template.id,
+      version: 1,
+      schema: canonical.schema,
+      publishedAt: new Date(),
+      publishedBy: null,
+      changelog: 'Platform baseline template v1',
+    })
+    inserted += 1
+  }
+  return inserted
 }

@@ -21,6 +21,7 @@ import { PageContainer } from '@/components/page-layout'
 import { SearchInput } from '@/components/search-input'
 import { TableToolbar } from '@/components/table-toolbar'
 import { getGeneratedTranslations } from '@/i18n/generated.server'
+import { openTenantUserInvite } from '../_actions'
 
 export const dynamic = 'force-dynamic'
 
@@ -67,6 +68,10 @@ export default async function PlatformTenantUsersPage({
         />
         <TableToolbar>
           <SearchInput placeholder={tGenerated('m_086b4fc4bde8f5')} />
+          <form action={openTenantUserInvite}>
+            <input type="hidden" name="tenantId" value={tenantId} />
+            <Button type="submit">Add user</Button>
+          </form>
         </TableToolbar>
         {data.rows.length === 0 ? (
           <EmptyState title={tGenerated('m_07295baa7ba277')} />
@@ -78,6 +83,8 @@ export default async function PlatformTenantUsersPage({
                 <TableHead>{tGenerated('m_00a0ba9938bdff')}</TableHead>
                 <TableHead>{tGenerated('m_0b9da892d6faf0')}</TableHead>
                 <TableHead>{tGenerated('m_0e732f319c37c9')}</TableHead>
+                <TableHead>Actions</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -92,6 +99,16 @@ export default async function PlatformTenantUsersPage({
                   </TableCell>
                   <TableCell>
                     {membership.localeOverride ?? tGenerated('m_1a6597dd1c00f3')}
+                  </TableCell>
+                  <TableCell>
+                    <Link href={`/platform/users/${user.id}`}>
+                      <Button variant="outline">Manage</Button>
+                    </Link>
+                  </TableCell>
+                  <TableCell>
+                    <Link href={`/platform/users/${user.id}`}>
+                      <Button variant="outline">Manage</Button>
+                    </Link>
                   </TableCell>
                 </TableRow>
               ))}

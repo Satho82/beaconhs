@@ -17,11 +17,13 @@ export function PlatformShell({
   operator,
   branding,
   defaultCollapsed,
+  deploymentVersion,
   children,
 }: {
   operator: { name: string; email: string }
   branding: PlatformBranding
   defaultCollapsed: boolean
+  deploymentVersion?: string
   children: React.ReactNode
 }) {
   const router = useRouter()
@@ -32,7 +34,12 @@ export function PlatformShell({
 
   return (
     <div className="flex [height:100dvh] h-screen overflow-hidden">
-      <AppSidebar groups={groups} defaultCollapsed={defaultCollapsed} platformBranding={branding} />
+      <AppSidebar
+        groups={groups}
+        defaultCollapsed={defaultCollapsed}
+        platformBranding={branding}
+        deploymentVersion={deploymentVersion}
+      />
       <MobileNavProvider>
         <div className="flex min-w-0 flex-1 flex-col overflow-hidden [padding-top:env(safe-area-inset-top)]">
           <header className="flex h-14 shrink-0 items-center gap-3 border-b border-slate-200 bg-white px-3 sm:px-6 dark:border-slate-800 dark:bg-slate-900">

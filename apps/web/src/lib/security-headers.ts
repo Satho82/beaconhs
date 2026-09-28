@@ -66,6 +66,12 @@ export function contentSecurityPolicy(options: ContentSecurityPolicyOptions): st
     // before MinIO/R2 ever receives it.
     storageOrigin,
     sentryOrigin,
+    // The optional platform Google tag is nonce-bound in the root layout. Its
+    // collection beacons must be connectable, otherwise a valid Measurement ID
+    // appears to load but every page-view request is blocked by this CSP.
+    'https://www.google-analytics.com',
+    'https://region1.google-analytics.com',
+    'https://www.googletagmanager.com',
     'https://nominatim.openstreetmap.org',
     'https://api.nango.dev',
     // Next.js HMR uses WebSockets locally. The application has no production

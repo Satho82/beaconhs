@@ -31,7 +31,7 @@ describe('contentSecurityPolicy', () => {
     )
     expect(policy).toContain('blob: https:')
     expect(policy).toContain(
-      "connect-src 'self' https://objects.example.com https://example.ingest.sentry.io",
+      "connect-src 'self' https://objects.example.com https://example.ingest.sentry.io https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com",
     )
     expect(policy).not.toContain('wss:')
     expect(policy).toContain("object-src 'none';")

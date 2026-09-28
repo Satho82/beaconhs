@@ -20,7 +20,7 @@ import { isUuid } from '@/lib/list-params'
 import { PageContainer } from '@/components/page-layout'
 import { ConfirmButton } from '@/components/confirm-button'
 import { getGeneratedTranslations } from '@/i18n/generated.server'
-import { changeTenantLifecycle } from './_actions'
+import { changeTenantLifecycle, repairTenantBaseline } from './_actions'
 
 export const dynamic = 'force-dynamic'
 
@@ -83,6 +83,12 @@ export default async function PlatformTenantPage({
               <Link href={`/platform/tenants/${tenantId}/entitlements`}>
                 <Button variant="outline">{tGenerated('m_03abc46dafbce6')}</Button>
               </Link>
+              <form action={repairTenantBaseline}>
+                <input type="hidden" name="tenantId" value={tenantId} />
+                <ConfirmButton variant="outline" message={tGenerated('m_069587d01e3b06')}>
+                  {tGenerated('m_0dc6071788cc08')}
+                </ConfirmButton>
+              </form>
               <form action={changeTenantLifecycle}>
                 <input type="hidden" name="tenantId" value={tenantId} />
                 <input type="hidden" name="status" value={next} />
@@ -134,9 +140,6 @@ export default async function PlatformTenantPage({
             <h2 className="font-semibold">{tGenerated('m_02390870f084f4')}</h2>
             <p className="mt-1 text-sm text-slate-500">{tGenerated('m_0a1d2a87f379d5')}</p>
             <div className="mt-4 flex flex-wrap gap-2">
-              <Link href={`/platform/tenants/${tenantId}/properties`}>
-                <Button variant="outline">{tGenerated('m_151769a9fde954')}</Button>
-              </Link>
               <Link href={`/platform/tenants/${tenantId}/users`}>
                 <Button variant="outline">{tGenerated('m_1324d0c784a75e')}</Button>
               </Link>

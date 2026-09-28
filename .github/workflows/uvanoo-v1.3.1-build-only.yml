@@ -1,0 +1,99 @@
+name: Uvanoo V1.3.1 build only
+
+# Builds one frozen release candidate and stops after publishing its immutable
+# container digest. This workflow has no deployment, SSH, VPS, Dokploy, staging,
+# production, workflow-call, or workflow-run chaining path.
+on:
+  push:
+    branches: [remediation/uvanoo-v1.3.1]
+    paths:
+      - .github/workflows/uvanoo-v1.3.1-build-only.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: uvanoo-v1-3-1-build-only
+  cancel-in-progress: false
+
+env:
+  RELEASE_SHA: 632339ee621ae277847b3e4d521cedde6c66ef41
+  IMAGE_NAME: ghcr.io/satho82/uvanoo-staging-private
+  RELEASE_VERSION: v1.3.1
+
+jobs:
+  build:
+    name: Build and publish V1.3.1 only
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    outputs:
+      image_digest: ${{ steps.image.outputs.digest }}
+    steps:
+      - name: Require the release branch
+        env:
+          REF: ${{ github.ref }}
+        run: |
+          set -euo pipefail
+          test "$REF" = "refs/heads/remediation/uvanoo-v1.3.1"
+
+      - name: Check out the frozen V1.3.1 source
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          ref: ${{ env.RELEASE_SHA }}
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Prove the checked-out source is the approved commit
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$RELEASE_SHA"
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4
+
+      - name: Authenticate only to GHCR
+        uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 # v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - name: Build linux/amd64 and publish release tags
+        id: image
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ${{ env.IMAGE_NAME }}:${{ env.RELEASE_VERSION }}
+            ${{ env.IMAGE_NAME }}:${{ env.RELEASE_SHA }}
+          labels: |
+            org.opencontainers.image.version=${{ env.RELEASE_VERSION }}
+            org.opencontainers.image.revision=${{ env.RELEASE_SHA }}
+            org.opencontainers.image.source=https://github.com/Satho82/beaconhs
+          build-args: |
+            DEPLOYMENT_VERSION=${{ env.RELEASE_SHA }}
+            BUILD_NODE_HEAP_MB=12288
+          cache-from: type=gha
+          cache-to: type=gha,mode=max,ignore-error=true
+
+      - name: Report immutable release image and stop
+        env:
+          DIGEST: ${{ steps.image.outputs.digest }}
+        run: |
+          set -euo pipefail
+          test -n "$DIGEST"
+          test "${DIGEST#sha256:}" != "$DIGEST"
+          {
+            echo "## Uvanoo V1.3.1 build-only result"
+            echo
+            echo "- Source commit: \`$RELEASE_SHA\`"
+            echo "- Release metadata: \`$RELEASE_VERSION / staging\`"
+            echo "- Immutable image: \`$IMAGE_NAME@$DIGEST\`"
+            echo
+            echo "Build-only workflow complete. No deployment was run."
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "Immutable image: $IMAGE_NAME@$DIGEST"

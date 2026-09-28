@@ -87,7 +87,7 @@ export default async function PlatformTenantPropertiesPage({
             <Input id="property-code" name="code" required />
           </div>
           <div>
-            <Label htmlFor="property-timezone">Time zone</Label>
+            <Label htmlFor="property-timezone">{tGenerated('m_18dd6072735a83')}</Label>
             <Input id="property-timezone" name="timezone" defaultValue="Europe/London" required />
           </div>
           <div className="flex items-end">
@@ -103,7 +103,7 @@ export default async function PlatformTenantPropertiesPage({
                 <TableHead>{tGenerated('m_0f7a8c3e57d104')}</TableHead>
                 <TableHead>{tGenerated('m_0570e24c85cf95')}</TableHead>
                 <TableHead>{tGenerated('m_02d326d09a4cc1')}</TableHead>
-                <TableHead>Lifecycle</TableHead>
+                <TableHead>{tGenerated('m_182e5fe6708eb9')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -119,9 +119,15 @@ export default async function PlatformTenantPropertiesPage({
                       <input type="hidden" name="archived" value={row.deletedAt ? 'off' : 'on'} />
                       <ConfirmButton
                         variant={row.deletedAt ? 'outline' : 'destructive'}
-                        message={row.deletedAt ? `Restore ${row.name}?` : `Archive ${row.name}?`}
+                        message={
+                          row.deletedAt
+                            ? tGenerated('m_1b2fcbf61bf7d0', { value0: row.name })
+                            : tGenerated('m_07b203e7f70673', { value0: row.name })
+                        }
                       >
-                        {row.deletedAt ? 'Restore' : tGenerated('m_16a01dc21eb543')}
+                        {row.deletedAt
+                          ? tGenerated('m_19500e41842c99')
+                          : tGenerated('m_16a01dc21eb543')}
                       </ConfirmButton>
                     </form>
                   </TableCell>

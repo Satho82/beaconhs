@@ -70,7 +70,7 @@ export default async function PlatformTenantUsersPage({
           <SearchInput placeholder={tGenerated('m_086b4fc4bde8f5')} />
           <form action={openTenantUserInvite}>
             <input type="hidden" name="tenantId" value={tenantId} />
-            <Button type="submit">Add user</Button>
+            <Button type="submit">{tGenerated('m_0487f8b993c905')}</Button>
           </form>
         </TableToolbar>
         {data.rows.length === 0 ? (
@@ -83,8 +83,8 @@ export default async function PlatformTenantUsersPage({
                 <TableHead>{tGenerated('m_00a0ba9938bdff')}</TableHead>
                 <TableHead>{tGenerated('m_0b9da892d6faf0')}</TableHead>
                 <TableHead>{tGenerated('m_0e732f319c37c9')}</TableHead>
-                <TableHead>Actions</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead>{tGenerated('m_0a7f1858f2ec46')}</TableHead>
+                <TableHead>{tGenerated('m_0a7f1858f2ec46')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -102,12 +102,12 @@ export default async function PlatformTenantUsersPage({
                   </TableCell>
                   <TableCell>
                     <Link href={`/platform/users/${user.id}`}>
-                      <Button variant="outline">Manage</Button>
+                      <Button variant="outline">{tGenerated('m_11d42075a22139')}</Button>
                     </Link>
                   </TableCell>
                   <TableCell>
                     <Link href={`/platform/users/${user.id}`}>
-                      <Button variant="outline">Manage</Button>
+                      <Button variant="outline">{tGenerated('m_11d42075a22139')}</Button>
                     </Link>
                   </TableCell>
                 </TableRow>

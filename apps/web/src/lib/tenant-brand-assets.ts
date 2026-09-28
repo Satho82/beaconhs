@@ -8,6 +8,11 @@ import { validatePlatformBrandAsset } from './platform-brand-asset-validation'
 const PDF = 'application/pdf'
 const MAX_LETTERHEAD_BYTES = 5 * 1024 * 1024
 
+/** A known upload-validation failure that can safely cross the action boundary. */
+export class TenantBrandAssetValidationError extends Error {
+  override name = 'TenantBrandAssetValidationError'
+}
+
 export async function storeTenantBrandAsset(args: {
   tenantId: string
   kind: 'logo' | 'letterhead'
@@ -20,13 +25,13 @@ export async function storeTenantBrandAsset(args: {
       contentType: args.contentType,
       bytes: args.bytes,
     })
-    if (error) throw new Error(error)
+    if (error) throw new TenantBrandAssetValidationError(error)
   } else if (
     args.contentType.toLowerCase().split(';', 1)[0] !== PDF ||
     args.bytes.byteLength > MAX_LETTERHEAD_BYTES ||
     Buffer.from(args.bytes.subarray(0, 5)).toString() !== '%PDF-'
   ) {
-    throw new Error('Letterhead must be a PDF no larger than 5 MB.')
+    throw new TenantBrandAssetValidationError('Letterhead must be a PDF no larger than 5 MB.')
   }
   const extension =
     args.kind === 'letterhead'

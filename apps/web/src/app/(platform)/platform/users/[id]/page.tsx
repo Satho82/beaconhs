@@ -382,12 +382,12 @@ export default async function PlatformUserDetailPage({
                 <div className="flex items-center justify-between gap-3">
                   <div className="min-w-0">
                     <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
-                      Global identity access
+                      <GeneratedText id="m_176013c3df0196" />
                     </p>
                     <p className="text-xs text-slate-500 dark:text-slate-400">
                       {account.disabledAt
-                        ? 'This person cannot sign in. Their historical records remain intact.'
-                        : 'Disabling signs this person out everywhere without removing their history or memberships.'}
+                        ? tGenerated('m_08d415bd66e89c')
+                        : tGenerated('m_0deebdf6fc2905')}
                     </p>
                   </div>
                   <form action={setIdentityDisabled}>
@@ -402,11 +402,15 @@ export default async function PlatformUserDetailPage({
                       variant={account.disabledAt ? 'outline' : 'destructive'}
                       message={
                         account.disabledAt
-                          ? `Restore sign-in access for ${account.name}?`
-                          : `Disable sign-in access for ${account.name}? Their history and tenant memberships will remain.`
+                          ? tGenerated('m_1eb6acad54453b', { value0: account.name })
+                          : tGenerated('m_06bb5058572971', { value0: account.name })
                       }
                     >
-                      {account.disabledAt ? 'Restore identity' : 'Disable identity'}
+                      {account.disabledAt ? (
+                        <GeneratedText id="m_19f58ce5c20911" />
+                      ) : (
+                        <GeneratedText id="m_13330b978b2aa3" />
+                      )}
                     </ConfirmButton>
                   </form>
                 </div>

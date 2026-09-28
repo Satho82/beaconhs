@@ -6,8 +6,13 @@ import { db, withSuperAdmin } from '@beaconhs/db'
 import { tenants } from '@beaconhs/db/schema'
 import { requirePlatformOperator } from '@/lib/auth'
 import { recordPlatformAudit } from '@/lib/platform-audit'
-import { deleteTenantBrandAsset, storeTenantBrandAsset } from '@/lib/tenant-brand-assets'
+import {
+  deleteTenantBrandAsset,
+  storeTenantBrandAsset,
+  TenantBrandAssetValidationError,
+} from '@/lib/tenant-brand-assets'
 import { isUuid } from '@/lib/list-params'
+import { getGeneratedTranslations } from '@/i18n/generated.server'
 
 const HEX = /^#[0-9A-F]{6}$/i
 
@@ -34,7 +39,7 @@ export async function saveTenantBranding(
     const resetLetterhead = formData.get('resetLetterhead') === '1'
     const result = await withSuperAdmin(db, async (tx) => {
       const [tenant] = await tx.select().from(tenants).where(eq(tenants.id, tenantId)).limit(1)
-      if (!tenant) throw new Error('Tenant not found.')
+      if (!tenant) return null
       const old = tenant.branding
       const logoKey =
         logo instanceof File && logo.size
@@ -66,6 +71,7 @@ export async function saveTenantBranding(
         .where(eq(tenants.id, tenantId))
       return { tenant, old, branding, logoKey, letterheadKey }
     })
+    if (!result) return { status: 'error', outcome: 'invalid_tenant' }
     if (resetLogo || result.logoKey) await deleteTenantBrandAsset(tenantId, result.old.logoUrl)
     if (resetLetterhead || result.letterheadKey)
       await deleteTenantBrandAsset(tenantId, result.old.pdfLetterhead)
@@ -73,19 +79,20 @@ export async function saveTenantBranding(
       entityType: 'tenant-branding',
       entityId: tenantId,
       action: 'update',
-      summary: `Updated branding for ${result.tenant.name}`,
+      summary: (await getGeneratedTranslations())('m_11c9b9a39f9753', {
+        value0: result.tenant.name,
+      }),
       after: result.branding,
     })
     revalidatePath(`/platform/tenants/${tenantId}/branding`)
     revalidatePath('/', 'layout')
     return { status: 'success', outcome: 'saved' }
   } catch (error) {
-    // Storage validation errors are safe to collapse; no provider, bucket, or
-    // object identifiers cross the server-action boundary.
-    const message = error instanceof Error ? error.message : ''
-    return {
-      status: 'error',
-      outcome: /branding image|letterhead must/i.test(message) ? 'invalid_asset' : 'save_failed',
+    // A typed validation error is safe to collapse; provider details never cross
+    // the server-action boundary.
+    if (error instanceof TenantBrandAssetValidationError) {
+      return { status: 'error', outcome: 'invalid_asset' }
     }
+    return { status: 'error', outcome: 'save_failed' }
   }
 }

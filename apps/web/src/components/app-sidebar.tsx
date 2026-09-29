@@ -25,7 +25,7 @@ export function deploymentLabels(deploymentVersion?: string, deploymentEnvironme
   const buildLabel = immutableVersion?.split('+', 1)[0]
   const releaseLabel =
     buildLabel && environmentLabel && buildLabel.endsWith(`-${environmentLabel}`)
-      ? buildLabel.slice(0, -(`-${environmentLabel}`).length)
+      ? buildLabel.slice(0, -`-${environmentLabel}`.length)
       : buildLabel
   return { immutableVersion, releaseLabel, environmentLabel }
 }
@@ -112,7 +112,9 @@ export function AppSidebar({
               <div className="space-y-2">
                 <ThemeToggle />
                 <div className="flex items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400">
-                  <span className="font-mono"><GeneratedValue value={releaseLabel ?? immutableVersion ?? ''} /></span>
+                  <span className="font-mono">
+                    <GeneratedValue value={releaseLabel ?? immutableVersion ?? ''} />
+                  </span>
                   {environmentLabel ? (
                     <Badge variant="secondary" className="font-mono text-[10px]">
                       <GeneratedValue value={environmentLabel} />

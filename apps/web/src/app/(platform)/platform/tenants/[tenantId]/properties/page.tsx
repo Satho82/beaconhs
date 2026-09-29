@@ -93,7 +93,12 @@ export default async function PlatformTenantPropertiesPage({
           </div>
           <div>
             <Label htmlFor="property-timezone">{tGenerated('m_18dd6072735a83')}</Label>
-            <Input id="property-timezone" name="timezone" defaultValue={data.editing?.timezone ?? 'Europe/London'} required />
+            <Input
+              id="property-timezone"
+              name="timezone"
+              defaultValue={data.editing?.timezone ?? 'Europe/London'}
+              required
+            />
           </div>
           <div className="flex items-end">
             <Button type="submit">
@@ -101,7 +106,9 @@ export default async function PlatformTenantPropertiesPage({
             </Button>
             {data.editing ? (
               <Link href={`/platform/tenants/${tenantId}/properties`}>
-                <Button type="button" variant="outline">{tGenerated('m_112e2e8ecda428')}</Button>
+                <Button type="button" variant="outline">
+                  {tGenerated('m_112e2e8ecda428')}
+                </Button>
               </Link>
             ) : null}
           </div>

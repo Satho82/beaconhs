@@ -32,7 +32,7 @@ describe('V1.3.1 staging-hotfix contracts', () => {
     expect(actions).toContain(
       "translateSystemCopy(locale, 'Reassign memberships before archiving this property.')",
     )
-    expect(actions).toContain("action: result.action")
+    expect(actions).toContain('action: result.action')
     expect(actions).toContain("action: archived ? 'property.archive' : 'property.restore'")
   })
 })

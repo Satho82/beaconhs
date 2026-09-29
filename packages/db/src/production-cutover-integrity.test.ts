@@ -160,6 +160,7 @@ describe('production cutover migration integrity', () => {
       { idx: 49, tag: '0050_report_property_context' },
       { idx: 50, tag: '0051_platform_audit' },
       { idx: 51, tag: '0052_user_identity_lifecycle' },
+      { idx: 52, tag: '0053_property_scope_repair' },
     ])
     for (let index = 1; index < journal.entries.length; index++) {
       expect(journal.entries[index]!.when).toBeGreaterThan(journal.entries[index - 1]!.when)

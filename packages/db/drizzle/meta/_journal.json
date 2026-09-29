@@ -365,6 +365,13 @@
       "when": 1790762400000,
       "tag": "0052_user_identity_lifecycle",
       "breakpoints": true
+    },
+    {
+      "idx": 52,
+      "version": "7",
+      "when": 1790848800000,
+      "tag": "0053_property_scope_repair",
+      "breakpoints": true
     }
   ]
 }

@@ -29,6 +29,13 @@ export const tenants = pgTable(
     region: text('region').default('ca-central-1').notNull(),
     defaultLanguage: text('default_language').default('en').notNull(),
     enabledLanguages: jsonb('enabled_languages').$type<string[]>().default(['en']).notNull(),
+    // Operational presentation defaults belong to the tenant, rather than to a
+    // global user identity. Locale and currency deliberately remain independent.
+    operationalLocale: text('operational_locale').default('en').notNull(),
+    operationalTimezone: text('operational_timezone').default('UTC').notNull(),
+    dateFormat: text('date_format').default('medium').notNull(),
+    numberFormat: text('number_format').default('standard').notNull(),
+    defaultCurrencyCode: text('default_currency_code').default('USD').notNull(),
     hierarchy: jsonb('hierarchy')
       .$type<{ customer: boolean; project: boolean; site: boolean; area: boolean }>()
       .default({ customer: true, project: true, site: true, area: false })

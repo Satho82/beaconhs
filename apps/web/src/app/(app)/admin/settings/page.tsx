@@ -27,6 +27,11 @@ import { requireRequestContext } from '@/lib/auth'
 import { recordAudit } from '@/lib/audit'
 import { levelLabel } from '@/lib/org-hierarchy'
 import { appBaseUrl } from '@/lib/app-base-url'
+import {
+  DATE_FORMATS,
+  NUMBER_FORMATS,
+  parseTenantOperationalDefaults,
+} from '@/lib/tenant-operational-defaults'
 import { PageContainer } from '@/components/page-layout'
 
 export async function generateMetadata() {
@@ -54,6 +59,13 @@ async function saveSettings(formData: FormData) {
   const name = String(formData.get('name') ?? '').trim()
   const slug = String(formData.get('slug') ?? '').trim()
   const defaultLanguage = String(formData.get('defaultLanguage') ?? 'en')
+  const operationalDefaults = parseTenantOperationalDefaults({
+    locale: formData.get('operationalLocale'),
+    timezone: formData.get('operationalTimezone'),
+    dateFormat: formData.get('dateFormat'),
+    numberFormat: formData.get('numberFormat'),
+    currencyCode: formData.get('defaultCurrencyCode'),
+  })
   const enabledLanguages = LOCALE_OPTIONS.map((l) => l.value).filter(
     (l) => formData.get(`lang_${l}`) === 'on',
   )
@@ -106,6 +118,11 @@ async function saveSettings(formData: FormData) {
         slug: slug || (before?.slug ?? 'tenant'),
         defaultLanguage: languagePolicy.defaultLocale,
         enabledLanguages: languagePolicy.enabledLocales,
+        operationalLocale: operationalDefaults.locale,
+        operationalTimezone: operationalDefaults.timezone,
+        dateFormat: operationalDefaults.dateFormat,
+        numberFormat: operationalDefaults.numberFormat,
+        defaultCurrencyCode: operationalDefaults.currencyCode,
         hierarchy,
         branding,
         settings: { ...(before?.settings ?? {}), regulatoryTerminology },
@@ -136,6 +153,11 @@ async function saveSettings(formData: FormData) {
           slug: before.slug,
           defaultLanguage: before.defaultLanguage,
           enabledLanguages: before.enabledLanguages,
+          operationalLocale: before.operationalLocale,
+          operationalTimezone: before.operationalTimezone,
+          dateFormat: before.dateFormat,
+          numberFormat: before.numberFormat,
+          defaultCurrencyCode: before.defaultCurrencyCode,
           hierarchy: before.hierarchy,
           branding: before.branding,
           regulatoryTerminology: resolveRegulatoryTerminology(before.settings),
@@ -147,6 +169,7 @@ async function saveSettings(formData: FormData) {
       slug,
       defaultLanguage: languagePolicy.defaultLocale,
       enabledLanguages: languagePolicy.enabledLocales,
+      ...operationalDefaults,
       hierarchy,
       branding,
       regulatoryTerminology,
@@ -191,6 +214,56 @@ export default async function AdminSettingsPage() {
         />
 
         <form action={saveSettings} className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>
+                <GeneratedValue value={t('operationalDefaults')} />
+              </CardTitle>
+              <CardDescription>
+                <GeneratedValue value={t('operationalDefaultsDescription')} />
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <Field label={tGeneratedValue(t('operationalLocale'))}>
+                <Input name="operationalLocale" defaultValue={tenant.operationalLocale} required />
+              </Field>
+              <Field label={tGeneratedValue(t('operationalTimezone'))}>
+                <Input
+                  name="operationalTimezone"
+                  defaultValue={tenant.operationalTimezone}
+                  required
+                />
+              </Field>
+              <Field label={tGeneratedValue(t('dateFormat'))}>
+                <Select name="dateFormat" defaultValue={tenant.dateFormat}>
+                  {DATE_FORMATS.map((format) => (
+                    <option key={format} value={format}>
+                      {tGeneratedValue(t(`dateFormat_${format}`))}
+                    </option>
+                  ))}
+                </Select>
+              </Field>
+              <Field label={tGeneratedValue(t('numberFormat'))}>
+                <Select name="numberFormat" defaultValue={tenant.numberFormat}>
+                  {NUMBER_FORMATS.map((format) => (
+                    <option key={format} value={format}>
+                      {tGeneratedValue(t(`numberFormat_${format}`))}
+                    </option>
+                  ))}
+                </Select>
+              </Field>
+              <Field label={tGeneratedValue(t('defaultCurrencyCode'))}>
+                <Input
+                  name="defaultCurrencyCode"
+                  defaultValue={tenant.defaultCurrencyCode}
+                  maxLength={3}
+                  className="font-mono uppercase"
+                  required
+                />
+              </Field>
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle>

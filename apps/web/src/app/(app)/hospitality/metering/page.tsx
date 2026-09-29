@@ -7,6 +7,7 @@ import { SearchInput } from '@/components/search-input'
 import { requireRequestContext } from '@/lib/auth'
 import { getGeneratedValueTranslations } from '@/i18n/generated.server'
 import { resolveHospitalityPropertyContext } from '@/lib/hospitality/property-context'
+import { resolveTenantOperationalDefaultsForContext } from '@/lib/tenant-operational-defaults'
 import {
   addReading,
   addTariff,
@@ -98,9 +99,9 @@ async function toggle(form: FormData) {
   )
   revalidatePath(BASE)
 }
-function money(value: number | string | null, currency: string | null) {
+function money(value: number | string | null, currency: string | null, locale: string) {
   if (value == null || !currency) return '-'
-  return new Intl.NumberFormat('en-GB', { style: 'currency', currency }).format(Number(value))
+  return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(Number(value))
 }
 type AnalyticsPoint = { label: string; value: number }
 
@@ -241,6 +242,7 @@ export default async function MeteringPage({
 }) {
   const t = await getGeneratedValueTranslations()
   const ctx = await requireRequestContext()
+  const operationalDefaults = await resolveTenantOperationalDefaultsForContext(ctx)
   const propertyContext = await resolveHospitalityPropertyContext(ctx)
   const search = await searchParams
   const rawTab = typeof search.tab === 'string' ? search.tab : 'overview'
@@ -392,7 +394,13 @@ export default async function MeteringPage({
                         </div>
                         <div>
                           <dt className="text-muted-foreground">{t('Estimated expenditure')}</dt>
-                          <dd>{money(spend, currentTariff?.currency ?? null)}</dd>
+                          <dd>
+                            {money(
+                              spend,
+                              currentTariff?.currency ?? null,
+                              operationalDefaults.locale,
+                            )}
+                          </dd>
                         </div>
                         <div>
                           <dt className="text-muted-foreground">{t('Weekly consumption')}</dt>
@@ -535,7 +543,9 @@ export default async function MeteringPage({
                       <td className="p-3">
                         {item.unitCost == null ? '-' : `${item.unitCost} ${item.currency}`}
                       </td>
-                      <td className="p-3">{money(item.expenditure, item.currency)}</td>
+                      <td className="p-3">
+                        {money(item.expenditure, item.currency, operationalDefaults.locale)}
+                      </td>
                       <td className="p-3">{item.submitterName}</td>
                       <td className="p-3">{item.notes ?? '-'}</td>
                     </tr>
@@ -759,7 +769,12 @@ export default async function MeteringPage({
                 </label>
                 <label className="space-y-1 text-sm">
                   <span>{t('Currency')}</span>
-                  <Input name="currency" defaultValue="GBP" maxLength={3} required />
+                  <Input
+                    name="currency"
+                    defaultValue={operationalDefaults.currencyCode}
+                    maxLength={3}
+                    required
+                  />
                 </label>
                 <label className="space-y-1 text-sm">
                   <span>{t('Effective from')}</span>

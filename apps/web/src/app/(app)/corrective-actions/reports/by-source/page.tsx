@@ -20,6 +20,7 @@ import { SearchInput } from '@/components/search-input'
 import { SortTh } from '@/components/sortable-th'
 import { TableToolbar } from '@/components/table-toolbar'
 import { parseListParams, pickString } from '@/lib/list-params'
+import { resolveTenantOperationalDefaultsForContext } from '@/lib/tenant-operational-defaults'
 
 export async function generateMetadata() {
   const tGenerated = await getGeneratedTranslations()
@@ -62,6 +63,7 @@ export default async function BySourceReport({
     allowedSorts: SORTS,
   })
   const ctx = await requireRequestContext()
+  const operationalDefaults = await resolveTenantOperationalDefaultsForContext(ctx)
   const propertyContext = await resolveHospitalityPropertyContext(ctx)
 
   const grouped = await ctx.db(async (tx) => {
@@ -341,7 +343,15 @@ export default async function BySourceReport({
                         </td>
                         <td className="px-4 py-2 text-right font-mono text-xs text-slate-700 dark:text-slate-300">
                           <GeneratedValue
-                            value={r.costImpact > 0 ? formatMoney(r.costImpact, ctx.locale) : '—'}
+                            value={
+                              r.costImpact > 0
+                                ? formatMoney(
+                                    r.costImpact,
+                                    operationalDefaults.locale,
+                                    operationalDefaults.currencyCode,
+                                  )
+                                : '—'
+                            }
                           />
                         </td>
                       </tr>
@@ -364,10 +374,10 @@ export default async function BySourceReport({
   )
 }
 
-function formatMoney(n: number, locale: string): string {
+function formatMoney(n: number, locale: string, currency: string): string {
   return n.toLocaleString(locale, {
     style: 'currency',
-    currency: 'USD',
+    currency,
     maximumFractionDigits: 2,
   })
 }

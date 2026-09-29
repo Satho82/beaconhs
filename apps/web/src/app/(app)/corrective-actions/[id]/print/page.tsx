@@ -15,6 +15,7 @@ import {
 import { attachmentUrl } from '@/lib/attachment-url'
 import { requireRequestContext } from '@/lib/auth'
 import { formatDate, formatDateTime } from '@/lib/datetime'
+import { resolveTenantOperationalDefaultsForContext } from '@/lib/tenant-operational-defaults'
 import { canSeeRecord } from '@/lib/visibility'
 import { recordAudit } from '@/lib/audit'
 import { isUuid } from '@/lib/list-params'
@@ -46,6 +47,7 @@ export default async function CorrectiveActionPrintPage({
   if (!isUuid(id)) notFound()
 
   const ctx = await requireRequestContext()
+  const operationalDefaults = await resolveTenantOperationalDefaultsForContext(ctx)
 
   const data = await ctx.db(async (tx) => {
     const [row] = await tx
@@ -206,7 +208,15 @@ export default async function CorrectiveActionPrintPage({
           <Field label={tGenerated('m_01381607e25f0d')} value={closed} />
           <Field
             label={tGenerated('m_08d00ceb0352a5')}
-            value={ca.costImpact != null ? formatMoney(Number(ca.costImpact), ctx.locale) : '—'}
+            value={
+              ca.costImpact != null
+                ? formatMoney(
+                    Number(ca.costImpact),
+                    operationalDefaults.locale,
+                    operationalDefaults.currencyCode,
+                  )
+                : '—'
+            }
           />
         </section>
 
@@ -391,10 +401,10 @@ function Field({ label, value }: { label: string; value: React.ReactNode }) {
   )
 }
 
-function formatMoney(n: number, locale: string): string {
+function formatMoney(n: number, locale: string, currency: string): string {
   return n.toLocaleString(locale, {
     style: 'currency',
-    currency: 'USD',
+    currency,
     maximumFractionDigits: 2,
   })
 }

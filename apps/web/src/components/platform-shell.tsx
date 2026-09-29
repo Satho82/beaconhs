@@ -18,12 +18,14 @@ export function PlatformShell({
   branding,
   defaultCollapsed,
   deploymentVersion,
+  deploymentEnvironment,
   children,
 }: {
   operator: { name: string; email: string }
   branding: PlatformBranding
   defaultCollapsed: boolean
   deploymentVersion?: string
+  deploymentEnvironment?: string
   children: React.ReactNode
 }) {
   const router = useRouter()
@@ -39,6 +41,7 @@ export function PlatformShell({
         defaultCollapsed={defaultCollapsed}
         platformBranding={branding}
         deploymentVersion={deploymentVersion}
+        deploymentEnvironment={deploymentEnvironment}
       />
       <MobileNavProvider>
         <div className="flex min-w-0 flex-1 flex-col overflow-hidden [padding-top:env(safe-area-inset-top)]">

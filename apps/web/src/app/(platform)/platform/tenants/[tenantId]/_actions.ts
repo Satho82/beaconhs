@@ -152,6 +152,7 @@ export async function saveTenantProperty(formData: FormData): Promise<void> {
 }
 
 export async function setTenantPropertyArchived(formData: FormData): Promise<void> {
+  const locale = await getLocale()
   const operator = await requirePlatformOperator()
   const tenantId = String(formData.get('tenantId') ?? '')
   const propertyId = String(formData.get('propertyId') ?? '')
@@ -174,7 +175,10 @@ export async function setTenantPropertyArchived(formData: FormData): Promise<voi
           ),
         )
         .limit(1)
-      if (assignment) throw new Error('Reassign memberships before archiving this property.')
+      if (assignment)
+        throw new Error(
+          translateSystemCopy(locale, 'Reassign memberships before archiving this property.'),
+        )
     }
     return tx
       .update(hospitalityProperties)

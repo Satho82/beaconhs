@@ -1,13 +1,15 @@
--- Repair only unambiguous stale hotel-property scopes: a deleted property may
--- be replaced when one active property with the same tenant and name exists.
--- The migration never guesses across zero or multiple active candidates.
+-- Repair only explicitly attested stale hotel-property scopes. An operator
+-- records the canonical successor on the active property as
+-- metadata.replacesPropertyId before this migration is run. Names, codes and
+-- tenancy alone are deliberately never treated as evidence of replacement.
+-- Missing, malformed or conflicting attestations leave the assignment intact.
 WITH candidates AS (
-  SELECT deleted.tenant_id, deleted.id AS old_id, min(active.id) AS new_id
+  SELECT deleted.tenant_id, deleted.id AS old_id, (array_agg(active.id))[1] AS new_id
   FROM hospitality_properties deleted
   JOIN hospitality_properties active
     ON active.tenant_id = deleted.tenant_id
    AND active.deleted_at IS NULL
-   AND active.name = deleted.name
+   AND active.metadata->>'replacesPropertyId' = deleted.id::text
   WHERE deleted.deleted_at IS NOT NULL
   GROUP BY deleted.tenant_id, deleted.id
   HAVING count(*) = 1
@@ -33,6 +35,7 @@ WITH candidates AS (
   FROM candidates candidate
   WHERE assignment.tenant_id = candidate.tenant_id
     AND assignment.scope->>'type' = 'properties'
+    AND jsonb_typeof(assignment.scope->'propertyIds') = 'array'
     AND assignment.scope->'propertyIds' ? candidate.old_id::text
   RETURNING assignment.id, assignment.tenant_id, assignment.scope
 )

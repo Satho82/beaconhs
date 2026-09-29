@@ -18,6 +18,18 @@ import type { PlatformBranding } from '@/lib/platform-branding-config'
 
 const COOKIE = 'sidebar_collapsed'
 
+/** Separates the customer-facing release from its immutable build identity. */
+export function deploymentLabels(deploymentVersion?: string, deploymentEnvironment?: string) {
+  const immutableVersion = deploymentVersion?.trim()
+  const environmentLabel = deploymentEnvironment?.trim()
+  const buildLabel = immutableVersion?.split('+', 1)[0]
+  const releaseLabel =
+    buildLabel && environmentLabel && buildLabel.endsWith(`-${environmentLabel}`)
+      ? buildLabel.slice(0, -(`-${environmentLabel}`).length)
+      : buildLabel
+  return { immutableVersion, releaseLabel, environmentLabel }
+}
+
 export function AppSidebar({
   groups,
   defaultCollapsed = false,
@@ -37,9 +49,10 @@ export function AppSidebar({
   const [collapsed, setCollapsed] = useState(defaultCollapsed)
   const t = useTranslations('Shell')
   const navGroups = useNavGroups(groups)
-  const immutableVersion = deploymentVersion?.trim()
-  const releaseLabel = immutableVersion?.split('+', 1)[0]
-  const environmentLabel = deploymentEnvironment?.trim()
+  const { immutableVersion, releaseLabel, environmentLabel } = deploymentLabels(
+    deploymentVersion,
+    deploymentEnvironment,
+  )
 
   const toggle = useCallback(() => {
     setCollapsed((c) => {

@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
+import { deploymentLabels } from '@/components/app-sidebar'
 
 const nextConfig = readFileSync(new URL('../../next.config.ts', import.meta.url), 'utf8')
 const dockerfile = readFileSync(new URL('../../../../Dockerfile', import.meta.url), 'utf8')
@@ -26,8 +27,17 @@ describe('self-hosted Next.js version-skew protection', () => {
   })
 
   it('shows the immutable runtime version rather than the package development version', () => {
-    expect(sidebar).toContain("const versionLabel = deploymentVersion?.trim() || 'dev'")
+    expect(sidebar).toContain('export function deploymentLabels')
     expect(sidebar).not.toContain('<GeneratedText id="m_155b48f51ba2b4" />')
     expect(appLayout).toContain('process.env.APP_VERSION ?? process.env.DEPLOYMENT_VERSION')
+  })
+
+  it('separates the configured release and environment from the build identity', () => {
+    expect(deploymentLabels('v1.3.1-staging+4d46b996', 'staging')).toEqual({
+      immutableVersion: 'v1.3.1-staging+4d46b996',
+      releaseLabel: 'v1.3.1',
+      environmentLabel: 'staging',
+    })
+    expect(deploymentLabels('v1.3.1+4d46b996', 'staging').releaseLabel).toBe('v1.3.1')
   })
 })

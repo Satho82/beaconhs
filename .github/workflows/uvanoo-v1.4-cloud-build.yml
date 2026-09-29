@@ -1,0 +1,122 @@
+name: Uvanoo V1.4 cloud validation and DEV image
+
+# Cloud-only validation and image publication for the frozen V1.4 source.
+# This workflow has no SSH, VPS, Dokploy, staging, production, or deployment path.
+on:
+  push:
+    branches: [feature/uvanoo-v1.4]
+    paths: [.github/workflows/uvanoo-v1.4-cloud-build.yml, docs/DEV-INFRA-02A.md]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: uvanoo-v1-4-cloud-build
+  cancel-in-progress: false
+
+env:
+  RELEASE_SHA: 542c2014cf318498d27b6d918a0b4af8772fb539
+  IMAGE_NAME: ghcr.io/satho82/uvanoo-staging-private
+  IMAGE_TAG: v1.4-dev-542c2014
+
+jobs:
+  validate:
+    name: Validate frozen V1.4 source
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    services:
+      postgres:
+        image: postgres:16-alpine@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777
+        env: { POSTGRES_USER: postgres, POSTGRES_PASSWORD: postgres, POSTGRES_DB: beaconhs_test }
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd="pg_isready -U postgres" --health-interval=5s --health-timeout=5s --health-retries=10
+      redis:
+        image: redis:7-alpine@sha256:6ab0b6e7381779332f97b8ca76193e45b0756f38d4c0dcda72dbb3c32061ab99
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd="redis-cli ping" --health-interval=5s --health-timeout=5s --health-retries=10
+    env:
+      DATABASE_URL: postgresql://beaconhs_app:beaconhs_app@localhost:5432/beaconhs_test
+      MIGRATION_DATABASE_URL: postgresql://beaconhs_migrator:beaconhs_migrator@localhost:5432/beaconhs_test
+      SUPERADMIN_DATABASE_URL: postgresql://beaconhs_super:beaconhs_super@localhost:5432/beaconhs_test
+      DATABASE_OWNER_ROLE: beaconhs_owner
+      DATABASE_BACKUP_ROLE: beaconhs_backup
+      REDIS_URL: redis://localhost:6379
+      BETTER_AUTH_SECRET: ci-secret-not-used-in-prod
+      ATTACHMENT_CAPABILITY_SECRET: ci-attachment-capability-secret-32-chars
+      BETTER_AUTH_URL: http://localhost:3000
+      APP_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with: { ref: '${{ env.RELEASE_SHA }}', persist-credentials: false, fetch-depth: 1 }
+      - run: test "$(git rev-parse HEAD)" = "$RELEASE_SHA"
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with: { node-version: 24.18.0, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - name: Provision isolated CI roles
+        env: { PGPASSWORD: postgres }
+        run: |
+          psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 <<'SQL'
+          CREATE ROLE beaconhs_owner NOLOGIN NOSUPERUSER NOBYPASSRLS;
+          CREATE ROLE beaconhs_migrator LOGIN NOINHERIT NOSUPERUSER NOBYPASSRLS PASSWORD 'beaconhs_migrator';
+          CREATE ROLE beaconhs_app LOGIN NOINHERIT NOSUPERUSER NOBYPASSRLS PASSWORD 'beaconhs_app';
+          CREATE ROLE beaconhs_super LOGIN NOINHERIT NOSUPERUSER BYPASSRLS PASSWORD 'beaconhs_super';
+          CREATE ROLE beaconhs_backup LOGIN NOINHERIT NOSUPERUSER BYPASSRLS PASSWORD 'beaconhs_backup';
+          ALTER ROLE beaconhs_backup SET default_transaction_read_only = 'on';
+          GRANT beaconhs_owner TO beaconhs_migrator;
+          ALTER DATABASE beaconhs_test OWNER TO beaconhs_owner;
+          REVOKE ALL ON DATABASE beaconhs_test FROM PUBLIC;
+          GRANT CONNECT ON DATABASE beaconhs_test TO beaconhs_migrator, beaconhs_app, beaconhs_super, beaconhs_backup;
+          \connect beaconhs_test
+          ALTER SCHEMA public OWNER TO beaconhs_owner;
+          REVOKE ALL ON SCHEMA public FROM PUBLIC;
+          SQL
+      - run: pnpm format:check
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm deadcode:check
+      - run: pnpm --filter @beaconhs/db exec tsx src/migrate.ts
+      - run: pnpm --filter @beaconhs/db exec tsx src/migrate.ts
+      - run: pnpm test
+      - run: pnpm --filter @beaconhs/web build
+        env: { NODE_OPTIONS: --max-old-space-size=6144 }
+
+  image:
+    name: Publish immutable V1.4 DEV candidate
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    outputs: { image_digest: '${{ steps.image.outputs.digest }}' }
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with: { ref: '${{ env.RELEASE_SHA }}', persist-credentials: false, fetch-depth: 1 }
+      - run: test "$(git rev-parse HEAD)" = "$RELEASE_SHA"
+      - uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4
+      - uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 # v4
+        with: { registry: ghcr.io, username: '${{ github.actor }}', password: '${{ github.token }}' }
+      - id: image
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+            ${{ env.IMAGE_NAME }}:${{ env.RELEASE_SHA }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/Satho82/beaconhs
+            org.opencontainers.image.revision=${{ env.RELEASE_SHA }}
+            org.opencontainers.image.version=${{ env.IMAGE_TAG }}
+          build-args: |
+            DEPLOYMENT_VERSION=${{ env.RELEASE_SHA }}
+            BUILD_NODE_HEAP_MB=8192
+          cache-from: type=gha
+          cache-to: type=gha,mode=max,ignore-error=true
+      - name: Record immutable candidate and stop
+        run: |
+          test "${{ steps.image.outputs.digest }}" != ''
+          echo "Immutable DEV candidate: ${{ env.IMAGE_NAME }}@${{ steps.image.outputs.digest }}" >> "$GITHUB_STEP_SUMMARY"

@@ -64,7 +64,7 @@ CREATE POLICY tenant_isolation ON org_units
       OR (
         current_setting('app.action_scope_mode', true) = 'property'
         AND coalesce(nullif(current_setting('app.action_property_ids', true), ''), '[]')::jsonb
-          ? (metadata->>'hospitalityPropertyId')
+          ? (metadata->>'hospitalityPropertyId')::text
         AND EXISTS (
           SELECT 1 FROM hospitality_properties property_scope
           WHERE property_scope.tenant_id = org_units.tenant_id
@@ -85,7 +85,7 @@ CREATE POLICY tenant_isolation ON org_units
       OR (
         current_setting('app.action_scope_mode', true) = 'property'
         AND coalesce(nullif(current_setting('app.action_property_ids', true), ''), '[]')::jsonb
-          ? (metadata->>'hospitalityPropertyId')
+          ? (metadata->>'hospitalityPropertyId')::text
         AND EXISTS (
           SELECT 1 FROM hospitality_properties property_scope
           WHERE property_scope.tenant_id = org_units.tenant_id

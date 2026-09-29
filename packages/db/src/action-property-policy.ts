@@ -97,7 +97,9 @@ export function sitePropertyPredicate(table: string, column = 'site_org_unit_id'
 /** Hotel site units are visible to property-scoped analytics only through their
  * canonical hospitality-property metadata mapping. */
 export function orgUnitPropertyPredicate(): string {
-  const property = "org_units.metadata->>'hospitalityPropertyId'"
+  // `?` accepts jsonb,text. Parenthesize and cast the JSON text extraction so
+  // PostgreSQL cannot bind `?` before `->>` and try jsonb ? jsonb.
+  const property = "(org_units.metadata->>'hospitalityPropertyId')::text"
   return `(${mode} = 'tenant' OR (
     ${mode} = 'property'
     AND (${ids}) ? ${property}

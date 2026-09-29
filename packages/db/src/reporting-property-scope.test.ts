@@ -5,6 +5,7 @@ import { PROPERTY_REPORTING_TABLES, RLS_POLICY_SQL } from './rls'
 describe('property-scoped reporting database contracts', () => {
   it('certifies the reporting sources whose rows have property provenance', () => {
     for (const table of [
+      'org_units',
       'risk_assessments',
       'operational_task_occurrences',
       'people',
@@ -20,6 +21,17 @@ describe('property-scoped reporting database contracts', () => {
     }
     expect(PROPERTY_REPORTING_TABLES.has('incident_hours_periods')).toBe(false)
     expect(PROPERTY_REPORTING_TABLES.has('truck_log_entries')).toBe(false)
+  })
+
+  it('keeps org units inside the exact active property boundary', () => {
+    const policy = RLS_POLICY_SQL('org_units')
+    expect(policy).toContain("? (org_units.metadata->>'hospitalityPropertyId')::text")
+    expect(policy).toContain('property_scope.tenant_id=org_units.tenant_id')
+    expect(policy).toContain('property_scope.deleted_at IS NULL')
+    expect(policy).toContain("current_setting('app.action_scope_mode', true) = 'legacy'")
+    expect(policy).toContain(
+      "coalesce((org_units.metadata->>'hospitalityPropertyId')::text, '') = ''",
+    )
   })
 
   it('scopes assignments through their org unit without recursing through people', () => {

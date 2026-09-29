@@ -30,7 +30,7 @@ describe('0053 property-scope repair migration contract', () => {
 
   it('certifies the incident site relation through property-safe org-unit RLS', () => {
     expect(migration).toContain('ALTER TABLE org_units ENABLE ROW LEVEL SECURITY')
-    expect(migration).toContain("metadata->>'hospitalityPropertyId'")
+    expect(migration).toContain("? (metadata->>'hospitalityPropertyId')::text")
     expect(migration).toContain('property_scope.deleted_at IS NULL')
   })
 })

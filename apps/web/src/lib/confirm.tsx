@@ -16,6 +16,7 @@ import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { AlertTriangle, HelpCircle } from 'lucide-react'
 import { Button } from '@beaconhs/ui'
+import { useHydrated } from '@/lib/use-hydrated'
 
 export type ConfirmTone = 'default' | 'danger'
 
@@ -72,6 +73,10 @@ function subscribe(cb: () => void) {
 
 /** Mounted once in the app layout. Renders the active confirm request (if any). */
 export function ConfirmRoot() {
+  // The server has no document and therefore renders no portal.  Keep that
+  // exact shape for the first browser render too; otherwise React abandons
+  // hydration for the app shell before any confirmation-backed form can work.
+  const hydrated = useHydrated()
   const req = React.useSyncExternalStore(
     subscribe,
     () => current,
@@ -93,7 +98,7 @@ export function ConfirmRoot() {
     }
   }, [req])
 
-  if (typeof document === 'undefined') return null
+  if (!hydrated) return null
 
   const danger = req?.tone === 'danger'
   const title = req?.title ?? (danger ? 'Are you sure?' : 'Confirm')

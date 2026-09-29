@@ -20,6 +20,7 @@ import {
   complianceChildPredicate,
   directPropertyPredicate,
   peoplePropertyPredicate,
+  orgUnitPropertyPredicate,
   ppeItemPropertyPredicate,
   propertyParentPredicate,
   reportSchedulePropertyPredicate,
@@ -92,6 +93,7 @@ const TENANT_ID_SQL = `nullif(current_setting('app.tenant_id', true), '')::uuid`
  * Dynamic analytics must fail closed to this inventory instead of treating
  * tenant isolation as property provenance. */
 export const PROPERTY_REPORTING_TABLES = new Set([
+  'org_units',
   'hospitality_properties',
   'hospitality_buildings',
   'hospitality_floors',
@@ -185,7 +187,9 @@ CREATE POLICY tenant_write_delete ON ${table}
   }
 
   const actionScope =
-    table === 'inspection_records' || table === 'equipment_inspection_records'
+    table === 'org_units'
+      ? orgUnitPropertyPredicate()
+      : table === 'inspection_records' || table === 'equipment_inspection_records'
       ? inspectionPropertyPredicate(table)
       : table === 'inspection_record_attachments' || table === 'inspection_record_criteria'
         ? inspectionChildPredicate(table, 'inspection_records')

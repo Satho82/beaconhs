@@ -38,6 +38,7 @@ export function AppShell({
   unreadCount,
   defaultCollapsed = false,
   deploymentVersion,
+  deploymentEnvironment,
   impersonation = null,
   canUseAssistant = false,
   children,
@@ -60,6 +61,7 @@ export function AppShell({
   /** Persisted sidebar-collapsed preference (from the `sidebar_collapsed` cookie). */
   defaultCollapsed?: boolean
   deploymentVersion?: string
+  deploymentEnvironment?: string
   /** Set only while this request is impersonating — drives the global banner. */
   impersonation?: { actorName: string; targetName: string; expiresAtMs: number } | null
   /** Whether to show the ⌘K assistant launcher (user holds assistant.use). */
@@ -75,6 +77,7 @@ export function AppShell({
         defaultCollapsed={defaultCollapsed}
         platformBranding={platformBranding}
         deploymentVersion={deploymentVersion}
+        deploymentEnvironment={deploymentEnvironment}
       />
 
       <MobileNavProvider>

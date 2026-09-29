@@ -24,6 +24,7 @@ export default async function PlatformLayout({ children }: { children: React.Rea
           branding={branding}
           defaultCollapsed={cookieStore.get('sidebar_collapsed')?.value === '1'}
           deploymentVersion={process.env.APP_VERSION ?? process.env.DEPLOYMENT_VERSION}
+          deploymentEnvironment={process.env.SENTRY_ENVIRONMENT ?? process.env.NODE_ENV}
         >
           <GeneratedValue value={children} />
         </PlatformShell>

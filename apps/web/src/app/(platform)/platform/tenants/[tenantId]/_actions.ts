@@ -3,10 +3,10 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { getLocale } from 'next-intl/server'
-import { and, eq, isNull } from 'drizzle-orm'
+import { and, eq, isNull, sql } from 'drizzle-orm'
 import { translateSystemCopy } from '@beaconhs/i18n/messages'
 import { db, provisionTenantBaseline, withSuperAdmin } from '@beaconhs/db'
-import { auditLog, hospitalityProperties, tenants } from '@beaconhs/db/schema'
+import { auditLog, hospitalityProperties, roleAssignments, tenants } from '@beaconhs/db/schema'
 import { requirePlatformOperator } from '@/lib/auth'
 import { setActiveTenant } from '@/lib/actions'
 import { recordPlatformAudit } from '@/lib/platform-audit'
@@ -158,15 +158,32 @@ export async function setTenantPropertyArchived(formData: FormData): Promise<voi
   const archived = String(formData.get('archived') ?? '') === 'on'
   if (!isUuid(tenantId) || !isUuid(propertyId))
     throw new Error('Invalid property lifecycle request.')
-  const [property] = await withSuperAdmin(db, async (tx) =>
-    tx
+  const [property] = await withSuperAdmin(db, async (tx) => {
+    // Scope JSON cannot carry a foreign key.  Refuse an archive that would
+    // leave any membership pointing at a deleted hotel; an operator must first
+    // reassign the membership to an intended active property or remove it.
+    if (archived) {
+      const [assignment] = await tx
+        .select({ id: roleAssignments.id })
+        .from(roleAssignments)
+        .where(
+          and(
+            eq(roleAssignments.tenantId, tenantId),
+            sql`${roleAssignments.scope}->>'type' = 'properties'`,
+            sql`${roleAssignments.scope}->'propertyIds' ? ${propertyId}`,
+          ),
+        )
+        .limit(1)
+      if (assignment) throw new Error('Reassign memberships before archiving this property.')
+    }
+    return tx
       .update(hospitalityProperties)
       .set({ deletedAt: archived ? new Date() : null, updatedAt: new Date() })
       .where(
         and(eq(hospitalityProperties.id, propertyId), eq(hospitalityProperties.tenantId, tenantId)),
       )
-      .returning(),
-  )
+      .returning()
+  })
   if (!property) throw new Error('Property not found in this tenant.')
   await recordPlatformAudit(operator, {
     entityType: 'property',

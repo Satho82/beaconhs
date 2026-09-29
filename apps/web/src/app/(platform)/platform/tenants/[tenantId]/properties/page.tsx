@@ -39,7 +39,9 @@ export default async function PlatformTenantPropertiesPage({
   await requirePlatformOperator()
   const { tenantId } = await params
   if (!isUuid(tenantId)) notFound()
-  const q = pickString((await searchParams).q)?.trim()
+  const requested = await searchParams
+  const q = pickString(requested.q)?.trim()
+  const editId = pickString(requested.edit)
   const data = await withSuperAdmin(db, async (tx) => {
     const [tenant] = await tx
       .select({ name: tenants.name })
@@ -56,7 +58,9 @@ export default async function PlatformTenantPropertiesPage({
       .where(and(eq(hospitalityProperties.tenantId, tenantId), search))
       .orderBy(asc(hospitalityProperties.name))
       .limit(100)
-    return { tenant, rows }
+    const editing =
+      editId && isUuid(editId) ? rows.find((row) => row.id === editId && !row.deletedAt) : undefined
+    return { tenant, rows, editing }
   })
   if (!data) notFound()
   return (
@@ -78,20 +82,28 @@ export default async function PlatformTenantPropertiesPage({
           className="grid gap-3 rounded-lg border bg-white p-4 md:grid-cols-4 dark:bg-slate-900"
         >
           <input type="hidden" name="tenantId" value={tenantId} />
+          {data.editing ? <input type="hidden" name="propertyId" value={data.editing.id} /> : null}
           <div>
             <Label htmlFor="property-name">{tGenerated('m_1db4bb1e2f8e4b')}</Label>
-            <Input id="property-name" name="name" required />
+            <Input id="property-name" name="name" defaultValue={data.editing?.name} required />
           </div>
           <div>
             <Label htmlFor="property-code">{tGenerated('m_09442c9bd77b7c')}</Label>
-            <Input id="property-code" name="code" required />
+            <Input id="property-code" name="code" defaultValue={data.editing?.code} required />
           </div>
           <div>
             <Label htmlFor="property-timezone">{tGenerated('m_18dd6072735a83')}</Label>
-            <Input id="property-timezone" name="timezone" defaultValue="Europe/London" required />
+            <Input id="property-timezone" name="timezone" defaultValue={data.editing?.timezone ?? 'Europe/London'} required />
           </div>
           <div className="flex items-end">
-            <Button type="submit">{tGenerated('m_067cc738ffbd0e')}</Button>
+            <Button type="submit">
+              {data.editing ? tGenerated('m_1ab9025ed1067c') : tGenerated('m_067cc738ffbd0e')}
+            </Button>
+            {data.editing ? (
+              <Link href={`/platform/tenants/${tenantId}/properties`}>
+                <Button type="button" variant="outline">{tGenerated('m_112e2e8ecda428')}</Button>
+              </Link>
+            ) : null}
           </div>
         </form>
         {data.rows.length === 0 ? (
@@ -113,6 +125,11 @@ export default async function PlatformTenantPropertiesPage({
                   <TableCell>{row.code ?? '—'}</TableCell>
                   <TableCell>{row.timezone}</TableCell>
                   <TableCell>
+                    {!row.deletedAt ? (
+                      <Link href={`/platform/tenants/${tenantId}/properties?edit=${row.id}`}>
+                        <Button variant="outline">{tGenerated('m_03a66f9d34ac7b')}</Button>
+                      </Link>
+                    ) : null}
                     <form action={setTenantPropertyArchived}>
                       <input type="hidden" name="tenantId" value={tenantId} />
                       <input type="hidden" name="propertyId" value={row.id} />

@@ -1,6 +1,6 @@
 'use client'
 
-import { GeneratedText, GeneratedValue, useGeneratedValueTranslations } from '@/i18n/generated'
+import { GeneratedValue, useGeneratedValueTranslations } from '@/i18n/generated'
 
 // The desktop nav rail. Collapses to an icon-only strip; the choice is persisted
 // in a cookie so the server can render the correct width on the next load (no
@@ -23,18 +23,23 @@ export function AppSidebar({
   defaultCollapsed = false,
   platformBranding,
   deploymentVersion,
+  deploymentEnvironment,
 }: {
   groups: SidebarNavGroup[]
   defaultCollapsed?: boolean
   platformBranding?: PlatformBranding
   /** Immutable runtime identity supplied by the deployment, never package.json. */
   deploymentVersion?: string
+  /** Deployment environment supplied alongside immutable release metadata. */
+  deploymentEnvironment?: string
 }) {
   const tGeneratedValue = useGeneratedValueTranslations()
   const [collapsed, setCollapsed] = useState(defaultCollapsed)
   const t = useTranslations('Shell')
   const navGroups = useNavGroups(groups)
-  const versionLabel = deploymentVersion?.trim() || 'dev'
+  const immutableVersion = deploymentVersion?.trim()
+  const releaseLabel = immutableVersion?.split('+', 1)[0]
+  const environmentLabel = deploymentEnvironment?.trim()
 
   const toggle = useCallback(() => {
     setCollapsed((c) => {
@@ -93,13 +98,13 @@ export function AppSidebar({
             ) : (
               <div className="space-y-2">
                 <ThemeToggle />
-                <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-                  <span>
-                    <GeneratedText id="m_0c85098694b405" />
-                  </span>
-                  <Badge variant="secondary" className="font-mono text-[10px]">
-                    <GeneratedValue value={versionLabel} />
-                  </Badge>
+                <div className="flex items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400">
+                  <span className="font-mono"><GeneratedValue value={releaseLabel ?? immutableVersion ?? ''} /></span>
+                  {environmentLabel ? (
+                    <Badge variant="secondary" className="font-mono text-[10px]">
+                      <GeneratedValue value={environmentLabel} />
+                    </Badge>
+                  ) : null}
                 </div>
               </div>
             )

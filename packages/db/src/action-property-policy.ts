@@ -94,6 +94,17 @@ export function sitePropertyPredicate(table: string, column = 'site_org_unit_id'
   ))`
 }
 
+/** Hotel site units are visible to property-scoped analytics only through their
+ * canonical hospitality-property metadata mapping. */
+export function orgUnitPropertyPredicate(): string {
+  const property = "org_units.metadata->>'hospitalityPropertyId'"
+  return `(${mode} = 'tenant' OR (
+    ${mode} = 'property'
+    AND (${ids}) ? ${property}
+    AND ${activePropertyExists('org_units.tenant_id', property)}
+  ) OR (${mode} = 'legacy' AND coalesce(${property}, '') = ''))`
+}
+
 /** People are reportable for a hotel only through a current org-unit assignment. */
 export function peoplePropertyPredicate(): string {
   return `(${mode} = 'tenant' OR (

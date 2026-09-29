@@ -131,6 +131,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           unreadCount={unread}
           defaultCollapsed={defaultCollapsed}
           deploymentVersion={process.env.APP_VERSION ?? process.env.DEPLOYMENT_VERSION}
+          deploymentEnvironment={process.env.SENTRY_ENVIRONMENT ?? process.env.NODE_ENV}
           impersonation={impersonation}
           canUseAssistant={can(ctx, 'assistant.use')}
         >

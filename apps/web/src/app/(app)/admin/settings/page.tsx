@@ -1,6 +1,7 @@
 import { getGeneratedValueTranslations, getGeneratedTranslations } from '@/i18n/generated.server'
 import { GeneratedValue } from '@/i18n/generated'
 import Image from 'next/image'
+import { redirect } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
 import { eq } from 'drizzle-orm'
 import {
@@ -18,6 +19,7 @@ import {
 } from '@beaconhs/ui'
 import { db, withSuperAdmin } from '@beaconhs/db'
 import { tenants } from '@beaconhs/db/schema'
+import { LOCALE_OPTIONS } from '@beaconhs/i18n'
 import { resolveTenantLogoUrl } from '@beaconhs/storage'
 import { can, resolveRegulatoryTerminology } from '@beaconhs/tenant'
 import { requireRequestContext } from '@/lib/auth'

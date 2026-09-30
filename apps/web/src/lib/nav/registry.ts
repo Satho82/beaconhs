@@ -279,6 +279,14 @@ export const NAV_MODULES: NavModule[] = [
     ],
     group: 'Administration',
   },
+  {
+    key: 'tenant-settings',
+    href: '/admin/settings',
+    label: 'Tenant Settings',
+    iconKey: 'settings',
+    requiredPermission: 'admin.settings.manage',
+    group: 'Administration',
+  },
   // Forms = the template library + designer; a build/admin task, so it lives in
   // Administration. Crews don't need the library — they fill forms via
   // assignments, the module pages (inspections/JSHA/…), and pinned forms.

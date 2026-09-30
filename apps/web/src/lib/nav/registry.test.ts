@@ -14,6 +14,16 @@ function moduleKeysOf(config: TenantNavConfig): string[] {
 }
 
 describe('withMissingModules', () => {
+  it('registers Tenant Settings as the existing permission-gated route', () => {
+    expect(NAV_MODULES).toContainEqual(
+      expect.objectContaining({
+        key: 'tenant-settings',
+        href: '/admin/settings',
+        requiredPermission: 'admin.settings.manage',
+      }),
+    )
+  })
+
   it('keeps a deliberately deleted module deleted when the config is stamped', () => {
     const config = stampKnownModules(buildDefaultNavConfig())
     config.groups = config.groups.map((g) => ({

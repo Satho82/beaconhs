@@ -7,10 +7,10 @@ import type { RequestContext } from '@beaconhs/tenant'
 
 export const DATE_FORMATS = ['short', 'medium', 'long'] as const
 export const NUMBER_FORMATS = ['standard', 'compact'] as const
-export type DateFormat = (typeof DATE_FORMATS)[number]
-export type NumberFormat = (typeof NUMBER_FORMATS)[number]
+type DateFormat = (typeof DATE_FORMATS)[number]
+type NumberFormat = (typeof NUMBER_FORMATS)[number]
 
-export type TenantOperationalDefaults = {
+type TenantOperationalDefaults = {
   locale: string
   timezone: string
   dateFormat: DateFormat
@@ -75,7 +75,7 @@ export function parseTenantOperationalDefaults(
  * pass their current tenant transaction/context; this function never selects
  * an arbitrary tenant from client input.
  */
-export async function resolveTenantOperationalDefaults(
+async function resolveTenantOperationalDefaults(
   tx: Database,
   tenantId: string,
 ): Promise<TenantOperationalDefaults> {

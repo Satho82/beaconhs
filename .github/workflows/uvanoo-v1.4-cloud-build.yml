@@ -5,7 +5,16 @@ name: Uvanoo V1.4 cloud validation and DEV image
 on:
   push:
     branches: [feature/uvanoo-v1.4]
-    paths: [.github/workflows/uvanoo-v1.4-cloud-build.yml, docs/DEV-INFRA-02A.md]
+    paths:
+      - .github/workflows/uvanoo-v1.4-cloud-build.yml
+      - apps/**
+      - packages/**
+      - package.json
+      - pnpm-lock.yaml
+      - pnpm-workspace.yaml
+      - turbo.json
+      - Dockerfile
+      - docs/DEV-INFRA-02A.md
   workflow_dispatch:
     inputs:
       source_sha:

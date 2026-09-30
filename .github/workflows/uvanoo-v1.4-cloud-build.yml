@@ -102,7 +102,7 @@ jobs:
       - run: pnpm --filter @beaconhs/db exec tsx src/migrate.ts
       - run: pnpm test
       - run: pnpm --filter @beaconhs/web build
-        env: { NODE_OPTIONS: --max-old-space-size=6144 }
+        env: { NODE_OPTIONS: --max-old-space-size=8192 }
 
   image:
     name: Publish immutable V1.4 DEV candidate

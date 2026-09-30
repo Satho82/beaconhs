@@ -263,6 +263,7 @@
     "unlock": "Desbloquear quiosco"
   },
   "Generated": {
+    "m_152a0c53b77f75": "Configuración del inquilino",
     "m_0bd104dda9f183": "Se creó el inquilino {value0}",
     "m_0e732f319c37c9": "Configuración regional",
     "m_1a6597dd1c00f3": "Predeterminado del inquilino",

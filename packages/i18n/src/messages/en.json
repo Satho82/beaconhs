@@ -116,6 +116,7 @@
       "insights": "Insights",
       "reports": "Reports",
       "admin": "Admin",
+      "tenantSettings": "Tenant Settings",
       "forms": "Builder"
     }
   },
@@ -263,6 +264,7 @@
     "unlock": "Unlock kiosk"
   },
   "Generated": {
+    "m_152a0c53b77f75": "Tenant Settings",
     "m_0bd104dda9f183": "Created tenant {value0}",
     "m_0e732f319c37c9": "Locale",
     "m_1a6597dd1c00f3": "Tenant default",

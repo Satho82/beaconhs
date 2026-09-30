@@ -9,7 +9,7 @@ import { tenantUsers, tenants } from '@beaconhs/db/schema'
 import { LOCALE_OPTIONS, normalizeLocalePolicy } from '@beaconhs/i18n'
 import { can, resolveRegulatoryTerminology } from '@beaconhs/tenant'
 import { requireRequestContext } from '@/lib/auth'
-import { recordAudit } from '@/lib/audit'
+import { recordAuditInTransaction } from '@/lib/audit'
 import { parseTenantOperationalDefaults } from '@/lib/tenant-operational-defaults'
 
 async function requireSettingsAdmin() {
@@ -66,22 +66,21 @@ export async function saveSettings(formData: FormData) {
     throw new Error(t('invalidKioskPin'))
   }
 
-  const before = await withSuperAdmin(db, async (tx) => {
-    const [t] = await tx.select().from(tenants).where(eq(tenants.id, ctx.tenantId)).limit(1)
-    return t
-  })
-  const kioskPin = clearKioskPin
-    ? null
-    : normalizedKioskPin
-      ? await hashKioskPin(normalizedKioskPin)
-      : (before?.kioskPin ?? null)
+  await withSuperAdmin(db, async (tx) => {
+    const [before] = await tx.select().from(tenants).where(eq(tenants.id, ctx.tenantId)).limit(1)
+    const tenantName = name || (before?.name ?? 'Tenant')
+    const tenantSlug = slug || (before?.slug ?? 'tenant')
+    const kioskPin = clearKioskPin
+      ? null
+      : normalizedKioskPin
+        ? await hashKioskPin(normalizedKioskPin)
+        : (before?.kioskPin ?? null)
 
-  const clearedOverrides = await withSuperAdmin(db, async (tx) => {
     await tx
       .update(tenants)
       .set({
-        name: name || (before?.name ?? 'Tenant'),
-        slug: slug || (before?.slug ?? 'tenant'),
+        name: tenantName,
+        slug: tenantSlug,
         defaultLanguage: languagePolicy.defaultLocale,
         enabledLanguages: languagePolicy.enabledLocales,
         operationalLocale: operationalDefaults.locale,
@@ -95,7 +94,7 @@ export async function saveSettings(formData: FormData) {
         kioskPin,
       })
       .where(eq(tenants.id, ctx.tenantId))
-    return tx
+    const clearedOverrides = await tx
       .update(tenantUsers)
       .set({ localeOverride: null, updatedAt: new Date() })
       .where(
@@ -106,42 +105,42 @@ export async function saveSettings(formData: FormData) {
         ),
       )
       .returning({ id: tenantUsers.id })
-  })
 
-  await recordAudit(ctx, {
-    entityType: 'tenant',
-    entityId: ctx.tenantId,
-    action: 'update',
-    summary: 'Tenant settings updated',
-    before: before
-      ? {
-          name: before.name,
-          slug: before.slug,
-          defaultLanguage: before.defaultLanguage,
-          enabledLanguages: before.enabledLanguages,
-          operationalLocale: before.operationalLocale,
-          operationalTimezone: before.operationalTimezone,
-          dateFormat: before.dateFormat,
-          numberFormat: before.numberFormat,
-          defaultCurrencyCode: before.defaultCurrencyCode,
-          hierarchy: before.hierarchy,
-          branding: before.branding,
-          regulatoryTerminology: resolveRegulatoryTerminology(before.settings),
-          kioskEnabled: Boolean(before.kioskPin),
-        }
-      : null,
-    after: {
-      name,
-      slug,
-      defaultLanguage: languagePolicy.defaultLocale,
-      enabledLanguages: languagePolicy.enabledLocales,
-      ...operationalDefaults,
-      hierarchy,
-      branding,
-      regulatoryTerminology,
-      kioskEnabled: Boolean(kioskPin),
-    },
-    metadata: { clearedLocaleOverrides: clearedOverrides.length },
+    await recordAuditInTransaction(tx, ctx, {
+      entityType: 'tenant',
+      entityId: ctx.tenantId,
+      action: 'update',
+      summary: 'Tenant settings updated',
+      before: before
+        ? {
+            name: before.name,
+            slug: before.slug,
+            defaultLanguage: before.defaultLanguage,
+            enabledLanguages: before.enabledLanguages,
+            operationalLocale: before.operationalLocale,
+            operationalTimezone: before.operationalTimezone,
+            dateFormat: before.dateFormat,
+            numberFormat: before.numberFormat,
+            defaultCurrencyCode: before.defaultCurrencyCode,
+            hierarchy: before.hierarchy,
+            branding: before.branding,
+            regulatoryTerminology: resolveRegulatoryTerminology(before.settings),
+            kioskEnabled: Boolean(before.kioskPin),
+          }
+        : null,
+      after: {
+        name: tenantName,
+        slug: tenantSlug,
+        defaultLanguage: languagePolicy.defaultLocale,
+        enabledLanguages: languagePolicy.enabledLocales,
+        ...operationalDefaults,
+        hierarchy,
+        branding,
+        regulatoryTerminology,
+        kioskEnabled: Boolean(kioskPin),
+      },
+      metadata: { clearedLocaleOverrides: clearedOverrides.length },
+    })
   })
 
   revalidatePath('/', 'layout')

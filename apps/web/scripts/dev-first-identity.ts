@@ -15,7 +15,10 @@ type Evidence = {
   address: string
 }
 
-export function requireFirstIdentityTarget(env: NodeJS.ProcessEnv, evidence: Evidence) {
+export function requireFirstIdentityTarget(
+  env: Readonly<Record<string, string | undefined>>,
+  evidence: Evidence,
+) {
   if (
     env.UVANOO_ENVIRONMENT !== 'development' ||
     env.NODE_ENV !== 'development' ||
@@ -63,7 +66,10 @@ export function requireEmptyIdentityDatabase(userCount: number) {
   if (userCount !== 0) throw new Error('REFUSED: authentication identities already exist')
 }
 
-export async function provisionFirstIdentity(env: NodeJS.ProcessEnv, evidence: Evidence) {
+export async function provisionFirstIdentity(
+  env: Readonly<Record<string, string | undefined>>,
+  evidence: Evidence,
+) {
   const identity = requireFirstIdentityTarget(env, evidence)
   const client = createClient({ url: env.SUPERADMIN_DATABASE_URL, max: 1 })
   try {

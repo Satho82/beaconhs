@@ -85,7 +85,10 @@ jobs:
       - run: pnpm format:check
       - run: pnpm typecheck
       - run: pnpm lint
+      # Knip's whole-workspace graph exceeds Node's default V8 heap; keep the
+      # gate on the hosted runner with the same bounded heap policy as the web build.
       - run: pnpm deadcode:check
+        env: { NODE_OPTIONS: --max-old-space-size=6144 }
       - run: pnpm --filter @beaconhs/db exec tsx src/migrate.ts
       - run: pnpm --filter @beaconhs/db exec tsx src/migrate.ts
       - run: pnpm test

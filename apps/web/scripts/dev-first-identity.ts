@@ -62,8 +62,13 @@ export function requireFirstIdentityTarget(
   return { email: env.UVANOO_FIRST_IDENTITY_EMAIL, password }
 }
 
+class ExistingIdentityError extends Error {}
+
 export function requireEmptyIdentityDatabase(userCount: number) {
-  if (userCount !== 0) throw new Error('REFUSED: authentication identities already exist')
+  if (!Number.isSafeInteger(userCount) || userCount < 0)
+    throw new Error('Identity count is ambiguous')
+  if (userCount > 0)
+    throw new ExistingIdentityError('REFUSED: authentication identities already exist')
 }
 
 export async function provisionFirstIdentity(
@@ -132,9 +137,13 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     const evidence = JSON.parse(readFileSync('/run/uvanoo-dev-target.json', 'utf8')) as Evidence
     const identity = await provisionFirstIdentity(process.env, evidence)
     console.log(`DEV first identity created: ${identity.email}`)
-  } catch {
+  } catch (error) {
     // Never serialize an auth/driver error: it may contain credential parameters.
-    console.error('DEV first-identity command refused or failed; no credentials logged')
-    process.exitCode = 1
+    console.error(
+      error instanceof ExistingIdentityError
+        ? 'REFUSED_EXISTING_IDENTITY: first-identity provisioning requires zero users'
+        : 'DEV first-identity command refused or failed; no credentials logged',
+    )
+    process.exitCode = error instanceof ExistingIdentityError ? 3 : 1
   }
 }

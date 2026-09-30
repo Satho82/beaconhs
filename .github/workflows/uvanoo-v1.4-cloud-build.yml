@@ -7,6 +7,11 @@ on:
     branches: [feature/uvanoo-v1.4]
     paths: [.github/workflows/uvanoo-v1.4-cloud-build.yml, docs/DEV-INFRA-02A.md]
   workflow_dispatch:
+    inputs:
+      source_sha:
+        description: Exact immutable V1.4 commit SHA to validate and build
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -17,9 +22,10 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  RELEASE_SHA: 542c2014cf318498d27b6d918a0b4af8772fb539
+  # A manual run must name its exact SHA. A push run uses that immutable event SHA.
+  RELEASE_SHA: ${{ inputs.source_sha || github.sha }}
   IMAGE_NAME: ghcr.io/satho82/uvanoo-staging-private
-  IMAGE_TAG: v1.4-dev-542c2014
+  IMAGE_TAG: ${{ format('v1.4-dev-{0}', inputs.source_sha || github.sha) }}
 
 jobs:
   validate:
@@ -53,6 +59,7 @@ jobs:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with: { ref: '${{ env.RELEASE_SHA }}', persist-credentials: false, fetch-depth: 1 }
       - run: test "$(git rev-parse HEAD)" = "$RELEASE_SHA"
+      - run: echo "SOURCE SHA VALIDATED=$RELEASE_SHA" >> "$GITHUB_STEP_SUMMARY"
       - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with: { node-version: 24.18.0, cache: pnpm }
@@ -95,6 +102,7 @@ jobs:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with: { ref: '${{ env.RELEASE_SHA }}', persist-credentials: false, fetch-depth: 1 }
       - run: test "$(git rev-parse HEAD)" = "$RELEASE_SHA"
+      - run: echo "SOURCE SHA BUILT=$RELEASE_SHA" >> "$GITHUB_STEP_SUMMARY"
       - uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4
       - uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 # v4
         with: { registry: ghcr.io, username: '${{ github.actor }}', password: '${{ github.token }}' }
@@ -119,4 +127,8 @@ jobs:
       - name: Record immutable candidate and stop
         run: |
           test "${{ steps.image.outputs.digest }}" != ''
-          echo "Immutable DEV candidate: ${{ env.IMAGE_NAME }}@${{ steps.image.outputs.digest }}" >> "$GITHUB_STEP_SUMMARY"
+          {
+            echo "IMAGE TAG=${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}"
+            echo "IMAGE DIGEST=${{ steps.image.outputs.digest }}"
+            echo "Immutable DEV candidate: ${{ env.IMAGE_NAME }}@${{ steps.image.outputs.digest }}"
+          } >> "$GITHUB_STEP_SUMMARY"

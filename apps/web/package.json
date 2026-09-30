@@ -8,6 +8,7 @@
     "build": "next build --webpack",
     "cutover:run": "tsx",
     "dev:first-identity": "node scripts/launch-dev-first-identity.mjs",
+    "dev:minimal-tenant": "node scripts/launch-dev-minimal-tenant.mjs",
     "start": "node scripts/start-standalone.mjs",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",

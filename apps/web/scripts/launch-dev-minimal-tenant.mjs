@@ -1,3 +1,3 @@
 import { runDevCommand } from './dev-command-launcher.mjs'
 
-runDevCommand('first-identity')
+runDevCommand('minimal-tenant')

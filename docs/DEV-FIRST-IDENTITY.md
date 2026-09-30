@@ -48,3 +48,27 @@ and absence of bootstrap routes/manual credential writes.
 Reference: [Better Auth server APIs](https://better-auth.com/docs/concepts/api).
 Installed 1.6.23 source was inspected; do not infer compatibility from latest docs
 alone. Next.js and container builds run only in GitHub Actions.
+
+## Separate minimal tenant fixture
+
+After successful first-identity creation and verified second-run refusal, set
+`UVANOO_DEV_BOOTSTRAP_CONFIRM=CREATE_MINIMAL_DEV_TENANT` in addition to the same
+DEV target confirmations and run `pnpm --filter @beaconhs/web dev:minimal-tenant`.
+This is a separate command; it cannot create authentication identities.
+
+It requires exactly the non-superadmin first DEV user with its platform audit
+provenance. It refuses unrelated tenants, memberships, properties and modified
+role assignments. It composes the canonical tenant baseline, built-in tenant-admin
+role, role-assignment validation and hospitality property creation service.
+Reference defaults are allowed; operational/demo records are never generated.
+Its maintenance connection is the established `beaconhs_super` role, explicitly
+bound to the verified DEV target. Property creation and permission verification
+then run through the ordinary `beaconhs_app` tenant context, with RLS enforced and
+`isSuperAdmin=false`. The resulting browser identity has no platform-wide access.
+
+Run it twice and verify stable tenant/property/membership/assignment counts and
+no extra audit records on the second run. Both commands share only a Docker
+execution/attestation helper, not identity-creation behaviour. DEV web must remain
+stopped while either command runs. Unit tests include idempotency, refusal of
+unrelated tenants and membership/scope collisions, and absence of operational
+data writes. Real database and browser smoke verification remains mandatory.

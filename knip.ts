@@ -24,6 +24,7 @@ const config: KnipConfig = {
         'scripts/generate-brand-icons.mjs',
         'scripts/materialize-compliance.ts',
         'scripts/dev-first-identity.ts',
+        'scripts/dev-minimal-tenant.ts',
         'scripts/normalize-ppe-inspection-notes.ts',
         'scripts/restore-equipment-preuse-links.ts',
         'scripts/restore-ppe-custody-from-legacy.ts',

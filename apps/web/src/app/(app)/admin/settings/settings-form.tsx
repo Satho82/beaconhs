@@ -3,7 +3,7 @@
 import { useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Button, cn } from '@beaconhs/ui'
-import { Bell, Cable, Cog, Palette, Settings2 } from 'lucide-react'
+import { Bell, Cable, Cog, Palette, Settings2, type LucideIcon } from 'lucide-react'
 
 const SETTINGS_DESTINATIONS = {
   general: '/admin/settings',
@@ -13,12 +13,29 @@ const SETTINGS_DESTINATIONS = {
   advanced: '/admin/settings/advanced',
 } as const
 
+type SettingsSection = keyof typeof SETTINGS_DESTINATIONS
+
+type SettingsNavigationEntry = {
+  id: SettingsSection
+  label: SettingsSection
+  href: (typeof SETTINGS_DESTINATIONS)[SettingsSection]
+  icon: LucideIcon
+}
+
+const SETTINGS_NAVIGATION: readonly SettingsNavigationEntry[] = [
+  { id: 'general', label: 'general', href: '/admin/settings', icon: Settings2 },
+  { id: 'branding', label: 'branding', href: '/admin/settings/branding', icon: Palette },
+  { id: 'notifications', label: 'notifications', href: '/admin/notifications', icon: Bell },
+  { id: 'integrations', label: 'integrations', href: '/admin/integrations', icon: Cable },
+  { id: 'advanced', label: 'advanced', href: '/admin/settings/advanced', icon: Cog },
+]
+
 type SettingsFormProps = {
   action: (formData: FormData) => void | Promise<void>
   saveLabel: string
   discardLabel: string
   navigationLabel: string
-  activeSection?: keyof typeof SETTINGS_DESTINATIONS
+  activeSection?: SettingsSection
   sidebar?: React.ReactNode
   children: React.ReactNode
 }
@@ -28,7 +45,7 @@ export function SettingsNavigation({
   activeSection,
 }: {
   navigationLabel: string
-  activeSection: keyof typeof SETTINGS_DESTINATIONS
+  activeSection: SettingsSection
 }) {
   const t = useTranslations('TenantSettings')
 
@@ -37,18 +54,13 @@ export function SettingsNavigation({
       aria-label={navigationLabel}
       className="flex gap-1 overflow-x-auto border-b border-blue-100 pb-px"
     >
-      {[
-        ['general', Settings2],
-        ['branding', Palette],
-        ['notifications', Bell],
-        ['integrations', Cable],
-        ['advanced', Cog],
-      ].map(([section, Icon]) => {
-        const active = activeSection === section
+      {SETTINGS_NAVIGATION.map((entry) => {
+        const active = activeSection === entry.id
+        const Icon = entry.icon
         return (
           <a
-            key={section}
-            href={SETTINGS_DESTINATIONS[section as keyof typeof SETTINGS_DESTINATIONS]}
+            key={entry.id}
+            href={entry.href}
             aria-current={active ? 'page' : undefined}
             className={cn(
               'flex shrink-0 items-center gap-2 border-b-2 px-5 py-3 text-sm hover:text-blue-700',
@@ -58,7 +70,7 @@ export function SettingsNavigation({
             )}
           >
             <Icon size={18} />
-            {t(section)}
+            {t(entry.label)}
           </a>
         )
       })}

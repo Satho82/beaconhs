@@ -24,11 +24,11 @@ describe('Tenant Settings General UI contract', () => {
       expect(page).toContain(`id=\"${section}\"`)
     }
     expect(form).toContain('aria-label={navigationLabel}')
-    expect(form).toContain("['general', Settings2]")
-    expect(form).toContain("['branding', Palette]")
-    expect(form).toContain("['notifications', Bell]")
-    expect(form).toContain("['integrations', Cable]")
-    expect(form).toContain("['advanced', Cog]")
+    for (const tab of ['general', 'branding', 'notifications', 'integrations', 'advanced']) {
+      expect(form).toContain(`id: '${tab}'`)
+      expect(form).toContain(`label: '${tab}'`)
+    }
+    expect(form).toContain('icon: LucideIcon')
     for (const href of [
       '/admin/settings',
       '/admin/settings/branding',

@@ -121,21 +121,20 @@ export default async function AdminSettingsPage() {
       <div className="space-y-4">
         <div className="border-b border-blue-100 pb-4">
           <div className="mb-3 flex items-center gap-2 text-sm text-blue-700">
-            <Link href="/dashboard">Home</Link>
+            <Link href="/dashboard">{t('home')}</Link>
             <span>›</span>
-            <span>Tenant Settings</span>
+            <span>{t('title')}</span>
             <span>›</span>
-            <span className="font-medium text-slate-900">General</span>
+            <span className="font-medium text-slate-900">{t('general')}</span>
           </div>
           <div className="flex items-start gap-4">
             <div className="rounded-xl bg-blue-50 p-3 text-blue-700">
               <Settings size={34} />
             </div>
             <div>
-              <h1 className="text-3xl font-bold tracking-tight text-blue-950">Tenant Settings</h1>
+              <h1 className="text-3xl font-bold tracking-tight text-blue-950">{t('title')}</h1>
               <p className="mt-1 text-sm text-blue-700">
-                Manage your tenant configuration, branding, integrations and operational
-                preferences.
+                {t('pageDescription')}
               </p>
             </div>
           </div>
@@ -490,7 +489,7 @@ function Field({
   )
 }
 
-function SettingsSidebar({
+async function SettingsSidebar({
   tenant,
   overview,
 }: {
@@ -502,17 +501,18 @@ function SettingsSidebar({
     modules: number
   }
 }) {
+  const t = await getTranslations('TenantSettings')
   const counts = [
-    ['Properties', overview.properties],
-    ['Rooms', overview.rooms],
-    ['Users', overview.users],
-    ['Modules', overview.modules],
+    [t('properties'), overview.properties],
+    [t('rooms'), overview.rooms],
+    [t('users'), overview.users],
+    [t('modules'), overview.modules],
   ]
   const actions = [
-    { href: '/admin/users/invite', label: 'Invite user', icon: UserPlus },
-    { href: '/admin/users', label: 'Manage users', icon: Users },
-    { href: '/admin/navigation', label: 'Manage modules', icon: LayoutGrid },
-    { href: '/admin/audit', label: 'View audit log', icon: FileText },
+    { href: '/admin/users/invite', label: t('inviteUser'), icon: UserPlus },
+    { href: '/admin/users', label: t('manageUsers'), icon: Users },
+    { href: '/admin/navigation', label: t('manageModules'), icon: LayoutGrid },
+    { href: '/admin/audit', label: t('viewAuditLog'), icon: FileText },
   ]
   return (
     <>
@@ -520,7 +520,7 @@ function SettingsSidebar({
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-base text-blue-950">
             <Building2 className="text-blue-600" size={22} />
-            Tenant overview
+            {t('tenantOverview')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -547,7 +547,7 @@ function SettingsSidebar({
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-base text-blue-950">
             <Settings className="text-blue-600" size={22} />
-            Quick actions
+            {t('quickActions')}
           </CardTitle>
         </CardHeader>
         <CardContent className="grid grid-cols-2 gap-2">
@@ -567,15 +567,13 @@ function SettingsSidebar({
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-base text-blue-950">
             <Info className="text-blue-600" size={22} />
-            About these settings
+            {t('aboutTheseSettings')}
           </CardTitle>
         </CardHeader>
         <CardContent className="text-sm leading-6 text-blue-800">
-          These settings apply to your tenant across all properties. They define how dates, times,
-          numbers and other information are displayed, as well as branding and integration
-          preferences.
+          {t('aboutTheseSettingsDescription')}
           <p className="mt-3">
-            Some settings can be overridden at property level where that is supported.
+            {t('propertyOverrideNote')}
           </p>
         </CardContent>
       </Card>
@@ -583,16 +581,16 @@ function SettingsSidebar({
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-base text-blue-950">
             <CircleHelp className="text-blue-600" size={22} />
-            Need help?
+            {t('needHelp')}
           </CardTitle>
         </CardHeader>
         <CardContent className="text-sm leading-6 text-slate-600">
-          Learn more about tenant settings in the in-app user guide.
+          {t('helpDescription')}
           <Link
             href="/help"
             className="mt-3 flex items-center gap-2 font-medium text-blue-700 hover:underline"
           >
-            Open user guide <span aria-hidden="true">→</span>
+            {t('openUserGuide')} <span aria-hidden="true">→</span>
           </Link>
         </CardContent>
       </Card>

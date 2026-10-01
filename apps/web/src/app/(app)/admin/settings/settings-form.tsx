@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Button, cn } from '@beaconhs/ui'
 import { Bell, Cable, Cog, Palette, Settings2 } from 'lucide-react'
 
@@ -27,6 +28,7 @@ export function SettingsForm({
   sidebar,
   children,
 }: SettingsFormProps) {
+  const t = useTranslations('TenantSettings')
   const formRef = useRef<HTMLFormElement>(null)
   const [dirty, setDirty] = useState(false)
 
@@ -47,35 +49,35 @@ export function SettingsForm({
           className="flex shrink-0 items-center gap-2 border-b-2 border-blue-600 px-5 py-3 text-sm font-semibold text-blue-700"
         >
           <Settings2 size={18} />
-          General
+          {t('general')}
         </a>
         <a
           href="#branding"
           className="flex shrink-0 items-center gap-2 px-5 py-3 text-sm font-medium text-slate-700 hover:text-blue-700"
         >
           <Palette size={18} />
-          Branding
+          {t('branding')}
         </a>
         <a
           href="#additional-controls"
           className="flex shrink-0 items-center gap-2 px-5 py-3 text-sm font-medium text-slate-700 hover:text-blue-700"
         >
           <Bell size={18} />
-          Notifications
+          {t('notifications')}
         </a>
         <a
           href="#additional-controls"
           className="flex shrink-0 items-center gap-2 px-5 py-3 text-sm font-medium text-slate-700 hover:text-blue-700"
         >
           <Cable size={18} />
-          Integrations
+          {t('integrations')}
         </a>
         <a
           href="#additional-controls"
           className="flex shrink-0 items-center gap-2 px-5 py-3 text-sm font-medium text-slate-700 hover:text-blue-700"
         >
           <Cog size={18} />
-          Advanced
+          {t('advanced')}
         </a>
       </nav>
       <div className="xl:grid xl:grid-cols-[minmax(0,1fr)_25rem] xl:gap-5">

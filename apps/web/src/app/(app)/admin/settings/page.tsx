@@ -133,9 +133,7 @@ export default async function AdminSettingsPage() {
             </div>
             <div>
               <h1 className="text-3xl font-bold tracking-tight text-blue-950">{t('title')}</h1>
-              <p className="mt-1 text-sm text-blue-700">
-                {t('pageDescription')}
-              </p>
+              <p className="mt-1 text-sm text-blue-700">{t('pageDescription')}</p>
             </div>
           </div>
         </div>
@@ -572,9 +570,7 @@ async function SettingsSidebar({
         </CardHeader>
         <CardContent className="text-sm leading-6 text-blue-800">
           {t('aboutTheseSettingsDescription')}
-          <p className="mt-3">
-            {t('propertyOverrideNote')}
-          </p>
+          <p className="mt-3">{t('propertyOverrideNote')}</p>
         </CardContent>
       </Card>
       <Card className="border-blue-100 shadow-sm">

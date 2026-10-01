@@ -27,8 +27,8 @@ export const DATE_FORMAT_OPTIONS = [
 /** Historic values remain valid so existing tenant records can be read safely. */
 export const LEGACY_DATE_FORMATS = ['short', 'medium', 'long'] as const
 export const NUMBER_FORMATS = ['standard', 'compact'] as const
-export type DateFormat = (typeof DATE_FORMATS)[number]
-export type LegacyDateFormat = (typeof LEGACY_DATE_FORMATS)[number]
+type DateFormat = (typeof DATE_FORMATS)[number]
+type LegacyDateFormat = (typeof LEGACY_DATE_FORMATS)[number]
 type StoredDateFormat = DateFormat | LegacyDateFormat
 type NumberFormat = (typeof NUMBER_FORMATS)[number]
 

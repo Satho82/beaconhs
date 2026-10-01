@@ -2,7 +2,7 @@ import { isUuid } from './list-params'
 
 const REMOTE_SEARCH_TEXT_LIMIT = 100
 
-export type RemoteSearchInput = {
+type RemoteSearchInput = {
   query: string
   selected: string | null
 }

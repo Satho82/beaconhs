@@ -201,24 +201,6 @@ describe('production-scale picker contract', () => {
     expect(route.match(/personOptions\(rows\)/g)).toHaveLength(9)
   })
 
-  it('keeps the public people kiosk PIN-gated, tenant-scoped, and bounded', () => {
-    const actions = source('../app/kiosk/actions.ts')
-    expect(actions).toContain('withVerifiedKioskScope')
-    expect(actions).toContain("guardPublicPinRateLimit('people-kiosk', tenantId)")
-    expect(actions).toContain('verifyKioskPin(tenant.kioskPin, pin)')
-    expect(actions).toContain("set_config('app.tenant_id'")
-    expect(actions.match(/\.limit\(PICKER_RESULT_LIMIT \+ 1\)/g)).toHaveLength(3)
-    expect(actions).not.toContain('KioskDirectory')
-    expect(actions).not.toContain('directory:')
-
-    const client = source('../app/kiosk/kiosk-client.tsx')
-    expect(client.match(/<RemoteSearchSelect/g)).toHaveLength(3)
-    expect(client).toContain('loadOptions={peopleLoader}')
-    expect(client).toContain('loadOptions={siteLoader}')
-    expect(client).toContain('loadOptions={crewLoader}')
-    expect(client).not.toContain('.slice(0, 50)')
-  })
-
   it('searches complete hazard and journal facets inside exact record visibility', () => {
     const hazardActions = source('../app/(app)/hazard-assessments/_site-picker-actions.ts')
     expect(hazardActions).toContain("prefix: 'hazid'")

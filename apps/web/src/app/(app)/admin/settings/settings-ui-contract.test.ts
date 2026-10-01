@@ -12,12 +12,11 @@ describe('Tenant Settings General UI contract', () => {
     expect(form).toContain('action={action}')
   })
 
-  it('provides accessible section navigation for every General Settings group', () => {
+  it('provides functional accessible navigation for every Tenant Settings destination', () => {
     for (const section of [
       'operational-defaults',
       'identity',
       'regulatory-terminology',
-      'people-kiosk',
       'branding',
       'languages',
       'hierarchy',
@@ -25,9 +24,22 @@ describe('Tenant Settings General UI contract', () => {
       expect(page).toContain(`id=\"${section}\"`)
     }
     expect(form).toContain('aria-label={navigationLabel}')
-    for (const tab of ['general', 'branding', 'notifications', 'integrations', 'advanced']) {
-      expect(form).toContain(`t('${tab}')`)
+    expect(form).toContain("['general', Settings2]")
+    expect(form).toContain("['branding', Palette]")
+    expect(form).toContain("['notifications', Bell]")
+    expect(form).toContain("['integrations', Cable]")
+    expect(form).toContain("['advanced', Cog]")
+    for (const href of [
+      '/admin/settings',
+      '/admin/settings/branding',
+      '/admin/notifications',
+      '/admin/integrations',
+      '/admin/settings/advanced',
+    ]) {
+      expect(form).toContain(href)
     }
+    expect(form).not.toContain('#additional-controls')
+    expect(form).toContain("aria-current={active ? 'page' : undefined}")
   })
 
   it('keeps the approved tenant settings composition connected to real data and routes', () => {

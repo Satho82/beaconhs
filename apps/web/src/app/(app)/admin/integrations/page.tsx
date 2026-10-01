@@ -34,6 +34,7 @@ import { deleteOutbound } from './outbound/_actions'
 import { DirectionPill, StatusPill } from './_pills'
 import { IntegrationCatalog, type CatalogItem } from './_catalog.client'
 import { DeleteIntegrationButton } from './_delete-integration-button'
+import { SettingsNavigation } from '../settings/settings-form'
 
 export async function generateMetadata() {
   const tGenerated = await getGeneratedTranslations()
@@ -177,6 +178,7 @@ export default async function IntegrationsPage() {
 
   return (
     <PageContainer>
+      <SettingsNavigation navigationLabel="Tenant settings" activeSection="integrations" />
       <AdminBackLink />
       <div className="space-y-8">
         <header className="space-y-1">

@@ -2,9 +2,8 @@
 
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
-import { getTranslations } from 'next-intl/server'
 import { and, eq, isNotNull, notInArray } from 'drizzle-orm'
-import { db, hashKioskPin, normalizeKioskPin, withSuperAdmin } from '@beaconhs/db'
+import { db, withSuperAdmin } from '@beaconhs/db'
 import { tenantUsers, tenants } from '@beaconhs/db/schema'
 import { LOCALE_OPTIONS, normalizeLocalePolicy } from '@beaconhs/i18n'
 import { can, resolveRegulatoryTerminology } from '@beaconhs/tenant'
@@ -20,8 +19,6 @@ async function requireSettingsAdmin() {
 
 export async function saveSettings(formData: FormData) {
   const ctx = await requireSettingsAdmin()
-  const t = await getTranslations('TenantSettings')
-
   const name = String(formData.get('name') ?? '').trim()
   const slug = String(formData.get('slug') ?? '').trim()
   const defaultLanguage = String(formData.get('defaultLanguage') ?? 'en')
@@ -59,23 +56,10 @@ export async function saveSettings(formData: FormData) {
       otherApplicableLegislation: formData.get('otherApplicableLegislation'),
     },
   })
-  const kioskPinInput = String(formData.get('kioskPin') ?? '').trim()
-  const clearKioskPin = formData.get('clearKioskPin') === 'on'
-  const normalizedKioskPin = kioskPinInput ? normalizeKioskPin(kioskPinInput) : null
-  if (kioskPinInput && !normalizedKioskPin) {
-    throw new Error(t('invalidKioskPin'))
-  }
-
   await withSuperAdmin(db, async (tx) => {
     const [before] = await tx.select().from(tenants).where(eq(tenants.id, ctx.tenantId)).limit(1)
     const tenantName = name || (before?.name ?? 'Tenant')
     const tenantSlug = slug || (before?.slug ?? 'tenant')
-    const kioskPin = clearKioskPin
-      ? null
-      : normalizedKioskPin
-        ? await hashKioskPin(normalizedKioskPin)
-        : (before?.kioskPin ?? null)
-
     await tx
       .update(tenants)
       .set({
@@ -91,7 +75,6 @@ export async function saveSettings(formData: FormData) {
         hierarchy,
         branding,
         settings: { ...(before?.settings ?? {}), regulatoryTerminology },
-        kioskPin,
       })
       .where(eq(tenants.id, ctx.tenantId))
     const clearedOverrides = await tx
@@ -125,7 +108,6 @@ export async function saveSettings(formData: FormData) {
             hierarchy: before.hierarchy,
             branding: before.branding,
             regulatoryTerminology: resolveRegulatoryTerminology(before.settings),
-            kioskEnabled: Boolean(before.kioskPin),
           }
         : null,
       after: {
@@ -137,7 +119,6 @@ export async function saveSettings(formData: FormData) {
         hierarchy,
         branding,
         regulatoryTerminology,
-        kioskEnabled: Boolean(kioskPin),
       },
       metadata: { clearedLocaleOverrides: clearedOverrides.length },
     })

@@ -5,15 +5,37 @@ import { tenants } from '@beaconhs/db/schema'
 import type { Database } from '@beaconhs/db'
 import type { RequestContext } from '@beaconhs/tenant'
 
-export const DATE_FORMATS = ['short', 'medium', 'long'] as const
+/** Values written by the current settings UI. */
+export const DATE_FORMATS = [
+  'DD/MM/YYYY',
+  'MM/DD/YYYY',
+  'YYYY-MM-DD',
+  'DD MMM YYYY',
+  'D MMM YYYY',
+  'DD MMMM YYYY',
+  'MMMM D, YYYY',
+] as const
+export const DATE_FORMAT_OPTIONS = [
+  ['DD/MM/YYYY', 'dateFormat_dayMonthYear'],
+  ['MM/DD/YYYY', 'dateFormat_monthDayYear'],
+  ['YYYY-MM-DD', 'dateFormat_yearMonthDay'],
+  ['DD MMM YYYY', 'dateFormat_dayShortMonthYear'],
+  ['D MMM YYYY', 'dateFormat_unpaddedDayShortMonthYear'],
+  ['DD MMMM YYYY', 'dateFormat_dayLongMonthYear'],
+  ['MMMM D, YYYY', 'dateFormat_longMonthDayYear'],
+] as const satisfies ReadonlyArray<readonly [DateFormat, string]>
+/** Historic values remain valid so existing tenant records can be read safely. */
+export const LEGACY_DATE_FORMATS = ['short', 'medium', 'long'] as const
 export const NUMBER_FORMATS = ['standard', 'compact'] as const
-type DateFormat = (typeof DATE_FORMATS)[number]
+export type DateFormat = (typeof DATE_FORMATS)[number]
+export type LegacyDateFormat = (typeof LEGACY_DATE_FORMATS)[number]
+type StoredDateFormat = DateFormat | LegacyDateFormat
 type NumberFormat = (typeof NUMBER_FORMATS)[number]
 
 type TenantOperationalDefaults = {
   locale: string
   timezone: string
-  dateFormat: DateFormat
+  dateFormat: StoredDateFormat
   numberFormat: NumberFormat
   currencyCode: string
 }
@@ -21,7 +43,7 @@ type TenantOperationalDefaults = {
 export const DEFAULT_TENANT_OPERATIONAL_DEFAULTS: TenantOperationalDefaults = {
   locale: 'en',
   timezone: 'UTC',
-  dateFormat: 'medium',
+  dateFormat: 'DD/MM/YYYY',
   numberFormat: 'standard',
   currencyCode: 'USD',
 }
@@ -60,12 +82,17 @@ export function parseTenantOperationalDefaults(
   const currencyCode = String(input.currencyCode ?? '')
     .trim()
     .toUpperCase()
-  const dateFormat = String(input.dateFormat ?? '') as DateFormat
+  const dateFormat = String(input.dateFormat ?? '') as StoredDateFormat
   const numberFormat = String(input.numberFormat ?? '') as NumberFormat
   if (!validLocale(locale)) throw new Error('Locale must be a valid BCP 47 locale.')
   if (!validTimezone(timezone)) throw new Error('Timezone must be a valid IANA timezone.')
   if (!validCurrency(currencyCode)) throw new Error('Currency must be a valid ISO 4217 code.')
-  if (!DATE_FORMATS.includes(dateFormat)) throw new Error('Choose a valid date format.')
+  if (
+    !(DATE_FORMATS as readonly string[]).includes(dateFormat) &&
+    !(LEGACY_DATE_FORMATS as readonly string[]).includes(dateFormat)
+  ) {
+    throw new Error('Choose a valid date format.')
+  }
   if (!NUMBER_FORMATS.includes(numberFormat)) throw new Error('Choose a valid number format.')
   return { locale, timezone, dateFormat, numberFormat, currencyCode }
 }

@@ -47,6 +47,8 @@ export const tenants = pgTable(
     settings: jsonb('settings').$type<Record<string, unknown>>().default({}).notNull(),
     riskMatrix: jsonb('risk_matrix').$type<RiskMatrixConfig | null>(),
     // Optional hashed kiosk PIN — used by /kiosk?t=<slug> to authenticate the shared tablet.
+    // Retained as dormant historical People Kiosk data. No active application
+    // route or settings action reads or writes this value.
     kioskPin: text('kiosk_pin'),
     ...timestamps,
   },

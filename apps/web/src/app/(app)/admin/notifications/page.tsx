@@ -20,6 +20,7 @@ import { PageContainer } from '@/components/page-layout'
 import { NotificationsSubNav } from '@/components/notifications-sub-nav'
 import { NOTIFICATION_CATEGORIES } from './_catalog'
 import { NotificationSettingsForm, type ChannelAvailability } from './_form'
+import { SettingsNavigation } from '../settings/settings-form'
 
 export const dynamic = 'force-dynamic'
 export async function generateMetadata() {
@@ -152,6 +153,7 @@ export default async function NotificationSettingsPage() {
 
   return (
     <PageContainer>
+      <SettingsNavigation navigationLabel="Tenant settings" activeSection="notifications" />
       <div className="space-y-4">
         <DetailHeader
           title={tGenerated('m_18d4f38ded7c87')}

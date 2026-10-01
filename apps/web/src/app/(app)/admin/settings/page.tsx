@@ -39,8 +39,12 @@ import { resolveTenantLogoUrl } from '@beaconhs/storage'
 import { can, resolveRegulatoryTerminology } from '@beaconhs/tenant'
 import { requireRequestContext } from '@/lib/auth'
 import { levelLabel } from '@/lib/org-hierarchy'
-import { appBaseUrl } from '@/lib/app-base-url'
-import { DATE_FORMATS, NUMBER_FORMATS } from '@/lib/tenant-operational-defaults'
+import {
+  DATE_FORMATS,
+  DATE_FORMAT_OPTIONS,
+  LEGACY_DATE_FORMATS,
+  NUMBER_FORMATS,
+} from '@/lib/tenant-operational-defaults'
 import { PageContainer } from '@/components/page-layout'
 import { saveSettings } from './_actions'
 import { SettingsForm } from './settings-form'
@@ -62,7 +66,13 @@ async function requireSettingsAdmin() {
   return ctx
 }
 
+type SettingsSection = 'general' | 'branding' | 'advanced'
+
 export default async function AdminSettingsPage() {
+  return <SettingsPage activeSection="general" />
+}
+
+export async function SettingsPage({ activeSection }: { activeSection: SettingsSection }) {
   const tGeneratedValue = await getGeneratedValueTranslations()
   const tGenerated = await getGeneratedTranslations()
   const ctx = await requireSettingsAdmin()
@@ -110,7 +120,6 @@ export default async function AdminSettingsPage() {
   const enabled = new Set(tenant.enabledLanguages)
   const hierarchy = tenant.hierarchy
   const regulatory = resolveRegulatoryTerminology(tenant.settings)
-  const kioskUrl = tenant.kioskPin ? `${appBaseUrl()}/kiosk?t=${tenant.slug}` : null
   const tenantLogoUrl = await resolveTenantLogoUrl({
     tenantId: tenant.id,
     logoUrl: tenant.branding.logoUrl,
@@ -125,7 +134,7 @@ export default async function AdminSettingsPage() {
             <span>›</span>
             <span>{t('title')}</span>
             <span>›</span>
-            <span className="font-medium text-slate-900">{t('general')}</span>
+            <span className="font-medium text-slate-900">{t(activeSection)}</span>
           </div>
           <div className="flex items-start gap-4">
             <div className="rounded-xl bg-blue-50 p-3 text-blue-700">
@@ -143,6 +152,7 @@ export default async function AdminSettingsPage() {
           saveLabel={account('saveChanges')}
           discardLabel={tGenerated('m_056c8c15d77140')}
           navigationLabel={tGeneratedValue(t('title'))}
+          activeSection={activeSection}
           sidebar={<SettingsSidebar tenant={tenant} overview={overview} />}
         >
           <Card id="operational-defaults" className="scroll-mt-6 border-blue-100 shadow-sm">
@@ -166,13 +176,25 @@ export default async function AdminSettingsPage() {
                 />
               </Field>
               <Field label={tGeneratedValue(t('dateFormat'))}>
-                <Select name="dateFormat" defaultValue={tenant.dateFormat}>
-                  {DATE_FORMATS.map((format) => (
+                <Select
+                  name="dateFormat"
+                  defaultValue={
+                    (DATE_FORMATS as readonly string[]).includes(tenant.dateFormat)
+                      ? tenant.dateFormat
+                      : 'DD/MM/YYYY'
+                  }
+                >
+                  {DATE_FORMAT_OPTIONS.map(([format, label]) => (
                     <option key={format} value={format}>
-                      {tGeneratedValue(t(`dateFormat_${format}`))}
+                      {tGeneratedValue(t(label))}
                     </option>
                   ))}
                 </Select>
+                {(LEGACY_DATE_FORMATS as readonly string[]).includes(tenant.dateFormat) ? (
+                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                    {t('dateFormatLegacyNotice')}
+                  </p>
+                ) : null}
               </Field>
               <Field label={tGeneratedValue(t('numberFormat'))}>
                 <Select name="numberFormat" defaultValue={tenant.numberFormat}>
@@ -266,66 +288,6 @@ export default async function AdminSettingsPage() {
                     placeholder={tGeneratedValue(t('otherApplicableLegislationPlaceholder'))}
                   />
                 </Field>
-              </CardContent>
-            </Card>
-
-            <Card id="people-kiosk" className="scroll-mt-6 border-blue-100 shadow-sm">
-              <CardHeader>
-                <CardTitle>
-                  <GeneratedValue value={t('peopleKiosk')} />
-                </CardTitle>
-                <CardDescription>
-                  <GeneratedValue value={t('peopleKioskDescription')} />
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Field label={tGeneratedValue(t('kioskPin'))} className="max-w-xs">
-                  <Input
-                    name="kioskPin"
-                    type="password"
-                    inputMode="numeric"
-                    pattern="[0-9]{4,12}"
-                    maxLength={12}
-                    placeholder={tGeneratedValue(
-                      tenant.kioskPin ? t('keepKioskPin') : t('kioskPinExample'),
-                    )}
-                    className="font-mono tracking-widest"
-                  />
-                  <GeneratedValue
-                    value={
-                      tenant.kioskPin ? (
-                        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                          <GeneratedValue value={t('kioskConfigured')} />
-                        </p>
-                      ) : null
-                    }
-                  />
-                </Field>
-                <GeneratedValue
-                  value={
-                    tenant.kioskPin ? (
-                      <label className="flex max-w-xs items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
-                        <input
-                          type="checkbox"
-                          name="clearKioskPin"
-                          className="h-4 w-4 rounded border-slate-300 text-teal-600 focus:ring-teal-500"
-                        />
-                        <GeneratedValue value={t('disableKiosk')} />
-                      </label>
-                    ) : null
-                  }
-                />
-                <GeneratedValue
-                  value={
-                    kioskUrl ? (
-                      <div className="max-w-xl rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm dark:border-slate-800 dark:bg-slate-900">
-                        <code className="block truncate font-mono text-xs text-slate-600 dark:text-slate-300">
-                          {kioskUrl}
-                        </code>
-                      </div>
-                    ) : null
-                  }
-                />
               </CardContent>
             </Card>
 

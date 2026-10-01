@@ -5,13 +5,65 @@ import { useTranslations } from 'next-intl'
 import { Button, cn } from '@beaconhs/ui'
 import { Bell, Cable, Cog, Palette, Settings2 } from 'lucide-react'
 
+const SETTINGS_DESTINATIONS = {
+  general: '/admin/settings',
+  branding: '/admin/settings/branding',
+  notifications: '/admin/notifications',
+  integrations: '/admin/integrations',
+  advanced: '/admin/settings/advanced',
+} as const
+
 type SettingsFormProps = {
   action: (formData: FormData) => void | Promise<void>
   saveLabel: string
   discardLabel: string
   navigationLabel: string
+  activeSection?: keyof typeof SETTINGS_DESTINATIONS
   sidebar?: React.ReactNode
   children: React.ReactNode
+}
+
+export function SettingsNavigation({
+  navigationLabel,
+  activeSection,
+}: {
+  navigationLabel: string
+  activeSection: keyof typeof SETTINGS_DESTINATIONS
+}) {
+  const t = useTranslations('TenantSettings')
+
+  return (
+    <nav
+      aria-label={navigationLabel}
+      className="flex gap-1 overflow-x-auto border-b border-blue-100 pb-px"
+    >
+      {[
+        ['general', Settings2],
+        ['branding', Palette],
+        ['notifications', Bell],
+        ['integrations', Cable],
+        ['advanced', Cog],
+      ].map(([section, Icon]) => {
+        const active = activeSection === section
+        return (
+          <a
+            key={section}
+            href={SETTINGS_DESTINATIONS[section as keyof typeof SETTINGS_DESTINATIONS]}
+            aria-current={active ? 'page' : undefined}
+            className={cn(
+              'flex shrink-0 items-center gap-2 border-b-2 px-5 py-3 text-sm hover:text-blue-700',
+              active
+                ? 'border-blue-600 font-semibold text-blue-700'
+                : 'border-transparent font-medium text-slate-700',
+            )}
+          >
+            <Icon size={18} />
+            {t(section)}
+          </a>
+        )
+      })}
+    </nav>
+  )
 }
 
 /**
@@ -25,10 +77,10 @@ export function SettingsForm({
   saveLabel,
   discardLabel,
   navigationLabel,
+  activeSection = 'general',
   sidebar,
   children,
 }: SettingsFormProps) {
-  const t = useTranslations('TenantSettings')
   const formRef = useRef<HTMLFormElement>(null)
   const [dirty, setDirty] = useState(false)
 
@@ -40,46 +92,7 @@ export function SettingsForm({
       onChange={() => setDirty(true)}
       className="space-y-6"
     >
-      <nav
-        aria-label={navigationLabel}
-        className="flex gap-1 overflow-x-auto border-b border-blue-100 pb-px"
-      >
-        <a
-          href="#operational-defaults"
-          className="flex shrink-0 items-center gap-2 border-b-2 border-blue-600 px-5 py-3 text-sm font-semibold text-blue-700"
-        >
-          <Settings2 size={18} />
-          {t('general')}
-        </a>
-        <a
-          href="#branding"
-          className="flex shrink-0 items-center gap-2 px-5 py-3 text-sm font-medium text-slate-700 hover:text-blue-700"
-        >
-          <Palette size={18} />
-          {t('branding')}
-        </a>
-        <a
-          href="#additional-controls"
-          className="flex shrink-0 items-center gap-2 px-5 py-3 text-sm font-medium text-slate-700 hover:text-blue-700"
-        >
-          <Bell size={18} />
-          {t('notifications')}
-        </a>
-        <a
-          href="#additional-controls"
-          className="flex shrink-0 items-center gap-2 px-5 py-3 text-sm font-medium text-slate-700 hover:text-blue-700"
-        >
-          <Cable size={18} />
-          {t('integrations')}
-        </a>
-        <a
-          href="#additional-controls"
-          className="flex shrink-0 items-center gap-2 px-5 py-3 text-sm font-medium text-slate-700 hover:text-blue-700"
-        >
-          <Cog size={18} />
-          {t('advanced')}
-        </a>
-      </nav>
+      <SettingsNavigation navigationLabel={navigationLabel} activeSection={activeSection} />
       <div className="xl:grid xl:grid-cols-[minmax(0,1fr)_25rem] xl:gap-5">
         <div className="min-w-0 space-y-4">{children}</div>
         <aside className="mt-5 space-y-4 xl:mt-0">{sidebar}</aside>

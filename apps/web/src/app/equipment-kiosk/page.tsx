@@ -3,7 +3,7 @@ import { getGeneratedTranslations } from '@/i18n/generated.server'
 // Public Equipment Station kiosk — mounted-tablet check in/out with a USB scan
 // gun. Lives OUTSIDE the (app) route group (no AppShell, no login). Authenticated
 // by tenant slug in ?t=<slug> + the tenant's equipment-station PIN (verified
-// server-side on every action). Mirrors the people sign-in/out kiosk at /kiosk.
+// server-side on every action).
 
 import { db, type Database } from '@beaconhs/db'
 import { NextIntlClientProvider } from 'next-intl'

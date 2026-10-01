@@ -11,7 +11,7 @@ describe('tenant operational defaults', () => {
     expect(DEFAULT_TENANT_OPERATIONAL_DEFAULTS).toEqual({
       locale: 'en',
       timezone: 'UTC',
-      dateFormat: 'medium',
+      dateFormat: 'DD/MM/YYYY',
       numberFormat: 'standard',
       currencyCode: 'USD',
     })
@@ -22,17 +22,26 @@ describe('tenant operational defaults', () => {
       parseTenantOperationalDefaults({
         locale: 'en-GB',
         timezone: 'Europe/London',
-        dateFormat: 'long',
+        dateFormat: 'YYYY-MM-DD',
         numberFormat: 'compact',
         currencyCode: 'AED',
       }),
     ).toEqual({
       locale: 'en-GB',
       timezone: 'Europe/London',
-      dateFormat: 'long',
+      dateFormat: 'YYYY-MM-DD',
       numberFormat: 'compact',
       currencyCode: 'AED',
     })
+  })
+
+  it.each(['short', 'medium', 'long'])('accepts legacy %s date preferences', (dateFormat) => {
+    expect(
+      parseTenantOperationalDefaults({
+        ...DEFAULT_TENANT_OPERATIONAL_DEFAULTS,
+        dateFormat,
+      }),
+    ).toMatchObject({ dateFormat })
   })
 
   it.each([

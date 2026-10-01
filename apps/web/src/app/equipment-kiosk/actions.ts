@@ -2,7 +2,7 @@
 
 // Public Equipment Station kiosk actions — unauthenticated, gated by tenant slug
 // (resolved to id on the page) + the tenant's equipment-station PIN. Mirrors the
-// people-kiosk pattern: verify PIN, scope reads/writes via app.tenant_id, write
+// Verify PIN, scope reads/writes via app.tenant_id, then write
 // an inline audit row (no RequestContext on this path). Rules come from the
 // shared core so the in-app station and the kiosk behave identically.
 

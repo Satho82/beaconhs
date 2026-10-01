@@ -93,33 +93,6 @@ ${CSV_EXPORT_LIMIT_GUIDANCE}
 - If you missed a day, pick that date in the list to create an entry for it.`,
   },
   {
-    slug: 'people-kiosk',
-    title: 'People sign-in / sign-out kiosk',
-    group: 'Everyday tasks',
-    iconKey: 'users',
-    summary: 'Sign in or out from the shared jobsite tablet.',
-    keywords: ['kiosk', 'sign in', 'sign out', 'attendance', 'tablet', 'crew', 'site', 'PIN'],
-    body: `The people kiosk is the shared tablet at a jobsite entrance. It records when you sign in or out and can attach the scan to a site and crew.
-
-## Sign in or out
-
-1. Enter the jobsite PIN and tap **Unlock kiosk**.
-2. Open **Your name**. Search by your name, employee number, or job title, then tap your exact match.
-3. If they apply, search **Site (optional)** and **Crew (optional)**. A saved choice stays selected for the next person using the same tablet.
-4. Tap **SIGN IN** or **SIGN OUT**.
-5. Check the confirmation, then tap **Done**. The kiosk also returns to the name search automatically after a few seconds.
-
-The kiosk searches the current company directory in small groups. If it says more results exist, type more of the name, employee number, job title, site, or crew. It does not hide a valid match just because the company has a large directory.
-
-Because the kiosk is shared and no member is signed in, it uses the workspace's **Default language**.
-
-## If the kiosk will not unlock
-
-- Check that the PIN has 4–12 digits.
-- Ask an administrator whether the people kiosk is enabled for this workspace.
-- A suspended or archived workspace cannot use the public kiosk.`,
-  },
-  {
     slug: 'hazard-assessments',
     title: 'Hazard assessments (JSHA / FLHA)',
     group: 'Everyday tasks',

@@ -56,7 +56,7 @@ function checksFor(scope: string, tenantId: string, fingerprint: string): RateLi
 }
 
 export async function guardPublicPinRateLimit(
-  scope: 'people-kiosk' | 'equipment-kiosk',
+  scope: 'equipment-kiosk',
   tenantId: string,
 ): Promise<{ ok: true; handle: PublicPinRateLimitHandle } | { ok: false; error: string }> {
   try {

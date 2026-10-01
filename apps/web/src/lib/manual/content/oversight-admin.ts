@@ -691,7 +691,7 @@ Open [Admin](/admin) from the sidebar. You only see the tiles your permissions a
 
 ## Workspace
 
-- **Tenant settings** — branding, languages, regulatory terminology, and hierarchy. Risk matrices are configured in each module's own **Manage** area.
+- **Tenant settings** — choose **General**, **Branding**, **Notifications**, **Integrations**, or **Advanced** to manage tenant defaults. The General page includes regional formats, tenant identity and available languages. Risk matrices are configured in each module's own **Manage** area.
 - **Notifications** — who gets automatic alerts and how often reminders repeat.
 - **Navigation** — reorder the sidebar and pin forms as modules.
 - **Data sources** — reference lists and live data your apps bind to. Search by name, key, or description and filter by **Reference** or **Live responses**. Inside a reference source, search its row values and its Builder references separately.
@@ -718,6 +718,8 @@ On **Notifications → Rules**, each delivery channel shows whether its provider
 2. Under **Languages**, enable every language members may choose.
 3. Choose the **Default language**. The default is always enabled and is used by members who choose **Use tenant default**.
 4. Click **Save settings**.
+
+Use the **Quick actions** panel to invite or manage users, manage modules, or open the audit log when you have permission. **Discard changes** restores the last saved values before you leave the page.
 
 Members choose their own language under **Account settings**. Their choice applies only to this workspace. If you disable a language, BeaconHS clears member choices for that language and those members return to the workspace default. Tenant-wide generated documents and group recap emails use the workspace default.
 

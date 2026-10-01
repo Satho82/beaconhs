@@ -2,13 +2,14 @@
 
 import { useRef, useState } from 'react'
 import { Button, cn } from '@beaconhs/ui'
+import { Bell, Cable, Cog, Palette, Settings2 } from 'lucide-react'
 
 type SettingsFormProps = {
   action: (formData: FormData) => void | Promise<void>
   saveLabel: string
   discardLabel: string
   navigationLabel: string
-  sections: { id: string; label: string }[]
+  sidebar?: React.ReactNode
   children: React.ReactNode
 }
 
@@ -23,7 +24,7 @@ export function SettingsForm({
   saveLabel,
   discardLabel,
   navigationLabel,
-  sections,
+  sidebar,
   children,
 }: SettingsFormProps) {
   const formRef = useRef<HTMLFormElement>(null)
@@ -37,24 +38,49 @@ export function SettingsForm({
       onChange={() => setDirty(true)}
       className="space-y-6"
     >
-      <div className="lg:grid lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-8">
-        <aside className="mb-5 lg:mb-0">
-          <nav
-            aria-label={navigationLabel}
-            className="flex gap-1 overflow-x-auto rounded-xl border border-orange-100 bg-orange-50/60 p-1.5 lg:sticky lg:top-5 lg:flex-col lg:overflow-visible"
-          >
-            {sections.map((section) => (
-              <a
-                key={section.id}
-                href={`#${section.id}`}
-                className="shrink-0 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-white hover:text-orange-800 focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:outline-none lg:w-full"
-              >
-                {section.label}
-              </a>
-            ))}
-          </nav>
-        </aside>
-        <div className="min-w-0 space-y-5">{children}</div>
+      <nav
+        aria-label={navigationLabel}
+        className="flex gap-1 overflow-x-auto border-b border-blue-100 pb-px"
+      >
+        <a
+          href="#operational-defaults"
+          className="flex shrink-0 items-center gap-2 border-b-2 border-blue-600 px-5 py-3 text-sm font-semibold text-blue-700"
+        >
+          <Settings2 size={18} />
+          General
+        </a>
+        <a
+          href="#branding"
+          className="flex shrink-0 items-center gap-2 px-5 py-3 text-sm font-medium text-slate-700 hover:text-blue-700"
+        >
+          <Palette size={18} />
+          Branding
+        </a>
+        <a
+          href="#additional-controls"
+          className="flex shrink-0 items-center gap-2 px-5 py-3 text-sm font-medium text-slate-700 hover:text-blue-700"
+        >
+          <Bell size={18} />
+          Notifications
+        </a>
+        <a
+          href="#additional-controls"
+          className="flex shrink-0 items-center gap-2 px-5 py-3 text-sm font-medium text-slate-700 hover:text-blue-700"
+        >
+          <Cable size={18} />
+          Integrations
+        </a>
+        <a
+          href="#additional-controls"
+          className="flex shrink-0 items-center gap-2 px-5 py-3 text-sm font-medium text-slate-700 hover:text-blue-700"
+        >
+          <Cog size={18} />
+          Advanced
+        </a>
+      </nav>
+      <div className="xl:grid xl:grid-cols-[minmax(0,1fr)_25rem] xl:gap-5">
+        <div className="min-w-0 space-y-4">{children}</div>
+        <aside className="mt-5 space-y-4 xl:mt-0">{sidebar}</aside>
       </div>
 
       <div

@@ -23,9 +23,34 @@ describe('Tenant Settings General UI contract', () => {
       'hierarchy',
     ]) {
       expect(page).toContain(`id=\"${section}\"`)
-      expect(page).toContain(`id: '${section}'`)
     }
     expect(form).toContain('aria-label={navigationLabel}')
+    for (const tab of ['General', 'Branding', 'Notifications', 'Integrations', 'Advanced']) {
+      expect(form).toContain(tab)
+    }
+  })
+
+  it('keeps the approved tenant settings composition connected to real data and routes', () => {
+    for (const text of [
+      'Tenant Settings',
+      'Tenant overview',
+      'Quick actions',
+      'About these settings',
+    ]) {
+      expect(page).toContain(text)
+    }
+    for (const href of [
+      '/admin/users/invite',
+      '/admin/users',
+      '/admin/navigation',
+      '/admin/audit',
+    ]) {
+      expect(page).toContain(`href: '${href}'`)
+    }
+    expect(page).toContain('hospitalityProperties')
+    expect(page).toContain('hospitalityRooms')
+    expect(page).toContain('tenantUsers')
+    expect(page).toContain('tenantModuleEntitlements')
   })
 
   it('only enables Save and Discard after a real form edit and resets natively', () => {

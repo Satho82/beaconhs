@@ -1,5 +1,6 @@
 import { GeneratedValue } from '@/i18n/generated'
 import { Fragment } from 'react'
+import type { CSSProperties } from 'react'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { and, count, eq, isNull } from 'drizzle-orm'
@@ -27,6 +28,9 @@ import { resolveWalkthroughs } from '@/lib/walkthroughs/service'
 import { RegulatoryTerminologyProvider } from '@/components/regulatory-terminology'
 import { getPlatformBranding } from '@/lib/platform-branding-config'
 import { resolveHospitalityPropertyContext } from '@/lib/hospitality/property-context'
+import { resolveTenantPrimaryAction } from '@/lib/theme-governance'
+
+type TenantThemeStyle = CSSProperties & Record<'--tenant-primary-action', string>
 
 // Every page in the authenticated app shell requires the per-request context
 // (auth + tenant + RLS-scoped DB), so none can be statically prerendered.
@@ -57,7 +61,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   ] = await Promise.all([
     withSuperAdmin(db, async (tx) => {
       const [t] = await tx
-        .select({ id: tenants.id, name: tenants.name, riskMatrix: tenants.riskMatrix })
+        .select({
+          id: tenants.id,
+          name: tenants.name,
+          riskMatrix: tenants.riskMatrix,
+          branding: tenants.branding,
+        })
         .from(tenants)
         .where(eq(tenants.id, ctx.tenantId))
         .limit(1)
@@ -82,6 +91,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     resolveHospitalityPropertyContext(ctx),
   ])
   if (!tenant) redirect('/login')
+  const themeStyle: TenantThemeStyle = {
+    '--tenant-primary-action': resolveTenantPrimaryAction(
+      platformBranding.primaryColor,
+      tenant.branding.primaryColor,
+    ),
+  }
 
   // The account menu shows the real signed-in account. Prefer the tenant display
   // name (consistent with the rest of the app), then the session name/email.
@@ -113,29 +128,30 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <ThemeProvider>
-      <NavigationProvider>
-        <AppShell
-          platformBranding={platformBranding}
-          ctx={{
-            isSuperAdmin: ctx.isSuperAdmin,
-            membership: ctx.membership,
-            tenantId: tenant.id,
-            tenantName: tenant.name,
-          }}
-          account={account}
-          groups={navGroups}
-          availableTenants={available}
-          availableRoles={roles}
-          activeRole={activeRole}
-          propertyContext={propertyContext}
-          unreadCount={unread}
-          defaultCollapsed={defaultCollapsed}
-          deploymentVersion={process.env.APP_VERSION ?? process.env.DEPLOYMENT_VERSION}
-          deploymentEnvironment={process.env.SENTRY_ENVIRONMENT ?? process.env.NODE_ENV}
-          impersonation={impersonation}
-          canUseAssistant={can(ctx, 'assistant.use')}
-        >
-          {/* Remount the page subtree when the active tenant — or effective
+      <div style={themeStyle}>
+        <NavigationProvider>
+          <AppShell
+            platformBranding={platformBranding}
+            ctx={{
+              isSuperAdmin: ctx.isSuperAdmin,
+              membership: ctx.membership,
+              tenantId: tenant.id,
+              tenantName: tenant.name,
+            }}
+            account={account}
+            groups={navGroups}
+            availableTenants={available}
+            availableRoles={roles}
+            activeRole={activeRole}
+            propertyContext={propertyContext}
+            unreadCount={unread}
+            defaultCollapsed={defaultCollapsed}
+            deploymentVersion={process.env.APP_VERSION ?? process.env.DEPLOYMENT_VERSION}
+            deploymentEnvironment={process.env.SENTRY_ENVIRONMENT ?? process.env.NODE_ENV}
+            impersonation={impersonation}
+            canUseAssistant={can(ctx, 'assistant.use')}
+          >
+            {/* Remount the page subtree when the active tenant — or effective
               user, while impersonating — changes. router.refresh() (fired by the
               tenant switcher) re-renders server components but PRESERVES client
               state across the refresh, so any 'use client' page that seeds
@@ -143,26 +159,29 @@ export default async function AppLayout({ children }: { children: React.ReactNod
               would keep showing the previous tenant's values. Keying here resets
               that whole class of state in one place; the shell/sidebar stay
               mounted and update via fresh props as before. */}
-          <RiskMatrixProvider matrix={tenant.riskMatrix}>
-            <RegulatoryTerminologyProvider value={ctx.regulatory ?? DEFAULT_REGULATORY_TERMINOLOGY}>
-              <BackNavProviders>
-                <Fragment key={`${ctx.tenantId}:${ctx.userId}:${ctx.activeRoleId ?? 'all'}`}>
-                  <GeneratedValue value={children} />
-                </Fragment>
-              </BackNavProviders>
-            </RegulatoryTerminologyProvider>
-          </RiskMatrixProvider>
-          <Toaster richColors position="top-right" />
-          <ConfirmRoot />
-          {/* Suspense: the provider reads useSearchParams (tour launch links). */}
-          <Suspense fallback={null}>
-            <WalkthroughProvider
-              availableIds={walkthroughs.visible.map((v) => v.walkthrough.id)}
-              autoStartId={walkthroughs.autoStartId}
-            />
-          </Suspense>
-        </AppShell>
-      </NavigationProvider>
+            <RiskMatrixProvider matrix={tenant.riskMatrix}>
+              <RegulatoryTerminologyProvider
+                value={ctx.regulatory ?? DEFAULT_REGULATORY_TERMINOLOGY}
+              >
+                <BackNavProviders>
+                  <Fragment key={`${ctx.tenantId}:${ctx.userId}:${ctx.activeRoleId ?? 'all'}`}>
+                    <GeneratedValue value={children} />
+                  </Fragment>
+                </BackNavProviders>
+              </RegulatoryTerminologyProvider>
+            </RiskMatrixProvider>
+            <Toaster richColors position="top-right" />
+            <ConfirmRoot />
+            {/* Suspense: the provider reads useSearchParams (tour launch links). */}
+            <Suspense fallback={null}>
+              <WalkthroughProvider
+                availableIds={walkthroughs.visible.map((v) => v.walkthrough.id)}
+                autoStartId={walkthroughs.autoStartId}
+              />
+            </Suspense>
+          </AppShell>
+        </NavigationProvider>
+      </div>
     </ThemeProvider>
   )
 }

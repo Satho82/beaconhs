@@ -14,7 +14,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          'bg-[rgb(var(--color-primary-action))] text-white shadow-sm hover:bg-[rgb(var(--color-primary-hover))] hover:shadow active:bg-[rgb(var(--color-primary-active))]',
+          'bg-[var(--tenant-primary-action,rgb(var(--color-primary-action)))] text-white shadow-sm hover:bg-[color-mix(in_srgb,var(--tenant-primary-action,rgb(var(--color-primary-action)))_88%,black)] hover:shadow active:bg-[color-mix(in_srgb,var(--tenant-primary-action,rgb(var(--color-primary-action)))_76%,black)]',
         outline:
           'border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:border-slate-300 dark:hover:border-slate-600 active:bg-slate-100 dark:active:bg-slate-700',
         ghost:
@@ -23,7 +23,7 @@ const buttonVariants = cva(
           'bg-red-600 text-white shadow-sm hover:bg-red-700 hover:shadow active:bg-red-800',
         secondary:
           'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-700 active:bg-slate-300 dark:active:bg-slate-600',
-        link: 'text-[rgb(var(--color-primary-action))] underline-offset-4 hover:underline focus-visible:ring-offset-0',
+        link: 'text-[var(--tenant-primary-action,rgb(var(--color-primary-action)))] underline-offset-4 hover:underline focus-visible:ring-offset-0',
       },
       size: {
         sm: 'h-8 px-3',

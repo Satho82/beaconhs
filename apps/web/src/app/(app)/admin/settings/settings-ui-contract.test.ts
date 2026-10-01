@@ -65,4 +65,15 @@ describe('Tenant Settings General UI contract', () => {
     expect(form).toContain('disabled={!dirty}')
     expect(form).toContain('formRef.current?.reset()')
   })
+
+  it('uses controlled operational choices with canonical persisted values', () => {
+    expect(page).toContain('const CURRENCY_OPTIONS')
+    expect(page).toContain("['GBP', 'GBP — £']")
+    expect(page).toContain("['AED', 'AED — د.إ']")
+    expect(page).toContain('LOCALE_OPTIONS.map')
+    expect(page).toContain('const TIMEZONE_OPTIONS')
+    for (const timezone of ['Europe/London', 'Europe/Paris', 'America/New_York', 'Asia/Dubai']) {
+      expect(page).toContain(`'${timezone}'`)
+    }
+  })
 })

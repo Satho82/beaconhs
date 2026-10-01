@@ -5,7 +5,6 @@ import { redirect } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
 import { eq } from 'drizzle-orm'
 import {
-  Button,
   Card,
   CardContent,
   CardDescription,
@@ -28,6 +27,7 @@ import { appBaseUrl } from '@/lib/app-base-url'
 import { DATE_FORMATS, NUMBER_FORMATS } from '@/lib/tenant-operational-defaults'
 import { PageContainer } from '@/components/page-layout'
 import { saveSettings } from './_actions'
+import { SettingsForm } from './settings-form'
 
 export async function generateMetadata() {
   const tGenerated = await getGeneratedTranslations()
@@ -50,9 +50,10 @@ export default async function AdminSettingsPage() {
   const tGeneratedValue = await getGeneratedValueTranslations()
   const tGenerated = await getGeneratedTranslations()
   const ctx = await requireSettingsAdmin()
-  const [t, languages] = await Promise.all([
+  const [t, languages, account] = await Promise.all([
     getTranslations('TenantSettings'),
     getTranslations('Languages'),
+    getTranslations('Account'),
   ])
   const tenant = await withSuperAdmin(db, async (tx) => {
     const [t] = await tx.select().from(tenants).where(eq(tenants.id, ctx.tenantId)).limit(1)
@@ -70,16 +71,45 @@ export default async function AdminSettingsPage() {
   })
 
   return (
-    <PageContainer>
-      <div className="space-y-5">
-        <DetailHeader
-          back={{ href: '/admin', label: t('backToAdmin') }}
-          title={tGeneratedValue(t('title'))}
-          subtitle={tGeneratedValue(t('subtitle'))}
-        />
+    <PageContainer className="max-w-[96rem] py-5 sm:py-8">
+      <div className="space-y-6">
+        <div className="rounded-2xl border border-orange-100 bg-gradient-to-br from-orange-50 via-white to-teal-50 px-5 py-6 sm:px-8 sm:py-8">
+          <DetailHeader
+            back={{ href: '/admin', label: t('backToAdmin') }}
+            title={tGeneratedValue(t('title'))}
+            subtitle={tGeneratedValue(t('subtitle'))}
+          />
+          <div className="mt-5 flex items-center gap-2 border-t border-orange-100 pt-4 text-sm text-slate-600">
+            <span className="font-medium text-orange-800">{tGeneratedValue(t('title'))}</span>
+            <span aria-hidden="true">/</span>
+            <span className="font-medium text-slate-900">
+              {tGeneratedValue(t('operationalDefaults'))}
+            </span>
+          </div>
+        </div>
 
-        <form action={saveSettings} className="space-y-4">
-          <Card>
+        <SettingsForm
+          action={saveSettings}
+          saveLabel={account('saveChanges')}
+          discardLabel={tGenerated('m_056c8c15d77140')}
+          navigationLabel={tGeneratedValue(t('title'))}
+          sections={[
+            {
+              id: 'operational-defaults',
+              label: tGeneratedValue(t('operationalDefaults')),
+            },
+            { id: 'identity', label: tGeneratedValue(t('identity')) },
+            {
+              id: 'regulatory-terminology',
+              label: tGeneratedValue(t('regulatoryTerminology')),
+            },
+            { id: 'people-kiosk', label: tGeneratedValue(t('peopleKiosk')) },
+            { id: 'branding', label: tGeneratedValue(t('branding')) },
+            { id: 'languages', label: tGeneratedValue(t('languages')) },
+            { id: 'hierarchy', label: tGeneratedValue(t('hierarchyDepth')) },
+          ]}
+        >
+          <Card id="operational-defaults" className="scroll-mt-6 border-orange-100 shadow-sm">
             <CardHeader>
               <CardTitle>
                 <GeneratedValue value={t('operationalDefaults')} />
@@ -129,7 +159,7 @@ export default async function AdminSettingsPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card id="identity" className="scroll-mt-6 border-orange-100 shadow-sm">
             <CardHeader>
               <CardTitle>
                 <GeneratedValue value={t('identity')} />
@@ -145,7 +175,7 @@ export default async function AdminSettingsPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card id="regulatory-terminology" className="scroll-mt-6 border-orange-100 shadow-sm">
             <CardHeader>
               <CardTitle>
                 <GeneratedValue value={t('regulatoryTerminology')} />
@@ -202,7 +232,7 @@ export default async function AdminSettingsPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card id="people-kiosk" className="scroll-mt-6 border-orange-100 shadow-sm">
             <CardHeader>
               <CardTitle>
                 <GeneratedValue value={t('peopleKiosk')} />
@@ -262,7 +292,7 @@ export default async function AdminSettingsPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card id="branding" className="scroll-mt-6 border-orange-100 shadow-sm">
             <CardHeader>
               <CardTitle>
                 <GeneratedValue value={t('branding')} />
@@ -311,7 +341,9 @@ export default async function AdminSettingsPage() {
                         />
                         <span
                           className="font-semibold"
-                          style={{ color: tenant.branding.primaryColor ?? '#0f766e' }}
+                          style={{
+                            color: tenant.branding.primaryColor ?? '#0f766e',
+                          }}
                         >
                           <GeneratedValue value={tenant.name} />
                         </span>
@@ -323,7 +355,7 @@ export default async function AdminSettingsPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card id="languages" className="scroll-mt-6 border-orange-100 shadow-sm">
             <CardHeader>
               <CardTitle>
                 <GeneratedValue value={t('languages')} />
@@ -369,7 +401,7 @@ export default async function AdminSettingsPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card id="hierarchy" className="scroll-mt-6 border-orange-100 shadow-sm">
             <CardHeader>
               <CardTitle>
                 <GeneratedValue value={t('hierarchyDepth')} />
@@ -392,13 +424,7 @@ export default async function AdminSettingsPage() {
               />
             </CardContent>
           </Card>
-
-          <div className="flex justify-end">
-            <Button type="submit">
-              <GeneratedValue value={t('saveSettings')} />
-            </Button>
-          </div>
-        </form>
+        </SettingsForm>
       </div>
     </PageContainer>
   )

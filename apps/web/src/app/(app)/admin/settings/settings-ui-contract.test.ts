@@ -25,19 +25,14 @@ describe('Tenant Settings General UI contract', () => {
       expect(page).toContain(`id=\"${section}\"`)
     }
     expect(form).toContain('aria-label={navigationLabel}')
-    for (const tab of ['General', 'Branding', 'Notifications', 'Integrations', 'Advanced']) {
-      expect(form).toContain(tab)
+    for (const tab of ['general', 'branding', 'notifications', 'integrations', 'advanced']) {
+      expect(form).toContain(`t('${tab}')`)
     }
   })
 
   it('keeps the approved tenant settings composition connected to real data and routes', () => {
-    for (const text of [
-      'Tenant Settings',
-      'Tenant overview',
-      'Quick actions',
-      'About these settings',
-    ]) {
-      expect(page).toContain(text)
+    for (const key of ['title', 'tenantOverview', 'quickActions', 'aboutTheseSettings']) {
+      expect(page).toContain(`t('${key}')`)
     }
     for (const href of [
       '/admin/users/invite',

@@ -56,6 +56,24 @@ export async function generateMetadata() {
 export const dynamic = 'force-dynamic'
 
 const LEVELS = ['customer', 'project', 'site', 'area'] as const
+const CURRENCY_OPTIONS = [
+  ['GBP', 'GBP — £'],
+  ['EUR', 'EUR — €'],
+  ['USD', 'USD — $'],
+  ['AED', 'AED — د.إ'],
+] as const
+const TIMEZONE_OPTIONS = [
+  'Europe/London',
+  'Europe/Paris',
+  'Europe/Rome',
+  'America/New_York',
+  'America/Los_Angeles',
+  'Asia/Dubai',
+  'Asia/Singapore',
+  'Asia/Tokyo',
+  'Australia/Sydney',
+  'UTC',
+] as const
 
 // Tenant settings is admin configuration. saveSettings bypasses RLS to write
 // the global tenants row, so it must self-gate (a POST endpoint isn't protected
@@ -166,14 +184,26 @@ export async function SettingsPage({ activeSection }: { activeSection: SettingsS
             </CardHeader>
             <CardContent className="grid grid-cols-1 gap-5 sm:grid-cols-2">
               <Field label={tGeneratedValue(t('operationalLocale'))}>
-                <Input name="operationalLocale" defaultValue={tenant.operationalLocale} required />
+                <Select name="operationalLocale" defaultValue={tenant.operationalLocale} required>
+                  {LOCALE_OPTIONS.map((locale) => (
+                    <option key={locale.value} value={locale.value}>
+                      {locale.nativeLabel}
+                    </option>
+                  ))}
+                </Select>
               </Field>
               <Field label={tGeneratedValue(t('operationalTimezone'))}>
-                <Input
+                <Select
                   name="operationalTimezone"
                   defaultValue={tenant.operationalTimezone}
                   required
-                />
+                >
+                  {TIMEZONE_OPTIONS.map((timezone) => (
+                    <option key={timezone} value={timezone}>
+                      {timezone}
+                    </option>
+                  ))}
+                </Select>
               </Field>
               <Field label={tGeneratedValue(t('dateFormat'))}>
                 <Select
@@ -206,13 +236,17 @@ export async function SettingsPage({ activeSection }: { activeSection: SettingsS
                 </Select>
               </Field>
               <Field label={tGeneratedValue(t('defaultCurrencyCode'))}>
-                <Input
+                <Select
                   name="defaultCurrencyCode"
                   defaultValue={tenant.defaultCurrencyCode}
-                  maxLength={3}
-                  className="font-mono uppercase"
                   required
-                />
+                >
+                  {CURRENCY_OPTIONS.map(([code, label]) => (
+                    <option key={code} value={code}>
+                      {label}
+                    </option>
+                  ))}
+                </Select>
               </Field>
             </CardContent>
           </Card>

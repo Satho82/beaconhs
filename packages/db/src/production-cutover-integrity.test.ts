@@ -103,6 +103,7 @@ describe('production cutover migration integrity', () => {
       '0052_user_identity_lifecycle.sql',
       '0053_property_scope_repair.sql',
       '0054_v14_configuration_tenant_defaults.sql',
+      '0055_v14_configuration_governance_lifecycle.sql',
     ])
 
     const journal = JSON.parse(readFileSync(new URL('_journal.json', metaFolder), 'utf8')) as {

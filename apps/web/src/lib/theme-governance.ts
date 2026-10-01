@@ -1,4 +1,4 @@
-export const UVANOO_PLATFORM_PRIMARY = '#0f766e'
+const UVANOO_PLATFORM_PRIMARY = '#0f766e'
 
 const HEX = /^#[0-9a-f]{6}$/i
 

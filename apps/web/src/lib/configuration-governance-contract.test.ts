@@ -9,6 +9,22 @@ describe('V1.4 configuration governance boundary', () => {
     expect(source).toContain("eq(configurationMasterVersions.state, 'published')")
     expect(source).toContain('payload: structuredClone(source.version.payload)')
     expect(source).toContain('sourceMasterVersionId: source.version.id')
+    expect(source).toContain('This platform configuration version has already been adopted.')
+  })
+
+  it('creates new tenant-owned drafts and publishes them without rewriting history', () => {
+    expect(source).toContain('export async function createTenantConfigurationDraft')
+    expect(source).toContain("state: 'draft'")
+    expect(source).toContain('version: (latest?.version ?? 0) + 1')
+    expect(source).toContain('export async function publishTenantConfigurationVersion')
+    expect(source).toContain("eq(tenantConfigurationVersions.state, 'draft')")
+    expect(source).toContain("state: 'published'")
+  })
+
+  it('archives only the tenant identity, preserving version rows for history', () => {
+    expect(source).toContain('export async function archiveTenantConfiguration')
+    expect(source).toContain("state: 'archived'")
+    expect(source).toContain("summary: 'Archived tenant configuration'")
   })
 
   it('requires tenant settings authority and audits adoption, applicability and forms binding', () => {

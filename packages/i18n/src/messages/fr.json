@@ -116,6 +116,7 @@
       "insights": "Analyses",
       "reports": "Rapports",
       "admin": "Administration",
+      "tenantSettings": "Paramètres du locataire",
       "forms": "Générateur"
     }
   },

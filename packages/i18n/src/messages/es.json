@@ -116,6 +116,7 @@
       "insights": "Análisis",
       "reports": "Informes",
       "admin": "Administración",
+      "tenantSettings": "Configuración del inquilino",
       "forms": "Constructor"
     }
   },

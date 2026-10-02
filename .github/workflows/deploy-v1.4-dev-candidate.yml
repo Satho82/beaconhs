@@ -1,0 +1,115 @@
+name: Deploy validated V1.4 candidate to DEV
+
+# This is deliberately the only feature-candidate deployment entrypoint. Pushes
+# publish candidates through uvanoo-v1.4-cloud-build.yml but never deploy them.
+on:
+  workflow_dispatch:
+    inputs:
+      source_sha:
+        description: Exact, already-green V1.4 candidate commit SHA to deploy to DEV
+        required: true
+        type: string
+
+permissions:
+  actions: read
+  contents: read
+  packages: read
+
+concurrency:
+  group: deploy-dev
+  cancel-in-progress: false
+
+env:
+  CANDIDATE_IMAGE_NAME: ghcr.io/satho82/uvanoo-staging-private
+
+jobs:
+  verify-candidate:
+    name: Verify immutable V1.4 DEV candidate
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    outputs:
+      source_sha: ${{ steps.verify.outputs.source_sha }}
+      image_digest: ${{ steps.verify.outputs.image_digest }}
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          ref: feature/uvanoo-v1.4
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4
+      - uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 # v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+      - name: Verify source, authoritative validation, and published image
+        id: verify
+        env:
+          CANDIDATE_SHA: ${{ inputs.source_sha }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if ! [[ "$CANDIDATE_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error::source_sha must be a full lowercase commit SHA"
+            exit 1
+          fi
+          if ! git cat-file -e "${CANDIDATE_SHA}^{commit}" 2>/dev/null; then
+            echo "::error::source_sha does not identify a repository commit"
+            exit 1
+          fi
+          if ! git merge-base --is-ancestor "$CANDIDATE_SHA" origin/feature/uvanoo-v1.4; then
+            echo "::error::source_sha is not in feature/uvanoo-v1.4 history"
+            exit 1
+          fi
+
+          run_id="$(gh api --paginate \
+            "repos/${GITHUB_REPOSITORY}/actions/workflows/uvanoo-v1.4-cloud-build.yml/runs?head_sha=${CANDIDATE_SHA}&status=completed&per_page=100" \
+            --jq '.workflow_runs[] | select(.conclusion == "success") | .id' | head -n 1)"
+          if ! [[ "$run_id" =~ ^[0-9]+$ ]]; then
+            echo "::error::No successful authoritative V1.4 validation run exists for source_sha"
+            exit 1
+          fi
+          required_jobs="$(gh api --paginate "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}/jobs?per_page=100" \
+            --jq '.jobs[] | select(.name == "Validate frozen V1.4 source" or .name == "Publish immutable V1.4 DEV candidate") | [.name, .conclusion] | @tsv')"
+          if [ "$(grep -c $'^Validate frozen V1.4 source\tsuccess$' <<< "$required_jobs")" -ne 1 ] \
+            || [ "$(grep -c $'^Publish immutable V1.4 DEV candidate\tsuccess$' <<< "$required_jobs")" -ne 1 ]; then
+            echo "::error::The authoritative V1.4 run did not complete both validation and candidate publication"
+            exit 1
+          fi
+
+          image_tag="${CANDIDATE_IMAGE_NAME}:v1.4-dev-${CANDIDATE_SHA}"
+          digest="$(docker buildx imagetools inspect "$image_tag" 2>/dev/null | awk '$1 == "Digest:" {print $2; exit}')"
+          if ! [[ "$digest" =~ ^sha256:[0-9a-f]{64}$ ]]; then
+            echo "::error::The published candidate tag did not resolve to an immutable sha256 digest"
+            exit 1
+          fi
+          image="${CANDIDATE_IMAGE_NAME}@${digest}"
+          docker pull "$image" >/dev/null
+          revision="$(docker image inspect "$image" --format '{{ index .Config.Labels "org.opencontainers.image.revision" }}')"
+          version="$(docker image inspect "$image" --format '{{ index .Config.Labels "org.opencontainers.image.version" }}')"
+          if [ "$revision" != "$CANDIDATE_SHA" ] \
+            || [ "$version" != "v1.4-dev-${CANDIDATE_SHA}" ]; then
+            echo "::error::Candidate tag, digest, and OCI source labels do not identify the requested source_sha"
+            exit 1
+          fi
+          {
+            echo "source_sha=$CANDIDATE_SHA"
+            echo "image_digest=$digest"
+          } >> "$GITHUB_OUTPUT"
+          {
+            echo "Verified DEV-only candidate source: $CANDIDATE_SHA"
+            echo "Verified immutable image: $image"
+            echo "Authoritative validation run: $run_id"
+          } >> "$GITHUB_STEP_SUMMARY"
+  deploy-dev:
+    name: Deploy verified V1.4 candidate to DEV
+    needs: verify-candidate
+    permissions:
+      contents: read
+      packages: read
+    uses: ./.github/workflows/deploy-dev.yml
+    with:
+      source_sha: ${{ needs.verify-candidate.outputs.source_sha }}
+      image_digest: ${{ needs.verify-candidate.outputs.image_digest }}
+      feature_candidate_verified: true
+    secrets: inherit

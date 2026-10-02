@@ -86,6 +86,7 @@ jobs:
           scripts/cluster/dokploy-curl.test.sh
           scripts/ci/require-current-main.test.sh
           scripts/ci/workflow-repository-immutability.test.sh
+          scripts/ci/v1.4-dev-candidate-deploy-contract.test.sh
       - name: Apply the production migration path
         run: pnpm --filter @beaconhs/db exec tsx src/migrate.ts
       - name: Prove migrations are idempotent

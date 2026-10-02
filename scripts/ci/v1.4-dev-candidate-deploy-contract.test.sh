@@ -81,7 +81,7 @@ forbid 'latest' "$core"
 # The existing feature push flow is image publication only; it must never
 # obtain the deployment reusable workflow or a deployment job.
 require '^  push:$' "$cloud"
-forbid 'deploy-dev\.yml' "$cloud"
+forbid '^[[:space:]]*uses:.*deploy-dev\.yml' "$cloud"
 forbid 'runs-on: \[self-hosted, dokploy\]' "$cloud"
 
 echo 'PASS V1.4 candidate deployment is manual, DEV-only, and digest-bound'

@@ -25,7 +25,7 @@ env:
 jobs:
   verify-candidate:
     name: Verify immutable V1.4 DEV candidate
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     outputs:
       source_sha: ${{ steps.verify.outputs.source_sha }}

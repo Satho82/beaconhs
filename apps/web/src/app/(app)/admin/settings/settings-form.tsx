@@ -3,7 +3,7 @@
 import { useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Button, cn } from '@beaconhs/ui'
-import { Bell, Cable, Cog, Palette, Settings2, type LucideIcon } from 'lucide-react'
+import { ArrowLeftRight, Bell, Cable, Cog, Palette, Settings2, type LucideIcon } from 'lucide-react'
 
 const SETTINGS_DESTINATIONS = {
   general: '/admin/settings',
@@ -11,6 +11,7 @@ const SETTINGS_DESTINATIONS = {
   notifications: '/admin/notifications',
   integrations: '/admin/integrations',
   advanced: '/admin/settings/advanced',
+  importExport: '/admin/settings/import-export',
 } as const
 
 type SettingsSection = keyof typeof SETTINGS_DESTINATIONS
@@ -28,6 +29,7 @@ const SETTINGS_NAVIGATION: readonly SettingsNavigationEntry[] = [
   { id: 'notifications', label: 'notifications', href: '/admin/notifications', icon: Bell },
   { id: 'integrations', label: 'integrations', href: '/admin/integrations', icon: Cable },
   { id: 'advanced', label: 'advanced', href: '/admin/settings/advanced', icon: Cog },
+  { id: 'importExport', label: 'importExport', href: '/admin/settings/import-export', icon: ArrowLeftRight },
 ]
 
 type SettingsFormProps = {

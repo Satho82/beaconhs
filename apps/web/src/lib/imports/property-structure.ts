@@ -60,16 +60,21 @@ export function validatePropertyStructureRows(rows: readonly Record<string, stri
 }
 
 export function propertyStructurePreview(rows: ReturnType<typeof validatePropertyStructureRows>) {
-  const count = (column: keyof PropertyStructureRow) =>
-    new Set(rows.map(({ values }) => value(values, column)).filter(Boolean)).size
+  const unique = (keyFor: (values: Record<string, string>) => string) =>
+    new Set(rows.map(({ values }) => keyFor(values)).filter(Boolean)).size
   return {
     rows: rows.length,
     errors: rows.filter((row) => row.issues.some((issue) => issue.severity === 'error')).length,
     warnings: rows.filter((row) => row.issues.some((issue) => issue.severity === 'warning')).length,
-    propertiesToCreate: count('property_code'),
-    buildingsToCreate: count('building_code'),
-    floorsToCreate: count('floor_code'),
-    roomsToCreate: count('room_code'),
-    roomTypesToReference: count('room_type'),
+    propertiesToCreate: unique((values) => value(values, 'property_code')),
+    buildingsToCreate: unique(
+      (values) => `${value(values, 'property_code')}/${value(values, 'building_code')}`,
+    ),
+    floorsToCreate: unique(
+      (values) =>
+        `${value(values, 'property_code')}/${value(values, 'building_code')}/${value(values, 'floor_code')}`,
+    ),
+    roomsToCreate: unique((values) => value(values, 'room_code')),
+    roomTypesToReference: unique((values) => value(values, 'room_type')),
   }
 }

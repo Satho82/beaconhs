@@ -120,8 +120,10 @@ describe('training completion clean cutover', () => {
     const expectedTables = [
       ...new Set([
         ...ATTACHMENT_TENANT_REFERENCES.map(({ table }) => table).filter(
-          // Added after the squashed cutover migration this test audits.
-          (table) => table !== 'training_record_files',
+          // These tables were added after the squashed cutover migration this
+          // test audits, so its temporary owner-visibility window could not
+          // include them.
+          (table) => table !== 'bulk_import_batches' && table !== 'training_record_files',
         ),
         'attachments',
         'audit_log',

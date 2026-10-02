@@ -7,6 +7,9 @@ on:
     branches: [feature/uvanoo-v1.4]
     paths:
       - .github/workflows/uvanoo-v1.4-cloud-build.yml
+      - .github/workflows/deploy-v1.4-dev-candidate.yml
+      - .github/workflows/deploy-dev.yml
+      - scripts/ci/v1.4-dev-candidate-deploy-contract.test.sh
       - apps/**
       - packages/**
       - package.json

@@ -47,7 +47,10 @@ export const bulkImportBatches = pgTable(
     sourceAttachmentId: uuid('source_attachment_id'),
     sourceDigest: text('source_digest').notNull(),
     status: bulkImportStatus('status').default('received').notNull(),
-    validationSummary: jsonb('validation_summary').$type<Record<string, number>>().default({}).notNull(),
+    validationSummary: jsonb('validation_summary')
+      .$type<Record<string, number>>()
+      .default({})
+      .notNull(),
     result: jsonb('result').$type<Record<string, unknown>>(),
     failureReason: text('failure_reason'),
     createdByUserId: text('created_by_user_id')
@@ -90,7 +93,10 @@ export const bulkImportRows = pgTable(
     sourceRowNumber: integer('source_row_number').notNull(),
     rawValues: jsonb('raw_values').$type<Record<string, string>>().default({}).notNull(),
     mappedValues: jsonb('mapped_values').$type<Record<string, unknown>>().default({}).notNull(),
-    issues: jsonb('issues').$type<Array<{ severity: 'error' | 'warning'; message: string }>>().default([]).notNull(),
+    issues: jsonb('issues')
+      .$type<Array<{ severity: 'error' | 'warning'; message: string }>>()
+      .default([])
+      .notNull(),
     duplicateReference: text('duplicate_reference'),
     proposedAction: text('proposed_action').notNull(),
     finalAction: text('final_action'),

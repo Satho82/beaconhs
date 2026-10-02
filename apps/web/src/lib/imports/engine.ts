@@ -1,9 +1,9 @@
 import 'server-only'
 
-export const MAX_IMPORT_ROWS = 10_000
+const MAX_IMPORT_ROWS = 10_000
 export type ImportIssue = { severity: 'error' | 'warning'; message: string }
-export type ImportAction = 'create' | 'update' | 'skip'
-export type ImportBatchState =
+type ImportAction = 'create' | 'update' | 'skip'
+type ImportBatchState =
   | 'received'
   | 'parsed'
   | 'ready_for_confirmation'
@@ -12,7 +12,7 @@ export type ImportBatchState =
   | 'failed'
   | 'cancelled'
 
-export type ParsedImportRow = { sourceRowNumber: number; values: Record<string, string> }
+type ParsedImportRow = { sourceRowNumber: number; values: Record<string, string> }
 export type ValidatedImportRow<T> = ParsedImportRow & {
   mapped: T | null
   issues: ImportIssue[]
@@ -31,23 +31,8 @@ export type ImportDataset<T> = {
   allowUpdates?: boolean
 }
 
-const registry = new Map<string, ImportDataset<unknown>>()
-
-export function registerImportDataset<T>(definition: ImportDataset<T>): void {
-  if (!/^[a-z][a-z0-9._-]{1,96}$/.test(definition.id)) throw new Error('Invalid import dataset id.')
-  if (registry.has(definition.id))
-    throw new Error(`Import dataset already registered: ${definition.id}`)
-  registry.set(definition.id, definition as ImportDataset<unknown>)
-}
-
-export function getImportDataset<T>(id: string): ImportDataset<T> {
-  const dataset = registry.get(id)
-  if (!dataset) throw new Error('Unknown import dataset.')
-  return dataset as ImportDataset<T>
-}
-
 /** RFC-4180-compatible enough for governed CSV intake; preserves all source rows. */
-export function parseCsv(source: string): string[][] {
+function parseCsv(source: string): string[][] {
   if (source.length > 5_000_000) throw new Error('Import file exceeds the 5 MB limit.')
   const rows: string[][] = [[]]
   let value = ''

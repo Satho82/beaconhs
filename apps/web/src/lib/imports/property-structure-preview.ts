@@ -9,7 +9,7 @@ import { propertyStructurePreview, validatePropertyStructureRows } from './prope
 
 export type PreviewFilter = 'all' | 'valid' | 'errors' | 'warnings' | 'duplicates'
 
-export type PropertyStructurePreviewRow = {
+type PropertyStructurePreviewRow = {
   sourceRowNumber: number
   recordType: 'Property' | 'Building' | 'Floor' | 'Room'
   reference: string

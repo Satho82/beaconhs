@@ -1,4 +1,4 @@
-export const PROPERTY_STRUCTURE_COLUMNS = [
+const PROPERTY_STRUCTURE_COLUMNS = [
   'property_code',
   'property_name',
   'property_timezone',
@@ -11,8 +11,8 @@ export const PROPERTY_STRUCTURE_COLUMNS = [
   'room_type',
 ] as const
 
-export type PropertyStructureRow = Record<(typeof PROPERTY_STRUCTURE_COLUMNS)[number], string>
-export type PropertyStructureIssue = { severity: 'error' | 'warning'; message: string }
+type PropertyStructureRow = Record<(typeof PROPERTY_STRUCTURE_COLUMNS)[number], string>
+type PropertyStructureIssue = { severity: 'error' | 'warning'; message: string }
 
 export const propertyStructureImportDataset = {
   id: 'property.structure',

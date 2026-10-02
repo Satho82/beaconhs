@@ -14,8 +14,7 @@ import { propertyStructureImportDataset, validatePropertyStructureRows } from '.
 
 const inputSchema = z.object({ attachmentId: z.string().uuid() })
 
-export type PropertyStructureUploadOutcome =
-  { ok: true; batchId: string } | { ok: false; error: string }
+type PropertyStructureUploadOutcome = { ok: true; batchId: string } | { ok: false; error: string }
 
 /**
  * Converts a finalized, tenant-owned CSV attachment into an immutable governed

@@ -29,7 +29,12 @@ const SETTINGS_NAVIGATION: readonly SettingsNavigationEntry[] = [
   { id: 'notifications', label: 'notifications', href: '/admin/notifications', icon: Bell },
   { id: 'integrations', label: 'integrations', href: '/admin/integrations', icon: Cable },
   { id: 'advanced', label: 'advanced', href: '/admin/settings/advanced', icon: Cog },
-  { id: 'importExport', label: 'importExport', href: '/admin/settings/import-export', icon: ArrowLeftRight },
+  {
+    id: 'importExport',
+    label: 'importExport',
+    href: '/admin/settings/import-export',
+    icon: ArrowLeftRight,
+  },
 ]
 
 type SettingsFormProps = {

@@ -29,7 +29,7 @@ type PlatformFormTemplatePayload = {
     iconKey?: string
     allowedRoles?: string[]
     moduleBinding?: string
-    moduleKey?: string
+    moduleKey?: ModuleKey
     emailOnSubmit?: boolean
     surfaceAsTool?: boolean
     recordConfig?: Record<string, unknown>

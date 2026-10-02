@@ -1,5 +1,3 @@
-import 'server-only'
-
 const MAX_IMPORT_ROWS = 10_000
 export type ImportIssue = { severity: 'error' | 'warning'; message: string }
 type ImportAction = 'create' | 'update' | 'skip'

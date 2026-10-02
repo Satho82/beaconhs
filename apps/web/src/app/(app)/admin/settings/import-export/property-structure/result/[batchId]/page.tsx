@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { CheckCircle2, Download, FileWarning, History, Upload } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 import { notFound } from 'next/navigation'
+import { isUuid } from '@/lib/list-params'
 import { Button, Card, CardContent, CardHeader, CardTitle } from '@beaconhs/ui'
 import { SettingsNavigation } from '../../../../settings-form'
 import { getPropertyStructureResult } from '@/lib/imports/property-structure-result'
@@ -12,6 +13,7 @@ export default async function PropertyStructureResultPage({
   params: Promise<{ batchId: string }>
 }) {
   const { batchId } = await params
+  if (!isUuid(batchId)) notFound()
   const result = await getPropertyStructureResult(batchId)
   if (!result) notFound()
   const t = await getTranslations('TenantSettings')

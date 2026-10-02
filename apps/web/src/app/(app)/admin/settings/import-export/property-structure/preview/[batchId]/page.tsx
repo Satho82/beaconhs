@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { ArrowLeft, ArrowRight, FileWarning, Upload } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 import { notFound } from 'next/navigation'
+import { isUuid } from '@/lib/list-params'
 import { Button, Card, CardContent, CardHeader, CardTitle } from '@beaconhs/ui'
 import { SettingsNavigation } from '../../../../settings-form'
 import {
@@ -25,6 +26,7 @@ export default async function PropertyStructurePreviewPage({
   searchParams: Promise<{ filter?: string }>
 }) {
   const [{ batchId }, { filter: requestedFilter }] = await Promise.all([params, searchParams])
+  if (!isUuid(batchId)) notFound()
   const filter = filterFrom(requestedFilter)
   const preview = await getPropertyStructurePreview(batchId, filter)
   if (!preview) notFound()

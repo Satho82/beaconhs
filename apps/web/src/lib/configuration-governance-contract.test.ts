@@ -28,7 +28,20 @@ describe('V1.4 configuration governance boundary', () => {
   })
 
   it('requires tenant settings authority and audits adoption, applicability and forms binding', () => {
-    expect(source.match(/assertCan\(ctx, 'admin\.settings\.manage'\)/g)).toHaveLength(3)
+    for (const operation of [
+      'adoptMasterConfiguration',
+      'createTenantConfigurationDraft',
+      'publishTenantConfigurationVersion',
+      'archiveTenantConfiguration',
+      'setConfigurationPropertyApplicability',
+      'bindConfigurationFormTemplate',
+    ]) {
+      expect(source).toMatch(
+        new RegExp(
+          `export async function ${operation}[\\s\\S]*?assertCan\\(ctx, 'admin\\.settings\\.manage'\\)`,
+        ),
+      )
+    }
     expect(source).toContain('summary: `Adopted platform configuration ${source.master.key}`')
     expect(source).toContain("summary: 'Updated configuration property applicability'")
     expect(source).toContain("summary: 'Bound configuration to an existing form template'")

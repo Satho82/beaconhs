@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { ArrowLeft, AlertTriangle } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 import { notFound } from 'next/navigation'
+import { isUuid } from '@/lib/list-params'
 import { Button, Card, CardContent, CardHeader, CardTitle } from '@beaconhs/ui'
 import { SettingsNavigation } from '../../../../settings-form'
 import { getPropertyStructureReview } from '@/lib/imports/property-structure-confirm'
@@ -13,6 +14,7 @@ export default async function PropertyStructureReviewPage({
   params: Promise<{ batchId: string }>
 }) {
   const { batchId } = await params
+  if (!isUuid(batchId)) notFound()
   const review = await getPropertyStructureReview(batchId)
   if (!review) notFound()
   const t = await getTranslations('TenantSettings')

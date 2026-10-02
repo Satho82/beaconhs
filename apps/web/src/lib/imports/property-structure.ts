@@ -87,7 +87,10 @@ export function propertyStructurePreview(rows: ReturnType<typeof validatePropert
       (values) =>
         `${value(values, 'property_code')}/${value(values, 'building_code')}/${value(values, 'floor_code')}`,
     ),
-    roomsToCreate: unique((values) => value(values, 'room_code')),
+    roomsToCreate: unique(
+      (values) =>
+        `${value(values, 'property_code')}/${value(values, 'building_code')}/${value(values, 'floor_code')}/${value(values, 'room_code')}`,
+    ),
     roomTypesToReference: unique((values) => value(values, 'room_type')),
   }
 }

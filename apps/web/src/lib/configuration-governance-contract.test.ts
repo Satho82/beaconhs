@@ -29,12 +29,12 @@ describe('V1.4 configuration governance boundary', () => {
 
   it('requires tenant settings authority and audits adoption, applicability and forms binding', () => {
     for (const operation of [
-      'adoptMasterConfiguration',
+      'adoptPublishedConfiguration',
       'createTenantConfigurationDraft',
       'publishTenantConfigurationVersion',
       'archiveTenantConfiguration',
       'setConfigurationPropertyApplicability',
-      'bindConfigurationFormTemplate',
+      'bindConfigurationToFormTemplate',
     ]) {
       expect(source).toMatch(
         new RegExp(

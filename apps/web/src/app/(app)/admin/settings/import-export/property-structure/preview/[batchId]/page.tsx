@@ -25,8 +25,9 @@ export default async function PropertyStructurePreviewPage({
   params: Promise<{ batchId: string }>
   searchParams: Promise<{ filter?: string }>
 }) {
-  const [{ batchId }, { filter: requestedFilter }] = await Promise.all([params, searchParams])
+  const { batchId } = await params
   if (!isUuid(batchId)) notFound()
+  const { filter: requestedFilter } = await searchParams
   const filter = filterFrom(requestedFilter)
   const preview = await getPropertyStructurePreview(batchId, filter)
   if (!preview) notFound()

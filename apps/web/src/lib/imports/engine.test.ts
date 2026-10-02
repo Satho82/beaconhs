@@ -29,7 +29,15 @@ describe('governed import engine', () => {
       parseImportRows('code\nnew\nexisting\n\n', dataset),
       dataset,
     )
-    expect(previewImport(rows, dataset)).toMatchObject({ total: 3, invalid: 1, duplicates: 1 })
+    expect(previewImport(rows, dataset)).toMatchObject({ total: 2, invalid: 0, duplicates: 1 })
+  })
+
+  it('ignores empty CSV rows but preserves malformed non-empty rows for validation', async () => {
+    const rows = await validateImportRows(parseImportRows('code\n\n,broken\n', dataset), dataset)
+    expect(rows).toEqual([
+      expect.objectContaining({ sourceRowNumber: 2, values: { code: '' } }),
+    ])
+    expect(previewImport(rows, dataset)).toMatchObject({ total: 1, invalid: 1 })
   })
 
   it('allows only linear confirmation and execution states', () => {

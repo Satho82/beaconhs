@@ -73,10 +73,7 @@ export function parseCsv(source: string): string[][] {
   return rows.filter((row) => row.some(Boolean))
 }
 
-export function parseImportRows(
-  source: string,
-  dataset: ImportDataset<unknown>,
-): ParsedImportRow[] {
+export function parseImportRows<T>(source: string, dataset: ImportDataset<T>): ParsedImportRow[] {
   const [header, ...body] = parseCsv(source)
   if (!header) throw new Error('Import file has no header row.')
   const columns = header.map((column) => column.trim().toLowerCase())

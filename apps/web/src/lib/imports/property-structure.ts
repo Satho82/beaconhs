@@ -14,6 +14,17 @@ export const PROPERTY_STRUCTURE_COLUMNS = [
 export type PropertyStructureRow = Record<(typeof PROPERTY_STRUCTURE_COLUMNS)[number], string>
 export type PropertyStructureIssue = { severity: 'error' | 'warning'; message: string }
 
+export const propertyStructureImportDataset = {
+  id: 'property.structure',
+  columns: PROPERTY_STRUCTURE_COLUMNS,
+  requiredColumns: PROPERTY_STRUCTURE_COLUMNS,
+  map: (row: Record<string, string>): PropertyStructureRow =>
+    Object.fromEntries(
+      PROPERTY_STRUCTURE_COLUMNS.map((column) => [column, row[column] ?? '']),
+    ) as PropertyStructureRow,
+  validate: (_row: PropertyStructureRow): PropertyStructureIssue[] => [],
+} as const
+
 export function propertyStructureTemplateCsv(): string {
   return `${PROPERTY_STRUCTURE_COLUMNS.join(',')}\r\n`
 }
@@ -36,7 +47,8 @@ export function validatePropertyStructureRows(rows: readonly Record<string, stri
     const floorCode = value(row, 'floor_code').toLowerCase()
     const roomCode = value(row, 'room_code').toLowerCase()
     if (!propertyCode) issues.push({ severity: 'error', message: 'Property code is required.' })
-    if (!value(row, 'property_name')) issues.push({ severity: 'error', message: 'Property name is required.' })
+    if (!value(row, 'property_name'))
+      issues.push({ severity: 'error', message: 'Property name is required.' })
     if (!value(row, 'property_timezone'))
       issues.push({ severity: 'error', message: 'Property timezone is required.' })
     const timezone = value(row, 'property_timezone')
@@ -52,7 +64,8 @@ export function validatePropertyStructureRows(rows: readonly Record<string, stri
     if (roomCode && !floorCode)
       issues.push({ severity: 'error', message: 'A room requires a floor code.' })
     if (roomCode) {
-      if (seenRooms.has(roomCode)) issues.push({ severity: 'error', message: 'Room code is duplicated.' })
+      if (seenRooms.has(roomCode))
+        issues.push({ severity: 'error', message: 'Room code is duplicated.' })
       seenRooms.add(roomCode)
     }
     return { sourceRowNumber: index + 2, values: row, issues }

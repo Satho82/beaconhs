@@ -96,6 +96,9 @@ require 'git merge-base --is-ancestor' "$candidate"
 # must have passed, and the tag must be bound to the requested source by OCI
 # labels before the digest may enter the reusable deployment workflow.
 require 'uvanoo-v1.4-cloud-build\.yml/runs\?head_sha=' "$candidate"
+require 'mapfile -t run_ids < "\$run_ids_file"' "$candidate"
+require '"\$\{#run_ids\[@\]\}" -ne 1' "$candidate"
+forbid 'gh api --paginate.*head -n 1' "$candidate"
 require 'Validate frozen V1\.4 source' "$candidate"
 require 'Publish immutable V1\.4 DEV candidate' "$candidate"
 require 'v1\.4-dev-\$\{CANDIDATE_SHA\}' "$candidate"

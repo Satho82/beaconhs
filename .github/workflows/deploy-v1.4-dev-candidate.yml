@@ -62,13 +62,20 @@ jobs:
             exit 1
           fi
 
-          run_id="$(gh api --paginate \
+          # Do not pipe gh into head under pipefail: gh can receive SIGPIPE
+          # after emitting the first run and report exit 255.  Persist the
+          # complete successful-run set, then require one unambiguous result.
+          run_ids_file="$(mktemp)"
+          trap 'rm -f "$run_ids_file"' EXIT
+          gh api --paginate \
             "repos/${GITHUB_REPOSITORY}/actions/workflows/uvanoo-v1.4-cloud-build.yml/runs?head_sha=${CANDIDATE_SHA}&status=completed&per_page=100" \
-            --jq '.workflow_runs[] | select(.conclusion == "success") | .id' | head -n 1)"
-          if ! [[ "$run_id" =~ ^[0-9]+$ ]]; then
+            --jq '.workflow_runs[] | select(.conclusion == "success") | .id' > "$run_ids_file"
+          mapfile -t run_ids < "$run_ids_file"
+          if [ "${#run_ids[@]}" -ne 1 ] || ! [[ "${run_ids[0]}" =~ ^[0-9]+$ ]]; then
             echo "::error::No successful authoritative V1.4 validation run exists for source_sha"
             exit 1
           fi
+          run_id="${run_ids[0]}"
           required_jobs="$(gh api --paginate "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}/jobs?per_page=100" \
             --jq '.jobs[] | select(.name == "Validate frozen V1.4 source" or .name == "Publish immutable V1.4 DEV candidate") | [.name, .conclusion] | @tsv')"
           if [ "$(grep -c $'^Validate frozen V1.4 source\tsuccess$' <<< "$required_jobs")" -ne 1 ] \

@@ -45,7 +45,9 @@ function requiredText(value: unknown, field: string, maxLength: number): string 
   return trimmed
 }
 
-function parsePlatformFormTemplatePayload(value: Record<string, unknown>): PlatformFormTemplatePayload {
+function parsePlatformFormTemplatePayload(
+  value: Record<string, unknown>,
+): PlatformFormTemplatePayload {
   const formTemplate = value.formTemplate
   if (!formTemplate || typeof formTemplate !== 'object' || Array.isArray(formTemplate)) {
     throw new Error('Published configuration is not a supported forms-domain template.')
@@ -60,7 +62,10 @@ function parsePlatformFormTemplatePayload(value: Record<string, unknown>): Platf
     throw new Error('Template kind is not supported.')
   }
   const allowedRoles = candidate.allowedRoles
-  if (allowedRoles && (!Array.isArray(allowedRoles) || allowedRoles.some((role) => typeof role !== 'string'))) {
+  if (
+    allowedRoles &&
+    (!Array.isArray(allowedRoles) || allowedRoles.some((role) => typeof role !== 'string'))
+  ) {
     throw new Error('Template allowed roles are invalid.')
   }
   const moduleKey = candidate.moduleKey
@@ -73,14 +78,20 @@ function parsePlatformFormTemplatePayload(value: Record<string, unknown>): Platf
       key,
       name,
       schema,
-      category: typeof candidate.category === 'string' ? candidate.category.trim() || undefined : undefined,
+      category:
+        typeof candidate.category === 'string' ? candidate.category.trim() || undefined : undefined,
       description:
-        typeof candidate.description === 'string' ? candidate.description.trim() || undefined : undefined,
+        typeof candidate.description === 'string'
+          ? candidate.description.trim() || undefined
+          : undefined,
       kind: kind as PlatformFormTemplatePayload['formTemplate']['kind'],
-      iconKey: typeof candidate.iconKey === 'string' ? candidate.iconKey.trim() || undefined : undefined,
+      iconKey:
+        typeof candidate.iconKey === 'string' ? candidate.iconKey.trim() || undefined : undefined,
       allowedRoles: allowedRoles as string[] | undefined,
       moduleBinding:
-        typeof candidate.moduleBinding === 'string' ? candidate.moduleBinding.trim() || undefined : undefined,
+        typeof candidate.moduleBinding === 'string'
+          ? candidate.moduleBinding.trim() || undefined
+          : undefined,
       moduleKey,
       emailOnSubmit: candidate.emailOnSubmit === true,
       surfaceAsTool: candidate.surfaceAsTool === true,

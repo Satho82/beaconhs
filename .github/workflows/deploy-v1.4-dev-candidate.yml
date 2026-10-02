@@ -106,7 +106,10 @@ jobs:
     needs: verify-candidate
     permissions:
       contents: read
-      packages: read
+      # The reusable workflow retains its skipped main-build job, which needs
+      # package write access when called from main. GitHub validates that
+      # nested permission edge before evaluating the candidate-only job path.
+      packages: write
     uses: ./.github/workflows/deploy-dev.yml
     with:
       source_sha: ${{ needs.verify-candidate.outputs.source_sha }}

@@ -27,6 +27,55 @@ forbid() {
   fi
 }
 
+permission_rank() {
+  case "$1" in
+    none) echo 0 ;;
+    read) echo 1 ;;
+    write) echo 2 ;;
+    *)
+      echo "Unsupported GitHub Actions permission value: $1" >&2
+      exit 1
+      ;;
+  esac
+}
+
+job_permission() {
+  local file="$1"
+  local job="$2"
+  local permission="$3"
+  awk -v job="$job" -v permission="$permission" '
+    $0 == "  " job ":" { in_job = 1; next }
+    in_job && /^  [A-Za-z0-9_-]+:/ { exit }
+    in_job && /^    permissions:/ { in_permissions = 1; next }
+    in_permissions && /^    [^[:space:]]/ { exit }
+    in_permissions && $1 == permission ":" { print $2; exit }
+  ' "$file"
+}
+
+assert_nested_job_permissions() {
+  local caller_permission callee_permission caller_rank callee_rank
+  for permission in contents packages; do
+    caller_permission="$(job_permission "$candidate" deploy-dev "$permission")"
+    if [ -z "$caller_permission" ]; then
+      echo "Missing caller permission ${permission} on candidate reusable-workflow job" >&2
+      exit 1
+    fi
+    caller_rank="$(permission_rank "$caller_permission")"
+    for callee_job in build deploy; do
+      callee_permission="$(job_permission "$core" "$callee_job" "$permission")"
+      if [ -z "$callee_permission" ]; then
+        echo "Missing ${permission} permission on reusable workflow job ${callee_job}" >&2
+        exit 1
+      fi
+      callee_rank="$(permission_rank "$callee_permission")"
+      if [ "$callee_rank" -gt "$caller_rank" ]; then
+        echo "Reusable workflow job ${callee_job} requests ${permission}: ${callee_permission}, beyond caller cap ${caller_permission}" >&2
+        exit 1
+      fi
+    done
+  done
+}
+
 # The feature workflow publishes images on push, but its only deployment
 # entrypoint is deliberately manual and accepts just one explicit source SHA.
 require '^  workflow_dispatch:$' "$candidate"
@@ -77,6 +126,7 @@ require 'DEPLOY_IMAGE_NAME\}@\$\{IMAGE_DIGEST\}' "$core"
 require 'Previous DEV source SHA' "$core"
 require 'Previous DEV image digest' "$core"
 forbid 'latest' "$core"
+assert_nested_job_permissions
 
 # The existing feature push flow is image publication only; it must never
 # obtain the deployment reusable workflow or a deployment job.

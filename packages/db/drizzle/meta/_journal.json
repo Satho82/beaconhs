@@ -379,6 +379,13 @@
       "when": 1790935200000,
       "tag": "0054_v14_configuration_tenant_defaults",
       "breakpoints": true
+    },
+    {
+      "idx": 54,
+      "version": "7",
+      "when": 1791021600000,
+      "tag": "0055_v14_configuration_governance_lifecycle",
+      "breakpoints": true
     }
   ]
 }

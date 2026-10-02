@@ -164,6 +164,7 @@ describe('production cutover migration integrity', () => {
       { idx: 51, tag: '0052_user_identity_lifecycle' },
       { idx: 52, tag: '0053_property_scope_repair' },
       { idx: 53, tag: '0054_v14_configuration_tenant_defaults' },
+      { idx: 54, tag: '0055_v14_configuration_governance_lifecycle' },
     ])
     for (let index = 1; index < journal.entries.length; index++) {
       expect(journal.entries[index]!.when).toBeGreaterThan(journal.entries[index - 1]!.when)

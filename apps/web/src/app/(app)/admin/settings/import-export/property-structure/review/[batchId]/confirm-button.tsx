@@ -41,7 +41,8 @@ export function ConfirmImportButton({
         disabled={!acknowledged || pending}
         onClick={() =>
           startTransition(async () => {
-            const outcome = await confirmPropertyStructureImport({ batchId, acknowledged })
+            if (!acknowledged) return
+            const outcome = await confirmPropertyStructureImport({ batchId, acknowledged: true })
             if (!outcome.ok) return setError(outcome.error || failure)
             router.push(`/admin/settings/import-export/property-structure/result/${batchId}`)
           })

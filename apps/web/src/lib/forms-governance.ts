@@ -15,14 +15,14 @@ import {
 import { assertCan, type RequestContext } from '@beaconhs/tenant'
 import { recordAuditInTransaction } from './audit'
 import { assertCanAccessProperty } from './hospitality/property-access'
-import { isModuleKey } from './module-entitlements/catalogue'
+import { isModuleKey, type ModuleKey } from './module-entitlements/catalogue'
 import { assertTenantModuleEntitled } from './module-entitlements/server'
 
 type PlatformFormTemplatePayload = {
   formTemplate: {
     key: string
     name: string
-    schema: unknown
+    schema: ReturnType<typeof validateFormSchema>
     category?: string
     description?: string
     kind?: 'form' | 'wizard' | 'checklist' | 'register' | 'mini_app'
@@ -68,9 +68,13 @@ function parsePlatformFormTemplatePayload(
   ) {
     throw new Error('Template allowed roles are invalid.')
   }
-  const moduleKey = candidate.moduleKey
-  if (moduleKey && (typeof moduleKey !== 'string' || !isModuleKey(moduleKey))) {
-    throw new Error('Template module entitlement is invalid.')
+  const moduleKeyValue = candidate.moduleKey
+  let moduleKey: ModuleKey | undefined
+  if (moduleKeyValue !== undefined) {
+    if (typeof moduleKeyValue !== 'string' || !isModuleKey(moduleKeyValue)) {
+      throw new Error('Template module entitlement is invalid.')
+    }
+    moduleKey = moduleKeyValue
   }
 
   return {

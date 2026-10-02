@@ -264,6 +264,7 @@ const hardenedCriticalReferences = [
   'ai_conversation_shares.tenant_id,target_user_id->tenant_users.tenant_id,user_id',
   'ai_messages.tenant_id,conversation_id->ai_conversations.tenant_id,id',
   'api_idempotency_keys.tenant_id,api_key_id->api_keys.tenant_id,id',
+  'bulk_import_rows.tenant_id,batch_id->bulk_import_batches.tenant_id,id',
   ...hardenedWorkflowPrincipalReferences,
   ...hardenedRoutingReferences.map(({ reference }) => reference),
   ...hardenedComplianceDispatchReferences.map(({ reference }) => reference),
@@ -365,6 +366,31 @@ describe('tenant relational integrity', () => {
       ]
       expect(uniqueKeys, signature(reference)).toContainEqual(reference.parentColumns)
     }
+  })
+
+  it('keeps governed bulk-import parents and attachments tenant-bound', () => {
+    const tables = new Map(allTableConfigs().map((table) => [table.name, table]))
+    const batches = tables.get('bulk_import_batches')
+    expect(batches).toBeDefined()
+    expect(
+      batches!.indexes
+        .filter((index) => index.config.unique)
+        .map((index) =>
+          index.config.columns.map((column) => ('name' in column ? column.name : '')),
+        ),
+    ).toContainEqual(['tenant_id', 'id'])
+
+    const bulkImportReferences = tenantForeignKeys().filter(
+      (reference) =>
+        reference.childTable === 'bulk_import_rows' ||
+        reference.childTable === 'bulk_import_batches',
+    )
+    expect(bulkImportReferences.map(signature)).toEqual(
+      expect.arrayContaining([
+        'bulk_import_rows.tenant_id,batch_id->bulk_import_batches.tenant_id,id',
+        'bulk_import_batches.tenant_id,source_attachment_id->attachments.tenant_id,id',
+      ]),
+    )
   })
 
   it('ratchets the reviewed residual single-column tenant FK manifest', () => {

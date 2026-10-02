@@ -63,6 +63,7 @@ export const bulkImportBatches = pgTable(
     ...timestamps,
   },
   (t) => ({
+    tenantIdIdUx: uniqueIndex('bulk_import_batches_tenant_id_id_ux').on(t.tenantId, t.id),
     tenantStatusIdx: index('bulk_import_batches_tenant_status_idx').on(
       t.tenantId,
       t.status,

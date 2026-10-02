@@ -25,6 +25,7 @@ CREATE TABLE "bulk_import_batches" (
 );
 CREATE INDEX "bulk_import_batches_tenant_status_idx" ON "bulk_import_batches" ("tenant_id", "status", "created_at");
 CREATE INDEX "bulk_import_batches_tenant_dataset_idx" ON "bulk_import_batches" ("tenant_id", "dataset_key", "created_at");
+CREATE UNIQUE INDEX "bulk_import_batches_tenant_id_id_ux" ON "bulk_import_batches" ("tenant_id", "id");
 
 CREATE TABLE "bulk_import_rows" (
   "id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,

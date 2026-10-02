@@ -34,9 +34,7 @@ describe('governed import engine', () => {
 
   it('ignores empty CSV rows but preserves malformed non-empty rows for validation', async () => {
     const rows = await validateImportRows(parseImportRows('code\n\n,broken\n', dataset), dataset)
-    expect(rows).toEqual([
-      expect.objectContaining({ sourceRowNumber: 2, values: { code: '' } }),
-    ])
+    expect(rows).toEqual([expect.objectContaining({ sourceRowNumber: 2, values: { code: '' } })])
     expect(previewImport(rows, dataset)).toMatchObject({ total: 1, invalid: 1 })
   })
 

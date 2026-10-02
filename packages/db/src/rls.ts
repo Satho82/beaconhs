@@ -406,6 +406,8 @@ export const TENANT_SCOPED_TABLES = [
   'user_permission_overrides',
   'attachments',
   'attachment_upload_reservations',
+  'bulk_import_batches',
+  'bulk_import_rows',
   'storage_object_deletion_outbox',
   'form_templates',
   'form_template_versions',

@@ -386,6 +386,13 @@
       "when": 1791021600000,
       "tag": "0055_v14_configuration_governance_lifecycle",
       "breakpoints": true
+    },
+    {
+      "idx": 55,
+      "version": "7",
+      "when": 1791108000000,
+      "tag": "0056_v14_governed_bulk_imports",
+      "breakpoints": true
     }
   ]
 }

@@ -326,6 +326,11 @@
     "unlock": "Desbloquear quiosco"
   },
   "Generated": {
+    "m_0c806c3b99dde9": "El nombre es obligatorio.",
+    "m_064ac64282b2fb": "El apellido es obligatorio.",
+    "m_0a54660cc17b69": "El correo electrónico no es válido.",
+    "m_1d42781ee0b3f7": "El estado no es válido.",
+    "m_0a3857482d89ae": "La referencia de {value0} es desconocida.",
     "m_152a0c53b77f75": "Configuración del inquilino",
     "m_0bd104dda9f183": "Se creó el inquilino {value0}",
     "m_0e732f319c37c9": "Configuración regional",

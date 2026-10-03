@@ -326,6 +326,11 @@
     "unlock": "Déverrouiller la borne"
   },
   "Generated": {
+    "m_0c806c3b99dde9": "Le prénom est obligatoire.",
+    "m_064ac64282b2fb": "Le nom est obligatoire.",
+    "m_0a54660cc17b69": "L’adresse e-mail n’est pas valide.",
+    "m_1d42781ee0b3f7": "Le statut n’est pas valide.",
+    "m_0a3857482d89ae": "La référence {value0} est inconnue.",
     "m_152a0c53b77f75": "Paramètres du locataire",
     "m_0bd104dda9f183": "Locataire {value0} créé",
     "m_0e732f319c37c9": "Paramètres régionaux",

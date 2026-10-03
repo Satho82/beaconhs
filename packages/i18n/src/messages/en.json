@@ -326,6 +326,11 @@
     "unlock": "Unlock kiosk"
   },
   "Generated": {
+    "m_0c806c3b99dde9": "First name is required.",
+    "m_064ac64282b2fb": "Last name is required.",
+    "m_0a54660cc17b69": "Email is invalid.",
+    "m_1d42781ee0b3f7": "Status is invalid.",
+    "m_0a3857482d89ae": "{value0} reference is unknown.",
     "m_152a0c53b77f75": "Tenant Settings",
     "m_0bd104dda9f183": "Created tenant {value0}",
     "m_0e732f319c37c9": "Locale",

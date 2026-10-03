@@ -139,10 +139,26 @@ core_deploy = core.dig('jobs', 'deploy')
 unless core_deploy.dig('env', 'MIGRATION_DOCKER_NETWORK') == "${{ inputs.feature_candidate_verified && 'uvanoo-dev-private' || 'infra-net' }}"
   abort 'Reusable deployment must select uvanoo-dev-private only for verified candidates and preserve infra-net for main'
 end
+unless core_deploy.dig('env', 'MIGRATION_DATABASE_URL') == '${{ inputs.feature_candidate_verified && secrets.DEV_MIGRATION_DATABASE_URL || secrets.MAIN_MIGRATION_DATABASE_URL }}'
+  abort 'Reusable deployment must select the candidate or normal-main migration secret from the verification flag'
+end
+unless core_deploy.dig('env', 'EXPECTED_MIGRATION_HOST') == "${{ inputs.feature_candidate_verified && 'uvanoo-dev-postgres' || 'beaconhs-postgres' }}"
+  abort 'Reusable deployment must select the matching candidate or normal-main migration host from the verification flag'
+end
+unless core.dig(true, 'workflow_call', 'secrets', 'MAIN_MIGRATION_DATABASE_URL', 'required') == true &&
+       core.dig(true, 'workflow_call', 'secrets', 'DEV_MIGRATION_DATABASE_URL', 'required') == true
+  abort 'Reusable deployment must require both explicit migration-context secrets'
+end
 migration_step = core_deploy.fetch('steps').find { |step| step['name'] == 'Run database migrations' }
 abort 'Canonical migrations must use the selected migration Docker network' unless migration_step['run'].include?('--network "$MIGRATION_DOCKER_NETWORK"')
 connectivity_step = core_deploy.fetch('steps').find { |step| step['name'] == 'Verify migration connectivity' }
 abort 'Reusable deployment must verify migrator identity before migrations' unless connectivity_step['run'].include?('beaconhs_migrator|beaconhs')
+url_step = core_deploy.fetch('steps').find { |step| step['name'] == 'Validate migration URL' }
+abort 'Migration URL validation must reject topology-crossed database hosts' unless url_step['run'].include?('EXPECTED_MIGRATION_HOST') && url_step['run'].include?('Migration URL does not match the selected deployment topology')
+ci = YAML.safe_load(File.read('.github/workflows/ci.yml'), aliases: true)
+main_caller = ci.dig('jobs', 'deploy-dev')
+abort 'Normal-main caller must inherit both required migration-context secrets' unless main_caller['secrets'] == 'inherit'
+abort 'Candidate caller must inherit both required migration-context secrets' unless deploy['secrets'] == 'inherit'
 RUBY
 
 # The core retains its gated main build while feature deployments skip builds

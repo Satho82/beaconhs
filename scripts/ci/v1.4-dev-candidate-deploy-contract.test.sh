@@ -135,6 +135,14 @@ unless deploy.dig('with', 'source_sha') == '${{ needs.verify-candidate.outputs.s
 end
 abort 'Candidate dispatcher must not hold the reusable deployment concurrency group' if candidate.dig('concurrency', 'group') == core.dig('concurrency', 'group')
 abort 'Reusable deployment workflow must retain the canonical deploy-dev concurrency group' unless core.dig('concurrency', 'group') == 'deploy-dev'
+core_deploy = core.dig('jobs', 'deploy')
+unless core_deploy.dig('env', 'MIGRATION_DOCKER_NETWORK') == "${{ inputs.feature_candidate_verified && 'uvanoo-dev-private' || 'infra-net' }}"
+  abort 'Reusable deployment must select uvanoo-dev-private only for verified candidates and preserve infra-net for main'
+end
+migration_step = core_deploy.fetch('steps').find { |step| step['name'] == 'Run database migrations' }
+abort 'Canonical migrations must use the selected migration Docker network' unless migration_step['run'].include?('--network "$MIGRATION_DOCKER_NETWORK"')
+connectivity_step = core_deploy.fetch('steps').find { |step| step['name'] == 'Verify migration connectivity' }
+abort 'Reusable deployment must verify migrator identity before migrations' unless connectivity_step['run'].include?('beaconhs_migrator|beaconhs')
 RUBY
 
 # The core retains its gated main build while feature deployments skip builds

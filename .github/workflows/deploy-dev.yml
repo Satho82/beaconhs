@@ -117,6 +117,10 @@ jobs:
       DEPLOY_SOURCE_SHA: ${{ inputs.source_sha || github.sha }}
       DEPLOY_IMAGE_NAME: ${{ inputs.source_sha != '' && 'ghcr.io/satho82/uvanoo-staging-private' || 'ghcr.io/satho82/beaconhs' }}
       CALLER_WORKFLOW_REF: ${{ github.workflow_ref }}
+      # The candidate database is isolated from the normal main deployment
+      # stack. Keep the main path on infra-net and use the DEV-private alias
+      # only after the candidate verifier has approved the immutable input.
+      MIGRATION_DOCKER_NETWORK: ${{ inputs.feature_candidate_verified && 'uvanoo-dev-private' || 'infra-net' }}
     steps:
       # The deploy runner shares storage with Dokploy. Keep stale build cache
       # and superseded images from exhausting the host and taking the Dokploy
@@ -339,6 +343,21 @@ jobs:
             console.log("Password present:", Boolean(u.password));
           '
 
+      - name: Verify migration connectivity
+        env:
+          MIGRATION_DATABASE_URL: ${{ secrets.DEV_MIGRATION_DATABASE_URL }}
+        run: |
+          set -euo pipefail
+          identity="$(docker run --rm --network "$MIGRATION_DOCKER_NETWORK" \
+            -e MIGRATION_DATABASE_URL="$MIGRATION_DATABASE_URL" \
+            postgres:16-alpine@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777 \
+            psql "$MIGRATION_DATABASE_URL" -At -F '|' -c 'SELECT current_user, current_database();')"
+          if [ "$identity" != 'beaconhs_migrator|beaconhs' ]; then
+            echo "::error::Migration connectivity identity did not match beaconhs_migrator|beaconhs"
+            exit 1
+          fi
+          echo 'Migration connectivity identity verified'
+
       - name: Run database migrations
         env:
           NODE_ENV: production
@@ -347,7 +366,7 @@ jobs:
           SUPERADMIN_DATABASE_URL: ${{ secrets.DEV_SUPERADMIN_DATABASE_URL }}
           DATABASE_OWNER_ROLE: beaconhs_owner
         run: |
-          docker run --rm --network infra-net \
+          docker run --rm --network "$MIGRATION_DOCKER_NETWORK" \
             -v "$GITHUB_WORKSPACE:/workspace" \
             -w /workspace \
             -e NODE_ENV="$NODE_ENV" \

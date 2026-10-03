@@ -16,7 +16,10 @@ permissions:
   packages: read
 
 concurrency:
-  group: deploy-dev
+  # The reusable workflow owns deploy-dev so the actual rollout is serialized
+  # with main-branch deployments. This outer dispatcher must not hold that
+  # same lease while invoking it.
+  group: v1.4-dev-candidate-dispatch
   cancel-in-progress: false
 
 env:

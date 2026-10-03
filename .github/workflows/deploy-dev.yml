@@ -15,6 +15,21 @@ on:
         required: false
         type: boolean
         default: false
+      source_sha:
+        description: Verified immutable source SHA for an approved feature candidate
+        required: false
+        type: string
+        default: ''
+      image_digest:
+        description: Verified immutable image digest for an approved feature candidate
+        required: false
+        type: string
+        default: ''
+      feature_candidate_verified:
+        description: Set only by the V1.4 candidate verification workflow
+        required: false
+        type: boolean
+        default: false
 
 concurrency:
   group: deploy-dev
@@ -22,7 +37,7 @@ concurrency:
 
 permissions:
   contents: read
-  packages: write
+  packages: read
 
 env:
   IMAGE_NAME: ghcr.io/satho82/beaconhs
@@ -30,10 +45,11 @@ env:
 
 jobs:
   build:
+    if: inputs.source_sha == ''
     permissions:
       contents: read
       packages: write
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
     outputs:
       image_digest: ${{ steps.build-image.outputs.digest }}
@@ -82,14 +98,25 @@ jobs:
           cache-to: type=gha,mode=max,ignore-error=true
 
   deploy:
-    needs: build
+    needs: [build]
+    # Main deployments require the existing build. A V1.4 deployment can only
+    # use the two immutable values emitted by the dedicated verifier workflow.
+    if: >-
+      always() && (
+        (inputs.source_sha == '' && needs.build.result == 'success') ||
+        (inputs.source_sha != '' && inputs.image_digest != '' &&
+          inputs.feature_candidate_verified)
+      )
     permissions:
       contents: read
       packages: read
     runs-on: [self-hosted, dokploy]
     timeout-minutes: 45
     env:
-      IMAGE_DIGEST: ${{ needs.build.outputs.image_digest }}
+      IMAGE_DIGEST: ${{ inputs.image_digest || needs.build.outputs.image_digest }}
+      DEPLOY_SOURCE_SHA: ${{ inputs.source_sha || github.sha }}
+      DEPLOY_IMAGE_NAME: ${{ inputs.source_sha != '' && 'ghcr.io/satho82/uvanoo-staging-private' || 'ghcr.io/satho82/beaconhs' }}
+      CALLER_WORKFLOW_REF: ${{ github.workflow_ref }}
     steps:
       # The deploy runner shares storage with Dokploy. Keep stale build cache
       # and superseded images from exhausting the host and taking the Dokploy
@@ -111,7 +138,27 @@ jobs:
           fi
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
+          ref: ${{ env.DEPLOY_SOURCE_SHA }}
           persist-credentials: false
+      - name: Validate verified deployment identity
+        run: |
+          set -euo pipefail
+          if ! [[ "$DEPLOY_SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error::Deployment source must be a full lowercase commit SHA"
+            exit 1
+          fi
+          if [ "${{ inputs.source_sha }}" != '' ] \
+            && { [ "${{ inputs.feature_candidate_verified }}" != true ] \
+              || [ "${{ inputs.image_digest }}" = '' ]; }; then
+            echo "::error::Feature deployments require the verified candidate workflow"
+            exit 1
+          fi
+          if [ "${{ inputs.source_sha }}" != '' ] \
+            && [[ "$CALLER_WORKFLOW_REF" != "$GITHUB_REPOSITORY/.github/workflows/deploy-v1.4-dev-candidate.yml@"* ]]; then
+            echo "::error::Feature deployments may only be called by the V1.4 candidate verifier workflow"
+            exit 1
+          fi
+          test "$(git rev-parse HEAD)" = "$DEPLOY_SOURCE_SHA"
       - name: Validate immutable build output
         run: |
           set -euo pipefail
@@ -119,7 +166,7 @@ jobs:
             echo "::error::The image build did not return a canonical sha256 digest"
             exit 1
           fi
-          echo "Deploying immutable image ${IMAGE_NAME}@${IMAGE_DIGEST}"
+          echo "Deploying immutable image ${DEPLOY_IMAGE_NAME}@${IMAGE_DIGEST} from $DEPLOY_SOURCE_SHA"
 
       - name: Configure TLS-preserving Dokploy split-DNS resolution
         env:
@@ -229,6 +276,18 @@ jobs:
             printf 'DOKPLOY_DEPLOY_MODE=%s\n' "$deploy_mode"
           } >> "$GITHUB_ENV"
 
+          if [ "$deploy_mode" = api ]; then
+            previous_image="$(awk -F= '$1 == "IMAGE" {sub(/^[^=]*=/, ""); print; exit}' "$response")"
+            previous_source_sha="$(awk -F= '$1 == "APP_VERSION" {sub(/^[^=]*=/, ""); print; exit}' "$response")"
+          else
+            previous_image="$(docker service inspect "${target_stack}_web" --format '{{.Spec.TaskTemplate.ContainerSpec.Image}}')"
+            previous_source_sha="$(docker service inspect "${target_stack}_web" --format '{{range .Spec.TaskTemplate.ContainerSpec.Env}}{{println .}}{{end}}' | awk -F= '$1 == "APP_VERSION" {print $2; exit}')"
+          fi
+          {
+            echo "Previous DEV source SHA: ${previous_source_sha:-not recorded}"
+            echo "Previous DEV image digest: ${previous_image#*@}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
       # Prove this run's least-privilege package token can read the exact
       # private image before touching anything. The token stays in a temporary
       # Docker config and is never persisted over Dokploy's registry login.
@@ -242,7 +301,7 @@ jobs:
             echo "::error::docker CLI not present on runner (socket mount expected)"
             exit 1
           fi
-          IMAGE="${IMAGE_NAME}@${IMAGE_DIGEST}"
+          IMAGE="${DEPLOY_IMAGE_NAME}@${IMAGE_DIGEST}"
           DOCKER_CONFIG="$(mktemp -d)"
           chmod 0700 "$DOCKER_CONFIG"
           export DOCKER_CONFIG
@@ -351,7 +410,7 @@ jobs:
           compose_state="$(mktemp)"
           env_block_file="$(mktemp)"
           trap 'rm -f "$update_response" "$compose_state" "$env_block_file"' EXIT
-          IMAGE="${IMAGE_NAME}@${IMAGE_DIGEST}"
+          IMAGE="${DEPLOY_IMAGE_NAME}@${IMAGE_DIGEST}"
           COMPOSE_FILE="$(cat deploy/dokploy-dev.compose.yaml)"
           # Collabora is served same-origin on the app domain (Traefik path
           # routes), so both editor and WOPI-callback bases are APP_URL; the
@@ -359,7 +418,7 @@ jobs:
           APP_HOST="$(printf '%s' "$APP_URL" | sed -E 's~^https?://~~; s~/+$~~' | tr '[:upper:]' '[:lower:]')"
           {
             printf 'IMAGE=%s\n' "$IMAGE"
-            printf 'APP_VERSION=%s\n' "$GITHUB_SHA"
+            printf 'APP_VERSION=%s\n' "$DEPLOY_SOURCE_SHA"
             printf 'WRITER_REPLICAS=1\n'
             printf 'COLLABORA_IMAGE=%s\n' "$COLLABORA_IMAGE"
             printf 'COLLABORA_URL=%s\n' "$APP_URL"
@@ -432,12 +491,12 @@ jobs:
         if: env.DOKPLOY_DEPLOY_MODE == 'direct'
         run: |
           set -euo pipefail
-          image="${IMAGE_NAME}@${IMAGE_DIGEST}"
+          image="${DEPLOY_IMAGE_NAME}@${IMAGE_DIGEST}"
           for role in web worker scheduler; do
             service="${DOKPLOY_TARGET_STACK}_${role}"
             docker service update --detach=true --with-registry-auth \
               --image "$image" --env-rm APP_VERSION \
-              --env-add "APP_VERSION=$GITHUB_SHA" "$service"
+              --env-add "APP_VERSION=$DEPLOY_SOURCE_SHA" "$service"
           done
           docker service update --detach=true --with-registry-auth \
             --image "$image" "${DOKPLOY_TARGET_STACK}_storage-init"
@@ -455,12 +514,12 @@ jobs:
           while [ "$SECONDS" -lt "$deadline" ]; do
             body="$(curl -fsS --connect-timeout 5 --max-time 15 "$ready_url" 2>/dev/null || true)"
             if [ -n "$body" ] \
-              && jq -e --arg sha "$GITHUB_SHA" \
+              && jq -e --arg sha "$DEPLOY_SOURCE_SHA" \
                   '.status=="ready" and .version==$sha' <<< "$body" >/dev/null 2>&1; then
               last_login_status="$(curl -sS -o /dev/null -w '%{http_code}' \
                 --connect-timeout 5 --max-time 15 "$login_url" || true)"
               if [ "$last_login_status" = 200 ]; then
-                echo "Deployment is externally ready at commit $GITHUB_SHA"
+                echo "Deployment is externally ready at commit $DEPLOY_SOURCE_SHA"
                 echo "Login page responds 200 — deployment healthy"
                 exit 0
               fi

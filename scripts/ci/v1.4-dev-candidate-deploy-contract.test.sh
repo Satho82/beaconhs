@@ -112,6 +112,31 @@ require 'feature_candidate_verified: true' "$candidate"
 require 'source_sha: \$\{\{ needs\.verify-candidate\.outputs\.source_sha \}\}' "$candidate"
 require 'image_digest: \$\{\{ needs\.verify-candidate\.outputs\.image_digest \}\}' "$candidate"
 
+# Parse the workflow graph so a missing job output, an accidental caller guard,
+# or a concurrency self-deadlock cannot silently omit the reusable deployment.
+ruby <<'RUBY'
+require 'yaml'
+
+candidate = YAML.safe_load(File.read('.github/workflows/deploy-v1.4-dev-candidate.yml'), aliases: true)
+core = YAML.safe_load(File.read('.github/workflows/deploy-dev.yml'), aliases: true)
+verify = candidate.dig('jobs', 'verify-candidate')
+deploy = candidate.dig('jobs', 'deploy-dev')
+
+unless verify.dig('outputs', 'source_sha')&.include?('steps.verify.outputs.source_sha') &&
+       verify.dig('outputs', 'image_digest')&.include?('steps.verify.outputs.image_digest')
+  abort 'Verifier must declare the source_sha and image_digest job outputs consumed downstream'
+end
+abort 'Candidate reusable deployment must need verify-candidate' unless deploy['needs'] == 'verify-candidate'
+abort 'Candidate reusable deployment must not use a caller-level guard that can suppress a verified deploy' if deploy.key?('if')
+unless deploy.dig('with', 'source_sha') == '${{ needs.verify-candidate.outputs.source_sha }}' &&
+       deploy.dig('with', 'image_digest') == '${{ needs.verify-candidate.outputs.image_digest }}' &&
+       deploy.dig('with', 'feature_candidate_verified') == true
+  abort 'Candidate reusable deployment must pass only the declared verified outputs and verification flag'
+end
+abort 'Candidate dispatcher must not hold the reusable deployment concurrency group' if candidate.dig('concurrency', 'group') == core.dig('concurrency', 'group')
+abort 'Reusable deployment workflow must retain the canonical deploy-dev concurrency group' unless core.dig('concurrency', 'group') == 'deploy-dev'
+RUBY
+
 # The core retains its gated main build while feature deployments skip builds
 # and deploy the verified source checkout, digest image, APP_VERSION, and
 # readiness identity instead of the dispatch workflow SHA.

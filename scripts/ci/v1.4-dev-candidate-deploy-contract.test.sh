@@ -211,23 +211,51 @@ process.stdin.on('data', x => source += x);
 process.stdin.on('end', () => {
   class Redis {
     on() {}
-    async connect() { if (['dns', 'auth', 'connect'].includes(mode)) throw new Error(mode); }
+    async connect() {
+      if (mode === 'redis-dns') throw Object.assign(new Error('dns'), { code: 'ENOTFOUND' });
+      if (mode === 'auth') throw Object.assign(new Error('auth'), { code: 'WRONGPASS' });
+    }
     async ping() { return mode === 'bad-pong' ? 'FAIL' : 'PONG'; }
     disconnect() {}
   }
   const net = { createConnection() {
     const socket = { setTimeout() {}, destroy() {}, once(event, callback) {
-      if (event === 'connect') queueMicrotask(callback);
+      if (mode === 'postgres' && event === 'error') queueMicrotask(() => callback(Object.assign(new Error('postgres'), { code: 'ENOTFOUND' })));
+      if (mode !== 'postgres' && event === 'connect') queueMicrotask(callback);
     }};
     return socket;
   }};
-  vm.runInNewContext(source, { URL, console, process: { env: { REDIS_URL: 'redis://:fixture@' + (mode === 'wrong-host' ? 'beaconhs-redis' : 'uvanoo-dev-redis') + ':6379' }, exit: process.exit }, require: name => name === 'ioredis' ? Redis : net });
+  const url = mode === 'invalid-url' ? 'not a URL' :
+    'redis://' + (mode === 'no-password' ? '' : ':fixture@') +
+    (mode === 'wrong-host' ? 'beaconhs-redis' : 'uvanoo-dev-redis') +
+    (mode === 'wrong-port' ? ':6380' : ':6379');
+  vm.runInNewContext(source, { URL, console, process: { env: { REDIS_URL: url }, exit: process.exit }, require: name => {
+    if (name === 'ioredis' && mode === 'runtime-dependency') throw Object.assign(new Error('missing'), { code: 'MODULE_NOT_FOUND' });
+    return name === 'ioredis' ? Redis : net;
+  }});
 });
 JS
-%w[pass dns auth connect bad-pong wrong-host].each do |mode|
-  _, _, status = Open3.capture3('node', '-e', redis_harness, mode, stdin_data: redis_script)
-  abort "Redis runtime fixture #{mode} has unexpected result" unless status.success? == (mode == 'pass')
+diagnostic_stages = {
+  'postgres' => 'POSTGRES_DNS_OR_TCP',
+  'wrong-host' => 'REDIS_URL_TOPOLOGY',
+  'wrong-port' => 'REDIS_URL_TOPOLOGY',
+  'no-password' => 'REDIS_URL_TOPOLOGY',
+  'invalid-url' => 'REDIS_URL_TOPOLOGY',
+  'redis-dns' => 'REDIS_DNS_OR_TCP',
+  'auth' => 'REDIS_AUTH_OR_PING',
+  'bad-pong' => 'REDIS_AUTH_OR_PING',
+  'runtime-dependency' => 'RUNTIME_DEPENDENCY'
+}
+stdout, stderr, status = Open3.capture3('node', '-e', redis_harness, 'pass', stdin_data: redis_script)
+abort "Redis runtime success fixture failed: #{stdout}#{stderr}" unless status.success? && stderr.empty?
+diagnostic_stages.each do |mode, stage|
+  stdout, stderr, status = Open3.capture3('node', '-e', redis_harness, mode, stdin_data: redis_script)
+  output = stdout + stderr
+  abort "Redis runtime fixture #{mode} unexpectedly passed" if status.success?
+  abort "Redis runtime fixture #{mode} did not report #{stage}" unless output.include?("[#{stage}]")
+  abort "Redis runtime fixture #{mode} exposed a secret" if output.include?('fixture')
 end
+abort 'Runtime network diagnostics must identify the network component' unless runtime_step['run'].include?('[NETWORK_ATTRIBUTES]')
 require 'json'
 require 'open3'
 target_step = core_deploy.fetch('steps').find { |step| step['name'] == 'Resolve the dev deployment target' }

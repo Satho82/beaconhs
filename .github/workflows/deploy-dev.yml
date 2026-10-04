@@ -607,11 +607,14 @@ jobs:
           REDIS_URL: ${{ secrets.DEV_REDIS_URL }}
         run: |
           set -euo pipefail
-          docker network inspect "$RUNTIME_DOCKER_NETWORK" | jq -e '
+          if ! docker network inspect "$RUNTIME_DOCKER_NETWORK" | jq -e '
             length == 1 and .[0].Name == "uvanoo-dev-runtime" and
             .[0].Driver == "overlay" and .[0].Scope == "swarm" and
             .[0].Attachable == true and .[0].Internal == true
-          ' >/dev/null || { echo '::error::Candidate runtime network topology is invalid'; exit 1; }
+          ' >/dev/null; then
+            echo '::error::Candidate runtime preflight failed [NETWORK_ATTRIBUTES]: topology mismatch'
+            exit 1
+          fi
           docker run --rm --pull=never --network "$RUNTIME_DOCKER_NETWORK" \
             -v "$GITHUB_WORKSPACE:/workspace:ro" \
             -v "$MIGRATION_PNPM_TOOLCHAIN_ROOT:/pnpm-toolchain:ro" \
@@ -620,21 +623,59 @@ jobs:
             -e REDIS_URL \
             "$MIGRATION_NODE_IMAGE" \
             pnpm --filter @beaconhs/jobs exec node -e '
-              const Redis = require("ioredis");
               const net = require("node:net");
+              const networkCodes = new Set(["EAI_AGAIN", "ECONNREFUSED", "EHOSTUNREACH", "ENETUNREACH", "ENOTFOUND", "ETIMEDOUT"]);
+              const safeCode = (error, fallback) => {
+                const code = error && typeof error.code === "string" ? error.code : "";
+                return /^[A-Z0-9_]+$/.test(code) ? code : fallback;
+              };
+              const fail = (stage, error, fallback) => {
+                console.error(`::error::Candidate runtime preflight failed [${stage}]: ${safeCode(error, fallback)}`);
+                process.exit(1);
+              };
               (async () => {
-                const url = new URL(process.env.REDIS_URL);
-                if (url.protocol !== "redis:" || url.hostname !== "uvanoo-dev-redis" ||
-                    (url.port && url.port !== "6379") || !url.password) {
-                  throw new Error("Invalid candidate Redis topology");
+                let Redis;
+                try {
+                  Redis = require("ioredis");
+                } catch (error) {
+                  fail("RUNTIME_DEPENDENCY", error, "IOREDIS_UNAVAILABLE");
+                  return;
                 }
-                await new Promise((resolve, reject) => {
-                  const socket = net.createConnection({ host: "uvanoo-dev-postgres", port: 5432 });
-                  socket.setTimeout(5000);
-                  socket.once("connect", () => { socket.destroy(); resolve(); });
-                  socket.once("error", reject);
-                  socket.once("timeout", () => { socket.destroy(); reject(new Error("PostgreSQL runtime connection timed out")); });
-                });
+                let url;
+                try {
+                  url = new URL(process.env.REDIS_URL);
+                } catch (error) {
+                  fail("REDIS_URL_TOPOLOGY", error, "INVALID_URL");
+                  return;
+                }
+                if (url.protocol !== "redis:") {
+                  fail("REDIS_URL_TOPOLOGY", null, "UNEXPECTED_PROTOCOL");
+                  return;
+                }
+                if (url.hostname !== "uvanoo-dev-redis") {
+                  fail("REDIS_URL_TOPOLOGY", null, "UNEXPECTED_HOSTNAME");
+                  return;
+                }
+                if (url.port && url.port !== "6379") {
+                  fail("REDIS_URL_TOPOLOGY", null, "UNEXPECTED_PORT");
+                  return;
+                }
+                if (!url.password) {
+                  fail("REDIS_URL_TOPOLOGY", null, "MISSING_PASSWORD");
+                  return;
+                }
+                try {
+                  await new Promise((resolve, reject) => {
+                    const socket = net.createConnection({ host: "uvanoo-dev-postgres", port: 5432 });
+                    socket.setTimeout(5000);
+                    socket.once("connect", () => { socket.destroy(); resolve(); });
+                    socket.once("error", reject);
+                    socket.once("timeout", () => { socket.destroy(); reject(Object.assign(new Error("PostgreSQL runtime connection timed out"), { code: "ETIMEDOUT" })); });
+                  });
+                } catch (error) {
+                  fail("POSTGRES_DNS_OR_TCP", error, "CONNECTION_FAILED");
+                  return;
+                }
                 const client = new Redis(process.env.REDIS_URL, {
                   lazyConnect: true, connectTimeout: 5000, commandTimeout: 5000,
                   retryStrategy: () => null, maxRetriesPerRequest: 0,
@@ -642,13 +683,23 @@ jobs:
                 client.on("error", () => {});
                 try {
                   await client.connect();
-                  if (await client.ping() !== "PONG") throw new Error("Redis PING failed");
+                } catch (error) {
+                  fail(networkCodes.has(error && error.code) ? "REDIS_DNS_OR_TCP" : "REDIS_AUTH_OR_PING", error, "CONNECTION_FAILED");
+                  return;
+                }
+                try {
+                  if (await client.ping() !== "PONG") {
+                    fail("REDIS_AUTH_OR_PING", null, "PING_NOT_PONG");
+                    return;
+                  }
                   console.log("Candidate runtime PostgreSQL reachable; authenticated Redis PONG");
+                } catch (error) {
+                  fail(networkCodes.has(error && error.code) ? "REDIS_DNS_OR_TCP" : "REDIS_AUTH_OR_PING", error, "PING_FAILED");
                 } finally {
                   client.disconnect();
                 }
-              })().catch(() => {
-                console.error("::error::Candidate runtime PostgreSQL/Redis topology or connectivity preflight failed");
+              })().catch((error) => {
+                console.error(`::error::Candidate runtime preflight failed [RUNTIME_DEPENDENCY]: ${safeCode(error, "UNEXPECTED_FAILURE")}`);
                 process.exit(1);
               });
             '

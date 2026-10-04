@@ -175,10 +175,15 @@ jobs:
       DEPLOY_SOURCE_SHA: ${{ inputs.source_sha || github.sha }}
       DEPLOY_IMAGE_NAME: ${{ inputs.source_sha != '' && 'ghcr.io/satho82/uvanoo-staging-private' || 'ghcr.io/satho82/beaconhs' }}
       CALLER_WORKFLOW_REF: ${{ github.workflow_ref }}
+      DEPLOY_GOVERNANCE_SHA: ${{ github.workflow_sha }}
       # The candidate database is isolated from the normal main deployment
       # stack. Keep the main path on infra-net and use the DEV-private alias
       # only after the candidate verifier has approved the immutable input.
       MIGRATION_DOCKER_NETWORK: ${{ inputs.feature_candidate_verified && 'uvanoo-dev-private' || 'infra-net' }}
+      RUNTIME_DOCKER_NETWORK: ${{ inputs.feature_candidate_verified && 'uvanoo-dev-runtime' || 'infra-net' }}
+      DOKPLOY_COMPOSE_ID: ${{ inputs.feature_candidate_verified && 'wYb0LxLQrvj2FPI21i-Oj' || secrets.DOKPLOY_COMPOSE_ID }}
+      EXPECTED_DOKPLOY_STACK: ${{ inputs.feature_candidate_verified && 'uvanoo-v1-4-dev-gniriv' || 'beaconhs-ib9ybf' }}
+      EXPECTED_APP_HOST: ${{ inputs.feature_candidate_verified && 'dev.uvanoo.com' || 'portal.uvanoo.com' }}
       MIGRATION_DATABASE_URL: ${{ inputs.feature_candidate_verified && secrets.DEV_MIGRATION_DATABASE_URL || secrets.MAIN_MIGRATION_DATABASE_URL }}
       DATABASE_URL: ${{ inputs.feature_candidate_verified && secrets.DEV_DATABASE_URL || secrets.MAIN_DATABASE_URL }}
       SUPERADMIN_DATABASE_URL: ${{ inputs.feature_candidate_verified && secrets.DEV_SUPERADMIN_DATABASE_URL || secrets.MAIN_SUPERADMIN_DATABASE_URL }}
@@ -206,6 +211,34 @@ jobs:
         with:
           ref: ${{ env.DEPLOY_SOURCE_SHA }}
           persist-credentials: false
+      # Relative reusable calls resolve at the caller workflow commit. Pin the
+      # compose separately so the frozen application checkout cannot select it.
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          ref: ${{ env.DEPLOY_GOVERNANCE_SHA }}
+          path: .deployment-governance
+          persist-credentials: false
+      - name: Verify deployment governance source
+        env:
+          FEATURE_CANDIDATE_VERIFIED: ${{ inputs.feature_candidate_verified }}
+        run: |
+          set -euo pipefail
+          if ! [[ "$DEPLOY_GOVERNANCE_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo '::error::Deployment governance must have a full immutable workflow SHA'
+            exit 1
+          fi
+          test "$(git -C .deployment-governance rev-parse HEAD)" = "$DEPLOY_GOVERNANCE_SHA"
+          if [ "$FEATURE_CANDIDATE_VERIFIED" = true ]; then
+            caller_path=.github/workflows/deploy-v1.4-dev-candidate.yml
+          else
+            caller_path=.github/workflows/ci.yml
+            test "$DEPLOY_GOVERNANCE_SHA" = "$DEPLOY_SOURCE_SHA"
+          fi
+          test "$CALLER_WORKFLOW_REF" = "$GITHUB_REPOSITORY/$caller_path@$GITHUB_REF"
+          grep -Fx '    uses: ./.github/workflows/deploy-dev.yml' ".deployment-governance/$caller_path" >/dev/null
+          compose_blob="$(git -C .deployment-governance rev-parse "$DEPLOY_GOVERNANCE_SHA:deploy/dokploy-dev.compose.yaml")"
+          test "$(git hash-object .deployment-governance/deploy/dokploy-dev.compose.yaml)" = "$compose_blob"
+          printf 'Deployment governance SHA: %s\nCompose blob: %s\n' "$DEPLOY_GOVERNANCE_SHA" "$compose_blob" >> "$GITHUB_STEP_SUMMARY"
       - name: Validate verified deployment identity
         run: |
           set -euo pipefail
@@ -275,7 +308,10 @@ jobs:
         env:
           DOKPLOY_URL: ${{ secrets.DOKPLOY_URL }}
           DOKPLOY_TOKEN: ${{ secrets.DOKPLOY_TOKEN }}
-          COMPOSE_ID: ${{ secrets.DOKPLOY_COMPOSE_ID }}
+          COMPOSE_ID: ${{ env.DOKPLOY_COMPOSE_ID }}
+          EXPECTED_STACK: ${{ env.EXPECTED_DOKPLOY_STACK }}
+          EXPECTED_APP_HOST: ${{ env.EXPECTED_APP_HOST }}
+          FEATURE_CANDIDATE_VERIFIED: ${{ inputs.feature_candidate_verified }}
         run: |
           set -euo pipefail
           umask 077
@@ -295,6 +331,25 @@ jobs:
               exit 1
             fi
             target_stack="$(jq -er '.appName | select(type=="string" and length>0)' "$response")"
+            if [ "$target_stack" != "$EXPECTED_STACK" ]; then
+              echo "::error::Dokploy compose target does not match the selected deployment stack"
+              exit 1
+            fi
+            if [ "$FEATURE_CANDIDATE_VERIFIED" = true ]; then
+              if ! jq -e --arg id "$COMPOSE_ID" --arg host "$EXPECTED_APP_HOST" '
+                .composeId == "wYb0LxLQrvj2FPI21i-Oj" and
+                .appName == "uvanoo-v1-4-dev-gniriv" and
+                .environmentId == "qT391QtcIqahNap5wPjif" and
+                $host == "dev.uvanoo.com" and
+                (.domains | type == "array" and length == 1) and
+                (.domains[0] | .composeId == $id and .host == $host and
+                  .serviceName == "web" and .port == 3000 and
+                  .path == "/" and .https == true and .enabled == true)
+              ' "$response" >/dev/null; then
+                echo "::error::Canonical candidate DEV target must route only dev.uvanoo.com to web:3000 over HTTPS"
+                exit 1
+              fi
+            fi
             existing_registry_id_json="$(jq -c '
               if (has("registryId") | not) or .registryId == null then null
               elif (.registryId | type) == "string" and (.registryId | length) > 0 then
@@ -306,6 +361,10 @@ jobs:
               || { echo "::error::Dokploy compose target returned an invalid registry identity"; exit 1; }
             deploy_mode=api
           elif [[ "$http_status" =~ ^(000|401|403|500|502|503|504)$ ]]; then
+            if [ "$FEATURE_CANDIDATE_VERIFIED" = true ]; then
+              echo "::error::Verified candidates require the canonical Dokploy DEV target; direct fallback is forbidden"
+              exit 1
+            fi
             mapfile -t stacks < <(
               docker service ls --format '{{.Name}} {{.Image}}' \
                 | awk '$2 ~ /^ghcr\.io\/braedonsaunders\/beaconhs(@|:)/ && $1 ~ /_web$/ {sub(/_web$/, "", $1); print $1}'
@@ -542,6 +601,58 @@ jobs:
               });
             '
 
+      - name: Preflight candidate runtime topology
+        if: inputs.feature_candidate_verified
+        env:
+          REDIS_URL: ${{ secrets.DEV_REDIS_URL }}
+        run: |
+          set -euo pipefail
+          docker network inspect "$RUNTIME_DOCKER_NETWORK" | jq -e '
+            length == 1 and .[0].Name == "uvanoo-dev-runtime" and
+            .[0].Driver == "overlay" and .[0].Scope == "swarm" and
+            .[0].Attachable == true and .[0].Internal == true
+          ' >/dev/null || { echo '::error::Candidate runtime network topology is invalid'; exit 1; }
+          docker run --rm --pull=never --network "$RUNTIME_DOCKER_NETWORK" \
+            -v "$GITHUB_WORKSPACE:/workspace:ro" \
+            -v "$MIGRATION_PNPM_TOOLCHAIN_ROOT:/pnpm-toolchain:ro" \
+            -w /workspace \
+            -e PATH=/pnpm-toolchain/node_modules/.bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+            -e REDIS_URL \
+            "$MIGRATION_NODE_IMAGE" \
+            pnpm --filter @beaconhs/jobs exec node -e '
+              const Redis = require("ioredis");
+              const net = require("node:net");
+              (async () => {
+                const url = new URL(process.env.REDIS_URL);
+                if (url.protocol !== "redis:" || url.hostname !== "uvanoo-dev-redis" ||
+                    (url.port && url.port !== "6379") || !url.password) {
+                  throw new Error("Invalid candidate Redis topology");
+                }
+                await new Promise((resolve, reject) => {
+                  const socket = net.createConnection({ host: "uvanoo-dev-postgres", port: 5432 });
+                  socket.setTimeout(5000);
+                  socket.once("connect", () => { socket.destroy(); resolve(); });
+                  socket.once("error", reject);
+                  socket.once("timeout", () => { socket.destroy(); reject(new Error("PostgreSQL runtime connection timed out")); });
+                });
+                const client = new Redis(process.env.REDIS_URL, {
+                  lazyConnect: true, connectTimeout: 5000, commandTimeout: 5000,
+                  retryStrategy: () => null, maxRetriesPerRequest: 0,
+                });
+                client.on("error", () => {});
+                try {
+                  await client.connect();
+                  if (await client.ping() !== "PONG") throw new Error("Redis PING failed");
+                  console.log("Candidate runtime PostgreSQL reachable; authenticated Redis PONG");
+                } finally {
+                  client.disconnect();
+                }
+              })().catch(() => {
+                console.error("::error::Candidate runtime PostgreSQL/Redis topology or connectivity preflight failed");
+                process.exit(1);
+              });
+            '
+
       - name: Run database migrations
         env:
           NODE_ENV: production
@@ -592,7 +703,7 @@ jobs:
         env:
           DOKPLOY_URL: ${{ secrets.DOKPLOY_URL }}
           DOKPLOY_TOKEN: ${{ secrets.DOKPLOY_TOKEN }}
-          COMPOSE_ID: ${{ secrets.DOKPLOY_COMPOSE_ID }}
+          COMPOSE_ID: ${{ env.DOKPLOY_COMPOSE_ID }}
           DATABASE_URL: ${{ env.DATABASE_URL }}
           SUPERADMIN_DATABASE_URL: ${{ env.SUPERADMIN_DATABASE_URL }}
           REDIS_URL: ${{ secrets.DEV_REDIS_URL }}
@@ -616,7 +727,7 @@ jobs:
           env_block_file="$(mktemp)"
           trap 'rm -f "$update_response" "$compose_state" "$env_block_file"' EXIT
           IMAGE="${DEPLOY_IMAGE_NAME}@${IMAGE_DIGEST}"
-          COMPOSE_FILE="$(cat deploy/dokploy-dev.compose.yaml)"
+          COMPOSE_FILE="$(cat .deployment-governance/deploy/dokploy-dev.compose.yaml)"
           # Collabora is served same-origin on the app domain (Traefik path
           # routes), so both editor and WOPI-callback bases are APP_URL; the
           # server_name is the bare host for Collabora's generated URLs.
@@ -632,6 +743,7 @@ jobs:
             printf 'DATABASE_URL=%s\n' "$DATABASE_URL"
             printf 'SUPERADMIN_DATABASE_URL=%s\n' "$SUPERADMIN_DATABASE_URL"
             printf 'REDIS_URL=%s\n' "$REDIS_URL"
+            printf 'RUNTIME_DB_NETWORK=%s\n' "$RUNTIME_DOCKER_NETWORK"
             printf 'APP_URL=%s\n' "$APP_URL"
             printf 'BETTER_AUTH_SECRET=%s\n' "$BETTER_AUTH_SECRET"
             printf 'ATTACHMENT_CAPABILITY_SECRET=%s\n' "$ATTACHMENT_CAPABILITY_SECRET"
@@ -681,7 +793,7 @@ jobs:
         env:
           DOKPLOY_URL: ${{ secrets.DOKPLOY_URL }}
           DOKPLOY_TOKEN: ${{ secrets.DOKPLOY_TOKEN }}
-          COMPOSE_ID: ${{ secrets.DOKPLOY_COMPOSE_ID }}
+          COMPOSE_ID: ${{ env.DOKPLOY_COMPOSE_ID }}
         run: |
           set -euo pipefail
           jq -n --arg id "$COMPOSE_ID" '{composeId:$id}' \

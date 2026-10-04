@@ -38,7 +38,7 @@ services:
       # editor URL and the WOPI callback base are both just APP_URL.
       COLLABORA_URL: ${COLLABORA_URL}
       COLLABORA_WOPI_URL: ${COLLABORA_WOPI_URL}
-    networks: [infra-net, dokploy-network]
+    networks: [runtime-db-network, dokploy-network]
     healthcheck:
       test: ['CMD', 'curl', '--fail', '--silent', 'http://127.0.0.1:3000/api/health/ready']
       interval: 15s
@@ -83,7 +83,7 @@ services:
       VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY}
       VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY}
       VAPID_SUBJECT: ${VAPID_SUBJECT}
-    networks: [infra-net]
+    networks: [runtime-db-network]
     healthcheck:
       test: ['CMD', 'node', 'apps/worker/dist/health.js']
       interval: 30s
@@ -128,7 +128,7 @@ services:
       SENTRY_ENVIRONMENT: dev
       DATABASE_URL: ${DATABASE_URL}
       REDIS_URL: ${REDIS_URL}
-    networks: [infra-net]
+    networks: [runtime-db-network]
     deploy:
       replicas: ${WRITER_REPLICAS}
       # One-shot: register BullMQ repeatable jobs, then exit.
@@ -163,6 +163,9 @@ services:
         delay: 5s
 
 networks:
+  runtime-db-network:
+    name: ${RUNTIME_DB_NETWORK:?Set RUNTIME_DB_NETWORK}
+    external: true
   infra-net:
     external: true
   dokploy-network:

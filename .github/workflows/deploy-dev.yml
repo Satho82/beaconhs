@@ -34,22 +34,29 @@ on:
       MAIN_MIGRATION_DATABASE_URL:
         description: Canonical normal-main migrator connection on infra-net
         required: true
+      MAIN_DATABASE_URL:
+        description: Canonical normal-main runtime connection on infra-net
+        required: true
+      MAIN_SUPERADMIN_DATABASE_URL:
+        description: Canonical normal-main maintenance connection on infra-net
+        required: true
       DEV_MIGRATION_DATABASE_URL:
         description: Verified V1.4 candidate migrator connection on the DEV-private network
         required: true
-      # Existing deployment secrets remain optional in the reusable interface;
-      # the caller inherits them and the relevant deployment path consumes them.
+      DEV_DATABASE_URL:
+        description: Verified V1.4 candidate runtime connection on the DEV-private network
+        required: true
+      DEV_SUPERADMIN_DATABASE_URL:
+        description: Verified V1.4 candidate maintenance connection on the DEV-private network
+        required: true
+      # The remaining deployment secrets are inherited by the caller as needed.
       DEV_APP_URL:
         required: false
       DEV_ATTACHMENT_CAPABILITY_SECRET:
         required: false
       DEV_BETTER_AUTH_SECRET:
         required: false
-      DEV_DATABASE_URL:
-        required: false
       DEV_REDIS_URL:
-        required: false
-      DEV_SUPERADMIN_DATABASE_URL:
         required: false
       DOKPLOY_COMPOSE_ID:
         required: false
@@ -173,6 +180,8 @@ jobs:
       # only after the candidate verifier has approved the immutable input.
       MIGRATION_DOCKER_NETWORK: ${{ inputs.feature_candidate_verified && 'uvanoo-dev-private' || 'infra-net' }}
       MIGRATION_DATABASE_URL: ${{ inputs.feature_candidate_verified && secrets.DEV_MIGRATION_DATABASE_URL || secrets.MAIN_MIGRATION_DATABASE_URL }}
+      DATABASE_URL: ${{ inputs.feature_candidate_verified && secrets.DEV_DATABASE_URL || secrets.MAIN_DATABASE_URL }}
+      SUPERADMIN_DATABASE_URL: ${{ inputs.feature_candidate_verified && secrets.DEV_SUPERADMIN_DATABASE_URL || secrets.MAIN_SUPERADMIN_DATABASE_URL }}
       EXPECTED_MIGRATION_HOST: ${{ inputs.feature_candidate_verified && 'uvanoo-dev-postgres' || 'beaconhs-postgres' }}
     steps:
       # The deploy runner shares storage with Dokploy. Keep stale build cache
@@ -418,11 +427,43 @@ jobs:
       # Forward-only schema migrations run before the redeploy. The unpooled
       # migrator login can SET ROLE to the NOLOGIN owner; neither credential
       # reaches the long-running deployment containers.
+      - name: Require complete selected database credential bundle
+        env:
+          FEATURE_CANDIDATE_VERIFIED: ${{ inputs.feature_candidate_verified }}
+          DEV_MIGRATION_DATABASE_URL: ${{ secrets.DEV_MIGRATION_DATABASE_URL }}
+          DEV_DATABASE_URL: ${{ secrets.DEV_DATABASE_URL }}
+          DEV_SUPERADMIN_DATABASE_URL: ${{ secrets.DEV_SUPERADMIN_DATABASE_URL }}
+          MAIN_MIGRATION_DATABASE_URL: ${{ secrets.MAIN_MIGRATION_DATABASE_URL }}
+          MAIN_DATABASE_URL: ${{ secrets.MAIN_DATABASE_URL }}
+          MAIN_SUPERADMIN_DATABASE_URL: ${{ secrets.MAIN_SUPERADMIN_DATABASE_URL }}
+        run: |
+          set -euo pipefail
+          if [ "$FEATURE_CANDIDATE_VERIFIED" = true ]; then
+            selected_bundle=(
+              DEV_MIGRATION_DATABASE_URL
+              DEV_DATABASE_URL
+              DEV_SUPERADMIN_DATABASE_URL
+            )
+          else
+            selected_bundle=(
+              MAIN_MIGRATION_DATABASE_URL
+              MAIN_DATABASE_URL
+              MAIN_SUPERADMIN_DATABASE_URL
+            )
+          fi
+
+          for credential_name in "${selected_bundle[@]}"; do
+            if [ -z "${!credential_name}" ]; then
+              echo "::error::Selected database credential bundle is incomplete"
+              exit 1
+            fi
+          done
+
       - name: Validate migration database URLs
         env:
           MIGRATION_DATABASE_URL: ${{ env.MIGRATION_DATABASE_URL }}
-          DATABASE_URL: ${{ secrets.DEV_DATABASE_URL }}
-          SUPERADMIN_DATABASE_URL: ${{ secrets.DEV_SUPERADMIN_DATABASE_URL }}
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+          SUPERADMIN_DATABASE_URL: ${{ env.SUPERADMIN_DATABASE_URL }}
           EXPECTED_MIGRATION_HOST: ${{ env.EXPECTED_MIGRATION_HOST }}
         run: |
           node -e '
@@ -452,8 +493,8 @@ jobs:
         env:
           NODE_ENV: production
           MIGRATION_DATABASE_URL: ${{ env.MIGRATION_DATABASE_URL }}
-          DATABASE_URL: ${{ secrets.DEV_DATABASE_URL }}
-          SUPERADMIN_DATABASE_URL: ${{ secrets.DEV_SUPERADMIN_DATABASE_URL }}
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+          SUPERADMIN_DATABASE_URL: ${{ env.SUPERADMIN_DATABASE_URL }}
         run: |
           docker run --rm --pull=never --network "$MIGRATION_DOCKER_NETWORK" \
             -v "$GITHUB_WORKSPACE:/workspace" \
@@ -505,8 +546,8 @@ jobs:
         env:
           NODE_ENV: production
           MIGRATION_DATABASE_URL: ${{ env.MIGRATION_DATABASE_URL }}
-          DATABASE_URL: ${{ secrets.DEV_DATABASE_URL }}
-          SUPERADMIN_DATABASE_URL: ${{ secrets.DEV_SUPERADMIN_DATABASE_URL }}
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+          SUPERADMIN_DATABASE_URL: ${{ env.SUPERADMIN_DATABASE_URL }}
           DATABASE_OWNER_ROLE: beaconhs_owner
         run: |
           docker run --rm --pull=never --network "$MIGRATION_DOCKER_NETWORK" \
@@ -552,8 +593,8 @@ jobs:
           DOKPLOY_URL: ${{ secrets.DOKPLOY_URL }}
           DOKPLOY_TOKEN: ${{ secrets.DOKPLOY_TOKEN }}
           COMPOSE_ID: ${{ secrets.DOKPLOY_COMPOSE_ID }}
-          DEV_DATABASE_URL: ${{ secrets.DEV_DATABASE_URL }}
-          DEV_SUPERADMIN_DATABASE_URL: ${{ secrets.DEV_SUPERADMIN_DATABASE_URL }}
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+          SUPERADMIN_DATABASE_URL: ${{ env.SUPERADMIN_DATABASE_URL }}
           REDIS_URL: ${{ secrets.DEV_REDIS_URL }}
           APP_URL: ${{ secrets.DEV_APP_URL }}
           BETTER_AUTH_SECRET: ${{ secrets.DEV_BETTER_AUTH_SECRET }}
@@ -588,8 +629,8 @@ jobs:
             printf 'COLLABORA_URL=%s\n' "$APP_URL"
             printf 'COLLABORA_WOPI_URL=%s\n' "$APP_URL"
             printf 'COLLABORA_SERVER_NAME=%s\n' "$APP_HOST"
-            printf 'DATABASE_URL=%s\n' "$DEV_DATABASE_URL"
-            printf 'SUPERADMIN_DATABASE_URL=%s\n' "$DEV_SUPERADMIN_DATABASE_URL"
+            printf 'DATABASE_URL=%s\n' "$DATABASE_URL"
+            printf 'SUPERADMIN_DATABASE_URL=%s\n' "$SUPERADMIN_DATABASE_URL"
             printf 'REDIS_URL=%s\n' "$REDIS_URL"
             printf 'APP_URL=%s\n' "$APP_URL"
             printf 'BETTER_AUTH_SECRET=%s\n' "$BETTER_AUTH_SECRET"

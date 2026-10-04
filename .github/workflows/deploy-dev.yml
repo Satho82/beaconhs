@@ -30,6 +30,53 @@ on:
         required: false
         type: boolean
         default: false
+    secrets:
+      MAIN_MIGRATION_DATABASE_URL:
+        description: Canonical normal-main migrator connection on infra-net
+        required: true
+      DEV_MIGRATION_DATABASE_URL:
+        description: Verified V1.4 candidate migrator connection on the DEV-private network
+        required: true
+      # Existing deployment secrets remain optional in the reusable interface;
+      # the caller inherits them and the relevant deployment path consumes them.
+      DEV_APP_URL:
+        required: false
+      DEV_ATTACHMENT_CAPABILITY_SECRET:
+        required: false
+      DEV_BETTER_AUTH_SECRET:
+        required: false
+      DEV_DATABASE_URL:
+        required: false
+      DEV_REDIS_URL:
+        required: false
+      DEV_SUPERADMIN_DATABASE_URL:
+        required: false
+      DOKPLOY_COMPOSE_ID:
+        required: false
+      DOKPLOY_RESOLVE_IP:
+        required: false
+      DOKPLOY_TOKEN:
+        required: false
+      DOKPLOY_URL:
+        required: false
+      R2_ACCESS_KEY_ID:
+        required: false
+      R2_BUCKET:
+        required: false
+      R2_ENDPOINT:
+        required: false
+      R2_PRIVATE_BUCKET_CONFIRMED:
+        required: false
+      R2_SECRET_ACCESS_KEY:
+        required: false
+      SENTRY_DSN:
+        required: false
+      VAPID_PRIVATE_KEY:
+        required: false
+      VAPID_PUBLIC_KEY:
+        required: false
+      VAPID_SUBJECT:
+        required: false
 
 concurrency:
   group: deploy-dev
@@ -121,6 +168,8 @@ jobs:
       # stack. Keep the main path on infra-net and use the DEV-private alias
       # only after the candidate verifier has approved the immutable input.
       MIGRATION_DOCKER_NETWORK: ${{ inputs.feature_candidate_verified && 'uvanoo-dev-private' || 'infra-net' }}
+      MIGRATION_DATABASE_URL: ${{ inputs.feature_candidate_verified && secrets.DEV_MIGRATION_DATABASE_URL || secrets.MAIN_MIGRATION_DATABASE_URL }}
+      EXPECTED_MIGRATION_HOST: ${{ inputs.feature_candidate_verified && 'uvanoo-dev-postgres' || 'beaconhs-postgres' }}
     steps:
       # The deploy runner shares storage with Dokploy. Keep stale build cache
       # and superseded images from exhausting the host and taking the Dokploy
@@ -330,22 +379,28 @@ jobs:
       # reaches the long-running deployment containers.
       - name: Validate migration URL
         env:
-          MIGRATION_DATABASE_URL: ${{ secrets.DEV_MIGRATION_DATABASE_URL }}
+          MIGRATION_DATABASE_URL: ${{ env.MIGRATION_DATABASE_URL }}
+          EXPECTED_MIGRATION_HOST: ${{ env.EXPECTED_MIGRATION_HOST }}
         run: |
           node -e '
             const u = new URL(process.env.MIGRATION_DATABASE_URL);
-            console.log("Migration URL is valid");
-            console.log("Protocol:", u.protocol);
-            console.log("Host:", u.hostname);
-            console.log("Port:", u.port || "(default)");
-            console.log("Database:", u.pathname);
-            console.log("Username:", decodeURIComponent(u.username));
-            console.log("Password present:", Boolean(u.password));
+            if (
+              u.protocol !== "postgresql:" ||
+              u.hostname !== process.env.EXPECTED_MIGRATION_HOST ||
+              (u.port && u.port !== "5432") ||
+              u.pathname !== "/beaconhs" ||
+              decodeURIComponent(u.username) !== "beaconhs_migrator" ||
+              !u.password
+            ) {
+              console.error("::error::Migration URL does not match the selected deployment topology");
+              process.exit(1);
+            }
+            console.log("Migration URL matches the selected deployment topology");
           '
 
       - name: Verify migration connectivity
         env:
-          MIGRATION_DATABASE_URL: ${{ secrets.DEV_MIGRATION_DATABASE_URL }}
+          MIGRATION_DATABASE_URL: ${{ env.MIGRATION_DATABASE_URL }}
         run: |
           set -euo pipefail
           identity="$(docker run --rm --network "$MIGRATION_DOCKER_NETWORK" \
@@ -361,7 +416,7 @@ jobs:
       - name: Run database migrations
         env:
           NODE_ENV: production
-          MIGRATION_DATABASE_URL: ${{ secrets.DEV_MIGRATION_DATABASE_URL }}
+          MIGRATION_DATABASE_URL: ${{ env.MIGRATION_DATABASE_URL }}
           DATABASE_URL: ${{ secrets.DEV_DATABASE_URL }}
           SUPERADMIN_DATABASE_URL: ${{ secrets.DEV_SUPERADMIN_DATABASE_URL }}
           DATABASE_OWNER_ROLE: beaconhs_owner

@@ -89,6 +89,10 @@ permissions:
 env:
   IMAGE_NAME: ghcr.io/satho82/beaconhs
   COLLABORA_IMAGE: collabora/code:26.04.2.1.1@sha256:df33af88c59e26b7335ea98d91e65f1edf13f33369ce6115941b8d59d3409cb5
+  # The migration runtime is pinned separately from the application image so
+  # it can be verified before the forward-only migration command is reached.
+  MIGRATION_NODE_IMAGE: node:24-bookworm@sha256:64af3819f9275802414d7cdc38c27e9d82bd564dec4d4da87d008255d36c63b4
+  DEPLOY_UTILITY_IMAGE: alpine:3@sha256:28bd5fe8b56d1bd048e5babf5b10710ebe0bae67db86916198a6eec434943f8b
 
 jobs:
   build:
@@ -364,6 +368,10 @@ jobs:
           docker image inspect "$IMAGE" --format 'pulled {{.Id}}'
           docker pull "$COLLABORA_IMAGE"
           docker image inspect "$COLLABORA_IMAGE" --format 'pulled Collabora {{.Id}}'
+          docker pull "$MIGRATION_NODE_IMAGE"
+          docker image inspect "$MIGRATION_NODE_IMAGE" --format 'pulled migration runtime {{.Id}}'
+          docker pull "$DEPLOY_UTILITY_IMAGE"
+          docker image inspect "$DEPLOY_UTILITY_IMAGE" --format 'pulled deployment utility {{.Id}}'
 
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with: { node-version: 24.18.0 }
@@ -373,6 +381,39 @@ jobs:
       # too errors with "Multiple versions of pnpm specified".
       - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
       - run: pnpm install --frozen-lockfile
+
+      # The migration container deliberately uses the exact pnpm provisioned
+      # by the pinned setup action. Do not invoke Corepack in the container:
+      # that would fetch pnpm from the public registry after the deployment
+      # has reached its forward-only migration phase.
+      - name: Verify deterministic migration toolchain
+        run: |
+          set -euo pipefail
+          if [ "$(pnpm --version)" != '10.30.3' ]; then
+            echo '::error::The deployment runner did not provision pnpm 10.30.3'
+            exit 1
+          fi
+          if [ -z "${PNPM_HOME:-}" ]; then
+            echo '::error::pnpm/action-setup did not expose PNPM_HOME'
+            exit 1
+          fi
+          toolchain_root="$(cd "$PNPM_HOME/../.." && pwd -P)"
+          test -x "$toolchain_root/node_modules/.bin/pnpm"
+          echo "MIGRATION_PNPM_TOOLCHAIN_ROOT=$toolchain_root" >> "$GITHUB_ENV"
+          docker run --rm --pull=never \
+            -v "$toolchain_root:/pnpm-toolchain:ro" \
+            -v "$GITHUB_WORKSPACE:/workspace:ro" \
+            -w /workspace \
+            -e PATH=/pnpm-toolchain/node_modules/.bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+            "$MIGRATION_NODE_IMAGE" \
+            pnpm --version | grep -Fx '10.30.3'
+          docker run --rm --pull=never \
+            -v "$toolchain_root:/pnpm-toolchain:ro" \
+            -v "$GITHUB_WORKSPACE:/workspace:ro" \
+            -w /workspace \
+            -e PATH=/pnpm-toolchain/node_modules/.bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+            "$MIGRATION_NODE_IMAGE" \
+            pnpm --filter @beaconhs/db exec tsx --version
 
       # Forward-only schema migrations run before the redeploy. The unpooled
       # migrator login can SET ROLE to the NOLOGIN owner; neither credential
@@ -421,25 +462,27 @@ jobs:
           SUPERADMIN_DATABASE_URL: ${{ secrets.DEV_SUPERADMIN_DATABASE_URL }}
           DATABASE_OWNER_ROLE: beaconhs_owner
         run: |
-          docker run --rm --network "$MIGRATION_DOCKER_NETWORK" \
+          docker run --rm --pull=never --network "$MIGRATION_DOCKER_NETWORK" \
             -v "$GITHUB_WORKSPACE:/workspace" \
+            -v "$MIGRATION_PNPM_TOOLCHAIN_ROOT:/pnpm-toolchain:ro" \
             -w /workspace \
+            -e PATH=/pnpm-toolchain/node_modules/.bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
             -e NODE_ENV="$NODE_ENV" \
             -e MIGRATION_DATABASE_URL="$MIGRATION_DATABASE_URL" \
             -e DATABASE_URL="$DATABASE_URL" \
             -e SUPERADMIN_DATABASE_URL="$SUPERADMIN_DATABASE_URL" \
             -e DATABASE_OWNER_ROLE="$DATABASE_OWNER_ROLE" \
-            node:24-bookworm \
-            bash -lc 'corepack enable && corepack prepare pnpm@10.30.3 --activate && pnpm --filter @beaconhs/db exec tsx src/migrate.ts'
+            "$MIGRATION_NODE_IMAGE" \
+            pnpm --filter @beaconhs/db exec tsx src/migrate.ts
 
       # coolwsd caches browser assets at startup, so a changed branding file
       # needs a Collabora restart; an unchanged file needs nothing.
       - name: Install Collabora branding on the swarm manager
         run: |
           set -euo pipefail
-          before="$(docker run --rm -v /etc/dokploy/beaconhs:/target alpine:3@sha256:28bd5fe8b56d1bd048e5babf5b10710ebe0bae67db86916198a6eec434943f8b \
+          before="$(docker run --rm --pull=never -v /etc/dokploy/beaconhs:/target "$DEPLOY_UTILITY_IMAGE" \
             sh -c 'sha256sum /target/collabora-branding.js 2>/dev/null | cut -d" " -f1' || true)"
-          docker run --rm -i -v /etc/dokploy/beaconhs:/target alpine:3@sha256:28bd5fe8b56d1bd048e5babf5b10710ebe0bae67db86916198a6eec434943f8b \
+          docker run --rm --pull=never -i -v /etc/dokploy/beaconhs:/target "$DEPLOY_UTILITY_IMAGE" \
             sh -c 'cat > /target/collabora-branding.js && chmod 0644 /target/collabora-branding.js' \
             < deploy/collabora-branding.js
           after="$(sha256sum deploy/collabora-branding.js | cut -d' ' -f1)"

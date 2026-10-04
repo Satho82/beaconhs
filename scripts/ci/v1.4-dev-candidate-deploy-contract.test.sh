@@ -151,6 +151,19 @@ unless core.dig(true, 'workflow_call', 'secrets', 'MAIN_MIGRATION_DATABASE_URL',
 end
 migration_step = core_deploy.fetch('steps').find { |step| step['name'] == 'Run database migrations' }
 abort 'Canonical migrations must use the selected migration Docker network' unless migration_step['run'].include?('--network "$MIGRATION_DOCKER_NETWORK"')
+abort 'Canonical migrations must use the pinned migration runtime without pulling' unless migration_step['run'].include?('--pull=never') && migration_step['run'].include?('"$MIGRATION_NODE_IMAGE"')
+abort 'Canonical migrations must mount the preflighted pnpm toolchain read-only' unless migration_step['run'].include?('"$MIGRATION_PNPM_TOOLCHAIN_ROOT:/pnpm-toolchain:ro"')
+abort 'Canonical migrations must not invoke Corepack' if migration_step['run'].match?(/corepack/)
+toolchain_step_index = core_deploy.fetch('steps').index { |step| step['name'] == 'Verify deterministic migration toolchain' }
+migration_step_index = core_deploy.fetch('steps').index { |step| step['name'] == 'Run database migrations' }
+abort 'Deployment must preflight the pinned migration toolchain before migrations' unless toolchain_step_index && toolchain_step_index < migration_step_index
+toolchain_step = core_deploy.fetch('steps')[toolchain_step_index]
+unless toolchain_step['run'].include?("pnpm --version)\" != '10.30.3'") &&
+       toolchain_step['run'].include?("pnpm --version | grep -Fx '10.30.3'") &&
+       toolchain_step['run'].include?('tsx --version') &&
+       toolchain_step['run'].include?('--pull=never')
+  abort 'Deployment toolchain preflight must prove pnpm 10.30.3 and tsx without a container image pull'
+end
 connectivity_step = core_deploy.fetch('steps').find { |step| step['name'] == 'Verify migration connectivity' }
 abort 'Reusable deployment must verify migrator identity before migrations' unless connectivity_step['run'].include?('beaconhs_migrator|beaconhs')
 url_step = core_deploy.fetch('steps').find { |step| step['name'] == 'Validate migration URL' }
@@ -177,6 +190,12 @@ require '\$DEPLOY_SOURCE_SHA' "$core"
 require 'DEPLOY_IMAGE_NAME\}@\$\{IMAGE_DIGEST\}' "$core"
 require 'Previous DEV source SHA' "$core"
 require 'Previous DEV image digest' "$core"
+require '^  MIGRATION_NODE_IMAGE: node:24-bookworm@sha256:64af3819f9275802414d7cdc38c27e9d82bd564dec4d4da87d008255d36c63b4$' "$core"
+require '^  DEPLOY_UTILITY_IMAGE: alpine:3@sha256:28bd5fe8b56d1bd048e5babf5b10710ebe0bae67db86916198a6eec434943f8b$' "$core"
+require 'docker pull "\$MIGRATION_NODE_IMAGE"' "$core"
+require 'docker pull "\$DEPLOY_UTILITY_IMAGE"' "$core"
+require 'docker run --rm --pull=never.*\$DEPLOY_UTILITY_IMAGE' "$core"
+forbid 'corepack (enable|prepare)' "$core"
 forbid 'latest' "$core"
 assert_nested_job_permissions
 

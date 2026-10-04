@@ -143,8 +143,136 @@ end
 abort 'Candidate dispatcher must not hold the reusable deployment concurrency group' if candidate.dig('concurrency', 'group') == core.dig('concurrency', 'group')
 abort 'Reusable deployment workflow must retain the canonical deploy-dev concurrency group' unless core.dig('concurrency', 'group') == 'deploy-dev'
 core_deploy = core.dig('jobs', 'deploy')
+require 'tmpdir'
+require 'fileutils'
+require 'open3'
+unless core_deploy.dig('env', 'DEPLOY_GOVERNANCE_SHA') == '${{ github.workflow_sha }}'
+  abort 'Deployment governance must be pinned to the caller workflow commit'
+end
+checkouts = core_deploy['steps'].select { |step| step['uses'].to_s.start_with?('actions/checkout@') }
+unless checkouts.any? { |step| step.dig('with', 'ref') == '${{ env.DEPLOY_SOURCE_SHA }}' && !step.dig('with', 'path') } &&
+       checkouts.any? { |step| step.dig('with', 'ref') == '${{ env.DEPLOY_GOVERNANCE_SHA }}' && step.dig('with', 'path') == '.deployment-governance' }
+  abort 'Frozen application and governance must use distinct pinned checkouts'
+end
+unless candidate.dig('jobs', 'deploy-dev', 'uses') == './.github/workflows/deploy-dev.yml' &&
+       YAML.safe_load(File.read('.github/workflows/ci.yml'), aliases: true)['jobs'].values.any? { |job| job['uses'] == './.github/workflows/deploy-dev.yml' }
+  abort 'Both callers must use the same-commit relative reusable workflow'
+end
+governance_step = core_deploy['steps'].find { |step| step['name'] == 'Verify deployment governance source' }
+abort 'Governance checkout must verify its SHA, caller and compose blob' unless governance_step &&
+  governance_step['run'].include?('git -C .deployment-governance rev-parse HEAD') &&
+  governance_step['run'].include?('test "$DEPLOY_GOVERNANCE_SHA" = "$DEPLOY_SOURCE_SHA"') &&
+  governance_step['run'].include?('git hash-object .deployment-governance/deploy/dokploy-dev.compose.yaml')
+compose_source = File.read('deploy/dokploy-dev.compose.yaml')
+compose_config = YAML.safe_load(compose_source, aliases: true)
+%w[web worker scheduler].each do |role|
+  abort "#{role} must use the selected runtime network" unless compose_config.dig('services', role, 'networks').include?('runtime-db-network') &&
+    !compose_config.dig('services', role, 'networks').include?('infra-net')
+end
+abort 'Runtime network must require an explicit context selection' unless compose_config.dig('networks', 'runtime-db-network', 'name') == '${RUNTIME_DB_NETWORK:?Set RUNTIME_DB_NETWORK}'
+abort 'Storage init does not require database access' unless compose_config.dig('services', 'storage-init', 'networks') == ['infra-net']
+compose_assignment = core_deploy['steps'].map { |step| step['run'].to_s }.join("\n").lines.find { |line| line.strip.start_with?('COMPOSE_FILE=') }
+abort 'Compose must be loaded from verified governance checkout' unless compose_assignment&.include?('.deployment-governance/deploy/dokploy-dev.compose.yaml')
+# A deliberately incompatible application-checkout fixture proves source selection
+# without requiring historical objects in the shallow validation checkout.
+application_compose = "services:\n  web:\n    networks: [infra-net]\n"
+Dir.mktmpdir('uvanoo-governance-contract-') do |dir|
+  FileUtils.mkdir_p("#{dir}/deploy")
+  FileUtils.mkdir_p("#{dir}/.deployment-governance/deploy")
+  File.write("#{dir}/deploy/dokploy-dev.compose.yaml", application_compose)
+  File.write("#{dir}/.deployment-governance/deploy/dokploy-dev.compose.yaml", compose_source)
+  actual, _, status = Open3.capture3('bash', '-ceu', compose_assignment + "\n" + 'printf "%s" "$COMPOSE_FILE"', chdir: dir)
+  abort 'Historical application compose controlled rollout' unless status.success? && actual == compose_source.rstrip
+end
+runtime_step = core_deploy.fetch('steps').find { |step| step['name'] == 'Preflight candidate runtime topology' }
+abort 'Runtime preflight must execute only for verified candidates' unless runtime_step && runtime_step['if'] == 'inputs.feature_candidate_verified'
+abort 'Runtime preflight must precede migrations' unless core_deploy['steps'].index(runtime_step) < core_deploy['steps'].index { |step| step['name'] == 'Run database migrations' }
+require 'json'
+require 'open3'
+network_filter = runtime_step['run'][/jq -e '(.*?)'/m, 1]
+abort 'Missing executable network inspection filter' unless network_filter
+network = { 'Name' => 'uvanoo-dev-runtime', 'Driver' => 'overlay', 'Scope' => 'swarm', 'Attachable' => true, 'Internal' => true }
+network_check = lambda do |value|
+  _, _, status = Open3.capture3('jq', '-e', network_filter, stdin_data: JSON.generate(value))
+  status.success?
+end
+abort 'Canonical overlay must pass' unless network_check.call([network])
+abort 'Missing network must fail' if network_check.call([])
+{ 'Name' => 'infra-net', 'Driver' => 'bridge', 'Scope' => 'local', 'Attachable' => false, 'Internal' => false }.each do |key, value|
+  abort "Invalid network #{key} accepted" if network_check.call([network.merge(key => value)])
+end
+redis_script = runtime_step['run'][/exec node -e '(.*?)'\s*\z/m, 1]
+abort 'Missing executable Redis preflight' unless redis_script
+redis_harness = <<'JS'
+const vm = require('node:vm');
+const mode = process.argv[1];
+let source = '';
+process.stdin.on('data', x => source += x);
+process.stdin.on('end', () => {
+  class Redis {
+    on() {}
+    async connect() { if (['dns', 'auth', 'connect'].includes(mode)) throw new Error(mode); }
+    async ping() { return mode === 'bad-pong' ? 'FAIL' : 'PONG'; }
+    disconnect() {}
+  }
+  const net = { createConnection() {
+    const socket = { setTimeout() {}, destroy() {}, once(event, callback) {
+      if (event === 'connect') queueMicrotask(callback);
+    }};
+    return socket;
+  }};
+  vm.runInNewContext(source, { URL, console, process: { env: { REDIS_URL: 'redis://:fixture@' + (mode === 'wrong-host' ? 'beaconhs-redis' : 'uvanoo-dev-redis') + ':6379' }, exit: process.exit }, require: name => name === 'ioredis' ? Redis : net });
+});
+JS
+%w[pass dns auth connect bad-pong wrong-host].each do |mode|
+  _, _, status = Open3.capture3('node', '-e', redis_harness, mode, stdin_data: redis_script)
+  abort "Redis runtime fixture #{mode} has unexpected result" unless status.success? == (mode == 'pass')
+end
+require 'json'
+require 'open3'
+target_step = core_deploy.fetch('steps').find { |step| step['name'] == 'Resolve the dev deployment target' }
+abort 'Routing validator must consume EXPECTED_APP_HOST' unless target_step.dig('env', 'EXPECTED_APP_HOST') == '${{ env.EXPECTED_APP_HOST }}'
+routing_filter = target_step.fetch('run')[/jq -e --arg id "\$COMPOSE_ID" --arg host "\$EXPECTED_APP_HOST" '(.*?)' "\$response"/m, 1]
+abort 'Missing executable canonical candidate routing validator' unless routing_filter
+fixture = {
+  'composeId' => 'wYb0LxLQrvj2FPI21i-Oj', 'appName' => 'uvanoo-v1-4-dev-gniriv',
+  'environmentId' => 'qT391QtcIqahNap5wPjif',
+  'domains' => [{ 'composeId' => 'wYb0LxLQrvj2FPI21i-Oj', 'host' => 'dev.uvanoo.com',
+                  'serviceName' => 'web', 'port' => 3000, 'path' => '/', 'https' => true, 'enabled' => true }]
+}
+verify_route = lambda do |value|
+  _, _, status = Open3.capture3('jq', '-e', '--arg', 'id', fixture['composeId'], '--arg', 'host', 'dev.uvanoo.com', routing_filter, stdin_data: JSON.generate(value))
+  status.success?
+end
+abort 'Canonical candidate routing fixture must pass' unless verify_route.call(fixture)
+mutations = [
+  ->(f) { f['composeId'] = 'r93MasImVQMkgJ-owMVfn' },
+  ->(f) { f['appName'] = 'beaconhs-ib9ybf' },
+  ->(f) { f['environmentId'] = '9eJBsiYEJm1SRMtnCro35' },
+  ->(f) { f['domains'][0]['host'] = 'portal.uvanoo.com' },
+  ->(f) { f['domains'] = [] },
+  ->(f) { f['domains'][0]['serviceName'] = 'worker' },
+  ->(f) { f['domains'][0]['port'] = 80 },
+  ->(f) { f['domains'][0]['https'] = false },
+  ->(f) { f['domains'][0]['enabled'] = false },
+  ->(f) { f['domains'] << f['domains'][0].dup }
+]
+mutations.each_with_index do |mutation, index|
+  invalid = Marshal.load(Marshal.dump(fixture))
+  mutation.call(invalid)
+  abort "Invalid candidate routing fixture #{index} was accepted" if verify_route.call(invalid)
+end
+abort 'Candidate routing validation must not change normal-main domain behavior' unless target_step['run'].include?('if [ "$FEATURE_CANDIDATE_VERIFIED" = true ]; then')
 unless core_deploy.dig('env', 'MIGRATION_DOCKER_NETWORK') == "${{ inputs.feature_candidate_verified && 'uvanoo-dev-private' || 'infra-net' }}"
   abort 'Reusable deployment must select uvanoo-dev-private only for verified candidates and preserve infra-net for main'
+end
+unless core_deploy.dig('env', 'RUNTIME_DOCKER_NETWORK') == "${{ inputs.feature_candidate_verified && 'uvanoo-dev-runtime' || 'infra-net' }}"
+  abort 'Reusable deployment must select uvanoo-dev-runtime only for verified candidate runtime services'
+end
+unless core_deploy.dig('env', 'DOKPLOY_COMPOSE_ID') == "${{ inputs.feature_candidate_verified && 'wYb0LxLQrvj2FPI21i-Oj' || secrets.DOKPLOY_COMPOSE_ID }}" &&
+       core_deploy.dig('env', 'EXPECTED_DOKPLOY_STACK') == "${{ inputs.feature_candidate_verified && 'uvanoo-v1-4-dev-gniriv' || 'beaconhs-ib9ybf' }}" &&
+       core_deploy.dig('env', 'EXPECTED_APP_HOST') == "${{ inputs.feature_candidate_verified && 'dev.uvanoo.com' || 'portal.uvanoo.com' }}"
+  abort 'Reusable deployment must select the isolated candidate target and preserve the production target for main'
 end
 unless core_deploy.dig('env', 'MIGRATION_DATABASE_URL') == '${{ inputs.feature_candidate_verified && secrets.DEV_MIGRATION_DATABASE_URL || secrets.MAIN_MIGRATION_DATABASE_URL }}'
   abort 'Reusable deployment must select the candidate or normal-main migration secret from the verification flag'

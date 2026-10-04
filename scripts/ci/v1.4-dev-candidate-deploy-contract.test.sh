@@ -164,10 +164,39 @@ unless toolchain_step['run'].include?("pnpm --version)\" != '10.30.3'") &&
        toolchain_step['run'].include?('--pull=never')
   abort 'Deployment toolchain preflight must prove pnpm 10.30.3 and tsx without a container image pull'
 end
-connectivity_step = core_deploy.fetch('steps').find { |step| step['name'] == 'Verify migration connectivity' }
-abort 'Reusable deployment must verify migrator identity before migrations' unless connectivity_step['run'].include?('beaconhs_migrator|beaconhs')
-url_step = core_deploy.fetch('steps').find { |step| step['name'] == 'Validate migration URL' }
-abort 'Migration URL validation must reject topology-crossed database hosts' unless url_step['run'].include?('EXPECTED_MIGRATION_HOST') && url_step['run'].include?('Migration URL does not match the selected deployment topology')
+preflight_step = core_deploy.fetch('steps').find { |step| step['name'] == 'Preflight all migration database roles' }
+abort 'Reusable deployment must preflight all database roles before migrations' unless preflight_step
+unless preflight_step['run'].include?('--network "$MIGRATION_DOCKER_NETWORK"') &&
+       preflight_step['run'].include?('"$MIGRATION_NODE_IMAGE"') &&
+       preflight_step['run'].include?('"$MIGRATION_PNPM_TOOLCHAIN_ROOT:/pnpm-toolchain:ro"')
+  abort 'Three-role preflight must use the canonical migration container context'
+end
+%w[MIGRATION_DATABASE_URL DATABASE_URL SUPERADMIN_DATABASE_URL].each do |url_name|
+  abort "Three-role preflight must receive #{url_name}" unless preflight_step['run'].include?("-e #{url_name}=\"$#{url_name}\"")
+end
+unless %w[beaconhs_migrator beaconhs_app beaconhs_super].all? { |role| preflight_step['run'].include?(role) } &&
+       preflight_step['run'].include?('SELECT current_user, current_database()') &&
+       preflight_step['run'].include?('identity.current_database !== "beaconhs"')
+  abort 'Three-role preflight must verify migrator, runtime, and maintenance identities'
+end
+unless preflight_step['run'].include?('error.code === "EAI_AGAIN"') &&
+       preflight_step['run'].include?('attempt <= 3') &&
+       preflight_step['run'].include?('setTimeout(resolve, 1000)')
+  abort 'Three-role preflight must use bounded DNS-only readiness retries'
+end
+url_step = core_deploy.fetch('steps').find { |step| step['name'] == 'Validate migration database URLs' }
+abort 'Migration URL validation must reject topology-crossed database hosts' unless url_step['run'].include?('EXPECTED_MIGRATION_HOST') && url_step['run'].include?('does not match the selected deployment topology')
+%w[MIGRATION_DATABASE_URL DATABASE_URL SUPERADMIN_DATABASE_URL].each do |url_name|
+  abort "URL validation must check #{url_name}" unless url_step['run'].include?(url_name)
+end
+migration_env = migration_step.fetch('env')
+unless migration_env['MIGRATION_DATABASE_URL'] == '${{ env.MIGRATION_DATABASE_URL }}' &&
+       migration_env['DATABASE_URL'] == '${{ secrets.DEV_DATABASE_URL }}' &&
+       migration_env['SUPERADMIN_DATABASE_URL'] == '${{ secrets.DEV_SUPERADMIN_DATABASE_URL }}'
+  abort 'Canonical migrations must receive the same three database URLs after preflight'
+end
+preflight_step_index = core_deploy.fetch('steps').index { |step| step['name'] == 'Preflight all migration database roles' }
+abort 'Three-role preflight must precede canonical migrations' unless preflight_step_index && preflight_step_index < migration_step_index
 ci = YAML.safe_load(File.read('.github/workflows/ci.yml'), aliases: true)
 main_caller = ci.dig('jobs', 'deploy-dev')
 abort 'Normal-main caller must inherit both required migration-context secrets' unless main_caller['secrets'] == 'inherit'

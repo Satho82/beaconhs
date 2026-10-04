@@ -418,41 +418,83 @@ jobs:
       # Forward-only schema migrations run before the redeploy. The unpooled
       # migrator login can SET ROLE to the NOLOGIN owner; neither credential
       # reaches the long-running deployment containers.
-      - name: Validate migration URL
+      - name: Validate migration database URLs
         env:
           MIGRATION_DATABASE_URL: ${{ env.MIGRATION_DATABASE_URL }}
+          DATABASE_URL: ${{ secrets.DEV_DATABASE_URL }}
+          SUPERADMIN_DATABASE_URL: ${{ secrets.DEV_SUPERADMIN_DATABASE_URL }}
           EXPECTED_MIGRATION_HOST: ${{ env.EXPECTED_MIGRATION_HOST }}
         run: |
           node -e '
-            const u = new URL(process.env.MIGRATION_DATABASE_URL);
-            if (
-              u.protocol !== "postgresql:" ||
-              u.hostname !== process.env.EXPECTED_MIGRATION_HOST ||
-              (u.port && u.port !== "5432") ||
-              u.pathname !== "/beaconhs" ||
-              decodeURIComponent(u.username) !== "beaconhs_migrator" ||
-              !u.password
-            ) {
-              console.error("::error::Migration URL does not match the selected deployment topology");
-              process.exit(1);
+            const urls = [
+              ["MIGRATION_DATABASE_URL", "beaconhs_migrator"],
+              ["DATABASE_URL", "beaconhs_app"],
+              ["SUPERADMIN_DATABASE_URL", "beaconhs_super"],
+            ];
+            for (const [name, role] of urls) {
+              const u = new URL(process.env[name]);
+              if (
+                u.protocol !== "postgresql:" ||
+                u.hostname !== process.env.EXPECTED_MIGRATION_HOST ||
+                (u.port && u.port !== "5432") ||
+                u.pathname !== "/beaconhs" ||
+                decodeURIComponent(u.username) !== role ||
+                !u.password
+              ) {
+                console.error(`::error::${name} does not match the selected deployment topology`);
+                process.exit(1);
+              }
             }
-            console.log("Migration URL matches the selected deployment topology");
+            console.log("Migration database URLs match the selected deployment topology");
           '
 
-      - name: Verify migration connectivity
+      - name: Preflight all migration database roles
         env:
+          NODE_ENV: production
           MIGRATION_DATABASE_URL: ${{ env.MIGRATION_DATABASE_URL }}
+          DATABASE_URL: ${{ secrets.DEV_DATABASE_URL }}
+          SUPERADMIN_DATABASE_URL: ${{ secrets.DEV_SUPERADMIN_DATABASE_URL }}
         run: |
-          set -euo pipefail
-          identity="$(docker run --rm --network "$MIGRATION_DOCKER_NETWORK" \
+          docker run --rm --pull=never --network "$MIGRATION_DOCKER_NETWORK" \
+            -v "$GITHUB_WORKSPACE:/workspace" \
+            -v "$MIGRATION_PNPM_TOOLCHAIN_ROOT:/pnpm-toolchain:ro" \
+            -w /workspace \
+            -e PATH=/pnpm-toolchain/node_modules/.bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+            -e NODE_ENV="$NODE_ENV" \
             -e MIGRATION_DATABASE_URL="$MIGRATION_DATABASE_URL" \
-            postgres:16-alpine@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777 \
-            psql "$MIGRATION_DATABASE_URL" -At -F '|' -c 'SELECT current_user, current_database();')"
-          if [ "$identity" != 'beaconhs_migrator|beaconhs' ]; then
-            echo "::error::Migration connectivity identity did not match beaconhs_migrator|beaconhs"
-            exit 1
-          fi
-          echo 'Migration connectivity identity verified'
+            -e DATABASE_URL="$DATABASE_URL" \
+            -e SUPERADMIN_DATABASE_URL="$SUPERADMIN_DATABASE_URL" \
+            "$MIGRATION_NODE_IMAGE" \
+            pnpm --filter @beaconhs/db exec tsx -e '
+              import postgres from "postgres";
+              const connections = [
+                ["MIGRATION_DATABASE_URL", "beaconhs_migrator"],
+                ["DATABASE_URL", "beaconhs_app"],
+                ["SUPERADMIN_DATABASE_URL", "beaconhs_super"],
+              ];
+              for (const [name, expectedRole] of connections) {
+                for (let attempt = 1; attempt <= 3; attempt++) {
+                  const client = postgres(process.env[name], { connect_timeout: 5, max: 1 });
+                  try {
+                    const [identity] = await client`SELECT current_user, current_database()`;
+                    if (identity.current_user !== expectedRole || identity.current_database !== "beaconhs") {
+                      throw new Error(`${name} identity did not match ${expectedRole}|beaconhs`);
+                    }
+                    console.log(`${name} identity verified as ${expectedRole}|beaconhs`);
+                    break;
+                  } catch (error) {
+                    if (error && typeof error === "object" && error.code === "EAI_AGAIN" && attempt < 3) {
+                      console.log(`${name} DNS not ready; retrying (${attempt}/3)`);
+                      await new Promise((resolve) => setTimeout(resolve, 1000));
+                      continue;
+                    }
+                    throw error;
+                  } finally {
+                    await client.end({ timeout: 1 }).catch(() => undefined);
+                  }
+                }
+              }
+            '
 
       - name: Run database migrations
         env:

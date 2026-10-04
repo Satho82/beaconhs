@@ -65,22 +65,49 @@ jobs:
             exit 1
           fi
 
-          # Do not pipe gh into head under pipefail: gh can receive SIGPIPE
-          # after emitting the first run and report exit 255.  Persist the
-          # complete successful-run set, then require one unambiguous result.
+          redact_gh_stderr() {
+            sed -E \
+              -e 's/(gh[pousr]_[[:alnum:]_]+|github_pat_[[:alnum:]_]+)/[REDACTED]/g' \
+              -e 's/(Authorization: )[^[:space:]]+/\1[REDACTED]/Ig' \
+              "$1" | tr '\n' ' ' | cut -c1-1000
+          }
+          api_failure() {
+            local operation="$1"
+            local status="$2"
+            local stderr_file="$3"
+            local safe_stderr
+            safe_stderr="$(redact_gh_stderr "$stderr_file")"
+            echo "::error::${operation} failed (gh exit ${status}): ${safe_stderr:-no stderr captured}" >&2
+            exit 1
+          }
+
+          # A SHA-specific lookup returns at most the first 100 completed
+          # runs. Require an unambiguous successful result; never select one.
           run_ids_file="$(mktemp)"
-          trap 'rm -f "$run_ids_file"' EXIT
-          gh api --paginate \
+          required_jobs_file="$(mktemp)"
+          gh_stderr_file="$(mktemp)"
+          trap 'rm -f "$run_ids_file" "$required_jobs_file" "$gh_stderr_file"' EXIT
+          if gh api \
             "repos/${GITHUB_REPOSITORY}/actions/workflows/uvanoo-v1.4-cloud-build.yml/runs?head_sha=${CANDIDATE_SHA}&status=completed&per_page=100" \
-            --jq '.workflow_runs[] | select(.conclusion == "success") | .id' > "$run_ids_file"
+            --jq '.workflow_runs[] | select(.conclusion == "success") | .id' > "$run_ids_file" 2> "$gh_stderr_file"; then
+            :
+          else
+            api_failure "authoritative-run lookup" "$?" "$gh_stderr_file"
+          fi
           mapfile -t run_ids < "$run_ids_file"
           if [ "${#run_ids[@]}" -ne 1 ] || ! [[ "${run_ids[0]}" =~ ^[0-9]+$ ]]; then
             echo "::error::No successful authoritative V1.4 validation run exists for source_sha"
             exit 1
           fi
           run_id="${run_ids[0]}"
-          required_jobs="$(gh api --paginate "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}/jobs?per_page=100" \
-            --jq '.jobs[] | select(.name == "Validate frozen V1.4 source" or .name == "Publish immutable V1.4 DEV candidate") | [.name, .conclusion] | @tsv')"
+          if gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}/jobs?per_page=100" \
+            --jq '.jobs[] | select(.name == "Validate frozen V1.4 source" or .name == "Publish immutable V1.4 DEV candidate") | [.name, .conclusion] | @tsv' \
+            > "$required_jobs_file" 2> "$gh_stderr_file"; then
+            :
+          else
+            api_failure "authoritative-run jobs lookup" "$?" "$gh_stderr_file"
+          fi
+          required_jobs="$(< "$required_jobs_file")"
           if [ "$(grep -c $'^Validate frozen V1.4 source\tsuccess$' <<< "$required_jobs")" -ne 1 ] \
             || [ "$(grep -c $'^Publish immutable V1.4 DEV candidate\tsuccess$' <<< "$required_jobs")" -ne 1 ]; then
             echo "::error::The authoritative V1.4 run did not complete both validation and candidate publication"

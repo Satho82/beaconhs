@@ -179,6 +179,11 @@ unless %w[beaconhs_migrator beaconhs_app beaconhs_super].all? { |role| preflight
        preflight_step['run'].include?('identity.current_database !== "beaconhs"')
   abort 'Three-role preflight must verify migrator, runtime, and maintenance identities'
 end
+unless preflight_step['run'].include?('(async () => {') &&
+       preflight_step['run'].include?('})().catch((error) => {') &&
+       preflight_step['run'].include?('process.exit(1);')
+  abort 'Three-role preflight must execute asynchronously without top-level await'
+end
 unless preflight_step['run'].include?('error.code === "EAI_AGAIN"') &&
        preflight_step['run'].include?('attempt <= 3') &&
        preflight_step['run'].include?('setTimeout(resolve, 1000)')

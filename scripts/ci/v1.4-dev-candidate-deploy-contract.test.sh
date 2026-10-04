@@ -149,12 +149,34 @@ end
 unless core_deploy.dig('env', 'MIGRATION_DATABASE_URL') == '${{ inputs.feature_candidate_verified && secrets.DEV_MIGRATION_DATABASE_URL || secrets.MAIN_MIGRATION_DATABASE_URL }}'
   abort 'Reusable deployment must select the candidate or normal-main migration secret from the verification flag'
 end
+unless core_deploy.dig('env', 'DATABASE_URL') == '${{ inputs.feature_candidate_verified && secrets.DEV_DATABASE_URL || secrets.MAIN_DATABASE_URL }}' &&
+       core_deploy.dig('env', 'SUPERADMIN_DATABASE_URL') == '${{ inputs.feature_candidate_verified && secrets.DEV_SUPERADMIN_DATABASE_URL || secrets.MAIN_SUPERADMIN_DATABASE_URL }}'
+  abort 'Reusable deployment must select complete candidate or normal-main runtime and maintenance bundles from the verification flag'
+end
 unless core_deploy.dig('env', 'EXPECTED_MIGRATION_HOST') == "${{ inputs.feature_candidate_verified && 'uvanoo-dev-postgres' || 'beaconhs-postgres' }}"
   abort 'Reusable deployment must select the matching candidate or normal-main migration host from the verification flag'
 end
-unless core.dig(true, 'workflow_call', 'secrets', 'MAIN_MIGRATION_DATABASE_URL', 'required') == true &&
-       core.dig(true, 'workflow_call', 'secrets', 'DEV_MIGRATION_DATABASE_URL', 'required') == true
-  abort 'Reusable deployment must require both explicit migration-context secrets'
+required_bundle_secrets = %w[
+  MAIN_MIGRATION_DATABASE_URL MAIN_DATABASE_URL MAIN_SUPERADMIN_DATABASE_URL
+  DEV_MIGRATION_DATABASE_URL DEV_DATABASE_URL DEV_SUPERADMIN_DATABASE_URL
+]
+unless required_bundle_secrets.all? { |secret| core.dig(true, 'workflow_call', 'secrets', secret, 'required') == true }
+  abort 'Reusable deployment must require complete explicit three-role credential bundles'
+end
+bundle_step = core_deploy.fetch('steps').find { |step| step['name'] == 'Require complete selected database credential bundle' }
+abort 'Reusable deployment must reject an incomplete selected credential bundle before URL validation' unless bundle_step
+unless bundle_step.dig('env', 'FEATURE_CANDIDATE_VERIFIED') == '${{ inputs.feature_candidate_verified }}' &&
+       required_bundle_secrets.all? { |secret| bundle_step.dig('env', secret) == "${{ secrets.#{secret} }}" } &&
+       bundle_step['run'].include?('if [ "$FEATURE_CANDIDATE_VERIFIED" = true ]; then') &&
+       bundle_step['run'].include?('DEV_MIGRATION_DATABASE_URL') &&
+       bundle_step['run'].include?('DEV_DATABASE_URL') &&
+       bundle_step['run'].include?('DEV_SUPERADMIN_DATABASE_URL') &&
+       bundle_step['run'].include?('MAIN_MIGRATION_DATABASE_URL') &&
+       bundle_step['run'].include?('MAIN_DATABASE_URL') &&
+       bundle_step['run'].include?('MAIN_SUPERADMIN_DATABASE_URL') &&
+       bundle_step['run'].include?('Selected database credential bundle is incomplete') &&
+       bundle_step['run'].include?('exit 1')
+  abort 'Reusable deployment must fail before URL use when the selected three-role bundle is incomplete'
 end
 migration_step = core_deploy.fetch('steps').find { |step| step['name'] == 'Run database migrations' }
 abort 'Canonical migrations must use the selected migration Docker network' unless migration_step['run'].include?('--network "$MIGRATION_DOCKER_NETWORK"')
@@ -201,11 +223,27 @@ abort 'Migration URL validation must reject topology-crossed database hosts' unl
 %w[MIGRATION_DATABASE_URL DATABASE_URL SUPERADMIN_DATABASE_URL].each do |url_name|
   abort "URL validation must check #{url_name}" unless url_step['run'].include?(url_name)
 end
+bundle_step_index = core_deploy.fetch('steps').index { |step| step['name'] == 'Require complete selected database credential bundle' }
+url_step_index = core_deploy.fetch('steps').index { |step| step['name'] == 'Validate migration database URLs' }
+abort 'Selected credential-bundle guard must run before URL validation' unless bundle_step_index && url_step_index && bundle_step_index < url_step_index
 migration_env = migration_step.fetch('env')
 unless migration_env['MIGRATION_DATABASE_URL'] == '${{ env.MIGRATION_DATABASE_URL }}' &&
-       migration_env['DATABASE_URL'] == '${{ secrets.DEV_DATABASE_URL }}' &&
-       migration_env['SUPERADMIN_DATABASE_URL'] == '${{ secrets.DEV_SUPERADMIN_DATABASE_URL }}'
+       migration_env['DATABASE_URL'] == '${{ env.DATABASE_URL }}' &&
+       migration_env['SUPERADMIN_DATABASE_URL'] == '${{ env.SUPERADMIN_DATABASE_URL }}'
   abort 'Canonical migrations must receive the same three database URLs after preflight'
+end
+unless url_step.dig('env', 'DATABASE_URL') == '${{ env.DATABASE_URL }}' &&
+       url_step.dig('env', 'SUPERADMIN_DATABASE_URL') == '${{ env.SUPERADMIN_DATABASE_URL }}' &&
+       preflight_step.dig('env', 'DATABASE_URL') == '${{ env.DATABASE_URL }}' &&
+       preflight_step.dig('env', 'SUPERADMIN_DATABASE_URL') == '${{ env.SUPERADMIN_DATABASE_URL }}'
+  abort 'URL validation and three-role preflight must consume the selected complete credential bundle'
+end
+compose_step = core_deploy.fetch('steps').find { |step| step['name'] == 'Update the Dokploy compose environment' }
+unless compose_step.dig('env', 'DATABASE_URL') == '${{ env.DATABASE_URL }}' &&
+       compose_step.dig('env', 'SUPERADMIN_DATABASE_URL') == '${{ env.SUPERADMIN_DATABASE_URL }}' &&
+       compose_step['run'].include?('printf \'DATABASE_URL=%s\\n\' "$DATABASE_URL"') &&
+       compose_step['run'].include?('printf \'SUPERADMIN_DATABASE_URL=%s\\n\' "$SUPERADMIN_DATABASE_URL"')
+  abort 'Compose updates must use the selected complete credential bundle without DEV fallback'
 end
 preflight_step_index = core_deploy.fetch('steps').index { |step| step['name'] == 'Preflight all migration database roles' }
 abort 'Three-role preflight must precede canonical migrations' unless preflight_step_index && preflight_step_index < migration_step_index

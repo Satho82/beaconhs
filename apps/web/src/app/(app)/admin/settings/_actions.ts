@@ -10,7 +10,6 @@ import { can, resolveRegulatoryTerminology } from '@beaconhs/tenant'
 import { requireRequestContext } from '@/lib/auth'
 import { recordAuditInTransaction } from '@/lib/audit'
 import { parseTenantOperationalDefaults } from '@/lib/tenant-operational-defaults'
-import { normalizeThemeColor } from '@/lib/theme-governance'
 
 async function requireSettingsAdmin() {
   const ctx = await requireRequestContext()
@@ -37,20 +36,6 @@ export async function saveSettings(formData: FormData) {
     defaultLocale: defaultLanguage,
     enabledLocales: enabledLanguages,
   })
-  const hierarchy = {
-    customer: formData.get('lvl_customer') === 'on',
-    project: formData.get('lvl_project') === 'on',
-    site: formData.get('lvl_site') === 'on',
-    area: formData.get('lvl_area') === 'on',
-  }
-  const requestedPrimaryColor = String(formData.get('primaryColor') ?? '').trim()
-  if (requestedPrimaryColor && !normalizeThemeColor(requestedPrimaryColor))
-    throw new Error('Primary colour must be a six-digit HEX value.')
-  const branding = {
-    logoUrl: String(formData.get('logoUrl') ?? '').trim() || undefined,
-    primaryColor: normalizeThemeColor(requestedPrimaryColor),
-    pdfLetterhead: String(formData.get('pdfLetterhead') ?? '').trim() || undefined,
-  }
   const regulatoryTerminology = resolveRegulatoryTerminology({
     regulatoryTerminology: {
       authorityName: formData.get('authorityName'),
@@ -76,8 +61,6 @@ export async function saveSettings(formData: FormData) {
         dateFormat: operationalDefaults.dateFormat,
         numberFormat: operationalDefaults.numberFormat,
         defaultCurrencyCode: operationalDefaults.currencyCode,
-        hierarchy,
-        branding,
         settings: { ...(before?.settings ?? {}), regulatoryTerminology },
       })
       .where(eq(tenants.id, ctx.tenantId))
@@ -120,8 +103,6 @@ export async function saveSettings(formData: FormData) {
         defaultLanguage: languagePolicy.defaultLocale,
         enabledLanguages: languagePolicy.enabledLocales,
         ...operationalDefaults,
-        hierarchy,
-        branding,
         regulatoryTerminology,
       },
       metadata: { clearedLocaleOverrides: clearedOverrides.length },

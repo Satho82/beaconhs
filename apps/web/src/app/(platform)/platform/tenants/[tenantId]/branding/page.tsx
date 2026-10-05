@@ -9,7 +9,8 @@ import { isUuid } from '@/lib/list-params'
 import { tenantBrandAssetUrl } from '@/lib/tenant-brand-asset-url'
 import { PageContainer } from '@/components/page-layout'
 import { getGeneratedTranslations } from '@/i18n/generated.server'
-import { TenantBrandingForm } from './branding-form'
+import { TenantBrandingForm } from '@/components/tenant-branding-form'
+import { saveTenantBranding } from './_actions'
 
 export const dynamic = 'force-dynamic'
 
@@ -40,7 +41,10 @@ export default async function PlatformTenantBrandingPage({
         />
         <section className="rounded-lg border bg-white p-5 dark:bg-slate-900">
           <TenantBrandingForm
+            key={JSON.stringify(tenant.branding)}
             tenantId={tenantId}
+            tenantName={tenant.name}
+            saveAction={saveTenantBranding}
             primaryColor={tenant.branding.primaryColor}
             logoUrl={tenant.branding.logoUrl ? tenantBrandAssetUrl(tenantId, 'logo') : undefined}
             letterheadUrl={

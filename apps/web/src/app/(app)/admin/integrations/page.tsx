@@ -8,7 +8,7 @@ import { GeneratedText, GeneratedValue } from '@/i18n/generated'
 // catalog below. Gated by admin.integrations.manage.
 
 import Link from 'next/link'
-import { redirect } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import {
   ArrowUpRight,
   Building2,
@@ -19,10 +19,10 @@ import {
   Upload,
   type LucideIcon,
 } from 'lucide-react'
-import { desc, isNull } from 'drizzle-orm'
+import { desc, eq, isNull } from 'drizzle-orm'
 import { Badge } from '@beaconhs/ui'
 import { can } from '@beaconhs/tenant'
-import { syncConnections, tenantIntegrations } from '@beaconhs/db/schema'
+import { syncConnections, tenantIntegrations, tenants } from '@beaconhs/db/schema'
 import { listConnectors, toConnectorSummary } from '@beaconhs/sync'
 import { requireRequestContext } from '@/lib/auth'
 import { getDestination, getTrigger, listDestinations } from '@beaconhs/integrations'
@@ -74,6 +74,10 @@ type Connected = {
 export default async function IntegrationsPage() {
   const ctx = await requireRequestContext()
   if (!ctx.isSuperAdmin && !can(ctx, 'admin.integrations.manage')) redirect('/admin')
+  const [tenant] = await ctx.db((tx) =>
+    tx.select({ name: tenants.name }).from(tenants).where(eq(tenants.id, ctx.tenantId)).limit(1),
+  )
+  if (!tenant) notFound()
 
   const connectors = listConnectors().map(toConnectorSummary)
   const iconFor = (key: string) => connectors.find((c) => c.key === key)?.iconKey ?? 'database'
@@ -178,6 +182,7 @@ export default async function IntegrationsPage() {
 
   return (
     <PageContainer>
+      <p className="mb-3 text-sm text-slate-600">{tenant.name} · Changes apply to this tenant.</p>
       <SettingsNavigation navigationLabel="Tenant settings" activeSection="integrations" />
       <AdminBackLink />
       <div className="space-y-8">

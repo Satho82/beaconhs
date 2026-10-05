@@ -17,14 +17,12 @@ describe('Tenant Settings General UI contract', () => {
       'operational-defaults',
       'identity',
       'regulatory-terminology',
-      'branding',
       'languages',
-      'hierarchy',
     ]) {
       expect(page).toContain(`id=\"${section}\"`)
     }
     expect(form).toContain('aria-label={navigationLabel}')
-    for (const tab of ['general', 'branding', 'notifications', 'integrations', 'advanced']) {
+    for (const tab of ['general', 'branding', 'notifications', 'integrations']) {
       expect(form).toContain(`id: '${tab}'`)
       expect(form).toContain(`label: '${tab}'`)
     }
@@ -34,10 +32,12 @@ describe('Tenant Settings General UI contract', () => {
       '/admin/settings/branding',
       '/admin/notifications',
       '/admin/integrations',
-      '/admin/settings/advanced',
     ]) {
       expect(form).toContain(href)
     }
+    expect(form).not.toContain("id: 'advanced'")
+    expect(page).not.toContain('name="logoUrl"')
+    expect(page).not.toContain('name="primaryColor"')
     expect(form).not.toContain('#additional-controls')
     expect(form).toContain("aria-current={active ? 'page' : undefined}")
   })
@@ -62,7 +62,7 @@ describe('Tenant Settings General UI contract', () => {
 
   it('only enables Save and Discard after a real form edit and resets natively', () => {
     expect(form).toContain('onInput={() => setDirty(true)}')
-    expect(form).toContain('disabled={!dirty}')
+    expect(form).toContain('disabled={!dirty || pending}')
     expect(form).toContain('formRef.current?.reset()')
   })
 

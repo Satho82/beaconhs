@@ -1,5 +1,4 @@
-import { SettingsPage } from '../page'
-
+import { redirect } from 'next/navigation'
 export default function AdvancedSettingsPage() {
-  return <SettingsPage activeSection="advanced" />
+  redirect('/admin/settings')
 }

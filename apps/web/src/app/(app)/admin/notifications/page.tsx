@@ -1,8 +1,9 @@
 import { getGeneratedTranslations } from '@/i18n/generated.server'
-import { redirect } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { and, asc, eq, isNull } from 'drizzle-orm'
 import {
   personGroups,
+  tenants,
   roles as rolesTable,
   tenantNotificationPolicy,
   tenantNotificationSettings,
@@ -32,6 +33,10 @@ export default async function NotificationSettingsPage() {
   const tGenerated = await getGeneratedTranslations()
   const ctx = await requireRequestContext()
   if (!ctx.isSuperAdmin && !can(ctx, 'admin.settings.manage')) redirect('/admin')
+  const [tenant] = await ctx.db((tx) =>
+    tx.select({ name: tenants.name }).from(tenants).where(eq(tenants.id, ctx.tenantId)).limit(1),
+  )
+  if (!tenant) notFound()
 
   const { roleRows, memberRows } = await ctx.db(async (tx) => {
     const roleRows = await tx
@@ -153,6 +158,7 @@ export default async function NotificationSettingsPage() {
 
   return (
     <PageContainer>
+      <p className="mb-3 text-sm text-slate-600">{tenant.name} · Changes apply to this tenant.</p>
       <SettingsNavigation navigationLabel="Tenant settings" activeSection="notifications" />
       <div className="space-y-4">
         <DetailHeader

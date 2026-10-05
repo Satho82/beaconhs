@@ -3,7 +3,7 @@ import { getGeneratedValueTranslations, getGeneratedTranslations } from '@/i18n/
 import { GeneratedText, GeneratedValue } from '@/i18n/generated'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { and, asc, count, desc, eq, ilike, or, sql, type SQL } from 'drizzle-orm'
+import { and, asc, count, desc, eq, ilike, inArray, or, sql, type SQL } from 'drizzle-orm'
 import {
   Badge,
   Button,
@@ -17,7 +17,16 @@ import {
   TableRow,
 } from '@beaconhs/ui'
 import { db, withSuperAdmin } from '@beaconhs/db'
-import { incidents, people, tenantUsers, tenants } from '@beaconhs/db/schema'
+import {
+  incidents,
+  people,
+  tenantUsers,
+  tenants,
+  hospitalityProperties,
+  tenantModuleEntitlements,
+} from '@beaconhs/db/schema'
+import { isEntitlementEffective } from '@/lib/module-entitlements/policy'
+import { isModuleKey } from '@/lib/module-entitlements/catalogue'
 import { requirePlatformOperator } from '@/lib/auth'
 import { setActiveTenant } from '@/lib/actions'
 import { PageContainer } from '@/components/page-layout'
@@ -51,7 +60,7 @@ export default async function AdminTenantsPage({
 }) {
   const tGeneratedValue = await getGeneratedValueTranslations()
   const tGenerated = await getGeneratedTranslations()
-  const { userId } = await requirePlatformOperator()
+  await requirePlatformOperator()
   const sp = await searchParams
   const statusParam = pickString(sp.status)
   const statusFilter =
@@ -77,6 +86,7 @@ export default async function AdminTenantsPage({
     const memberCount = sql<number>`(select count(*) from ${tenantUsers} where ${tenantUsers.tenantId} = ${tenants.id})`
     const peopleCount = sql<number>`(select count(*) from ${people} where ${people.tenantId} = ${tenants.id})`
     const incidentCount = sql<number>`(select count(*) from ${incidents} where ${incidents.tenantId} = ${tenants.id})`
+    const propertyCount = sql<number>`(select count(*) from ${hospitalityProperties} where ${hospitalityProperties.tenantId} = ${tenants.id} and ${hospitalityProperties.deletedAt} is null)`
     const dirFn = params.dir === 'asc' ? asc : desc
     const orderBy =
       params.sort === 'slug'
@@ -100,15 +110,40 @@ export default async function AdminTenantsPage({
         .where(search)
         .groupBy(tenants.status),
       tx
-        .select({ tenant: tenants, memberCount, peopleCount, incidentCount })
+        .select({ tenant: tenants, memberCount, peopleCount, incidentCount, propertyCount })
         .from(tenants)
         .where(where)
         .orderBy(...orderBy)
         .limit(params.perPage)
         .offset((params.page - 1) * params.perPage),
     ])
+    const entitlementRows = result.length
+      ? await tx
+          .select()
+          .from(tenantModuleEntitlements)
+          .where(
+            inArray(
+              tenantModuleEntitlements.tenantId,
+              result.map((row) => row.tenant.id),
+            ),
+          )
+      : []
+    const now = new Date()
     return {
-      rows: result,
+      rows: result.map((row) => {
+        const effective = new Set(
+          entitlementRows
+            .filter(
+              (entry) =>
+                entry.tenantId === row.tenant.id &&
+                isModuleKey(entry.moduleKey) &&
+                isEntitlementEffective(entry, now),
+            )
+            .map((entry) => entry.moduleKey),
+        )
+        if (!effective.has('hospitality.diary')) effective.delete('hospitality.manager-signoff')
+        return { ...row, effectiveCount: effective.size }
+      }),
       total: Number(totalRow[0]?.c ?? 0),
       statusCounts: Object.fromEntries(counts.map((row) => [row.status, Number(row.c)])),
     }
@@ -122,7 +157,7 @@ export default async function AdminTenantsPage({
           title={tGenerated('m_081f25902e5502')}
           subtitle={tGenerated('m_05fdc03a84e6dd')}
           actions={
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <Link href="/platform/tenants/seed-templates">
                 <Button variant="outline">
                   <GeneratedText id="m_1571c4300b11d6" />
@@ -137,6 +172,7 @@ export default async function AdminTenantsPage({
           }
         />
 
+        <p className="text-sm text-slate-500">{total} matching tenants</p>
         <TableToolbar>
           <SearchInput placeholder={tGenerated('m_08a94e8cabaf07')} />
           <FilterChips
@@ -200,65 +236,90 @@ export default async function AdminTenantsPage({
                         </SortableTh>
                       ))}
                     />
-                    <TableHead></TableHead>
+                    <TableHead>Properties</TableHead>
+                    <TableHead>Effective Modules</TableHead>
+                    <TableHead>Configuration</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   <GeneratedValue
-                    value={rows.map(({ tenant, memberCount, peopleCount, incidentCount }) => (
-                      <TableRow key={tenant.id}>
-                        <TableCell className="font-medium">
-                          <Link className="hover:underline" href={`/platform/tenants/${tenant.id}`}>
-                            <GeneratedValue value={tenant.name} />
-                          </Link>
-                        </TableCell>
-                        <TableCell className="font-mono text-xs">
-                          <GeneratedValue value={tenant.slug} />
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant={tenant.status === 'active' ? 'success' : 'secondary'}>
-                            <GeneratedValue value={tenant.status} />
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <GeneratedValue value={tenant.region} />
-                        </TableCell>
-                        <TableCell>
-                          <GeneratedValue value={Number(memberCount)} />
-                        </TableCell>
-                        <TableCell>
-                          <GeneratedValue value={Number(peopleCount)} />
-                        </TableCell>
-                        <TableCell>
-                          <GeneratedValue value={Number(incidentCount)} />
-                        </TableCell>
-                        <TableCell>
-                          <GeneratedValue
-                            value={
-                              tenant.status === 'active' ? (
-                                <div className="flex flex-wrap gap-2">
-                                  <form action={viewAs}>
-                                    <input type="hidden" name="tenantId" value={tenant.id} />
-                                    <Button type="submit" size="sm" variant="outline">
-                                      <GeneratedText id="m_1583ec793bd336" />
-                                    </Button>
-                                  </form>
-                                  <Link href={`/platform/tenants/${tenant.id}`}>
-                                    <Button type="button" size="sm" variant="outline">
-                                      <GeneratedText id="m_107ab58c3c38bc" />
-                                    </Button>
-                                  </Link>
-                                </div>
-                              ) : (
-                                <span className="text-xs text-slate-400">
-                                  <GeneratedText id="m_134f2adcabdf96" />
-                                </span>
-                              )
-                            }
-                          />
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                    value={rows.map(
+                      ({
+                        tenant,
+                        memberCount,
+                        peopleCount,
+                        incidentCount,
+                        propertyCount,
+                        effectiveCount,
+                      }) => (
+                        <TableRow key={tenant.id}>
+                          <TableCell className="font-medium">
+                            <Link
+                              className="hover:underline"
+                              href={`/platform/tenants/${tenant.id}`}
+                            >
+                              <GeneratedValue value={tenant.name} />
+                            </Link>
+                          </TableCell>
+                          <TableCell className="font-mono text-xs">
+                            <GeneratedValue value={tenant.slug} />
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant={tenant.status === 'active' ? 'success' : 'secondary'}>
+                              <GeneratedValue value={tenant.status} />
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <GeneratedValue value={tenant.region} />
+                          </TableCell>
+                          <TableCell>
+                            <GeneratedValue value={Number(memberCount)} />
+                          </TableCell>
+                          <TableCell>
+                            <GeneratedValue value={Number(peopleCount)} />
+                          </TableCell>
+                          <TableCell>
+                            <GeneratedValue value={Number(incidentCount)} />
+                          </TableCell>
+                          <TableCell>{Number(propertyCount)}</TableCell>
+                          <TableCell>{effectiveCount}</TableCell>
+                          <TableCell>
+                            <Link
+                              href={`/platform/tenants/${tenant.id}/settings`}
+                              className="text-teal-700 underline"
+                            >
+                              Review settings
+                            </Link>
+                          </TableCell>
+                          <TableCell>
+                            <GeneratedValue
+                              value={
+                                tenant.status === 'active' ? (
+                                  <div className="flex flex-wrap gap-2">
+                                    <form action={viewAs}>
+                                      <input type="hidden" name="tenantId" value={tenant.id} />
+                                      <Button type="submit" size="sm" variant="outline">
+                                        <GeneratedText id="m_1583ec793bd336" />
+                                      </Button>
+                                    </form>
+                                    <Link href={`/platform/tenants/${tenant.id}`}>
+                                      <Button type="button" size="sm" variant="outline">
+                                        <GeneratedText id="m_107ab58c3c38bc" />
+                                      </Button>
+                                    </Link>
+                                  </div>
+                                ) : (
+                                  <span className="text-xs text-slate-400">
+                                    <GeneratedText id="m_134f2adcabdf96" />
+                                  </span>
+                                )
+                              }
+                            />
+                          </TableCell>
+                        </TableRow>
+                      ),
+                    )}
                   />
                 </TableBody>
               </Table>

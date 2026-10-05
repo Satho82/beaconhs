@@ -37,9 +37,16 @@ export default async function HospitalityPropertiesPage({
         description={translateHospitality('m_06f2e6bfa2a821')}
         actions={
           <div className="flex flex-wrap gap-2">
-            {modules.has('hospitality.maintenance') && (
+            {modules.has('hospitality.maintenance') && can(ctx, 'maintenance.read') && (
               <Button asChild variant="outline">
                 <Link href="/hospitality/maintenance">{translateValue('Maintenance queue')}</Link>
+              </Button>
+            )}
+            {can(ctx, 'admin.settings.manage') && can(ctx, 'hospitality.manage') && (
+              <Button asChild variant="outline">
+                <Link href="/admin/settings/import-export/property-structure/upload">
+                  Import property structure
+                </Link>
               </Button>
             )}
             {can(ctx, 'hospitality.manage') && (
@@ -52,6 +59,9 @@ export default async function HospitalityPropertiesPage({
           </div>
         }
       />
+      <p className="mt-4 text-sm text-slate-500">
+        {total} matching properties · Property → Building → Floor → Room
+      </p>
       <div className="mt-4">
         <SearchInput />
       </div>
@@ -66,7 +76,7 @@ export default async function HospitalityPropertiesPage({
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           {properties.map((property) => (
             <Link
-              className="rounded-lg border p-4"
+              className="rounded-xl border bg-white p-5 hover:border-teal-600 focus-visible:outline-2 focus-visible:outline-teal-600 dark:bg-slate-900"
               href={`/hospitality/properties/${property.id}`}
               key={property.id}
             >

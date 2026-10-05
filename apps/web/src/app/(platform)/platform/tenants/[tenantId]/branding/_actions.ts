@@ -16,12 +16,7 @@ import { getGeneratedTranslations } from '@/i18n/generated.server'
 
 const HEX = /^#[0-9A-F]{6}$/i
 
-export type TenantBrandingOutcome =
-  'saved' | 'invalid_tenant' | 'invalid_hex' | 'invalid_asset' | 'save_failed'
-export type TenantBrandingFormState = {
-  status: 'idle' | 'success' | 'error'
-  outcome?: TenantBrandingOutcome
-}
+import type { TenantBrandingFormState } from '@/lib/tenant-branding-form-state'
 
 export async function saveTenantBranding(
   _previous: TenantBrandingFormState,

@@ -1,6 +1,5 @@
 import { getGeneratedValueTranslations, getGeneratedTranslations } from '@/i18n/generated.server'
 import { GeneratedValue } from '@/i18n/generated'
-import Image from 'next/image'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
@@ -22,7 +21,6 @@ import {
   CardHeader,
   CardTitle,
   Input,
-  Label,
   Select,
   Textarea,
 } from '@beaconhs/ui'
@@ -35,10 +33,8 @@ import {
   tenantUsers,
 } from '@beaconhs/db/schema'
 import { LOCALE_OPTIONS } from '@beaconhs/i18n'
-import { resolveTenantLogoUrl } from '@beaconhs/storage'
 import { can, resolveRegulatoryTerminology } from '@beaconhs/tenant'
 import { requireRequestContext } from '@/lib/auth'
-import { levelLabel } from '@/lib/org-hierarchy'
 import {
   DATE_FORMATS,
   DATE_FORMAT_OPTIONS,
@@ -55,7 +51,6 @@ export async function generateMetadata() {
 }
 export const dynamic = 'force-dynamic'
 
-const LEVELS = ['customer', 'project', 'site', 'area'] as const
 const CURRENCY_OPTIONS = [
   ['GBP', 'GBP — £'],
   ['EUR', 'EUR — €'],
@@ -84,13 +79,13 @@ async function requireSettingsAdmin() {
   return ctx
 }
 
-type SettingsSection = 'general' | 'branding' | 'advanced'
+type SettingsSection = 'general'
 
 export default async function AdminSettingsPage() {
   return <SettingsPage activeSection="general" />
 }
 
-export async function SettingsPage({ activeSection }: { activeSection: SettingsSection }) {
+async function SettingsPage({ activeSection }: { activeSection: SettingsSection }) {
   const tGeneratedValue = await getGeneratedValueTranslations()
   const tGenerated = await getGeneratedTranslations()
   const ctx = await requireSettingsAdmin()
@@ -136,18 +131,13 @@ export async function SettingsPage({ activeSection }: { activeSection: SettingsS
   if (!tenant) return null
 
   const enabled = new Set(tenant.enabledLanguages)
-  const hierarchy = tenant.hierarchy
   const regulatory = resolveRegulatoryTerminology(tenant.settings)
-  const tenantLogoUrl = await resolveTenantLogoUrl({
-    tenantId: tenant.id,
-    logoUrl: tenant.branding.logoUrl,
-  })
 
   return (
     <PageContainer className="max-w-[100rem] py-5 sm:py-6">
       <div className="space-y-4">
-        <div className="border-b border-blue-100 pb-4">
-          <div className="mb-3 flex items-center gap-2 text-sm text-blue-700">
+        <div className="border-b border-slate-200 pb-4 dark:border-slate-800">
+          <div className="mb-3 flex items-center gap-2 text-sm text-teal-700">
             <Link href="/dashboard">{t('home')}</Link>
             <span>›</span>
             <span>{t('title')}</span>
@@ -155,12 +145,16 @@ export async function SettingsPage({ activeSection }: { activeSection: SettingsS
             <span className="font-medium text-slate-900">{t(activeSection)}</span>
           </div>
           <div className="flex items-start gap-4">
-            <div className="rounded-xl bg-blue-50 p-3 text-blue-700">
+            <div className="rounded-xl bg-teal-50 p-3 text-teal-700">
               <Settings size={34} />
             </div>
             <div>
-              <h1 className="text-3xl font-bold tracking-tight text-blue-950">{t('title')}</h1>
-              <p className="mt-1 text-sm text-blue-700">{t('pageDescription')}</p>
+              <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+                {t('title')}
+              </h1>
+              <p className="mt-1 text-sm text-slate-600">
+                {tenant.name} · Changes apply to this tenant.
+              </p>
             </div>
           </div>
         </div>
@@ -173,7 +167,10 @@ export async function SettingsPage({ activeSection }: { activeSection: SettingsS
           activeSection={activeSection}
           sidebar={<SettingsSidebar tenant={tenant} overview={overview} />}
         >
-          <Card id="operational-defaults" className="scroll-mt-6 border-blue-100 shadow-sm">
+          <Card
+            id="operational-defaults"
+            className="scroll-mt-6 border-slate-200 shadow-none dark:border-slate-800"
+          >
             <CardHeader>
               <CardTitle>
                 <GeneratedValue value={t('operationalDefaults')} />
@@ -251,7 +248,10 @@ export async function SettingsPage({ activeSection }: { activeSection: SettingsS
             </CardContent>
           </Card>
 
-          <Card id="identity" className="scroll-mt-6 border-blue-100 shadow-sm">
+          <Card
+            id="identity"
+            className="scroll-mt-6 border-slate-200 shadow-none dark:border-slate-800"
+          >
             <CardHeader>
               <CardTitle>
                 <GeneratedValue value={t('identity')} />
@@ -268,7 +268,10 @@ export async function SettingsPage({ activeSection }: { activeSection: SettingsS
           </Card>
 
           <div id="additional-controls" className="space-y-4">
-            <Card id="regulatory-terminology" className="scroll-mt-6 border-blue-100 shadow-sm">
+            <Card
+              id="regulatory-terminology"
+              className="scroll-mt-6 border-slate-200 shadow-none dark:border-slate-800"
+            >
               <CardHeader>
                 <CardTitle>
                   <GeneratedValue value={t('regulatoryTerminology')} />
@@ -325,70 +328,10 @@ export async function SettingsPage({ activeSection }: { activeSection: SettingsS
               </CardContent>
             </Card>
 
-            <Card id="branding" className="scroll-mt-6 border-blue-100 shadow-sm">
-              <CardHeader>
-                <CardTitle>
-                  <GeneratedValue value={t('branding')} />
-                </CardTitle>
-                <CardDescription>
-                  <GeneratedValue value={t('brandingDescription')} />
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <Field label={tGeneratedValue(t('logoUrl'))}>
-                  <Input
-                    name="logoUrl"
-                    defaultValue={tenant.branding.logoUrl ?? ''}
-                    placeholder="https://…"
-                  />
-                </Field>
-                <Field label={tGeneratedValue(t('primaryColor'))}>
-                  <Input
-                    name="primaryColor"
-                    defaultValue={tenant.branding.primaryColor ?? ''}
-                    placeholder={tGenerated('m_15e421af604eae')}
-                  />
-                </Field>
-                <Field label={tGeneratedValue(t('pdfLetterhead'))} className="sm:col-span-2">
-                  <Input
-                    name="pdfLetterhead"
-                    defaultValue={tenant.branding.pdfLetterhead ?? ''}
-                    placeholder={tGenerated('m_0a8cab85b1e5ec')}
-                  />
-                </Field>
-                <GeneratedValue
-                  value={
-                    tenantLogoUrl ? (
-                      <div className="sm:col-span-2">
-                        <Label className="text-xs">
-                          <GeneratedValue value={t('preview')} />
-                        </Label>
-                        <div className="mt-1 flex items-center gap-3 rounded-md border border-slate-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-900">
-                          <Image
-                            src={tenantLogoUrl}
-                            alt=""
-                            width={160}
-                            height={32}
-                            unoptimized
-                            className="h-8 w-auto"
-                          />
-                          <span
-                            className="font-semibold"
-                            style={{
-                              color: tenant.branding.primaryColor ?? '#0f766e',
-                            }}
-                          >
-                            <GeneratedValue value={tenant.name} />
-                          </span>
-                        </div>
-                      </div>
-                    ) : null
-                  }
-                />
-              </CardContent>
-            </Card>
-
-            <Card id="languages" className="scroll-mt-6 border-blue-100 shadow-sm">
+            <Card
+              id="languages"
+              className="scroll-mt-6 border-slate-200 shadow-none dark:border-slate-800"
+            >
               <CardHeader>
                 <CardTitle>
                   <GeneratedValue value={t('languages')} />
@@ -433,30 +376,6 @@ export async function SettingsPage({ activeSection }: { activeSection: SettingsS
                 </Field>
               </CardContent>
             </Card>
-
-            <Card id="hierarchy" className="scroll-mt-6 border-blue-100 shadow-sm">
-              <CardHeader>
-                <CardTitle>
-                  <GeneratedValue value={t('hierarchyDepth')} />
-                </CardTitle>
-                <CardDescription>
-                  <GeneratedValue value={t('hierarchyDescription')} />
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-                <GeneratedValue
-                  value={LEVELS.map((lvl) => (
-                    <label
-                      key={lvl}
-                      className="flex items-center gap-2 rounded-md border border-slate-200 px-3 py-2 text-sm dark:border-slate-800"
-                    >
-                      <input type="checkbox" name={`lvl_${lvl}`} defaultChecked={hierarchy[lvl]} />
-                      <GeneratedValue value={levelLabel(lvl)} />
-                    </label>
-                  ))}
-                />
-              </CardContent>
-            </Card>
           </div>
         </SettingsForm>
       </div>
@@ -474,12 +393,12 @@ function Field({
   children: React.ReactNode
 }) {
   return (
-    <div className={`space-y-1.5 ${className ?? ''}`}>
-      <Label>
+    <label className={`block space-y-1.5 ${className ?? ''}`}>
+      <span className="text-sm font-medium">
         <GeneratedValue value={label} />
-      </Label>
+      </span>
       <GeneratedValue value={children} />
-    </div>
+    </label>
   )
 }
 
@@ -500,7 +419,7 @@ async function SettingsSidebar({
     [t('properties'), overview.properties],
     [t('rooms'), overview.rooms],
     [t('users'), overview.users],
-    [t('modules'), overview.modules],
+    ['Configured modules', overview.modules],
   ]
   const actions = [
     { href: '/admin/users/invite', label: t('inviteUser'), icon: UserPlus },
@@ -510,37 +429,37 @@ async function SettingsSidebar({
   ]
   return (
     <>
-      <Card className="border-blue-100 shadow-sm">
+      <Card className="border-slate-200 shadow-none dark:border-slate-800">
         <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-base text-blue-950">
-            <Building2 className="text-blue-600" size={22} />
+          <CardTitle className="flex items-center gap-2 text-base text-slate-900 dark:text-slate-100">
+            <Building2 className="text-teal-700" size={22} />
             {t('tenantOverview')}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center gap-3 border-b border-blue-100 pb-4">
-            <div className="rounded-full bg-blue-50 p-3 text-blue-600">
+          <div className="flex items-center gap-3 border-b border-slate-200 pb-4 dark:border-slate-800">
+            <div className="rounded-full bg-teal-50 p-3 text-teal-700">
               <Building2 size={26} />
             </div>
             <div>
-              <p className="font-semibold text-blue-950">{tenant.name}</p>
+              <p className="font-semibold text-slate-900 dark:text-slate-100">{tenant.name}</p>
               <p className="text-sm text-slate-500">{tenant.slug}</p>
             </div>
           </div>
           <dl className="mt-4 grid grid-cols-4 gap-2">
             {counts.map(([label, value]) => (
               <div key={String(label)}>
-                <dt className="text-xl font-bold text-blue-950">{value}</dt>
+                <dt className="text-xl font-bold text-slate-900 dark:text-slate-100">{value}</dt>
                 <dd className="text-xs text-slate-500">{label}</dd>
               </div>
             ))}
           </dl>
         </CardContent>
       </Card>
-      <Card className="border-blue-100 shadow-sm">
+      <Card className="border-slate-200 shadow-none dark:border-slate-800">
         <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-base text-blue-950">
-            <Settings className="text-blue-600" size={22} />
+          <CardTitle className="flex items-center gap-2 text-base text-slate-900 dark:text-slate-100">
+            <Settings className="text-teal-700" size={22} />
             {t('quickActions')}
           </CardTitle>
         </CardHeader>
@@ -549,7 +468,7 @@ async function SettingsSidebar({
             <Link
               key={href}
               href={href}
-              className="flex min-h-12 items-center gap-2 rounded-md border border-blue-100 px-3 py-2 text-sm font-medium text-blue-700 transition-colors hover:bg-blue-50"
+              className="flex min-h-12 items-center gap-2 rounded-md border border-slate-200 px-3 py-2 text-sm font-medium text-teal-700 transition-colors hover:bg-teal-50 dark:border-slate-800"
             >
               <Icon size={20} />
               {label}
@@ -557,22 +476,22 @@ async function SettingsSidebar({
           ))}
         </CardContent>
       </Card>
-      <Card className="border-blue-100 bg-blue-50/60 shadow-sm">
+      <Card className="border-slate-200 bg-teal-50/60 shadow-none dark:border-slate-800">
         <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-base text-blue-950">
-            <Info className="text-blue-600" size={22} />
+          <CardTitle className="flex items-center gap-2 text-base text-slate-900 dark:text-slate-100">
+            <Info className="text-teal-700" size={22} />
             {t('aboutTheseSettings')}
           </CardTitle>
         </CardHeader>
-        <CardContent className="text-sm leading-6 text-blue-800">
+        <CardContent className="text-sm leading-6 text-slate-700">
           {t('aboutTheseSettingsDescription')}
           <p className="mt-3">{t('propertyOverrideNote')}</p>
         </CardContent>
       </Card>
-      <Card className="border-blue-100 shadow-sm">
+      <Card className="border-slate-200 shadow-none dark:border-slate-800">
         <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-base text-blue-950">
-            <CircleHelp className="text-blue-600" size={22} />
+          <CardTitle className="flex items-center gap-2 text-base text-slate-900 dark:text-slate-100">
+            <CircleHelp className="text-teal-700" size={22} />
             {t('needHelp')}
           </CardTitle>
         </CardHeader>
@@ -580,7 +499,7 @@ async function SettingsSidebar({
           {t('helpDescription')}
           <Link
             href="/help"
-            className="mt-3 flex items-center gap-2 font-medium text-blue-700 hover:underline"
+            className="mt-3 flex items-center gap-2 font-medium text-teal-700 hover:underline"
           >
             {t('openUserGuide')} <span aria-hidden="true">→</span>
           </Link>

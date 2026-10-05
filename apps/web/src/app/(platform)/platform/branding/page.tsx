@@ -1,3 +1,6 @@
+import { requirePlatformOperator } from '@/lib/auth'
+import { PRODUCT_NAME } from '@/lib/brand'
+import { Logo } from '@/components/brand-logo'
 import { Palette } from 'lucide-react'
 import { getGeneratedTranslations } from '@/i18n/generated.server'
 import {
@@ -24,19 +27,42 @@ export async function generateMetadata() {
 
 // Authorization is enforced by /platform/layout.tsx (super-admin only).
 export default async function PlatformBrandingPage() {
+  await requirePlatformOperator()
   const branding = await getPlatformBranding()
   const tGenerated = await getGeneratedTranslations()
   const faviconUrl = platformBrandAssetUrl('favicon', branding.faviconKey)
 
   return (
     <PageContainer>
-      <div className="max-w-2xl space-y-4">
+      <div className="max-w-5xl space-y-5">
         <DetailHeader
-          back={{ href: '/admin', label: tGenerated('m_1d8f8f623b8111') }}
+          back={{ href: '/platform', label: 'Platform administration' }}
           title={tGenerated('m_17d3955fc7b8c9')}
           subtitle={tGenerated('m_0431e1142db314')}
         />
 
+        <section aria-label="Saved platform identity preview" className="grid gap-4 sm:grid-cols-3">
+          <div className="rounded-xl bg-[rgb(var(--color-sidebar))] p-5 text-white">
+            <p className="mb-4 text-xs text-slate-300">Sidebar masthead</p>
+            <Logo branding={branding} className="h-8 w-auto max-w-full rounded bg-white p-1" />
+          </div>
+          <div className="rounded-xl border bg-white p-5 dark:bg-slate-900">
+            <p className="text-xs text-slate-500">Login identity</p>
+            <p className="mt-4 text-xl font-semibold">
+              {branding.productName?.trim() || PRODUCT_NAME}
+            </p>
+          </div>
+          <div className="rounded-xl border bg-white p-5 dark:bg-slate-900">
+            <p className="text-xs text-slate-500">Browser-title example</p>
+            <p className="mt-4 text-sm break-words">
+              Dashboard · {branding.productName?.trim() || PRODUCT_NAME}
+            </p>
+          </div>
+        </section>
+        <p className="text-xs text-slate-500">
+          Preview reflects the saved master branding. Light/Terra is the shared design system;
+          tenant branding cannot change this platform identity.
+        </p>
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">

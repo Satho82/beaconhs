@@ -1,3 +1,4 @@
+import { TabNav, pickActiveTab } from '@/components/tab-nav'
 import { PageContainer } from '@/components/page-layout'
 import { SearchInput } from '@/components/search-input'
 import { Pagination } from '@/components/pagination'
@@ -78,6 +79,13 @@ export default async function PropertyDetail({
   const translateValue = await getGeneratedValueTranslations()
   const manage = can(ctx, 'hospitality.manage')
   const modules = await loadEnabledModuleKeys(ctx)
+  const tab = pickActiveTab(
+    search,
+    manage
+      ? (['overview', 'structure', 'operations', 'settings'] as const)
+      : (['overview', 'structure', 'operations'] as const),
+    'overview',
+  )
   return (
     <PageContainer>
       <PageHeader
@@ -85,6 +93,50 @@ export default async function PropertyDetail({
         description={`${property.code} · ${property.timezone}`}
         actions={
           <div className="flex flex-wrap gap-2">
+            <Button asChild>
+              <Link href="/hospitality/properties">{translateHospitality('m_0ff8b0f42104ce')}</Link>
+            </Button>
+          </div>
+        }
+      />
+      <div className="mt-5">
+        <TabNav
+          basePath={`/hospitality/properties/${id}`}
+          currentParams={search}
+          active={tab}
+          tabs={[
+            { key: 'overview', label: 'Overview' },
+            { key: 'structure', label: 'Structure' },
+            { key: 'operations', label: 'Operations' },
+            { key: 'settings', label: 'Settings', hidden: !manage },
+          ]}
+        />
+      </div>
+      {tab === 'overview' && (
+        <section className="mt-5 rounded-xl border bg-white p-5 dark:bg-slate-900">
+          <h2 className="text-lg font-semibold">Property overview</h2>
+          <dl className="mt-4 grid gap-4 sm:grid-cols-3">
+            {[
+              ['Property', property.name],
+              ['Code', property.code],
+              ['Timezone', property.timezone],
+            ].map(([label, value]) => (
+              <div key={label}>
+                <dt className="text-xs text-slate-500">{label}</dt>
+                <dd className="mt-1 font-medium break-words">{value}</dd>
+              </div>
+            ))}
+          </dl>
+          <p className="mt-5 text-sm text-slate-600">
+            Manage the existing Property → Building → Floor → Room structure. Rooms remain the
+            hospitality accommodation records.
+          </p>
+        </section>
+      )}
+      {tab === 'operations' && (
+        <section className="mt-5 rounded-xl border bg-white p-5 dark:bg-slate-900">
+          <h2 className="text-lg font-semibold">Property operations</h2>
+          <div className="mt-4 flex flex-wrap gap-3">
             {modules.has('hospitality.manager-signoff') && (
               <Button asChild variant="outline">
                 <Link href={`/hospitality/properties/${property.id}/signoff`}>
@@ -100,68 +152,91 @@ export default async function PropertyDetail({
                 </Link>
               </Button>
             )}
-            <Button asChild>
-              <Link href="/hospitality/properties">{translateHospitality('m_0ff8b0f42104ce')}</Link>
-            </Button>
           </div>
-        }
-      />
-      <section className="mt-5">
-        <h2 className="text-lg font-semibold">{translateHospitality('m_120c894d671916')}</h2>
-        {manage && (
-          <form
-            action={createBuildingAction}
-            className="mt-3 grid gap-2 rounded-lg border p-3 sm:grid-cols-3"
-          >
-            <input type="hidden" name="propertyId" value={property.id} />
-            <Label>
-              {' '}
-              {translateHospitality('m_02b18d5c7f6f2d')}{' '}
-              <Input name="name" required maxLength={200} />
-            </Label>
-            <Label>
-              {' '}
-              {translateHospitality('m_0570e24c85cf95')}{' '}
-              <Input name="code" required maxLength={80} />
-            </Label>
-            <Button type="submit">{translateHospitality('m_0697734d149926')}</Button>
-          </form>
-        )}
-        <div className="mt-3">
-          <SearchInput />
-        </div>
-        {data.buildings.length === 0 ? (
-          <EmptyState
-            title={translateHospitality(
-              list.q || data.total > 0 ? 'm_0c726da8b78d42' : 'm_1454923d61098a',
-            )}
-            description={
-              list.q || data.total > 0 ? undefined : translateHospitality('m_01ba1670f68aa6')
-            }
-          />
-        ) : (
-          <div className="mt-3 grid gap-3 sm:grid-cols-2">
-            {data.buildings.map((b) => (
-              <Link
-                className="rounded-lg border p-4"
-                href={`/hospitality/properties/${property.id}/buildings/${b.id}`}
-                key={b.id}
+          {!modules.has('hospitality.diary') && !modules.has('hospitality.manager-signoff') && (
+            <p className="mt-3 text-sm text-slate-500">
+              No property diary or sign-off module is enabled.
+            </p>
+          )}
+        </section>
+      )}
+      {tab === 'structure' && (
+        <div className="mt-5 grid gap-5 lg:grid-cols-[14rem_minmax(0,1fr)]">
+          <aside className="rounded-xl border bg-white p-4 dark:bg-slate-900">
+            <h2 className="font-semibold">Structure</h2>
+            <ol className="mt-3 space-y-3 border-l border-teal-700 pl-4 text-sm">
+              <li className="font-medium">{property.name}</li>
+              <li>Buildings</li>
+              <li className="text-slate-500">Open a building to browse floors, then rooms.</li>
+            </ol>
+          </aside>
+          <section className="min-w-0 rounded-xl border bg-white p-5 dark:bg-slate-900">
+            <h2 className="text-lg font-semibold">{translateHospitality('m_120c894d671916')}</h2>
+            {manage && (
+              <form
+                action={createBuildingAction}
+                className="mt-3 grid gap-2 rounded-lg border p-3 sm:grid-cols-3"
               >
-                <strong>{b.name}</strong>
-                <p className="text-muted-foreground text-sm">{b.code}</p>
-              </Link>
-            ))}
-          </div>
-        )}
-        <Pagination
-          basePath={`/hospitality/properties/${property.id}`}
-          currentParams={search}
-          total={data.total}
-          page={list.page}
-          perPage={list.perPage}
-        />
-      </section>
-      {manage && (
+                <input type="hidden" name="propertyId" value={property.id} />
+                <Label>
+                  {' '}
+                  {translateHospitality('m_02b18d5c7f6f2d')}{' '}
+                  <Input name="name" required maxLength={200} />
+                </Label>
+                <Label>
+                  {' '}
+                  {translateHospitality('m_0570e24c85cf95')}{' '}
+                  <Input name="code" required maxLength={80} />
+                </Label>
+                <Button type="submit">{translateHospitality('m_0697734d149926')}</Button>
+              </form>
+            )}
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+              <SearchInput />
+              <span className="text-sm text-slate-500">{data.total} matching buildings</span>
+              {can(ctx, 'admin.settings.manage') && manage && (
+                <Link
+                  href="/admin/settings/import-export/property-structure/upload"
+                  className="text-sm text-teal-700 underline"
+                >
+                  Import property structure (tenant-wide)
+                </Link>
+              )}
+            </div>
+            {data.buildings.length === 0 ? (
+              <EmptyState
+                title={translateHospitality(
+                  list.q || data.total > 0 ? 'm_0c726da8b78d42' : 'm_1454923d61098a',
+                )}
+                description={
+                  list.q || data.total > 0 ? undefined : translateHospitality('m_01ba1670f68aa6')
+                }
+              />
+            ) : (
+              <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                {data.buildings.map((b) => (
+                  <Link
+                    className="rounded-xl border bg-white p-4 hover:border-teal-600 dark:bg-slate-900"
+                    href={`/hospitality/properties/${property.id}/buildings/${b.id}`}
+                    key={b.id}
+                  >
+                    <strong>{b.name}</strong>
+                    <p className="text-muted-foreground text-sm">{b.code}</p>
+                  </Link>
+                ))}
+              </div>
+            )}
+            <Pagination
+              basePath={`/hospitality/properties/${property.id}`}
+              currentParams={search}
+              total={data.total}
+              page={list.page}
+              perPage={list.perPage}
+            />
+          </section>
+        </div>
+      )}
+      {manage && tab === 'settings' && (
         <section className="mt-6 rounded-lg border p-4">
           <h2 className="font-semibold">{translateValue('Property management')}</h2>
           <form action={archivePropertyAction} className="mt-3">

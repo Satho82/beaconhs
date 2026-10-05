@@ -1,8 +1,8 @@
 import 'server-only'
 
-import { and, eq } from 'drizzle-orm'
+import { and, eq, getTableColumns } from 'drizzle-orm'
 import { db, withSuperAdmin } from '@beaconhs/db'
-import { auditLog, tenantModuleEntitlements, tenants } from '@beaconhs/db/schema'
+import { auditLog, tenantModuleEntitlements, tenants, users } from '@beaconhs/db/schema'
 import type { PlatformOperator } from '@/lib/auth'
 import { normalizeEntitlementChange, type EntitlementChange } from './policy'
 
@@ -21,8 +21,9 @@ export async function listTenantModuleEntitlements(operator: PlatformOperator, t
       .limit(1)
     if (!tenant) throw new Error('Tenant not found.')
     const rows = await tx
-      .select()
+      .select({ ...getTableColumns(tenantModuleEntitlements), changedByName: users.name })
       .from(tenantModuleEntitlements)
+      .leftJoin(users, eq(users.id, tenantModuleEntitlements.changedByUserId))
       .where(eq(tenantModuleEntitlements.tenantId, tenantId))
       .orderBy(tenantModuleEntitlements.moduleKey)
     return { tenant, rows }

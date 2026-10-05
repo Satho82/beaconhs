@@ -1,0 +1,131 @@
+name: Uvanoo V1.4 Fast DEV validation
+
+# Development evidence only. The authoritative release workflow is unchanged.
+on:
+  push:
+    branches: [feature/uvanoo-v1.4]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: uvanoo-v1-4-fast-dev-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Fast DEV broad validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    services:
+      postgres:
+        image: postgres:16-alpine@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777
+        env: { POSTGRES_USER: postgres, POSTGRES_PASSWORD: postgres, POSTGRES_DB: beaconhs_test }
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd="pg_isready -U postgres" --health-interval=5s --health-timeout=5s --health-retries=10
+      redis:
+        image: redis:7-alpine@sha256:6ab0b6e7381779332f97b8ca76193e45b0756f38d4c0dcda72dbb3c32061ab99
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd="redis-cli ping" --health-interval=5s --health-timeout=5s --health-retries=10
+    env:
+      DATABASE_URL: postgresql://beaconhs_app:beaconhs_app@localhost:5432/beaconhs_test
+      MIGRATION_DATABASE_URL: postgresql://beaconhs_migrator:beaconhs_migrator@localhost:5432/beaconhs_test
+      SUPERADMIN_DATABASE_URL: postgresql://beaconhs_super:beaconhs_super@localhost:5432/beaconhs_test
+      DATABASE_OWNER_ROLE: beaconhs_owner
+      DATABASE_BACKUP_ROLE: beaconhs_backup
+      REDIS_URL: redis://localhost:6379
+      BETTER_AUTH_SECRET: ci-secret-not-used-in-prod
+      ATTACHMENT_CAPABILITY_SECRET: ci-attachment-capability-secret-32-chars
+      BETTER_AUTH_URL: http://localhost:3000
+      APP_URL: http://localhost:3000
+      NEXT_TELEMETRY_DISABLED: '1'
+    steps:
+      - id: checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with: { ref: '${{ github.sha }}', persist-credentials: false, fetch-depth: 0 }
+      - name: Verify immutable feature source
+        id: source
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = Satho82/beaconhs
+          test "$GITHUB_REF" = refs/heads/feature/uvanoo-v1.4
+          [[ "$GITHUB_SHA" =~ ^[0-9a-f]{40}$ ]]
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+      - id: pnpm
+        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
+      - id: node
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with: { node-version-file: .nvmrc, cache: pnpm }
+      - name: Verify repository-pinned toolchain
+        id: toolchain
+        run: |
+          set -euo pipefail
+          test "$(node --version)" = "v$(tr -d '\r\n' < .nvmrc)"
+          expected_pnpm="$(node -p 'JSON.parse(require("node:fs").readFileSync("package.json", "utf8")).packageManager')"
+          test "pnpm@$(pnpm --version)" = "$expected_pnpm"
+      - id: install
+        run: pnpm install --frozen-lockfile
+      - name: Report source, baseline and broad plan
+        id: plan
+        run: node scripts/ci/v1.4-fast-dev-plan.mjs
+      - id: classifier
+        run: node --test scripts/ci/v1.4-fast-dev-plan.test.mjs
+      - id: contract
+        run: bash scripts/ci/v1.4-fast-dev-contract.test.sh
+      - id: format
+        run: pnpm format:check
+      - name: Generate fresh route types without production compilation
+        id: route_types
+        run: |
+          set -euo pipefail
+          test ! -d apps/web/.next
+          pnpm --filter @beaconhs/web exec next typegen
+          git diff --exit-code -- apps/web/tsconfig.json apps/web/next.config.ts
+      - id: typecheck
+        run: pnpm typecheck
+      - id: lint
+        run: pnpm lint
+      - id: deadcode
+        run: pnpm deadcode:check
+        env: { NODE_OPTIONS: --max-old-space-size=6144 }
+      - name: Provision disposable CI database roles
+        id: provision
+        env: { PGPASSWORD: postgres }
+        run: |
+          set -euo pipefail
+          psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 <<'SQL'
+          CREATE ROLE beaconhs_owner NOLOGIN NOSUPERUSER NOBYPASSRLS;
+          CREATE ROLE beaconhs_migrator LOGIN NOINHERIT NOSUPERUSER NOBYPASSRLS PASSWORD 'beaconhs_migrator';
+          CREATE ROLE beaconhs_app LOGIN NOINHERIT NOSUPERUSER NOBYPASSRLS PASSWORD 'beaconhs_app';
+          CREATE ROLE beaconhs_super LOGIN NOINHERIT NOSUPERUSER BYPASSRLS PASSWORD 'beaconhs_super';
+          CREATE ROLE beaconhs_backup LOGIN NOINHERIT NOSUPERUSER BYPASSRLS PASSWORD 'beaconhs_backup';
+          ALTER ROLE beaconhs_backup SET default_transaction_read_only = 'on';
+          GRANT beaconhs_owner TO beaconhs_migrator;
+          ALTER DATABASE beaconhs_test OWNER TO beaconhs_owner;
+          REVOKE ALL ON DATABASE beaconhs_test FROM PUBLIC;
+          GRANT CONNECT ON DATABASE beaconhs_test TO beaconhs_migrator, beaconhs_app, beaconhs_super, beaconhs_backup;
+          \connect beaconhs_test
+          ALTER SCHEMA public OWNER TO beaconhs_owner;
+          REVOKE ALL ON SCHEMA public FROM PUBLIC;
+          SQL
+      - id: migration
+        run: pnpm --filter @beaconhs/db exec tsx src/migrate.ts
+      - id: idempotence
+        run: pnpm --filter @beaconhs/db exec tsx src/migrate.ts
+      - id: tests
+        run: pnpm test
+      - name: Existing deployment and repository contracts
+        id: regressions
+        run: |
+          set -euo pipefail
+          scripts/cluster/dokploy-curl.test.sh
+          scripts/ci/require-current-main.test.sh
+          scripts/ci/workflow-repository-immutability.test.sh
+          scripts/ci/v1.4-dev-candidate-deploy-contract.test.sh
+      - name: Fail-closed development result
+        id: aggregate
+        if: always()
+        env: { FAST_DEV_STEPS: '${{ toJSON(steps) }}' }
+        run: node scripts/ci/v1.4-fast-dev-plan.mjs --aggregate

@@ -41,7 +41,7 @@ export type Walkthrough = {
 export const WALKTHROUGHS: Walkthrough[] = [
   {
     id: 'welcome',
-    title: 'Welcome to BeaconHS',
+    title: 'Welcome to Uvanoo',
     description: 'A quick lap of the app: the menu, your workspace, and where to get help.',
     startPath: '/dashboard',
     defaultEnabled: true,
@@ -49,7 +49,7 @@ export const WALKTHROUGHS: Walkthrough[] = [
     steps: [
       {
         title: 'Welcome',
-        body: 'BeaconHS is where your crew logs safety work: journals, hazard assessments, inspections, incidents and more. This quick tour shows you around. You can leave it any time with Skip.',
+        body: 'Uvanoo brings your property operations and safety work together: journals, hazard assessments, inspections, incidents and more. This quick tour shows you around. You can leave it any time with Skip.',
       },
       {
         target: '[data-walkthrough="nav:/dashboard"]',
@@ -58,8 +58,13 @@ export const WALKTHROUGHS: Walkthrough[] = [
       },
       {
         target: '[data-walkthrough="nav:/my"]',
-        title: 'My Workspace',
+        title: 'My Work',
         body: 'Everything that is yours in one place: open items, training cards and your certificate wallet.',
+      },
+      {
+        target: '[data-walkthrough="nav:/hospitality/properties"]',
+        title: 'Properties',
+        body: 'Open an authorised property to browse Overview, Structure and Operations. Property management actions appear only when your role allows them.',
       },
       {
         target: '[data-walkthrough="nav:/notifications"]',

@@ -141,7 +141,7 @@ Almost every record in the app — incidents, inspections, forms — asks for a 
 
 ## Where to find it
 
-Open [Locations](/locations) from the sidebar.
+Legacy [Locations](/locations) remains available by direct link for existing records. The board navigation uses **Properties** for hospitality structure; this does not migrate legacy relationships.
 
 ## Add a location
 

@@ -30,7 +30,6 @@ export function PlatformShell({
 }) {
   const router = useRouter()
   const [pending, startSignOut] = useTransition()
-  const platformT = useTranslations('PlatformNav')
   const shellT = useTranslations('Shell')
   const groups = PLATFORM_NAV_GROUPS
 
@@ -48,10 +47,10 @@ export function PlatformShell({
           <header className="flex h-14 shrink-0 items-center gap-3 border-b border-slate-200 bg-white px-3 sm:px-6 dark:border-slate-800 dark:bg-slate-900">
             <MobileNavToggle groups={groups} platformBranding={branding} />
             <div className="flex min-w-0 items-center gap-2">
-              <ShieldCheck className="shrink-0 text-amber-600 dark:text-amber-400" size={18} />
+              <ShieldCheck className="shrink-0 text-teal-700 dark:text-teal-300" size={18} />
               <div className="min-w-0">
                 <div className="truncate text-sm font-semibold">
-                  <GeneratedValue value={platformT('controlCentre')} />
+                  <GeneratedValue value={'Platform administration'} />
                 </div>
                 <div className="truncate text-xs text-slate-500 dark:text-slate-400">
                   <GeneratedValue value={operator.email} />
@@ -61,13 +60,14 @@ export function PlatformShell({
             <button
               type="button"
               disabled={pending}
+              aria-label={shellT('signOut')}
               onClick={() =>
                 startSignOut(async () => {
                   await signOut()
                   router.replace('/login')
                 })
               }
-              className="ml-auto flex items-center gap-2 rounded-md px-3 py-2 text-sm text-slate-600 hover:bg-slate-100 disabled:opacity-60 dark:text-slate-300 dark:hover:bg-slate-800"
+              className="ml-auto flex shrink-0 items-center gap-2 rounded-md px-3 py-2 text-sm text-slate-600 hover:bg-slate-100 disabled:opacity-60 dark:text-slate-300 dark:hover:bg-slate-800"
             >
               <LogOut size={16} />
               <span className="hidden sm:inline">
@@ -75,7 +75,7 @@ export function PlatformShell({
               </span>
             </button>
           </header>
-          <main className="flex min-h-0 flex-1 flex-col overflow-hidden bg-slate-50 dark:bg-slate-950">
+          <main className="flex min-h-0 flex-1 flex-col overflow-hidden bg-[rgb(var(--color-canvas))]">
             <AppScrollReset />
             <GeneratedValue value={children} />
           </main>

@@ -1,10 +1,11 @@
 import { isNavModuleEntitled } from './entitlements'
+import { boardNavigation } from './board-presentation'
 // Server-side nav resolver.
 //
 // Turns the code-defined module registry + a tenant's saved overrides
 // (tenant_nav_config) into the concrete SidebarNavGroup[] the client nav
 // components render. Responsibilities:
-//   - load the saved config, or compute defaults (registry + lift-plan pin)
+//   - load the saved config, or compute defaults (registry + Toolbox Talk pin)
 //   - resolve pinned-form items to their template name / icon / home href
 //   - filter every item by its module permission gates — the sidebar now reflects
 //     what each user may actually open
@@ -59,7 +60,7 @@ function canSeePinnedForm(ctx: RequestContext): boolean {
 /**
  * The raw, editable nav config for the current tenant: the saved row if one
  * exists, else the computed defaults (registry modules + an auto-pinned
- * lift-plan form). Shared by the renderer (resolveNavGroups) and the
+ * Toolbox Talk form). Shared by the renderer (resolveNavGroups) and the
  * /admin/navigation editor so both agree on what "defaults" means.
  */
 export async function loadNavConfig(tx: Database): Promise<TenantNavConfig> {
@@ -68,30 +69,20 @@ export async function loadNavConfig(tx: Database): Promise<TenantNavConfig> {
   // missing registry modules into their default groups so new built-ins appear.
   if (row?.config) return withMissingModules(row.config)
 
-  // No saved row → computed defaults. Auto-pin the built-in forms (lift-plan,
-  // toolbox-talk) so the old native "Lift plans" / "Toolbox talks" entries
-  // don't regress — now as real pinned forms.
+  // Keep Toolbox Talk accessible. Lift Plan remains stored but is excluded
+  // from the board navigation, including saved pins.
   const config = buildDefaultNavConfig()
   const builtIns = await tx
     .select({ id: formTemplates.id, key: formTemplates.key })
     .from(formTemplates)
     .where(
       and(
-        inArray(formTemplates.key, [LIFT_PLAN_TEMPLATE_KEY, TOOLBOX_TEMPLATE_KEY]),
+        inArray(formTemplates.key, [TOOLBOX_TEMPLATE_KEY]),
         eq(formTemplates.status, 'published'),
         isNull(formTemplates.deletedAt),
       ),
     )
   const frontline = config.groups.find((g) => g.id === 'frontline')
-  const lift = builtIns.find((t) => t.key === LIFT_PLAN_TEMPLATE_KEY)
-  if (lift) {
-    frontline?.items.push({
-      kind: 'form',
-      templateId: lift.id,
-      label: 'Lift plans',
-      iconKey: 'construction',
-    })
-  }
   const toolbox = builtIns.find((t) => t.key === TOOLBOX_TEMPLATE_KEY)
   if (toolbox) {
     frontline?.items.push({
@@ -144,10 +135,15 @@ export async function resolveNavGroups(
         .map((i) => i.templateId),
     ),
   ]
-  const formMeta = new Map<string, { name: string; iconKey: string | null }>()
+  const formMeta = new Map<string, { name: string; iconKey: string | null; key: string | null }>()
   if (formIds.length > 0) {
     const rows = await tx
-      .select({ id: formTemplates.id, name: formTemplates.name, iconKey: formTemplates.iconKey })
+      .select({
+        id: formTemplates.id,
+        name: formTemplates.name,
+        iconKey: formTemplates.iconKey,
+        key: formTemplates.key,
+      })
       .from(formTemplates)
       .where(
         and(
@@ -155,7 +151,7 @@ export async function resolveNavGroups(
           templateAccessWhere(ctx, effectiveRoleKeys, 'operate'),
         ),
       )
-    for (const r of rows) formMeta.set(r.id, { name: r.name, iconKey: r.iconKey })
+    for (const r of rows) formMeta.set(r.id, { name: r.name, iconKey: r.iconKey, key: r.key })
   }
 
   // 3. Map → SidebarNavGroup[], filtering hidden + permission + dangling refs.
@@ -175,18 +171,18 @@ export async function resolveNavGroups(
       })
     }
   }
-  return groups
+  return boardNavigation(groups)
 }
 
 function resolveItem(
   item: NavItemConfig,
   ctx: RequestContext,
-  formMeta: Map<string, { name: string; iconKey: string | null }>,
+  formMeta: Map<string, { name: string; iconKey: string | null; key: string | null }>,
   entitledModules: Set<ModuleKey>,
 ): SidebarNavItem | null {
   if (item.kind === 'module') {
     const mod = moduleByKey(item.moduleKey)
-    if (!mod) return null // stale/removed module key
+    if (!mod || mod.boardHidden) return null // stale/removed module key
     if (!isNavModuleEntitled(mod.key, entitledModules)) return null
     if (mod.requiredPermission && !can(ctx, mod.requiredPermission)) return null
     if (mod.requiredAnyPermission?.length && !mod.requiredAnyPermission.some((p) => can(ctx, p))) {
@@ -201,7 +197,7 @@ function resolveItem(
   }
   if (item.kind === 'form') {
     const meta = formMeta.get(item.templateId)
-    if (!meta) return null // template deleted
+    if (!meta || meta.key === LIFT_PLAN_TEMPLATE_KEY) return null // template deleted
     if (!canSeePinnedForm(ctx)) return null
     return {
       // A pinned app behaves like a native module: land on its list of entries

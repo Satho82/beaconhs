@@ -9,7 +9,9 @@
     --color-primary-hover: 13 100 94;
     --color-primary-active: 12 83 78;
     --color-secondary-action: 241 245 249;
-    --color-accent: 37 99 235;
+    --color-accent: 180 83 52;
+    --color-canvas: 246 247 249;
+    --color-surface: 255 255 255;
     --color-sidebar: 15 23 42;
     --color-focus: 20 184 166;
     --color-primary-fg: 255 255 255;
@@ -29,7 +31,9 @@
     --color-primary-hover: 45 212 191;
     --color-primary-active: 13 148 136;
     --color-secondary-action: 30 41 59;
-    --color-accent: 96 165 250;
+    --color-accent: 234 148 112;
+    --color-canvas: 2 6 23;
+    --color-surface: 15 23 42;
     --color-sidebar: 2 6 23;
     --color-focus: 45 212 191;
     --color-primary-fg: 17 24 39;

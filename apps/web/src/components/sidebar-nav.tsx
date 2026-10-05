@@ -3,6 +3,7 @@
 import { GeneratedValue, useGeneratedValueTranslations } from '@/i18n/generated'
 
 import Link from 'next/link'
+import { useId, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import {
   AlertTriangle,
@@ -11,6 +12,7 @@ import {
   BookOpen,
   Building2,
   CheckCircle2,
+  ChevronDown,
   CircleHelp,
   CircleUser,
   ClipboardCheck,
@@ -104,6 +106,8 @@ export type SidebarNavItem = {
   /** When set, the item is active ONLY on an exact path match (no greedy
    * prefix). Used for hub/overview links that are a prefix of their siblings. */
   exact?: boolean
+  /** Children must already be permission/entitlement-filtered by the caller. */
+  children?: SidebarNavItem[]
 }
 
 export type SidebarNavGroup = {
@@ -131,78 +135,96 @@ export function SidebarNav({
   groups: SidebarNavGroup[]
   collapsed?: boolean
 }) {
-  const tGeneratedValue = useGeneratedValueTranslations()
   const pathname = usePathname() ?? ''
   const activeHref = findActiveNavHref(pathname, groups)
   return (
-    <nav className={cn('app-scroll flex-1 overflow-y-auto py-3', collapsed ? 'px-2' : 'px-2')}>
-      <GeneratedValue
-        value={groups.map((group) => (
-          <div key={group.label} className="mb-3">
-            <GeneratedValue
-              value={
-                collapsed ? (
-                  <div
-                    className="mx-2 mb-1 border-t border-slate-100 dark:border-slate-800"
-                    aria-hidden
-                  />
-                ) : (
-                  <div className="px-2 pb-1 text-[10px] font-semibold tracking-wider text-slate-400 uppercase dark:text-slate-500">
-                    <GeneratedValue value={group.label} />
-                  </div>
-                )
-              }
-            />
-            <GeneratedValue
-              value={group.items.map((item) => {
-                const active = activeHref === item.href
-                const Icon = ICONS[item.iconKey] ?? Gauge
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href as any}
-                    aria-current={active ? 'page' : undefined}
-                    title={tGeneratedValue(collapsed ? item.label : undefined)}
-                    // Guided-tour anchor (lib/walkthroughs) — spotlights nav items.
-                    data-walkthrough={`nav:${item.href}`}
-                    className={cn(
-                      'group relative flex items-center rounded-md py-1.5 text-sm',
-                      'transition-colors duration-150 ease-out',
-                      collapsed ? 'justify-center px-2' : 'gap-2.5 px-2',
-                      'before:absolute before:top-1/2 before:left-0 before:h-5 before:w-[2px] before:-translate-y-1/2 before:rounded-full',
-                      'before:transition-all before:duration-150 before:ease-out',
-                      active
-                        ? 'bg-teal-50 text-teal-900 before:h-6 before:bg-teal-700 dark:bg-teal-950/50 dark:text-teal-100 dark:before:bg-teal-400'
-                        : 'text-slate-700 before:bg-transparent hover:bg-slate-100 hover:text-slate-900 hover:before:bg-slate-300 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100 dark:hover:before:bg-slate-600',
-                      'focus-visible:ring-2 focus-visible:ring-teal-500/40 focus-visible:outline-none',
-                    )}
-                  >
-                    <Icon
-                      size={15}
-                      className={cn(
-                        'shrink-0 transition-colors duration-150',
-                        active
-                          ? 'text-teal-700 dark:text-teal-300'
-                          : 'text-slate-500 group-hover:text-slate-700 dark:text-slate-400 dark:group-hover:text-slate-200',
-                      )}
-                    />
-                    <GeneratedValue
-                      value={
-                        collapsed ? null : (
-                          <span>
-                            <GeneratedValue value={item.label} />
-                          </span>
-                        )
-                      }
-                    />
-                  </Link>
-                )
-              })}
-            />
-          </div>
-        ))}
-      />
+    <nav
+      aria-label="Application navigation"
+      className="app-scroll flex-1 overflow-y-auto px-2 py-4"
+    >
+      {groups.map((group) => (
+        <section key={group.label} className="mb-5">
+          {!collapsed && (
+            <h2 className="px-3 pb-2 text-[10px] font-semibold tracking-widest text-slate-400 uppercase">
+              {group.label}
+            </h2>
+          )}
+          {group.items.map((item) => (
+            <NavEntry key={item.href} item={item} activeHref={activeHref} collapsed={collapsed} />
+          ))}
+        </section>
+      ))}
     </nav>
+  )
+}
+
+function NavEntry({
+  item,
+  activeHref,
+  collapsed,
+}: {
+  item: SidebarNavItem
+  activeHref: string | null
+  collapsed: boolean
+}) {
+  const tGeneratedValue = useGeneratedValueTranslations()
+  const id = useId()
+  const childActive = item.children
+    ? findActiveNavHref(activeHref, [{ items: item.children }]) !== null
+    : false
+  const [expanded, setExpanded] = useState<boolean | null>(null)
+  const open = expanded ?? childActive
+  const active = item.href === activeHref
+  const Icon = ICONS[item.iconKey] ?? Gauge
+  return (
+    <div>
+      <div className="flex items-center gap-1">
+        <Link
+          href={item.href as never}
+          aria-current={active ? 'page' : undefined}
+          title={tGeneratedValue(collapsed ? item.label : undefined)}
+          data-walkthrough={`nav:${item.href}`}
+          className={cn(
+            'flex min-w-0 flex-1 items-center gap-3 rounded-lg px-3 py-2.5 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-300',
+            collapsed && 'justify-center px-2',
+            active
+              ? 'bg-teal-900 text-white ring-1 ring-teal-700'
+              : 'text-slate-300 hover:bg-white/10 hover:text-white',
+          )}
+        >
+          <Icon size={18} className="shrink-0" />
+          {!collapsed && (
+            <span className="truncate">
+              <GeneratedValue value={item.label} />
+            </span>
+          )}
+        </Link>
+        {!collapsed && Boolean(item.children?.length) && (
+          <button
+            type="button"
+            aria-label={`Expand ${item.label}`}
+            aria-expanded={open}
+            aria-controls={id}
+            onClick={() => setExpanded(!open)}
+            className="rounded p-2 text-slate-300 hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-teal-300"
+          >
+            <ChevronDown size={16} className={open ? 'rotate-180' : ''} />
+          </button>
+        )}
+      </div>
+      {Boolean(item.children?.length) &&
+        (!collapsed ? (
+          <div id={id} hidden={!open} className="ml-5 border-l border-white/15 pl-2">
+            {item.children?.map((child) => (
+              <NavEntry key={child.href} item={child} activeHref={activeHref} collapsed={false} />
+            ))}
+          </div>
+        ) : (
+          item.children?.map((child) => (
+            <NavEntry key={child.href} item={child} activeHref={activeHref} collapsed />
+          ))
+        ))}
+    </div>
   )
 }
 

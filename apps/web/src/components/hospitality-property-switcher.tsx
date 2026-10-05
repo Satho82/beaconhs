@@ -38,7 +38,7 @@ export function HospitalityPropertySwitcher({
   if (properties.length === 0) return null
   if (properties.length === 1) {
     return (
-      <span className="hidden min-w-0 items-center gap-2 rounded-md px-2 py-1 text-sm text-slate-700 md:flex dark:text-slate-200">
+      <span className="flex max-w-full min-w-0 items-center gap-2 rounded-md px-2 py-1 text-sm text-slate-700 dark:text-slate-200">
         <Building2 size={14} />
         <span className="truncate">{properties[0]?.name}</span>
       </span>
@@ -55,7 +55,7 @@ export function HospitalityPropertySwitcher({
           type="button"
           onClick={() => setOpen((value) => !value)}
           disabled={pending}
-          className="hidden min-w-0 items-center gap-2 rounded-md border border-slate-200 bg-white px-2.5 py-1 text-sm font-medium text-slate-700 hover:bg-slate-50 md:flex dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800/60"
+          className="flex max-w-full min-w-0 items-center gap-2 rounded-md border border-slate-200 bg-white px-2.5 py-1 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800/60"
         >
           <Building2 size={14} />
           <span className="truncate">{pending ? t('m_0bec5451fa832e') : label}</span>

@@ -1,6 +1,7 @@
 type ActiveNavItem = {
   href: string
   exact?: boolean
+  children?: ActiveNavItem[]
 }
 
 type ActiveNavGroup = {
@@ -16,7 +17,7 @@ export function findActiveNavHref(
   let activeHref: string | null = null
 
   for (const group of groups) {
-    for (const item of group.items) {
+    for (const item of flatten(group.items)) {
       if (!matchesNavPath(pathname, item)) continue
       if (!activeHref || item.href.length > activeHref.length) {
         activeHref = item.href
@@ -31,4 +32,8 @@ function matchesNavPath(pathname: string, item: ActiveNavItem): boolean {
   if (pathname === item.href) return true
   if (item.exact || item.href === '/') return false
   return pathname.startsWith(item.href + '/')
+}
+
+function flatten(items: ActiveNavItem[]): ActiveNavItem[] {
+  return items.flatMap((item) => [item, ...flatten(item.children ?? [])])
 }

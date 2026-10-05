@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { createPortal } from 'react-dom'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { useUiText } from './text-context'
 import { cn } from './utils'
 
@@ -57,6 +57,8 @@ export function Drawer({
   bodyClassName?: string
 }) {
   const t = useUiText()
+  const titleId = React.useId()
+  const reduce = useReducedMotion()
   const [mounted, setMounted] = React.useState(false)
   React.useEffect(() => setMounted(true), [])
 
@@ -153,12 +155,16 @@ export function Drawer({
           <motion.aside
             ref={panelRef}
             role="dialog"
+            aria-labelledby={title ? titleId : undefined}
+            aria-label={title ? undefined : 'Panel'}
             aria-modal="true"
             tabIndex={-1}
-            initial={{ x: side === 'left' ? '-100%' : '100%' }}
+            initial={reduce ? false : { x: side === 'left' ? '-100%' : '100%' }}
             animate={{ x: 0 }}
-            exit={{ x: side === 'left' ? '-100%' : '100%' }}
-            transition={{ type: 'spring', damping: 32, stiffness: 320, mass: 0.8 }}
+            exit={reduce ? { opacity: 0 } : { x: side === 'left' ? '-100%' : '100%' }}
+            transition={
+              reduce ? { duration: 0 } : { type: 'spring', damping: 32, stiffness: 320, mass: 0.8 }
+            }
             className={cn(
               'absolute top-0 flex h-full flex-col overflow-hidden border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-900',
               side === 'left' ? 'left-0 border-r' : 'right-0 border-l',
@@ -169,7 +175,10 @@ export function Drawer({
               <header className="flex items-start justify-between gap-4 border-b border-slate-200 px-6 py-4 dark:border-slate-800">
                 <div className="min-w-0 space-y-0.5">
                   {title ? (
-                    <h2 className="truncate text-base font-semibold text-slate-900 dark:text-slate-100">
+                    <h2
+                      id={titleId}
+                      className="truncate text-base font-semibold text-slate-900 dark:text-slate-100"
+                    >
                       {typeof title === 'string' ? t(title) : title}
                     </h2>
                   ) : null}

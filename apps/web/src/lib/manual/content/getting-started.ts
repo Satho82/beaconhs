@@ -7,10 +7,10 @@ import type { ManualArticle } from '../types'
 export const GETTING_STARTED_ARTICLES: ManualArticle[] = [
   {
     slug: 'getting-started',
-    title: 'Welcome to BeaconHS',
+    title: 'Welcome to Uvanoo',
     group: 'Getting started',
     iconKey: 'gauge',
-    summary: 'Sign in, find your way around, and set up BeaconHS on your phone.',
+    summary: 'Sign in, find your way around, and set up Uvanoo on your phone.',
     keywords: [
       'login',
       'log in',
@@ -31,11 +31,11 @@ export const GETTING_STARTED_ARTICLES: ManualArticle[] = [
       'basics',
       'start',
     ],
-    body: `BeaconHS is where your crew reports hazards, fills out forms, and keeps safety records in one place. This article covers signing in and finding your way around.
+    body: `Uvanoo is where your crew reports hazards, fills out forms, and keeps safety records in one place. This article covers signing in and finding your way around.
 
 ## Signing in
 
-BeaconHS does not have public sign-up. Your administrator creates your account and sends an invitation to your work email.
+Uvanoo does not have public sign-up. Your administrator creates your account and sends an invitation to your work email.
 
 For your first visit:
 
@@ -59,10 +59,12 @@ A normal password or magic-link sign-in does not activate a pending invitation. 
 The left menu lists everything you can use. Items are grouped:
 
 - **Overview** — the **Dashboard**, your [Workspace](/my), and the activity feed.
-- **Frontline** — day-to-day field work like incidents, hazard assessments, and journals.
-- **Knowledge** — training and documents.
-- **Assets & people** — people, equipment, and PPE.
-- **Assurance** — inspections, compliance, and follow-up actions.
+- **Properties** — the existing Property → Building → Floor → Room structure.
+- **Operations** — Maintenance, Handover and Corrective Actions.
+- **Safety & Compliance** — Compliance, Inspections, Incidents, Risk and Training.
+- **Resources** — training and documents.
+- **Assets** — Assets and Metering. **People** has its own group.
+- **Reports** — inspections, compliance, and follow-up actions.
 
 You only see the items your role allows. If a page is missing, ask your supervisor or admin.
 
@@ -73,14 +75,14 @@ The **Dashboard** shows your open work at a glance. Tap any card to jump to it.
 1. Tap your name in the top right corner.
 2. Use the theme switcher to pick **Light**, **System**, or **Dark**.
 
-## Using BeaconHS on a phone or tablet
+## Using Uvanoo on a phone or tablet
 
-BeaconHS works in any modern browser and is built for the field. You can also install it so it opens like a regular app:
+Uvanoo works in any modern browser and is built for the field. You can also install it so it opens like a regular app:
 
-1. Open BeaconHS in your phone's browser.
+1. Open Uvanoo in your phone's browser.
 2. On iPhone or iPad: tap the Share icon, then choose **Add to Home Screen**.
 3. On Android: open the browser menu, then choose **Install app** or **Add to Home screen**.
-4. Open BeaconHS from the new icon.
+4. Open Uvanoo from the new icon.
 
 Installing it also lets you get push notifications on iPhone. See [Notifications & Inbox](/help/notifications).
 
@@ -177,7 +179,7 @@ Your wallet holds your certificates and skill cards — like the paper tickets i
       'unread',
       'reminders',
     ],
-    body: `BeaconHS sends you a notification when something needs your attention — a new task, an overdue item, or a training reminder. They all land in your inbox.
+    body: `Uvanoo sends you a notification when something needs your attention — a new task, an overdue item, or a training reminder. They all land in your inbox.
 
 ## Where to find it
 
@@ -202,18 +204,18 @@ There is also a search box at the top if you are looking for something specific.
 
 ## Turning on push notifications on your phone
 
-Push notifications pop up on your phone even when BeaconHS is not open.
+Push notifications pop up on your phone even when Uvanoo is not open.
 
 1. Open [Notification preferences](/notifications/preferences) on the device you want alerts on.
 2. Find the **Push notifications on this device** card.
 3. Tap **Enable on this device** and allow notifications when your phone asks.
 4. Tap **Send a test push** to check it works.
 
-On iPhone and iPad, push only works after you install BeaconHS to your home screen:
+On iPhone and iPad, push only works after you install Uvanoo to your home screen:
 
 1. In Safari, tap the Share icon.
 2. Choose **Add to Home Screen**.
-3. Open BeaconHS from the new icon, then follow the steps above.
+3. Open Uvanoo from the new icon, then follow the steps above.
 
 ## Tips
 
@@ -272,7 +274,7 @@ Your saved signature is used when you sign off forms, inspections, and lift plan
 2. Enter your **Current password**, then your **New password** and **Confirm new password**.
 3. Tap **Change password**.
 
-If you cannot remember your current password, tap **Forgot current password?** and BeaconHS emails you a reset link.
+If you cannot remember your current password, tap **Forgot current password?** and Uvanoo emails you a reset link.
 
 ## Adding a password if you only use magic links
 
@@ -310,7 +312,7 @@ After that you can sign in either way — password or magic link.
       'shortcut',
       'smart search',
     ],
-    body: `The Assistant is a chat built into BeaconHS. Ask it questions in plain English — about your safety records or about how to do something in the app.
+    body: `The Assistant is a chat built into Uvanoo. Ask it questions in plain English — about your safety records or about how to do something in the app.
 
 ## What this is for
 
@@ -392,7 +394,7 @@ The Assistant only sees what you are allowed to see. It follows the same permiss
       'onboarding',
       'learn',
     ],
-    body: `BeaconHS has two kinds of built-in help: this user guide, and guided tours that show you around live on screen.
+    body: `Uvanoo has two kinds of built-in help: this user guide, and guided tours that show you around live on screen.
 
 ## The user guide
 
@@ -419,7 +421,7 @@ Some tours start on their own the first time you sign in, to show you the basics
 
 ## For admins: choosing who sees which tours
 
-If you manage BeaconHS for your company, you decide which tours are shown to which roles:
+If you manage Uvanoo for your company, you decide which tours are shown to which roles:
 
 1. Open **Admin** in the left menu, then go to **Walkthroughs**.
 2. Pick a tour and choose the roles that should see it.

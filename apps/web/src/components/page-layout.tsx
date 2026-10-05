@@ -16,7 +16,7 @@ export function PageContainer({
   children: React.ReactNode
 }) {
   return (
-    <div className="app-scroll flex-1 overflow-y-auto">
+    <div className="app-scroll min-w-0 flex-1 overflow-y-auto">
       <FadeInBody className={cn('mx-auto w-full max-w-screen-2xl p-4 sm:p-6', className)}>
         <GeneratedValue value={children} />
       </FadeInBody>

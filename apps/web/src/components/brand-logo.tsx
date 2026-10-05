@@ -252,6 +252,23 @@ export function Logo({ animated, draw, branding, className, ...rest }: LogoProps
     )
   }
 
+  // Without an uploaded master logo, use the product wordmark rather than a
+  // legacy industry symbol. The configured name remains the source of truth.
+  if (customName !== 'BeaconHS')
+    return (
+      <span
+        role="img"
+        aria-label={customName}
+        className={cn(
+          'inline-flex h-8 items-center text-xl font-semibold tracking-tight whitespace-nowrap',
+          INK_CLASS,
+          className,
+        )}
+      >
+        {customName}
+      </span>
+    )
+
   return (
     <svg
       viewBox={`0 0 ${LOCKUP_W} 116`}
@@ -267,21 +284,7 @@ export function Logo({ animated, draw, branding, className, ...rest }: LogoProps
       <g transform="translate(0 5)">
         <MarkArt mode={mode} />
       </g>
-      {customName !== 'BeaconHS' ? (
-        <text
-          x={WORD_X}
-          y={WORD_Y + 70 * WORD_SCALE}
-          fill="currentColor"
-          fontFamily="Inter, ui-sans-serif, system-ui, sans-serif"
-          fontSize={31}
-          fontWeight={700}
-          letterSpacing="-0.8"
-        >
-          {customName}
-        </text>
-      ) : (
-        <WordmarkArt mode={mode} />
-      )}
+      <WordmarkArt mode={mode} />
     </svg>
   )
 }

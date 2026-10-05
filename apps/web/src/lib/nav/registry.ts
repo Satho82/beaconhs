@@ -14,6 +14,7 @@ import type { TenantNavConfig } from '@beaconhs/db/schema'
 type NavModule = {
   /** Stable id, referenced by NavItemConfig.moduleKey. Never change once shipped. */
   key: string
+  boardHidden?: boolean
   href: string
   label: string
   /** Key into the ICONS map in components/sidebar-nav.tsx. */
@@ -155,6 +156,7 @@ export const NAV_MODULES: NavModule[] = [
   // Field tools (safe-distance calc, etc.) sit with the crew workflows by default.
   {
     key: 'tools',
+    boardHidden: true,
     href: '/tools',
     label: 'Tools',
     iconKey: 'wrench',
@@ -173,7 +175,7 @@ export const NAV_MODULES: NavModule[] = [
   {
     key: 'hospitality',
     href: '/hospitality/properties',
-    label: 'Hospitality',
+    label: 'Properties',
     iconKey: 'building',
     requiredPermission: 'hospitality.read',
     group: 'Assets & people',
@@ -212,6 +214,7 @@ export const NAV_MODULES: NavModule[] = [
   },
   {
     key: 'locations',
+    boardHidden: true,
     href: '/locations',
     label: 'Locations',
     iconKey: 'pin',
@@ -225,7 +228,14 @@ export const NAV_MODULES: NavModule[] = [
     requiredPermission: 'equipment.read.self',
     group: 'Assets & people',
   },
-  { key: 'ppe', href: '/ppe', label: 'PPE', iconKey: 'hard-hat', group: 'Assets & people' },
+  {
+    boardHidden: true,
+    key: 'ppe',
+    href: '/ppe',
+    label: 'PPE',
+    iconKey: 'hard-hat',
+    group: 'Assets & people',
+  },
 
   // Compliance — the unified obligations hub (viewing + management). Visible to
   // EVERYONE: a person without `compliance.read` still has their own obligations,
@@ -315,7 +325,7 @@ export function buildDefaultNavConfig(): TenantNavConfig {
     groups: NAV_GROUP_ORDER.map((label) => ({
       id: defaultGroupId(label),
       label,
-      items: NAV_MODULES.filter((m) => m.group === label).map((m) => ({
+      items: NAV_MODULES.filter((m) => m.group === label && !m.boardHidden).map((m) => ({
         kind: 'module' as const,
         moduleKey: m.key,
       })),

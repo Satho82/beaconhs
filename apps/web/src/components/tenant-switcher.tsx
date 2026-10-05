@@ -66,7 +66,7 @@ export function TenantSwitcher({
           type="button"
           onClick={() => setOpen((v) => !v)}
           disabled={pending}
-          className="flex min-w-0 items-center gap-2 rounded-md border border-slate-200 bg-white px-2.5 py-1 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800/60"
+          className="flex max-w-full min-w-0 items-center gap-2 rounded-md border border-slate-200 bg-white px-2.5 py-1 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800/60"
         >
           <Building2 size={14} className="shrink-0" />
           <span className="truncate">

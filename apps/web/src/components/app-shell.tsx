@@ -111,13 +111,19 @@ export function AppShell({
 
           <header className="flex h-14 shrink-0 items-center gap-2 border-b border-slate-200 bg-white px-3 sm:gap-4 sm:px-6 dark:border-slate-800 dark:bg-slate-900">
             <MobileNavToggle groups={groups} platformBranding={platformBranding} />
-            <TenantSwitcher
-              current={{ id: ctx.tenantId, name: ctx.tenantName }}
-              available={availableTenants}
-              isSuperAdmin={ctx.isSuperAdmin}
-            />
-            <RoleSwitcher current={activeRole} available={availableRoles} />
-            <HospitalityPropertySwitcher {...propertyContext} />
+            <div className="min-w-0 flex-1 md:flex-none">
+              <TenantSwitcher
+                current={{ id: ctx.tenantId, name: ctx.tenantName }}
+                available={availableTenants}
+                isSuperAdmin={ctx.isSuperAdmin}
+              />
+            </div>
+            <div className="hidden min-w-0 md:block">
+              <RoleSwitcher current={activeRole} available={availableRoles} />
+            </div>
+            <div className="hidden min-w-0 md:block">
+              <HospitalityPropertySwitcher {...propertyContext} />
+            </div>
             <GeneratedValue value={ctx.isSuperAdmin ? <PlatformMenu /> : null} />
             <div className="hidden flex-1 justify-center md:flex">
               <GlobalSearch />
@@ -133,9 +139,21 @@ export function AppShell({
             </div>
           </header>
 
+          <div className="flex min-w-0 shrink-0 flex-wrap items-center gap-2 border-b bg-white px-3 py-2 text-xs md:hidden dark:bg-slate-900">
+            <div className="max-w-full min-w-0">
+              <RoleSwitcher current={activeRole} available={availableRoles} />
+            </div>
+            {propertyContext.properties.length > 0 && (
+              <div className="flex max-w-full min-w-0 items-center gap-2">
+                <span className="shrink-0 text-slate-500">Property</span>
+                <HospitalityPropertySwitcher {...propertyContext} />
+              </div>
+            )}
+          </div>
+
           <main
             data-app-main
-            className="flex min-h-0 flex-1 flex-col overflow-hidden bg-slate-50 dark:bg-slate-950"
+            className="flex min-h-0 flex-1 flex-col overflow-hidden bg-[rgb(var(--color-canvas))]"
           >
             <AppScrollReset />
             <GeneratedValue value={children} />

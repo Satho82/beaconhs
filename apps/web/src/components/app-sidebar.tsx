@@ -69,19 +69,26 @@ export function AppSidebar({
   return (
     <aside
       className={cn(
-        'hidden shrink-0 flex-col border-r border-slate-200 bg-white transition-[width] duration-200 ease-out lg:flex',
-        'dark:border-slate-800 dark:bg-slate-900',
+        'hidden shrink-0 flex-col border-r border-slate-800 bg-[rgb(var(--color-sidebar))] text-slate-100 motion-safe:transition-[width] motion-safe:duration-200 lg:flex',
+        'dark:border-slate-800',
         collapsed ? 'w-[4.25rem]' : 'w-60',
       )}
     >
       <div
         className={cn(
-          'flex h-14 items-center border-b border-slate-200 px-3 dark:border-slate-800',
+          'flex h-14 items-center border-b border-white/10 px-3 dark:border-slate-800',
           collapsed ? 'justify-center' : 'gap-2',
         )}
       >
         <GeneratedValue
-          value={collapsed ? null : <Logo className="h-7 w-auto" branding={platformBranding} />}
+          value={
+            collapsed ? null : (
+              <Logo
+                className="h-7 w-auto max-w-[10rem] overflow-hidden rounded bg-white px-1 dark:text-slate-900"
+                branding={platformBranding}
+              />
+            )
+          }
         />
         <button
           type="button"
@@ -89,7 +96,7 @@ export function AppSidebar({
           aria-label={tGeneratedValue(collapsed ? t('expandSidebar') : t('collapseSidebar'))}
           title={tGeneratedValue(collapsed ? t('expandSidebar') : t('collapseSidebar'))}
           className={cn(
-            'grid h-8 w-8 place-items-center rounded-md text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:text-slate-500 dark:hover:bg-slate-800 dark:hover:text-slate-200',
+            'grid h-8 w-8 place-items-center rounded-md text-slate-400 transition-colors hover:bg-white/10 hover:text-white dark:text-slate-500 dark:hover:bg-slate-800 dark:hover:text-slate-200',
             collapsed ? '' : 'ml-auto',
           )}
         >
@@ -101,7 +108,7 @@ export function AppSidebar({
 
       <SidebarNav groups={navGroups} collapsed={collapsed} />
 
-      <div className="border-t border-slate-200 p-3 dark:border-slate-800">
+      <div className="border-t border-white/10 p-3 dark:border-slate-800">
         <GeneratedValue
           value={
             collapsed ? (

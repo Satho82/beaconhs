@@ -58,6 +58,8 @@ on:
         required: false
       DEV_REDIS_URL:
         required: false
+      MAIN_REDIS_URL:
+        required: false
       DOKPLOY_COMPOSE_ID:
         required: false
       DOKPLOY_RESOLVE_IP:
@@ -187,6 +189,7 @@ jobs:
       MIGRATION_DATABASE_URL: ${{ inputs.feature_candidate_verified && secrets.DEV_MIGRATION_DATABASE_URL || secrets.MAIN_MIGRATION_DATABASE_URL }}
       DATABASE_URL: ${{ inputs.feature_candidate_verified && secrets.DEV_DATABASE_URL || secrets.MAIN_DATABASE_URL }}
       SUPERADMIN_DATABASE_URL: ${{ inputs.feature_candidate_verified && secrets.DEV_SUPERADMIN_DATABASE_URL || secrets.MAIN_SUPERADMIN_DATABASE_URL }}
+      REDIS_URL: ${{ inputs.feature_candidate_verified && secrets.DEV_REDIS_URL || secrets.MAIN_REDIS_URL }}
       EXPECTED_MIGRATION_HOST: ${{ inputs.feature_candidate_verified && 'uvanoo-dev-postgres' || 'beaconhs-postgres' }}
     steps:
       # The deploy runner shares storage with Dokploy. Keep stale build cache
@@ -548,6 +551,32 @@ jobs:
             console.log("Migration database URLs match the selected deployment topology");
           '
 
+      - name: Validate selected Redis URL
+        env:
+          FEATURE_CANDIDATE_VERIFIED: ${{ inputs.feature_candidate_verified }}
+          REDIS_URL: ${{ env.REDIS_URL }}
+        run: |
+          node -e '
+            let url;
+            try {
+              url = new URL(process.env.REDIS_URL);
+            } catch {
+              console.error("::error::Selected Redis credential is missing or invalid");
+              process.exit(1);
+            }
+            const candidate = process.env.FEATURE_CANDIDATE_VERIFIED === "true";
+            const expectedHost = candidate ? "uvanoo-dev-redis" : "beaconhs-redis";
+            if (url.protocol !== "redis:" || url.hostname !== expectedHost || (url.port && url.port !== "6379")) {
+              console.error("::error::Selected Redis credential does not match the deployment topology");
+              process.exit(1);
+            }
+            if (candidate && !url.password) {
+              console.error("::error::Selected candidate Redis credential requires authentication");
+              process.exit(1);
+            }
+            console.log("Selected Redis credential matches the deployment topology");
+          '
+
       - name: Preflight all migration database roles
         env:
           NODE_ENV: production
@@ -604,7 +633,7 @@ jobs:
       - name: Preflight candidate runtime topology
         if: inputs.feature_candidate_verified
         env:
-          REDIS_URL: ${{ secrets.DEV_REDIS_URL }}
+          REDIS_URL: ${{ env.REDIS_URL }}
         run: |
           set -euo pipefail
           if ! docker network inspect "$RUNTIME_DOCKER_NETWORK" | jq -e '
@@ -757,7 +786,7 @@ jobs:
           COMPOSE_ID: ${{ env.DOKPLOY_COMPOSE_ID }}
           DATABASE_URL: ${{ env.DATABASE_URL }}
           SUPERADMIN_DATABASE_URL: ${{ env.SUPERADMIN_DATABASE_URL }}
-          REDIS_URL: ${{ secrets.DEV_REDIS_URL }}
+          REDIS_URL: ${{ env.REDIS_URL }}
           APP_URL: ${{ secrets.DEV_APP_URL }}
           BETTER_AUTH_SECRET: ${{ secrets.DEV_BETTER_AUTH_SECRET }}
           ATTACHMENT_CAPABILITY_SECRET: ${{ secrets.DEV_ATTACHMENT_CAPABILITY_SECRET }}

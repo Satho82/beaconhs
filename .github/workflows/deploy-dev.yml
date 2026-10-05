@@ -645,13 +645,10 @@ jobs:
             exit 1
           fi
           docker run --rm --pull=never --network "$RUNTIME_DOCKER_NETWORK" \
-            -v "$GITHUB_WORKSPACE:/workspace:ro" \
-            -v "$MIGRATION_PNPM_TOOLCHAIN_ROOT:/pnpm-toolchain:ro" \
-            -w /workspace \
-            -e PATH=/pnpm-toolchain/node_modules/.bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
             -e REDIS_URL \
-            "$MIGRATION_NODE_IMAGE" \
-            pnpm --filter @beaconhs/jobs exec node -e '
+            --entrypoint node \
+            "$MIGRATION_NODE_IMAGE" -e '
+              const dns = require("node:dns").promises;
               const net = require("node:net");
               const networkCodes = new Set(["EAI_AGAIN", "ECONNREFUSED", "EHOSTUNREACH", "ENETUNREACH", "ENOTFOUND", "ETIMEDOUT"]);
               const safeCode = (error, fallback) => {
@@ -663,13 +660,6 @@ jobs:
                 process.exit(1);
               };
               (async () => {
-                let Redis;
-                try {
-                  Redis = require("ioredis");
-                } catch (error) {
-                  fail("RUNTIME_DEPENDENCY", error, "IOREDIS_UNAVAILABLE");
-                  return;
-                }
                 let url;
                 try {
                   url = new URL(process.env.REDIS_URL);
@@ -705,27 +695,58 @@ jobs:
                   fail("POSTGRES_DNS_OR_TCP", error, "CONNECTION_FAILED");
                   return;
                 }
-                const client = new Redis(process.env.REDIS_URL, {
-                  lazyConnect: true, connectTimeout: 5000, commandTimeout: 5000,
-                  retryStrategy: () => null, maxRetriesPerRequest: 0,
-                });
-                client.on("error", () => {});
                 try {
-                  await client.connect();
+                  await dns.lookup(url.hostname);
                 } catch (error) {
-                  fail(networkCodes.has(error && error.code) ? "REDIS_DNS_OR_TCP" : "REDIS_AUTH_OR_PING", error, "CONNECTION_FAILED");
+                  fail("REDIS_DNS_OR_TCP", error, "DNS_FAILED");
                   return;
                 }
+                let socket;
                 try {
-                  if (await client.ping() !== "PONG") {
+                  socket = net.createConnection({ host: url.hostname, port: Number(url.port || 6379) });
+                  socket.setTimeout(5000);
+                  await new Promise((resolve, reject) => {
+                    socket.once("connect", resolve);
+                    socket.once("error", reject);
+                    socket.once("timeout", () => reject(Object.assign(new Error("Redis connection timed out"), { code: "ETIMEDOUT" })));
+                  });
+                } catch (error) {
+                  fail("REDIS_DNS_OR_TCP", error, "CONNECTION_FAILED");
+                  return;
+                }
+                const encode = (parts) => `*${parts.length}\r\n${parts.map((part) => `$${Buffer.byteLength(part)}\r\n${part}\r\n`).join("")}`;
+                const command = (parts) => new Promise((resolve, reject) => {
+                  let response = "";
+                  const timeout = setTimeout(() => reject(Object.assign(new Error("Redis command timed out"), { code: "ETIMEDOUT" })), 5000);
+                  const onData = (chunk) => {
+                    response += chunk;
+                    if (response.includes("\r\n")) {
+                      clearTimeout(timeout);
+                      socket.off("data", onData);
+                      resolve(response);
+                    }
+                  };
+                  socket.on("data", onData);
+                  socket.once("error", reject);
+                  socket.write(encode(parts));
+                });
+                try {
+                  const password = decodeURIComponent(url.password);
+                  const auth = await command(url.username ? ["AUTH", decodeURIComponent(url.username), password] : ["AUTH", password]);
+                  if (!auth.startsWith("+OK")) {
+                    fail("REDIS_AUTH_OR_PING", null, "AUTH_FAILED");
+                    return;
+                  }
+                  const pong = await command(["PING"]);
+                  if (!pong.startsWith("+PONG")) {
                     fail("REDIS_AUTH_OR_PING", null, "PING_NOT_PONG");
                     return;
                   }
                   console.log("Candidate runtime PostgreSQL reachable; authenticated Redis PONG");
                 } catch (error) {
-                  fail(networkCodes.has(error && error.code) ? "REDIS_DNS_OR_TCP" : "REDIS_AUTH_OR_PING", error, "PING_FAILED");
+                  fail(networkCodes.has(error && error.code) ? "REDIS_DNS_OR_TCP" : "REDIS_AUTH_OR_PING", error, "CONNECTION_FAILED");
                 } finally {
-                  client.disconnect();
+                  socket.destroy();
                 }
               })().catch((error) => {
                 console.error(`::error::Candidate runtime preflight failed [RUNTIME_DEPENDENCY]: ${safeCode(error, "UNEXPECTED_FAILURE")}`);

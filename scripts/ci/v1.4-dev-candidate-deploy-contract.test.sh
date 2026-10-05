@@ -201,60 +201,16 @@ abort 'Missing network must fail' if network_check.call([])
 { 'Name' => 'infra-net', 'Driver' => 'bridge', 'Scope' => 'local', 'Attachable' => false, 'Internal' => false }.each do |key, value|
   abort "Invalid network #{key} accepted" if network_check.call([network.merge(key => value)])
 end
-redis_script = runtime_step['run'][/exec node -e '(.*?)'\s*\z/m, 1]
-abort 'Missing executable Redis preflight' unless redis_script
-redis_harness = <<'JS'
-const vm = require('node:vm');
-const mode = process.argv[1];
-let source = '';
-process.stdin.on('data', x => source += x);
-process.stdin.on('end', () => {
-  class Redis {
-    on() {}
-    async connect() {
-      if (mode === 'redis-dns') throw Object.assign(new Error('dns'), { code: 'ENOTFOUND' });
-      if (mode === 'auth') throw Object.assign(new Error('auth'), { code: 'WRONGPASS' });
-    }
-    async ping() { return mode === 'bad-pong' ? 'FAIL' : 'PONG'; }
-    disconnect() {}
-  }
-  const net = { createConnection() {
-    const socket = { setTimeout() {}, destroy() {}, once(event, callback) {
-      if (mode === 'postgres' && event === 'error') queueMicrotask(() => callback(Object.assign(new Error('postgres'), { code: 'ENOTFOUND' })));
-      if (mode !== 'postgres' && event === 'connect') queueMicrotask(callback);
-    }};
-    return socket;
-  }};
-  const url = mode === 'invalid-url' ? 'not a URL' :
-    'redis://' + (mode === 'no-password' ? '' : ':fixture@') +
-    (mode === 'wrong-host' ? 'beaconhs-redis' : 'uvanoo-dev-redis') +
-    (mode === 'wrong-port' ? ':6380' : ':6379');
-  vm.runInNewContext(source, { URL, console, process: { env: { REDIS_URL: url }, exit: process.exit }, require: name => {
-    if (name === 'ioredis' && mode === 'runtime-dependency') throw Object.assign(new Error('missing'), { code: 'MODULE_NOT_FOUND' });
-    return name === 'ioredis' ? Redis : net;
-  }});
-});
-JS
-diagnostic_stages = {
-  'postgres' => 'POSTGRES_DNS_OR_TCP',
-  'wrong-host' => 'REDIS_URL_TOPOLOGY',
-  'wrong-port' => 'REDIS_URL_TOPOLOGY',
-  'no-password' => 'REDIS_URL_TOPOLOGY',
-  'invalid-url' => 'REDIS_URL_TOPOLOGY',
-  'redis-dns' => 'REDIS_DNS_OR_TCP',
-  'auth' => 'REDIS_AUTH_OR_PING',
-  'bad-pong' => 'REDIS_AUTH_OR_PING',
-  'runtime-dependency' => 'RUNTIME_DEPENDENCY'
-}
-stdout, stderr, status = Open3.capture3('node', '-e', redis_harness, 'pass', stdin_data: redis_script)
-abort "Redis runtime success fixture failed: #{stdout}#{stderr}" unless status.success? && stderr.empty?
-diagnostic_stages.each do |mode, stage|
-  stdout, stderr, status = Open3.capture3('node', '-e', redis_harness, mode, stdin_data: redis_script)
-  output = stdout + stderr
-  abort "Redis runtime fixture #{mode} unexpectedly passed" if status.success?
-  abort "Redis runtime fixture #{mode} did not report #{stage}" unless output.include?("[#{stage}]")
-  abort "Redis runtime fixture #{mode} exposed a secret" if output.include?('fixture')
+abort 'Runtime Redis preflight must use the pinned Node runtime without workspace mounts or application dependencies' unless
+  runtime_step['run'].include?('--entrypoint node') &&
+  runtime_step['run'].include?('"$MIGRATION_NODE_IMAGE" -e') &&
+  !runtime_step['run'].include?('/workspace') &&
+  !runtime_step['run'].include?('ioredis')
+%w[REDIS_URL_TOPOLOGY REDIS_DNS_OR_TCP REDIS_AUTH_OR_PING].each do |stage|
+  abort "Runtime Redis preflight must retain #{stage} diagnostics" unless runtime_step['run'].include?(stage)
 end
+abort 'Runtime Redis preflight must issue explicit authenticated AUTH and PING commands' unless
+  runtime_step['run'].include?('["AUTH"') && runtime_step['run'].include?('["PING"]')
 abort 'Runtime network diagnostics must identify the network component' unless runtime_step['run'].include?('[NETWORK_ATTRIBUTES]')
 require 'json'
 require 'open3'

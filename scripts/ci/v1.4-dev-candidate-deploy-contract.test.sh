@@ -309,6 +309,24 @@ unless core_deploy.dig('env', 'DATABASE_URL') == '${{ inputs.feature_candidate_v
        core_deploy.dig('env', 'SUPERADMIN_DATABASE_URL') == '${{ inputs.feature_candidate_verified && secrets.DEV_SUPERADMIN_DATABASE_URL || secrets.MAIN_SUPERADMIN_DATABASE_URL }}'
   abort 'Reusable deployment must select complete candidate or normal-main runtime and maintenance bundles from the verification flag'
 end
+unless core_deploy.dig('env', 'REDIS_URL') == '${{ inputs.feature_candidate_verified && secrets.DEV_REDIS_URL || secrets.MAIN_REDIS_URL }}'
+  abort 'Reusable deployment must select the candidate or normal-main Redis credential from the verification flag'
+end
+%w[DEV_REDIS_URL MAIN_REDIS_URL].each do |secret|
+  abort "Reusable deployment must declare #{secret}" unless core.dig(true, 'workflow_call', 'secrets').key?(secret)
+end
+redis_url_step = core_deploy.fetch('steps').find { |step| step['name'] == 'Validate selected Redis URL' }
+abort 'Reusable deployment must validate the selected Redis credential before migrations' unless redis_url_step
+unless redis_url_step.dig('env', 'FEATURE_CANDIDATE_VERIFIED') == '${{ inputs.feature_candidate_verified }}' &&
+       redis_url_step.dig('env', 'REDIS_URL') == '${{ env.REDIS_URL }}' &&
+       redis_url_step['run'].include?('uvanoo-dev-redis') &&
+       redis_url_step['run'].include?('beaconhs-redis') &&
+       redis_url_step['run'].include?('candidate && !url.password')
+  abort 'Selected Redis validation must enforce context-specific topology and candidate authentication'
+end
+redis_url_step_index = core_deploy.fetch('steps').index(redis_url_step)
+migration_step_index = core_deploy.fetch('steps').index { |step| step['name'] == 'Run database migrations' }
+abort 'Selected Redis credential validation must precede migrations' unless redis_url_step_index && migration_step_index && redis_url_step_index < migration_step_index
 unless core_deploy.dig('env', 'EXPECTED_MIGRATION_HOST') == "${{ inputs.feature_candidate_verified && 'uvanoo-dev-postgres' || 'beaconhs-postgres' }}"
   abort 'Reusable deployment must select the matching candidate or normal-main migration host from the verification flag'
 end
@@ -397,8 +415,10 @@ end
 compose_step = core_deploy.fetch('steps').find { |step| step['name'] == 'Update the Dokploy compose environment' }
 unless compose_step.dig('env', 'DATABASE_URL') == '${{ env.DATABASE_URL }}' &&
        compose_step.dig('env', 'SUPERADMIN_DATABASE_URL') == '${{ env.SUPERADMIN_DATABASE_URL }}' &&
+       compose_step.dig('env', 'REDIS_URL') == '${{ env.REDIS_URL }}' &&
        compose_step['run'].include?('printf \'DATABASE_URL=%s\\n\' "$DATABASE_URL"') &&
-       compose_step['run'].include?('printf \'SUPERADMIN_DATABASE_URL=%s\\n\' "$SUPERADMIN_DATABASE_URL"')
+       compose_step['run'].include?('printf \'SUPERADMIN_DATABASE_URL=%s\\n\' "$SUPERADMIN_DATABASE_URL"') &&
+       compose_step['run'].include?('printf \'REDIS_URL=%s\\n\' "$REDIS_URL"')
   abort 'Compose updates must use the selected complete credential bundle without DEV fallback'
 end
 preflight_step_index = core_deploy.fetch('steps').index { |step| step['name'] == 'Preflight all migration database roles' }

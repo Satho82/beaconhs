@@ -111,7 +111,7 @@ services:
       R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY}
       R2_BUCKET: ${R2_BUCKET}
       R2_PRIVATE_BUCKET_CONFIRMED: ${R2_PRIVATE_BUCKET_CONFIRMED}
-    networks: [infra-net]
+    networks: [runtime-db-network]
     deploy:
       replicas: 1
       restart_policy:

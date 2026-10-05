@@ -60,6 +60,16 @@ on:
         required: false
       MAIN_REDIS_URL:
         required: false
+      DEV_R2_ENDPOINT:
+        required: false
+      DEV_R2_ACCESS_KEY_ID:
+        required: false
+      DEV_R2_SECRET_ACCESS_KEY:
+        required: false
+      DEV_R2_BUCKET:
+        required: false
+      DEV_R2_PRIVATE_BUCKET_CONFIRMED:
+        required: false
       DOKPLOY_COMPOSE_ID:
         required: false
       DOKPLOY_RESOLVE_IP:
@@ -521,6 +531,63 @@ jobs:
             fi
           done
 
+      - name: Select and validate storage credential bundle
+        env:
+          FEATURE_CANDIDATE_VERIFIED: ${{ inputs.feature_candidate_verified }}
+          DEV_R2_ENDPOINT: ${{ secrets.DEV_R2_ENDPOINT }}
+          DEV_R2_ACCESS_KEY_ID: ${{ secrets.DEV_R2_ACCESS_KEY_ID }}
+          DEV_R2_SECRET_ACCESS_KEY: ${{ secrets.DEV_R2_SECRET_ACCESS_KEY }}
+          DEV_R2_BUCKET: ${{ secrets.DEV_R2_BUCKET }}
+          DEV_R2_PRIVATE_BUCKET_CONFIRMED: ${{ secrets.DEV_R2_PRIVATE_BUCKET_CONFIRMED }}
+          MAIN_R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
+          MAIN_R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          MAIN_R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          MAIN_R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          MAIN_R2_PRIVATE_BUCKET_CONFIRMED: ${{ secrets.R2_PRIVATE_BUCKET_CONFIRMED }}
+        run: |
+          set -euo pipefail
+          case "$FEATURE_CANDIDATE_VERIFIED" in
+            true) storage_prefix=DEV_ ;;
+            false) storage_prefix=MAIN_ ;;
+            *) echo '::error::Unknown storage deployment context'; exit 1 ;;
+          esac
+          storage_names=(R2_ENDPOINT R2_ACCESS_KEY_ID R2_SECRET_ACCESS_KEY R2_BUCKET R2_PRIVATE_BUCKET_CONFIRMED)
+          for name in "${storage_names[@]}"; do
+            source_name="${storage_prefix}${name}"
+            value="${!source_name}"
+            if [[ "$value" == *$'\n'* || "$value" == *$'\r'* ]]; then
+              echo '::error::Selected storage value contains a newline'
+              exit 1
+            fi
+            if [ "$FEATURE_CANDIDATE_VERIFIED" = true ] && [ -z "$value" ]; then
+              echo '::error::Selected DEV storage bundle is incomplete'
+              exit 1
+            fi
+            export "$name=$value"
+          done
+          if [ "$FEATURE_CANDIDATE_VERIFIED" = true ]; then
+            node -e '
+              try {
+                const endpoint = new URL(process.env.R2_ENDPOINT);
+                if (endpoint.protocol !== "http:" || endpoint.hostname !== "uvanoo-dev-minio" ||
+                    endpoint.port !== "9000" || endpoint.username || endpoint.password ||
+                    endpoint.pathname !== "/" || endpoint.search || endpoint.hash ||
+                    process.env.R2_BUCKET !== "uvanoo-dev" ||
+                    process.env.R2_PRIVATE_BUCKET_CONFIRMED !== "true" ||
+                    !process.env.R2_ACCESS_KEY_ID.trim() || !process.env.R2_SECRET_ACCESS_KEY.trim()) {
+                  throw new Error("topology");
+                }
+              } catch {
+                console.error("::error::DEV storage bundle does not match isolated private storage");
+                process.exit(1);
+              }
+            '
+          fi
+          for name in "${storage_names[@]}"; do
+            printf '%s=%s\n' "$name" "${!name}" >> "$GITHUB_ENV"
+          done
+          echo 'Selected storage bundle validated'
+
       - name: Validate migration database URLs
         env:
           MIGRATION_DATABASE_URL: ${{ env.MIGRATION_DATABASE_URL }}
@@ -811,11 +878,11 @@ jobs:
           APP_URL: ${{ secrets.DEV_APP_URL }}
           BETTER_AUTH_SECRET: ${{ secrets.DEV_BETTER_AUTH_SECRET }}
           ATTACHMENT_CAPABILITY_SECRET: ${{ secrets.DEV_ATTACHMENT_CAPABILITY_SECRET }}
-          R2_ENDPOINT: ${{ secrets.R2_ENDPOINT }}
-          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-          R2_BUCKET: ${{ secrets.R2_BUCKET }}
-          R2_PRIVATE_BUCKET_CONFIRMED: ${{ secrets.R2_PRIVATE_BUCKET_CONFIRMED }}
+          R2_ENDPOINT: ${{ env.R2_ENDPOINT }}
+          R2_ACCESS_KEY_ID: ${{ env.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ env.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET: ${{ env.R2_BUCKET }}
+          R2_PRIVATE_BUCKET_CONFIRMED: ${{ env.R2_PRIVATE_BUCKET_CONFIRMED }}
           VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
           VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
           VAPID_SUBJECT: ${{ secrets.VAPID_SUBJECT }}

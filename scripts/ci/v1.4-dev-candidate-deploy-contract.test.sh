@@ -170,7 +170,7 @@ compose_config = YAML.safe_load(compose_source, aliases: true)
     !compose_config.dig('services', role, 'networks').include?('infra-net')
 end
 abort 'Runtime network must require an explicit context selection' unless compose_config.dig('networks', 'runtime-db-network', 'name') == '${RUNTIME_DB_NETWORK:?Set RUNTIME_DB_NETWORK}'
-abort 'Storage init does not require database access' unless compose_config.dig('services', 'storage-init', 'networks') == ['infra-net']
+abort 'Storage init must share the selected isolated runtime storage path' unless compose_config.dig('services', 'storage-init', 'networks') == ['runtime-db-network']
 compose_assignment = core_deploy['steps'].map { |step| step['run'].to_s }.join("\n").lines.find { |line| line.strip.start_with?('COMPOSE_FILE=') }
 abort 'Compose must be loaded from verified governance checkout' unless compose_assignment&.include?('.deployment-governance/deploy/dokploy-dev.compose.yaml')
 # A deliberately incompatible application-checkout fixture proves source selection
@@ -356,6 +356,77 @@ end
 bundle_step_index = core_deploy.fetch('steps').index { |step| step['name'] == 'Require complete selected database credential bundle' }
 url_step_index = core_deploy.fetch('steps').index { |step| step['name'] == 'Validate migration database URLs' }
 abort 'Selected credential-bundle guard must run before URL validation' unless bundle_step_index && url_step_index && bundle_step_index < url_step_index
+storage_step = core_deploy.fetch('steps').find { |step| step['name'] == 'Select and validate storage credential bundle' }
+abort 'Reusable deployment must explicitly select a storage credential bundle' unless storage_step
+storage_names = %w[R2_ENDPOINT R2_ACCESS_KEY_ID R2_SECRET_ACCESS_KEY R2_BUCKET R2_PRIVATE_BUCKET_CONFIRMED]
+storage_names.each do |name|
+  abort "Reusable deployment must declare DEV_#{name}" unless core.dig(true, 'workflow_call', 'secrets').key?("DEV_#{name}")
+  abort "Candidate storage selector must receive DEV_#{name}" unless storage_step.dig('env', "DEV_#{name}") == "${{ secrets.DEV_#{name} }}"
+  abort "Normal-main storage selector must receive R2_#{name.delete_prefix('R2_')}" unless storage_step.dig('env', "MAIN_#{name}") == "${{ secrets.#{name} }}"
+end
+unless storage_step.dig('env', 'FEATURE_CANDIDATE_VERIFIED') == '${{ inputs.feature_candidate_verified }}' &&
+       storage_step['run'].include?('true) storage_prefix=DEV_') &&
+       storage_step['run'].include?('false) storage_prefix=MAIN_') &&
+       storage_step['run'].include?('source_name="${storage_prefix}${name}"') &&
+       storage_step['run'].include?('value="${!source_name}"') &&
+       storage_step['run'].include?('uvanoo-dev-minio') &&
+       storage_step['run'].include?('endpoint.port !== "9000"') &&
+       storage_step['run'].include?('process.env.R2_BUCKET !== "uvanoo-dev"') &&
+       storage_step['run'].include?('process.env.R2_PRIVATE_BUCKET_CONFIRMED !== "true"')
+  abort 'Storage selector must fail closed on context and isolated candidate topology'
+end
+storage_step_index = core_deploy.fetch('steps').index(storage_step)
+abort 'Selected storage bundle must be validated before migrations' unless storage_step_index && migration_step_index && storage_step_index < migration_step_index
+
+run_storage_selector = lambda do |overrides|
+  Dir.mktmpdir('uvanoo-storage-selector-') do |dir|
+    github_env = File.join(dir, 'github-env')
+    base = {
+      'FEATURE_CANDIDATE_VERIFIED' => 'true',
+      'GITHUB_ENV' => github_env,
+      'DEV_R2_ENDPOINT' => 'http://uvanoo-dev-minio:9000',
+      'DEV_R2_ACCESS_KEY_ID' => 'fixture-dev-access',
+      'DEV_R2_SECRET_ACCESS_KEY' => 'fixture-dev-secret',
+      'DEV_R2_BUCKET' => 'uvanoo-dev',
+      'DEV_R2_PRIVATE_BUCKET_CONFIRMED' => 'true',
+      'MAIN_R2_ENDPOINT' => 'https://objects.example.test',
+      'MAIN_R2_ACCESS_KEY_ID' => 'fixture-main-access',
+      'MAIN_R2_SECRET_ACCESS_KEY' => 'fixture-main-secret',
+      'MAIN_R2_BUCKET' => 'main-bucket',
+      'MAIN_R2_PRIVATE_BUCKET_CONFIRMED' => 'true'
+    }
+    stdout, stderr, status = Open3.capture3(base.merge(overrides), 'bash', '-c', storage_step.fetch('run'))
+    [status.success?, File.exist?(github_env) ? File.read(github_env) : '', stdout + stderr]
+  end
+end
+candidate_ok, candidate_env, = run_storage_selector.call({})
+abort 'Canonical isolated DEV storage bundle must pass selection' unless candidate_ok &&
+  candidate_env.include?("R2_ENDPOINT=http://uvanoo-dev-minio:9000\n") &&
+  candidate_env.include?("R2_BUCKET=uvanoo-dev\n") &&
+  !candidate_env.include?('fixture-main')
+main_ok, main_env, = run_storage_selector.call('FEATURE_CANDIDATE_VERIFIED' => 'false')
+abort 'Normal-main storage selection must remain separate from DEV' unless main_ok &&
+  main_env.include?("R2_ENDPOINT=https://objects.example.test\n") &&
+  main_env.include?("R2_BUCKET=main-bucket\n") &&
+  !main_env.include?('fixture-dev')
+storage_names.each do |name|
+  ok, written, output = run_storage_selector.call("DEV_#{name}" => '')
+  abort "Incomplete DEV storage bundle accepted without #{name}" if ok || !written.empty?
+  abort 'Storage selector exposed a fixture secret on failure' if output.include?('fixture-dev-secret')
+end
+[
+  { 'DEV_R2_ENDPOINT' => 'https://uvanoo-dev-minio:9000' },
+  { 'DEV_R2_ENDPOINT' => 'http://portal.uvanoo.com:9000' },
+  { 'DEV_R2_ENDPOINT' => 'http://uvanoo-dev-minio:9001' },
+  { 'DEV_R2_ENDPOINT' => 'http://user:password@uvanoo-dev-minio:9000' },
+  { 'DEV_R2_ENDPOINT' => 'http://uvanoo-dev-minio:9000/path' },
+  { 'DEV_R2_BUCKET' => 'production' },
+  { 'DEV_R2_PRIVATE_BUCKET_CONFIRMED' => 'false' },
+  { 'DEV_R2_ACCESS_KEY_ID' => "fixture\nvalue" }
+].each_with_index do |invalid, index|
+  ok, = run_storage_selector.call(invalid)
+  abort "Invalid candidate storage fixture #{index} was accepted" if ok
+end
 migration_env = migration_step.fetch('env')
 unless migration_env['MIGRATION_DATABASE_URL'] == '${{ env.MIGRATION_DATABASE_URL }}' &&
        migration_env['DATABASE_URL'] == '${{ env.DATABASE_URL }}' &&
@@ -372,6 +443,7 @@ compose_step = core_deploy.fetch('steps').find { |step| step['name'] == 'Update 
 unless compose_step.dig('env', 'DATABASE_URL') == '${{ env.DATABASE_URL }}' &&
        compose_step.dig('env', 'SUPERADMIN_DATABASE_URL') == '${{ env.SUPERADMIN_DATABASE_URL }}' &&
        compose_step.dig('env', 'REDIS_URL') == '${{ env.REDIS_URL }}' &&
+       storage_names.all? { |name| compose_step.dig('env', name) == "${{ env.#{name} }}" } &&
        compose_step['run'].include?('printf \'DATABASE_URL=%s\\n\' "$DATABASE_URL"') &&
        compose_step['run'].include?('printf \'SUPERADMIN_DATABASE_URL=%s\\n\' "$SUPERADMIN_DATABASE_URL"') &&
        compose_step['run'].include?('printf \'REDIS_URL=%s\\n\' "$REDIS_URL"')

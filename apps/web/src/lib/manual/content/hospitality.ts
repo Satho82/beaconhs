@@ -38,7 +38,7 @@ Archived properties disappear from active property lists. Existing records are r
     body: `
 # Guest room QR and maintenance
 
-Your organisation must have the hospitality maintenance module enabled.
+Your organisation must have the hospitality maintenance module enabled. When it is disabled, Maintenance queue is hidden from the menu and direct access is denied. Enabling it does not change your permissions or assigned hotel access.
 
 ## Create a room QR code
 

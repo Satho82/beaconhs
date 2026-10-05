@@ -5,6 +5,7 @@ import type { ModuleKey } from '../module-entitlements/catalogue'
 // remain the authority for every request and mutation.
 const NAV_MODULE_ENTITLEMENTS: Partial<Record<string, ModuleKey>> = {
   hospitality: 'hospitality.properties',
+  'hospitality-maintenance': 'hospitality.maintenance',
 }
 
 export function isNavModuleEntitled(

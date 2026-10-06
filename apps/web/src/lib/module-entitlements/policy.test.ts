@@ -26,3 +26,14 @@ describe('module entitlement policy', () => {
     )
   })
 })
+
+it.each([
+  'hospitality.properties',
+  'hospitality.maintenance',
+  'hospitality.compliance',
+  'hospitality.diary',
+  'hospitality.manager-signoff',
+] as const)('requires an independent explicit entitlement for %s', (key) => {
+  expect(() => assertModuleEntitled([], key)).toThrow(ModuleNotEntitledError)
+  expect(() => assertModuleEntitled([key], key)).not.toThrow()
+})

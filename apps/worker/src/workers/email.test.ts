@@ -3,6 +3,7 @@ import type { Job } from 'bullmq'
 import type { EmailJobData } from '@beaconhs/jobs'
 
 const mocks = vi.hoisted(() => ({
+  entitled: vi.fn(),
   inserted: [] as Record<string, unknown>[],
   categoryEnabled: vi.fn(),
   resolveDelivery: vi.fn(),
@@ -13,7 +14,11 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('drizzle-orm', () => ({ and: vi.fn(), eq: vi.fn() }))
 vi.mock('@beaconhs/emails', () => ({ sendVia: mocks.sendVia }))
-vi.mock('@beaconhs/db', () => ({ db: {}, withSuperAdmin: mocks.withSuperAdmin }))
+vi.mock('@beaconhs/db', () => ({
+  isTenantModuleEntitled: mocks.entitled,
+  db: {},
+  withSuperAdmin: mocks.withSuperAdmin,
+}))
 vi.mock('@beaconhs/events', () => ({
   isNotificationCategoryEnabled: mocks.categoryEnabled,
 }))
@@ -68,6 +73,7 @@ function job(): Job<EmailJobData> {
 
 beforeEach(() => {
   vi.clearAllMocks()
+  mocks.entitled.mockResolvedValue(true)
   mocks.inserted.length = 0
   mocks.updated.length = 0
   mocks.withSuperAdmin.mockImplementation(async (_db, callback) => callback(tx))
@@ -162,3 +168,20 @@ describe('email worker provider policy', () => {
     })
   })
 })
+
+it.each(['compliance', 'digest'])(
+  'suppresses queued %s content after module revocation before contacting the provider',
+  async (category) => {
+    mocks.entitled.mockResolvedValue(false)
+    const queued = job()
+    queued.data.meta = {
+      tenantId: 'tenant-1',
+      category,
+      requiresComplianceEntitlement: category === 'digest',
+    }
+    const { processEmail } = await import('./email')
+    await expect(processEmail(queued)).resolves.toBeUndefined()
+    expect(mocks.sendVia).not.toHaveBeenCalled()
+    expect(mocks.resolveDelivery).not.toHaveBeenCalled()
+  },
+)

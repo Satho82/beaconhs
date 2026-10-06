@@ -3,6 +3,7 @@ import type { Job } from 'bullmq'
 import type { NotifyJobData } from '@beaconhs/jobs'
 
 const mocks = vi.hoisted(() => ({
+  entitled: vi.fn(),
   enqueueEmail: vi.fn(),
   enqueuePush: vi.fn(),
   insert: vi.fn(),
@@ -17,6 +18,7 @@ vi.mock('drizzle-orm', () => ({
   isNull: vi.fn(),
 }))
 vi.mock('@beaconhs/db', () => ({
+  isTenantModuleEntitled: mocks.entitled,
   db: {},
   withTenant: async (
     _db: unknown,
@@ -54,6 +56,7 @@ vi.mock('../lib/escape-html', () => ({ escapeHtml: (value: string) => value }))
 
 beforeEach(() => {
   vi.clearAllMocks()
+  mocks.entitled.mockResolvedValue(true)
   mocks.select.mockReturnValue({
     from: () => ({
       where: () => ({
@@ -86,4 +89,24 @@ describe('notification worker tenant category kill switch', () => {
     expect(mocks.enqueuePush).not.toHaveBeenCalled()
     expect(mocks.sendSmsVia).not.toHaveBeenCalled()
   })
+})
+
+it('drops Compliance notifications after module revocation before category or recipient queries', async () => {
+  mocks.entitled.mockResolvedValue(false)
+  const { processNotification } = await import('./notify')
+  await processNotification({
+    id: 'compliance-revoked',
+    data: {
+      tenantId: 'tenant-1',
+      userIds: ['user-1'],
+      category: 'compliance',
+      type: 'compliance.overdue',
+      title: 'Due',
+    },
+  } as unknown as Job<NotifyJobData>)
+  expect(mocks.select).not.toHaveBeenCalled()
+  expect(mocks.insert).not.toHaveBeenCalled()
+  expect(mocks.enqueueEmail).not.toHaveBeenCalled()
+  expect(mocks.enqueuePush).not.toHaveBeenCalled()
+  expect(mocks.sendSmsVia).not.toHaveBeenCalled()
 })

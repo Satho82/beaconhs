@@ -1,3 +1,4 @@
+import { assertTenantModuleEntitled } from '@/lib/module-entitlements/server'
 import { GeneratedText, GeneratedValue } from '@/i18n/generated'
 import { getGeneratedTranslations } from '@/i18n/generated.server'
 import {
@@ -34,6 +35,7 @@ const BUCKETS: { key: AgingBucket; label: string; tone: 'warning' | 'danger' }[]
 export default async function AgingPage() {
   const tGenerated = await getGeneratedTranslations()
   const ctx = await requireRequestContext()
+  await assertTenantModuleEntitled(ctx, 'hospitality.compliance')
   assertCan(ctx, 'compliance.read')
   const rows = await agingFromStatus(ctx)
 

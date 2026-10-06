@@ -1,3 +1,4 @@
+import { isTenantModuleEntitled } from '@beaconhs/db'
 import { and, eq, gte, inArray, isNull, lte, or, sql, type SQL } from 'drizzle-orm'
 import type { Database } from '@beaconhs/db'
 import {
@@ -60,6 +61,8 @@ export async function materializeIdentityAudienceObligations(
   tenantId: string,
   rawPersonIds: readonly string[],
 ): Promise<IdentityAudienceMaterialization> {
+  if (!(await isTenantModuleEntitled(tx, tenantId, 'hospitality.compliance')))
+    return { personIds: [], obligationIds: [] }
   const personIds = [...new Set(rawPersonIds.map((id) => id.trim()).filter(Boolean))].sort((a, b) =>
     a.localeCompare(b),
   )

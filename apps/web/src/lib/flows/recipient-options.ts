@@ -1,3 +1,4 @@
+import { isTenantModuleEntitled } from '@beaconhs/db'
 import 'server-only'
 
 // Active people / roles / departments for the send_email recipient pickers in
@@ -28,6 +29,11 @@ type RecipientOptionsData = {
 
 export async function loadRecipientOptions(ctx: RequestContext): Promise<RecipientOptionsData> {
   return ctx.db(async (tx) => {
+    const complianceEnabled = await isTenantModuleEntitled(
+      tx,
+      ctx.tenantId,
+      'hospitality.compliance',
+    )
     const ppl = await tx
       .select({ id: people.id, first: people.firstName, last: people.lastName })
       .from(people)
@@ -56,13 +62,18 @@ export async function loadRecipientOptions(ctx: RequestContext): Promise<Recipie
         .from(customerContacts)
         .innerJoin(orgUnits, eq(orgUnits.id, customerContacts.orgUnitId))
         .orderBy(asc(orgUnits.name), asc(customerContacts.name)),
-      tx
-        .select({ id: complianceObligations.id, name: complianceObligations.title })
-        .from(complianceObligations)
-        .where(
-          and(eq(complianceObligations.status, 'active'), isNull(complianceObligations.deletedAt)),
-        )
-        .orderBy(asc(complianceObligations.title)),
+      complianceEnabled
+        ? tx
+            .select({ id: complianceObligations.id, name: complianceObligations.title })
+            .from(complianceObligations)
+            .where(
+              and(
+                eq(complianceObligations.status, 'active'),
+                isNull(complianceObligations.deletedAt),
+              ),
+            )
+            .orderBy(asc(complianceObligations.title))
+        : Promise.resolve([]),
       tx
         .select({ id: attachments.id, name: attachments.filename })
         .from(attachments)

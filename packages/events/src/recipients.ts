@@ -6,6 +6,8 @@
 //
 // Server-only (queries the db) — never import from a client component.
 
+import { isTenantModuleEntitled } from '@beaconhs/db'
+
 import { and, eq, inArray, isNull } from 'drizzle-orm'
 import type { Database } from '@beaconhs/db'
 import {
@@ -35,6 +37,11 @@ export async function isNotificationCategoryEnabled(
   tenantId: string,
   category: string,
 ): Promise<boolean> {
+  if (
+    category === 'compliance' &&
+    !(await isTenantModuleEntitled(tx, tenantId, 'hospitality.compliance'))
+  )
+    return false
   const [settings] = await tx
     .select({ enabled: tenantNotificationSettings.enabled })
     .from(tenantNotificationSettings)
@@ -59,6 +66,11 @@ export async function resolveNotificationAudienceUserIds(
   category: string,
   extraUserIds: string[] = [],
 ): Promise<string[]> {
+  if (
+    category === 'compliance' &&
+    !(await isTenantModuleEntitled(tx, tenantId, 'hospitality.compliance'))
+  )
+    return []
   const [settings] = await tx
     .select()
     .from(tenantNotificationSettings)

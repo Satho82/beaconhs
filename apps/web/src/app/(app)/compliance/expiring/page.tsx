@@ -1,3 +1,4 @@
+import { assertTenantModuleEntitled } from '@/lib/module-entitlements/server'
 import { GeneratedText, GeneratedValue } from '@/i18n/generated'
 import { getGeneratedTranslations } from '@/i18n/generated.server'
 import Link from 'next/link'
@@ -83,6 +84,7 @@ export default async function ExpiringPage({
   const tGenerated = await getGeneratedTranslations()
   const sp = await searchParams
   const ctx = await requireRequestContext()
+  await assertTenantModuleEntitled(ctx, 'hospitality.compliance')
   assertCan(ctx, 'compliance.read')
   const moduleParam = pickString(sp.module)
   const moduleFilter = MODULE_OPTIONS.find((option) => option.value === moduleParam)?.value

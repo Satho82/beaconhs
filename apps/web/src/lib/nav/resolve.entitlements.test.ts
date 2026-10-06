@@ -2,6 +2,21 @@ import { describe, expect, it } from 'vitest'
 import { isNavModuleEntitled } from './entitlements'
 
 describe('module entitlement navigation filter', () => {
+  it('hides Compliance independently of every other module', () => {
+    expect(
+      isNavModuleEntitled(
+        'compliance',
+        new Set([
+          'hospitality.properties',
+          'hospitality.maintenance',
+          'hospitality.diary',
+          'hospitality.manager-signoff',
+        ]),
+      ),
+    ).toBe(false)
+    expect(isNavModuleEntitled('compliance', new Set(['hospitality.compliance']))).toBe(true)
+  })
+
   it('hides Maintenance when its entitlement is absent, including when Properties is enabled', () => {
     expect(isNavModuleEntitled('hospitality-maintenance', new Set())).toBe(false)
     expect(

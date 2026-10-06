@@ -15,6 +15,7 @@ export type PushJobData = {
   title: string
   body?: string
   linkPath?: string
+  requiresComplianceEntitlement?: boolean
 }
 
 let pushQueue: Queue<PushJobData> | undefined
@@ -26,6 +27,12 @@ export function assertPushJobData(data: PushJobData): void {
   assertString(data.title, 'Push title', { min: 1, max: 500 })
   assertOptionalString(data.body, 'Push body', 20_000)
   assertRelativeAppPath(data.linkPath, 'Push linkPath')
+  if (
+    data.requiresComplianceEntitlement !== undefined &&
+    typeof data.requiresComplianceEntitlement !== 'boolean'
+  ) {
+    throw new Error('Push requiresComplianceEntitlement must be a boolean.')
+  }
 }
 
 function getPushQueue(): Queue<PushJobData> {

@@ -1,5 +1,6 @@
 'use server'
 
+import { isTenantModuleEntitled } from '@beaconhs/db'
 import { revalidatePath } from 'next/cache'
 import {
   and,
@@ -273,7 +274,7 @@ async function collectTodos(ctx: Ctx): Promise<TodoItem[]> {
     const todos: TodoItem[] = []
     const { personId, membershipId } = await resolveTodoIdentity(tx, ctx)
 
-    if (personId) {
+    if (personId && (await isTenantModuleEntitled(tx, ctx.tenantId, 'hospitality.compliance'))) {
       const rows = await tx
         .select({
           subjectKey: complianceStatus.subjectKey,
@@ -352,7 +353,7 @@ async function countTodos(ctx: Ctx): Promise<number> {
   return ctx.db(async (tx) => {
     const { personId, membershipId } = await resolveTodoIdentity(tx, ctx)
     let total = 0
-    if (personId) {
+    if (personId && (await isTenantModuleEntitled(tx, ctx.tenantId, 'hospitality.compliance'))) {
       const [row] = await tx
         .select({ c: count() })
         .from(complianceStatus)

@@ -1,6 +1,10 @@
 import { describe, expect, it, vi } from 'vitest'
 import type { Database } from '@beaconhs/db'
-import { complianceDispatches, complianceObligations } from '@beaconhs/db/schema'
+import {
+  complianceDispatches,
+  complianceObligations,
+  tenantModuleEntitlements,
+} from '@beaconhs/db/schema'
 import {
   confirmDispatchStillPublishable,
   publishClaimedComplianceDispatch,
@@ -32,12 +36,18 @@ function fakeDatabase(
     deletedAt: Date | null
   } | null,
   ownsLease = true,
+  entitled = true,
 ) {
   const events: string[] = []
   const updates: Array<{ table: unknown; values: Record<string, unknown> }> = []
   const tx = {
     select: vi.fn(() => ({
       from: (table: unknown) => {
+        if (table === tenantModuleEntitlements)
+          return query(
+            entitled ? [{ tenantId: TENANT_ID, moduleKey: 'hospitality.compliance' }] : [],
+            () => {},
+          )
         if (table !== complianceObligations) throw new Error('Unexpected selected table')
         return query(obligation ? [obligation] : [], (mode) => events.push(`lock:${mode}`))
       },
@@ -158,4 +168,24 @@ describe('compliance dispatch lifecycle', () => {
       fake.tx,
     )
   })
+})
+
+it('does not publish or mutate a queued Compliance dispatch after entitlement revocation', async () => {
+  const fake = fakeDatabase({ id: OBLIGATION_ID, status: 'active', deletedAt: null }, true, false)
+  const emit = vi.fn()
+  const outcome = await publishClaimedComplianceDispatch(
+    fake.tx,
+    {
+      id: DISPATCH_ID,
+      tenantId: TENANT_ID,
+      obligationId: OBLIGATION_ID,
+      publishLeaseId: LEASE_ID,
+      alertPayload: null,
+    },
+    emit,
+  )
+  expect(outcome).toBe('skipped')
+  expect(emit).not.toHaveBeenCalled()
+  expect(fake.events).toEqual([])
+  expect(fake.updates).toEqual([])
 })

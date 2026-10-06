@@ -237,14 +237,12 @@ export const NAV_MODULES: NavModule[] = [
     group: 'Assets & people',
   },
 
-  // Compliance — the unified obligations hub (viewing + management). Visible to
-  // EVERYONE: a person without `compliance.read` still has their own obligations,
-  // so `/compliance` lands them on "Mine" (the overview redirects there) while
-  // holders of `compliance.read` get the org-wide hub. Org tabs + write actions
-  // stay gated on the pages themselves.
+  // The organisation-wide hub requires Compliance read access. Entitlement
+  // filtering happens before this RBAC gate; My Work retains the self-only view.
   {
     key: 'compliance',
     href: '/compliance',
+    requiredPermission: 'compliance.read',
     label: 'Compliance',
     iconKey: 'check',
     group: 'Assurance',

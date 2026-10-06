@@ -10,6 +10,7 @@
 // no transition). Tenants without a policy row use the documented daily
 // 06:00-UTC default.
 
+import { isTenantModuleEntitled, tenantModuleEntitlementExists } from '@beaconhs/db'
 import { and, asc, eq, exists, inArray, isNull, notExists, sql } from 'drizzle-orm'
 import { db, withSuperAdmin, withTenant, type Database } from '@beaconhs/db'
 import {
@@ -102,6 +103,7 @@ async function claimQueuedComplianceDispatches(tx: Database, now: Date) {
           now,
         ),
         exists(liveObligationForDispatch(tx)),
+        tenantModuleEntitlementExists(complianceDispatches.tenantId, 'hospitality.compliance'),
       ),
     )
     .orderBy(
@@ -213,6 +215,8 @@ export async function publishClaimedComplianceDispatch(
   dispatch: ClaimedComplianceDispatch,
   emit: typeof emitComplianceTransitions = emitComplianceTransitions,
 ): Promise<CompliancePublicationOutcome> {
+  if (!(await isTenantModuleEntitled(tx, dispatch.tenantId, 'hospitality.compliance')))
+    return 'skipped'
   const owned = await confirmDispatchStillPublishable(
     tx,
     dispatch.id,

@@ -1,3 +1,4 @@
+import { assertTenantModuleEntitled } from '@/lib/module-entitlements/server'
 import { getGeneratedValueTranslations, getGeneratedTranslations } from '@/i18n/generated.server'
 
 import { GeneratedText, GeneratedValue } from '@/i18n/generated'
@@ -59,6 +60,7 @@ export default async function ObligationDetailPage({
 
   const sp = await searchParams
   const ctx = await requireRequestContext()
+  await assertTenantModuleEntitled(ctx, 'hospitality.compliance')
   assertCan(ctx, 'compliance.read')
   const data = await obligationCompliance(ctx, id)
   if (!data) notFound()

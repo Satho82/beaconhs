@@ -1,3 +1,4 @@
+import { loadEnabledModuleKeys } from '@/lib/module-entitlements/server'
 import { getGeneratedTranslations } from '@/i18n/generated.server'
 import { requireRequestContext } from '@/lib/auth'
 import { getTranslations } from 'next-intl/server'
@@ -49,7 +50,15 @@ export default async function DashboardPage() {
   // guarantee: a saved/edited/migrated layout can never surface another user's
   // data. Personal widgets always pass; placed Insights cards need analytics
   // access. Everything below renders from `widgets` / `visibleLayout`.
-  const widgets = layout.widgets.filter((w) => canSeeWidget(ctx, w.id))
+  const complianceEnabled = (await loadEnabledModuleKeys(ctx)).has('hospitality.compliance')
+  const complianceWidgets = new Set([
+    'kpi-training-compliance',
+    'kpi-document-compliance',
+    'personal-my-compliance',
+  ])
+  const widgets = layout.widgets.filter(
+    (w) => canSeeWidget(ctx, w.id) && (complianceEnabled || !complianceWidgets.has(w.id)),
+  )
   const visibleLayout = { ...layout, widgets }
 
   // Every placed widget is EITHER a bespoke widget key, a headline analytics key

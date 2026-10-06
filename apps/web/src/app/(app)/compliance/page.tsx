@@ -1,7 +1,7 @@
+import { assertTenantModuleEntitled } from '@/lib/module-entitlements/server'
 import { GeneratedText, GeneratedValue } from '@/i18n/generated'
 import { getGeneratedTranslations } from '@/i18n/generated.server'
 import Link from 'next/link'
-import { redirect } from 'next/navigation'
 import {
   Badge,
   Button,
@@ -13,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from '@beaconhs/ui'
-import { can } from '@beaconhs/tenant'
+import { assertCan, can } from '@beaconhs/tenant'
 import { requireRequestContext } from '@/lib/auth'
 import { parseListParams, pickString } from '@/lib/list-params'
 import { ListPageLayout } from '@/components/page-layout'
@@ -42,9 +42,9 @@ export default async function ComplianceOverviewPage({
   const tGenerated = await getGeneratedTranslations()
   const sp = await searchParams
   const ctx = await requireRequestContext()
-  // Everyone reaches /compliance from the sidebar; those without the org-wide
-  // read permission see only their own obligations.
-  if (!can(ctx, 'compliance.read')) redirect('/compliance/mine')
+  await assertTenantModuleEntitled(ctx, 'hospitality.compliance')
+  // The overview is organisation-wide; self-only access remains at /compliance/mine.
+  assertCan(ctx, 'compliance.read')
   const canAssign = can(ctx, 'compliance.assign')
   const params = parseListParams(sp, { sort: 'overdue', allowedSorts: ['overdue'] as const })
   const rawKind = pickString(sp.kind)

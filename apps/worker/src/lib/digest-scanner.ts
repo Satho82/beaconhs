@@ -4,6 +4,7 @@
 // of one email per alert. The notify worker holds non-critical emails back when
 // digest mode is on, so this is where they actually go out.
 
+import { isTenantModuleEntitled } from '@beaconhs/db'
 import { and, asc, count, eq, gt, inArray, isNull, lte, sql } from 'drizzle-orm'
 import { createHash } from 'node:crypto'
 import { db, withSuperAdmin, withTenant } from '@beaconhs/db'
@@ -44,6 +45,7 @@ export async function scanDigests(scheduledFor: Date = new Date()): Promise<Dige
       if (pol.digestMode === 'weekly' && !isMonday) return
       result.tenants += 1
 
+      const complianceEnabled = await isTenantModuleEntitled(tx, t.id, 'hospitality.compliance')
       const sinceHours = pol.digestMode === 'weekly' ? 168 : 24
       const windowEnd = now
       const windowStart = new Date(windowEnd.getTime() - sinceHours * 60 * 60 * 1_000)
@@ -69,6 +71,7 @@ export async function scanDigests(scheduledFor: Date = new Date()): Promise<Dige
             and(
               eq(notifications.tenantId, t.id),
               isNull(notifications.readAt),
+              complianceEnabled ? undefined : sql`${notifications.category} <> 'compliance'`,
               sql`${notifications.occurredAt} >= ${windowStart}`,
               lte(notifications.occurredAt, windowEnd),
               afterUserId ? gt(notifications.userId, afterUserId) : undefined,
@@ -84,6 +87,7 @@ export async function scanDigests(scheduledFor: Date = new Date()): Promise<Dige
           .select({
             userId: notifications.userId,
             title: notifications.title,
+            category: notifications.category,
             linkPath: notifications.linkPath,
             rank: sql<number>`row_number() over (
               partition by ${notifications.userId}
@@ -96,6 +100,7 @@ export async function scanDigests(scheduledFor: Date = new Date()): Promise<Dige
               eq(notifications.tenantId, t.id),
               inArray(notifications.userId, recipientIds),
               isNull(notifications.readAt),
+              complianceEnabled ? undefined : sql`${notifications.category} <> 'compliance'`,
               sql`${notifications.occurredAt} >= ${windowStart}`,
               lte(notifications.occurredAt, windowEnd),
             ),
@@ -105,6 +110,7 @@ export async function scanDigests(scheduledFor: Date = new Date()): Promise<Dige
           .select({
             userId: ranked.userId,
             title: ranked.title,
+            category: ranked.category,
             linkPath: ranked.linkPath,
           })
           .from(ranked)
@@ -140,7 +146,11 @@ export async function scanDigests(scheduledFor: Date = new Date()): Promise<Dige
               subject,
               html: `<p>${total} unread notification${total === 1 ? '' : 's'}:</p>${moreHtml}<ul>${list}</ul>`,
               text: `${items.map((i) => `• ${i.title}`).join('\n')}${moreText}`,
-              meta: { tenantId: t.id, category: 'digest' },
+              meta: {
+                tenantId: t.id,
+                category: 'digest',
+                requiresComplianceEntitlement: items.some((item) => item.category === 'compliance'),
+              },
             },
             { jobId },
           )

@@ -451,3 +451,22 @@ export function addTrustedSystemAppResponsesEntity(
       }
     : { ...entityMap }
 }
+
+/** Remove disabled Compliance storage and every incoming join to it. */
+export function filterComplianceEntities(
+  entities: readonly AnalyticsEntity[],
+  allowed: boolean,
+): AnalyticsEntity[] {
+  const safe = entities.filter(
+    (entity) =>
+      allowed ||
+      (!entity.key.startsWith('compliance_') &&
+        !entity.table.startsWith('compliance_') &&
+        entity.key !== 'report_compliance_status'),
+  )
+  const keys = new Set(safe.map((entity) => entity.key))
+  return safe.map((entity) => ({
+    ...entity,
+    relations: entity.relations?.filter((relation) => keys.has(relation.target)),
+  }))
+}

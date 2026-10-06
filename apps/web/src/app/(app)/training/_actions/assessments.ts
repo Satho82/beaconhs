@@ -1,5 +1,6 @@
 'use server'
 
+import { assertTenantModuleEntitled } from '@/lib/module-entitlements/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { and, eq, inArray, isNull } from 'drizzle-orm'
@@ -73,6 +74,7 @@ export async function startAssessmentAttempt(formData: FormData) {
   const typeId = String(formData.get('typeId') ?? '').trim()
   const personId = String(formData.get('personId') ?? '').trim()
   const complianceObligationId = String(formData.get('complianceObligationId') ?? '').trim() || null
+  if (complianceObligationId) await assertTenantModuleEntitled(ctx, 'hospitality.compliance')
   if (!typeId || !personId) throw new Error('Type and person are required')
   if (complianceObligationId && !isUuid(complianceObligationId)) {
     throw new Error('The compliance requirement is invalid')

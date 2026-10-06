@@ -1,3 +1,4 @@
+import { assertTenantModuleEntitled } from '@/lib/module-entitlements/server'
 import { GeneratedText, GeneratedValue } from '@/i18n/generated'
 import { getGeneratedTranslations } from '@/i18n/generated.server'
 import Link from 'next/link'
@@ -56,6 +57,7 @@ export default async function MyCompliancePage({
   const tGenerated = await getGeneratedTranslations()
   const sp = await searchParams
   const ctx = await requireRequestContext()
+  await assertTenantModuleEntitled(ctx, 'hospitality.compliance')
   const canReadAll = can(ctx, 'compliance.read')
   const statusParam = pickString(sp.status)
   const statusFilter = isPersonStatusFilter(statusParam) ? statusParam : undefined

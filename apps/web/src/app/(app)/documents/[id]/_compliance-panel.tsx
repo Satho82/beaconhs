@@ -1,3 +1,5 @@
+import { assertCan } from '@beaconhs/tenant'
+import { assertTenantModuleEntitled } from '@/lib/module-entitlements/server'
 import { GeneratedText, GeneratedValue } from '@/i18n/generated'
 import { useGeneratedTranslations } from '@/i18n/generated'
 // The Compliance tab body: which compliance obligations this document is part
@@ -44,6 +46,8 @@ export async function loadDocumentObligations(
     perPage: number
   },
 ): Promise<{ rows: DocObligationRow[]; total: number; filteredTotal: number }> {
+  await assertTenantModuleEntitled(ctx, 'hospitality.compliance')
+  assertCan(ctx, 'compliance.read')
   return ctx.db(async (tx) => {
     const baseWhere = and(
       eq(complianceObligations.tenantId, ctx.tenantId),

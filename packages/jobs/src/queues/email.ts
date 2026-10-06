@@ -28,6 +28,8 @@ export type EmailJobData = {
     category?: string
     /** Re-check the tenant category kill switch immediately before delivery. */
     automaticNotification?: boolean
+    /** A mixed digest with Compliance content must be suppressed after revocation. */
+    requiresComplianceEntitlement?: boolean
     reportRunDeliveryId?: string
   }
 }

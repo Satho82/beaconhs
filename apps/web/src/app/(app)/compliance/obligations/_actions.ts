@@ -5,6 +5,7 @@
 // @beaconhs/compliance and materialised into compliance_status on create + by
 // the daily worker scan.
 
+import { assertTenantModuleEntitled } from '@/lib/module-entitlements/server'
 import { revalidatePath } from 'next/cache'
 import { and, eq, isNull } from 'drizzle-orm'
 import type { Database } from '@beaconhs/db'
@@ -239,6 +240,7 @@ async function setEnabledInTransaction(
 
 export async function createObligation(rawInput: ObligationInput): Promise<ObligationResult> {
   const ctx = await requireRequestContext()
+  await assertTenantModuleEntitled(ctx, 'hospitality.compliance')
   assertCan(ctx, 'compliance.assign')
   const propertyId = await requireAuthoringProperty(ctx)
   const parsed = parseObligationInput(rawInput)
@@ -314,6 +316,7 @@ export async function updateObligation(
   rawInput: ObligationInput,
 ): Promise<ObligationResult> {
   const ctx = await requireRequestContext()
+  await assertTenantModuleEntitled(ctx, 'hospitality.compliance')
   assertCan(ctx, 'compliance.manage')
   const parsed = parseObligationInput(rawInput)
   if (!parsed.ok) return parsed
@@ -448,6 +451,7 @@ export async function setObligationEnabled(
   enabled: boolean,
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   const ctx = await requireRequestContext()
+  await assertTenantModuleEntitled(ctx, 'hospitality.compliance')
   assertCan(ctx, 'compliance.manage')
   try {
     await ctx.db(async (tx) => {
@@ -496,6 +500,7 @@ export async function deleteObligation(
   id: string,
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   const ctx = await requireRequestContext()
+  await assertTenantModuleEntitled(ctx, 'hospitality.compliance')
   assertCan(ctx, 'compliance.manage')
   try {
     await ctx.db(async (tx) => {

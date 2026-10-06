@@ -6,6 +6,7 @@ import {
   complianceObligations,
   complianceStatus,
   tenantNotificationPolicy,
+  tenantModuleEntitlements,
 } from '@beaconhs/db/schema'
 import type { ComplianceObligation, EvalResult } from './evaluate'
 
@@ -85,6 +86,7 @@ function query<T>(rows: T[], onLock?: (mode: string) => void) {
 }
 
 function fakeDatabase(options: {
+  entitled?: boolean
   locked: ComplianceObligation | null
   prior?: Array<{
     subjectKey: string
@@ -105,6 +107,10 @@ function fakeDatabase(options: {
   const deletes: unknown[] = []
 
   const rowsFor = (table: unknown): unknown[] => {
+    if (table === tenantModuleEntitlements)
+      return options.entitled === false
+        ? []
+        : [{ tenantId: TENANT_ID, moduleKey: 'hospitality.compliance' }]
     if (table === complianceObligations) return options.locked ? [options.locked] : []
     if (table === tenantNotificationPolicy) return [{ timezone: 'UTC' }]
     if (table === complianceAudience) return []
@@ -599,5 +605,20 @@ describe('materializeObligation serialization and durable transitions', () => {
     expect(
       actionableComplianceTransitions(obligation({ sourceModule: 'form' }), [pending]),
     ).toEqual([pending])
+  })
+})
+
+describe('disabled Compliance materialisation', () => {
+  it('does not lock, evaluate, update, insert or delete tenant Compliance data', async () => {
+    const fake = fakeDatabase({ locked: obligation(), entitled: false })
+    const evaluatedBefore = evaluateObligation.mock.calls.length
+    const result = await materializeObligation(fake.tx, TENANT_ID, obligation())
+    expect(result.materialized).toBe(false)
+    expect(result.dispatchId).toBeNull()
+    expect(fake.events).toEqual([])
+    expect(fake.inserts).toEqual([])
+    expect(fake.updates).toEqual([])
+    expect(fake.deletes).toEqual([])
+    expect(evaluateObligation.mock.calls.length).toBe(evaluatedBefore)
   })
 })

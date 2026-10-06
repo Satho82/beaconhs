@@ -4,6 +4,7 @@
 // Returns 404 if the run has no PDF yet (e.g. it's still queued/running, or
 // failed before rendering).
 
+import { assertReportSnapshotAccessible } from '@/lib/report-catalog'
 import { NextResponse } from 'next/server'
 import { and, eq } from 'drizzle-orm'
 import { assertCan } from '@beaconhs/tenant'
@@ -65,6 +66,11 @@ export async function GET(
 
   if (!found) {
     return NextResponse.json({ error: 'Run not found' }, { status: 404 })
+  }
+  try {
+    await assertReportSnapshotAccessible(ctx, found.run.requestSnapshot)
+  } catch {
+    return NextResponse.json({ error: 'Report source is not available' }, { status: 403 })
   }
   if (!found.attachment) {
     return NextResponse.json(

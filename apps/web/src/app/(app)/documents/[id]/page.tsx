@@ -1,3 +1,4 @@
+import { loadEnabledModuleKeys, assertTenantModuleEntitled } from '@/lib/module-entitlements/server'
 import { getGeneratedValueTranslations, getGeneratedTranslations } from '@/i18n/generated.server'
 
 import { GeneratedText, GeneratedValue } from '@/i18n/generated'
@@ -420,6 +421,8 @@ export default async function DocumentDetailPage({
   const activityAction = pickString(sp.activityAction)?.slice(0, 100) || undefined
 
   const ctx = await requireRequestContext()
+  const complianceEnabled = (await loadEnabledModuleKeys(ctx)).has('hospitality.compliance')
+  if (active === 'compliance') await assertTenantModuleEntitled(ctx, 'hospitality.compliance')
   // Viewing a document requires documents.read; managers hold it implicitly via
   // documents.manage. Mirrors the /documents list page so the direct-URL detail
   // route can't leak drafts / under-review / archived docs to users who only see
@@ -933,7 +936,9 @@ export default async function DocumentDetailPage({
                   count: reviewTotal,
                   icon: <ClipboardCheck size={16} />,
                 },
-                { key: 'compliance', label: 'Compliance', icon: <ShieldCheck size={16} /> },
+                ...(complianceEnabled
+                  ? [{ key: 'compliance', label: 'Compliance', icon: <ShieldCheck size={16} /> }]
+                  : []),
                 { key: 'activity', label: 'Activity', icon: <Activity size={16} /> },
               ]}
             />

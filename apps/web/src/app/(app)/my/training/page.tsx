@@ -1,3 +1,4 @@
+import { tenantModuleEntitlementExists } from '@beaconhs/db'
 import { getGeneratedValueTranslations, getGeneratedTranslations } from '@/i18n/generated.server'
 
 import { GeneratedText, GeneratedValue } from '@/i18n/generated'
@@ -263,6 +264,7 @@ export default async function MyTrainingPage({
     const expiringCount = Number(expCntRow?.c ?? 0)
 
     const assignedScope = and(
+      tenantModuleEntitlementExists(ctx.tenantId, 'hospitality.compliance'),
       eq(complianceStatus.tenantId, ctx.tenantId),
       eq(complianceStatus.personId, personId),
       inArray(complianceStatus.status, ['pending', 'in_progress', 'overdue', 'expiring']),

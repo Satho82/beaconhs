@@ -3,6 +3,8 @@
 // queries, one source of truth, kept fresh by the worker scan. Replaces the old
 // per-module legacy breakdowns entirely.
 
+import { assertCan } from '@beaconhs/tenant'
+import { assertTenantModuleEntitled } from '@/lib/module-entitlements/server'
 import { and, asc, count, desc, eq, ilike, inArray, isNull, sql } from 'drizzle-orm'
 import {
   type ComplianceTargetRef,
@@ -49,6 +51,8 @@ export async function obligationOverview(
   ctx: Ctx,
   opts: { q?: string; kind?: ObligationKind; page: number; perPage: number },
 ): Promise<ObligationOverview> {
+  await assertTenantModuleEntitled(ctx, 'hospitality.compliance')
+  assertCan(ctx, 'compliance.read')
   return ctx.db(async (tx) => {
     const live = and(eq(complianceObligations.tenantId, ctx.tenantId), ...liveFilter())
     const filtered = and(
@@ -149,6 +153,8 @@ export type PersonStatusRow = {
 
 /** Everything one person owes, across every obligation kind. */
 export async function personCompliance(ctx: Ctx, personId: string): Promise<PersonStatusRow[]> {
+  await assertTenantModuleEntitled(ctx, 'hospitality.compliance')
+  if (personId !== ctx.personId) assertCan(ctx, 'compliance.read')
   const rows = await ctx.db((tx) =>
     tx
       .select({
@@ -202,6 +208,8 @@ type AgingRow = { kind: ObligationKind; bucket: AgingBucket; count: number }
 
 /** Overdue / expiring subjects bucketed by age of due date. */
 export async function agingFromStatus(ctx: Ctx): Promise<AgingRow[]> {
+  await assertTenantModuleEntitled(ctx, 'hospitality.compliance')
+  assertCan(ctx, 'compliance.read')
   const today = new Date()
   const iso = (d: Date) => d.toISOString().slice(0, 10)
   const t7 = iso(new Date(today.getTime() - 7 * 864e5))

@@ -388,7 +388,9 @@ Click **Publish** while customising to share a dashboard with your team. Others 
       'audience',
     ],
     requiredPermission: 'compliance.read',
-    body: `The Compliance hub is the org-wide view of every requirement: who must do what, by when, and who is behind.
+    body: `Compliance must be enabled for your workspace by a Platform administrator. When disabled, its navigation, pages, obligation actions, reporting sources and background processing are unavailable. Existing training, document and inspection evidence remains in its own module. Enabling Compliance does not grant role or Property permissions. The organisation-wide hub requires Compliance read access; **My Work → Compliance** remains a self-only view for an entitled workspace.
+
+The Compliance hub is the org-wide view of every requirement: who must do what, by when, and who is behind.
 
 ## What this is for
 

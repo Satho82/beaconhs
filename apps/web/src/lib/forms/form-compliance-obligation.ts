@@ -1,3 +1,4 @@
+import { isTenantModuleEntitled } from '@beaconhs/db'
 import 'server-only'
 
 import { and, eq, inArray } from 'drizzle-orm'
@@ -11,6 +12,7 @@ export async function loadFormObligation(
   tx: Database,
   input: { tenantId: string; obligationId: string; templateId: string },
 ): Promise<FormObligation | null> {
+  if (!(await isTenantModuleEntitled(tx, input.tenantId, 'hospitality.compliance'))) return null
   const [row] = await tx
     .select()
     .from(complianceObligations)

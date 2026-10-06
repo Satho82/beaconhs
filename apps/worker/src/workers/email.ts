@@ -1,3 +1,4 @@
+import { isTenantModuleEntitled } from '@beaconhs/db'
 import type { Job } from 'bullmq'
 import { and, eq } from 'drizzle-orm'
 import { sendVia } from '@beaconhs/emails'
@@ -92,11 +93,20 @@ export async function processEmail(job: Job<EmailJobData>): Promise<void> {
     }
   }
 
-  const categorySuppressed =
-    Boolean(job.data.meta?.automaticNotification) &&
+  const complianceSuppressed =
     Boolean(tenantId) &&
-    Boolean(categoryKey) &&
-    !(await withSuperAdmin(db, (tx) => isNotificationCategoryEnabled(tx, tenantId!, categoryKey!)))
+    (categoryKey === 'compliance' || job.data.meta?.requiresComplianceEntitlement === true) &&
+    !(await withSuperAdmin(db, (tx) =>
+      isTenantModuleEntitled(tx, tenantId!, 'hospitality.compliance'),
+    ))
+  const categorySuppressed =
+    complianceSuppressed ||
+    (Boolean(job.data.meta?.automaticNotification) &&
+      Boolean(tenantId) &&
+      Boolean(categoryKey) &&
+      !(await withSuperAdmin(db, (tx) =>
+        isNotificationCategoryEnabled(tx, tenantId!, categoryKey!),
+      )))
 
   // Resolve the effective transport first so we can record the provider used
   // (and the actual sender) on the log row, and honour the global kill switch.

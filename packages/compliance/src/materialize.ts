@@ -4,6 +4,7 @@
 // delete-stale. The obligation row is also the shared serialization lock for
 // every caller: web mutations, evidence writers, sync, and the worker.
 
+import { isTenantModuleEntitled } from '@beaconhs/db'
 import { and, asc, desc, eq, inArray, isNull, notInArray, sql } from 'drizzle-orm'
 import type { Database } from '@beaconhs/db'
 import {
@@ -380,6 +381,16 @@ export async function materializeObligation(
     throw new Error('Cannot materialize an obligation for a different tenant')
   }
 
+  if (!(await isTenantModuleEntitled(tx, tenantId, 'hospitality.compliance'))) {
+    return {
+      obligation: null,
+      result: emptyResult(),
+      transitions: [],
+      dispatchId: null,
+      materialized: false,
+    }
+  }
+
   // This lock is deliberately the first mutable-domain operation. Every
   // materializer uses the same row, so a scan cannot evaluate an old target or
   // audience and commit after a concurrent edit/pause/delete. Reloading after
@@ -550,6 +561,7 @@ export async function materializeObligation(
  * it's safe to call on every scan. Keyed by tenantId → exactly one per tenant.
  */
 export async function ensureSystemObligations(tx: Tx, tenantId: string): Promise<void> {
+  if (!(await isTenantModuleEntitled(tx, tenantId, 'hospitality.compliance'))) return
   await tx
     .insert(complianceObligations)
     .values({
@@ -590,6 +602,7 @@ export async function materializeTenant(
     dispatchId: string | null
   }[]
 > {
+  if (!(await isTenantModuleEntitled(tx, tenantId, 'hospitality.compliance'))) return []
   const clock = await resolveComplianceClock(tx, tenantId, options)
   await ensureSystemObligations(tx, tenantId)
   const obligations = await tx

@@ -1,3 +1,4 @@
+import { isTenantModuleEntitled } from '@beaconhs/db'
 import { and, eq, isNull, or, sql, type SQL } from 'drizzle-orm'
 import type { Database } from '@beaconhs/db'
 import {
@@ -338,6 +339,8 @@ export async function materializeEvidenceTargetsObligations(
   tenantId: string,
   targets: readonly ComplianceEvidenceTarget[],
 ): Promise<EvidenceMaterializationResult> {
+  if (!(await isTenantModuleEntitled(tx, tenantId, 'hospitality.compliance')))
+    return { obligationIds: [] }
   const plansByOwner = new Map<string, ComplianceEvidenceTargetPlan>()
   for (const target of targets) {
     const next = planComplianceEvidenceTarget(target)

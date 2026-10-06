@@ -1,10 +1,11 @@
 // Dashboard KPI queries. Centralised so the page stays readable and so we
 // can re-use them from /reports/dashboard previews later.
 
+import { loadEnabledModuleKeys } from '@/lib/module-entitlements/server'
 import { and, asc, count, desc, eq, gte, inArray, isNotNull, isNull, lte, sql } from 'drizzle-orm'
 import { htmlToSnippet } from '@beaconhs/forms-core'
 import type { Database } from '@beaconhs/db'
-import { actionPropertyScope, type RequestContext } from '@beaconhs/tenant'
+import { can, actionPropertyScope, type RequestContext } from '@beaconhs/tenant'
 import {
   complianceObligations,
   complianceStatus,
@@ -340,6 +341,7 @@ export async function loadDashboardMetrics(
   ctx: RequestContext,
   now: Date = new Date(),
 ): Promise<DashboardMetrics> {
+  const complianceEnabled = (await loadEnabledModuleKeys(ctx)).has('hospitality.compliance')
   const today = new Date(now)
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 86_400_000)
   const sixtyDaysAgo = new Date(now.getTime() - 60 * 86_400_000)
@@ -618,12 +620,18 @@ export async function loadDashboardMetrics(
     // From the unified compliance engine's materialised scoreboard, filtered to
     // training + certification obligations. Matches the Insights "Training
     // compliance" card.
-    const tcRows = await tx
-      .select({ status: complianceStatus.status, c: count() })
-      .from(complianceStatus)
-      .innerJoin(complianceObligations, eq(complianceObligations.id, complianceStatus.obligationId))
-      .where(inArray(complianceObligations.sourceModule, ['training', 'cert_requirement']))
-      .groupBy(complianceStatus.status)
+    const tcRows =
+      complianceEnabled && can(ctx, 'compliance.read')
+        ? await tx
+            .select({ status: complianceStatus.status, c: count() })
+            .from(complianceStatus)
+            .innerJoin(
+              complianceObligations,
+              eq(complianceObligations.id, complianceStatus.obligationId),
+            )
+            .where(inArray(complianceObligations.sourceModule, ['training', 'cert_requirement']))
+            .groupBy(complianceStatus.status)
+        : []
     const trainingTotal = tcRows.reduce((acc, r) => acc + Number(r.c), 0)
     const trainingCompleted = tcRows
       .filter((r) => r.status === 'completed')
@@ -635,12 +643,18 @@ export async function loadDashboardMetrics(
     // From compliance_status (document obligations) — the unified engine already
     // resolved audiences + acknowledgments, so it's a simple completed ÷ total
     // (no per-tier audience approximation). Matches the Insights card.
-    const dcRows = await tx
-      .select({ status: complianceStatus.status, c: count() })
-      .from(complianceStatus)
-      .innerJoin(complianceObligations, eq(complianceObligations.id, complianceStatus.obligationId))
-      .where(eq(complianceObligations.sourceModule, 'document'))
-      .groupBy(complianceStatus.status)
+    const dcRows =
+      complianceEnabled && can(ctx, 'compliance.read')
+        ? await tx
+            .select({ status: complianceStatus.status, c: count() })
+            .from(complianceStatus)
+            .innerJoin(
+              complianceObligations,
+              eq(complianceObligations.id, complianceStatus.obligationId),
+            )
+            .where(eq(complianceObligations.sourceModule, 'document'))
+            .groupBy(complianceStatus.status)
+        : []
     const documentExpected = dcRows.reduce((acc, r) => acc + Number(r.c), 0)
     const documentAcked = dcRows
       .filter((r) => r.status === 'completed')
@@ -1039,85 +1053,86 @@ export async function loadDashboardMetrics(
 
     // My compliance — current recurring period work stays visible even when it
     // is complete. One-time documents are summarized separately below it.
-    const complianceData = myPersonId
-      ? await (async () => {
-          const baseWhere = and(
-            eq(complianceStatus.tenantId, ctx.tenantId),
-            eq(complianceStatus.personId, myPersonId),
-            isNull(complianceObligations.deletedAt),
-            eq(complianceObligations.status, 'active'),
-          )
-          const [summaryRows, currentPeriod, documentRows] = await Promise.all([
-            tx
-              .select({
-                total: count(),
-                completed: sql<number>`count(*) filter (where ${complianceStatus.status} = 'completed')::int`,
-                overdue: sql<number>`count(*) filter (where ${complianceStatus.status} = 'overdue')::int`,
-                dueSoon: sql<number>`count(*) filter (where ${complianceStatus.status} = 'expiring')::int`,
-                pending: sql<number>`count(*) filter (where ${complianceStatus.status} in ('pending','in_progress'))::int`,
-              })
-              .from(complianceStatus)
-              .innerJoin(
-                complianceObligations,
-                eq(complianceObligations.id, complianceStatus.obligationId),
-              )
-              .where(baseWhere),
-            tx
-              .select({
-                obligationId: complianceObligations.id,
-                kind: complianceObligations.sourceModule,
-                title: complianceObligations.title,
-                status: complianceStatus.status,
-                dueOn: complianceStatus.dueOn,
-                periodStart: complianceStatus.periodStart,
-                periodEnd: complianceStatus.periodEnd,
-                count: complianceStatus.count,
-                expected: complianceStatus.expected,
-                percent: complianceStatus.percent,
-                targetRef: complianceObligations.targetRef,
-              })
-              .from(complianceStatus)
-              .innerJoin(
-                complianceObligations,
-                eq(complianceObligations.id, complianceStatus.obligationId),
-              )
-              .where(
-                and(
-                  baseWhere,
-                  isNotNull(complianceStatus.periodStart),
-                  isNotNull(complianceStatus.periodEnd),
-                  lte(complianceStatus.periodStart, todayIso),
-                  gte(complianceStatus.periodEnd, todayIso),
-                  sql`${complianceObligations.sourceModule} <> 'document'`,
-                ),
-              )
-              .orderBy(
-                asc(sql`case ${complianceStatus.status}
+    const complianceData =
+      complianceEnabled && myPersonId
+        ? await (async () => {
+            const baseWhere = and(
+              eq(complianceStatus.tenantId, ctx.tenantId),
+              eq(complianceStatus.personId, myPersonId),
+              isNull(complianceObligations.deletedAt),
+              eq(complianceObligations.status, 'active'),
+            )
+            const [summaryRows, currentPeriod, documentRows] = await Promise.all([
+              tx
+                .select({
+                  total: count(),
+                  completed: sql<number>`count(*) filter (where ${complianceStatus.status} = 'completed')::int`,
+                  overdue: sql<number>`count(*) filter (where ${complianceStatus.status} = 'overdue')::int`,
+                  dueSoon: sql<number>`count(*) filter (where ${complianceStatus.status} = 'expiring')::int`,
+                  pending: sql<number>`count(*) filter (where ${complianceStatus.status} in ('pending','in_progress'))::int`,
+                })
+                .from(complianceStatus)
+                .innerJoin(
+                  complianceObligations,
+                  eq(complianceObligations.id, complianceStatus.obligationId),
+                )
+                .where(baseWhere),
+              tx
+                .select({
+                  obligationId: complianceObligations.id,
+                  kind: complianceObligations.sourceModule,
+                  title: complianceObligations.title,
+                  status: complianceStatus.status,
+                  dueOn: complianceStatus.dueOn,
+                  periodStart: complianceStatus.periodStart,
+                  periodEnd: complianceStatus.periodEnd,
+                  count: complianceStatus.count,
+                  expected: complianceStatus.expected,
+                  percent: complianceStatus.percent,
+                  targetRef: complianceObligations.targetRef,
+                })
+                .from(complianceStatus)
+                .innerJoin(
+                  complianceObligations,
+                  eq(complianceObligations.id, complianceStatus.obligationId),
+                )
+                .where(
+                  and(
+                    baseWhere,
+                    isNotNull(complianceStatus.periodStart),
+                    isNotNull(complianceStatus.periodEnd),
+                    lte(complianceStatus.periodStart, todayIso),
+                    gte(complianceStatus.periodEnd, todayIso),
+                    sql`${complianceObligations.sourceModule} <> 'document'`,
+                  ),
+                )
+                .orderBy(
+                  asc(sql`case ${complianceStatus.status}
                   when 'overdue' then 0
                   when 'in_progress' then 1
                   when 'pending' then 2
                   else 3
                 end`),
-                asc(sql`coalesce(${complianceStatus.dueOn}, '9999-12-31'::date)`),
-                asc(complianceObligations.title),
-                asc(complianceObligations.id),
-              )
-              .limit(5),
-            tx
-              .select({
-                total: count(),
-                completed: sql<number>`count(*) filter (where ${complianceStatus.status} = 'completed')::int`,
-              })
-              .from(complianceStatus)
-              .innerJoin(
-                complianceObligations,
-                eq(complianceObligations.id, complianceStatus.obligationId),
-              )
-              .where(and(baseWhere, eq(complianceObligations.sourceModule, 'document'))),
-          ])
-          return { summary: summaryRows[0], currentPeriod, documents: documentRows[0] }
-        })()
-      : { summary: null, currentPeriod: [], documents: null }
+                  asc(sql`coalesce(${complianceStatus.dueOn}, '9999-12-31'::date)`),
+                  asc(complianceObligations.title),
+                  asc(complianceObligations.id),
+                )
+                .limit(5),
+              tx
+                .select({
+                  total: count(),
+                  completed: sql<number>`count(*) filter (where ${complianceStatus.status} = 'completed')::int`,
+                })
+                .from(complianceStatus)
+                .innerJoin(
+                  complianceObligations,
+                  eq(complianceObligations.id, complianceStatus.obligationId),
+                )
+                .where(and(baseWhere, eq(complianceObligations.sourceModule, 'document'))),
+            ])
+            return { summary: summaryRows[0], currentPeriod, documents: documentRows[0] }
+          })()
+        : { summary: null, currentPeriod: [], documents: null }
     const cTotal = Number(complianceData.summary?.total ?? 0)
     const cCompleted = Number(complianceData.summary?.completed ?? 0)
     const cOverdue = Number(complianceData.summary?.overdue ?? 0)

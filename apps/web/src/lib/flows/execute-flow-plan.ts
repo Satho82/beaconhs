@@ -1,3 +1,4 @@
+import { loadEnabledModuleKeys } from '@/lib/module-entitlements/server'
 import 'server-only'
 
 // The ONE Flows executor — subject-agnostic. Runs a planned graph (actions +
@@ -302,6 +303,7 @@ export async function executeFlowPlan(
     obligationId: string,
     personField: string,
   ): Promise<boolean> => {
+    if (!(await loadEnabledModuleKeys(ctx)).has('hospitality.compliance')) return false
     const subjectIdentities = await Promise.all(fieldIds(personField).map(personIdentity))
     const subjectPersonIds = new Set(
       subjectIdentities

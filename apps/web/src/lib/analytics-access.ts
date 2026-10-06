@@ -1,3 +1,6 @@
+import { isTenantModuleEntitled } from '@beaconhs/db'
+import { can } from '@beaconhs/tenant'
+import { filterComplianceEntities } from '@beaconhs/analytics/server'
 import 'server-only'
 
 import { asc, isNull } from 'drizzle-orm'
@@ -49,24 +52,33 @@ export async function resolveAnalyticsAccess(
   ])
   const accessible = accessibleAnalyticsTemplates(ctx, templates, roleKeys)
   const propertyScope = actionPropertyScope(ctx)
-  const entities = removeRawBuilderEntities(
-    await discoverEntitiesWithScopedApps(
-      tx,
-      accessible.map(({ id, name }) => ({ id, name })),
-      { propertyScopeMode: propertyScope.mode },
+  const complianceAllowed =
+    (await isTenantModuleEntitled(tx, ctx.tenantId, 'hospitality.compliance')) &&
+    can(ctx, 'compliance.read')
+  const entities = filterComplianceEntities(
+    removeRawBuilderEntities(
+      await discoverEntitiesWithScopedApps(
+        tx,
+        accessible.map(({ id, name }) => ({ id, name })),
+        { propertyScopeMode: propertyScope.mode },
+      ),
     ),
+    complianceAllowed,
   )
   return {
     entities,
     entityMap: Object.fromEntries(entities.map((entity) => [entity.key, entity])),
-    scopeKey: analyticsAccessScopeKey({
-      activeRoleId: ctx.activeRoleId,
-      effectiveRoleKeys: roleKeys,
-      templateIds: accessible.map((template) => template.id),
-      propertyScopeMode: propertyScope.mode,
-      assignedPropertyIds: propertyScope.propertyIds,
-      activePropertyId: options.activePropertyId ?? null,
-    }),
+    scopeKey:
+      String(complianceAllowed) +
+      ':' +
+      analyticsAccessScopeKey({
+        activeRoleId: ctx.activeRoleId,
+        effectiveRoleKeys: roleKeys,
+        templateIds: accessible.map((template) => template.id),
+        propertyScopeMode: propertyScope.mode,
+        assignedPropertyIds: propertyScope.propertyIds,
+        activePropertyId: options.activePropertyId ?? null,
+      }),
   }
 }
 

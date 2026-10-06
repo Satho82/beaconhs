@@ -2,6 +2,8 @@
 // over `compliance_obligations` (+ audience counts), and live compliance via the
 // evaluation adapters. The old per-module UNION is gone.
 
+import { assertCan } from '@beaconhs/tenant'
+import { assertTenantModuleEntitled } from '@/lib/module-entitlements/server'
 import { and, count, desc, eq, ilike, inArray, isNull, ne, sql } from 'drizzle-orm'
 import { complianceAudience, complianceObligations } from '@beaconhs/db/schema'
 import type { requireRequestContext } from '@/lib/auth'
@@ -35,6 +37,8 @@ export async function listObligations(
   ctx: Ctx,
   opts: { kind?: ObligationKind; q?: string; page?: number; perPage?: number } = {},
 ): Promise<ObligationListResult> {
+  await assertTenantModuleEntitled(ctx, 'hospitality.compliance')
+  assertCan(ctx, 'compliance.read')
   const perPage = opts.perPage ?? 25
   const page = Math.max(1, opts.page ?? 1)
   return ctx.db(async (tx) => {
@@ -115,6 +119,8 @@ async function getObligationWithAudience(ctx: Ctx, id: string) {
 }
 
 export async function obligationCompliance(ctx: Ctx, id: string) {
+  await assertTenantModuleEntitled(ctx, 'hospitality.compliance')
+  assertCan(ctx, 'compliance.read')
   const data = await getObligationWithAudience(ctx, id)
   if (!data) return null
   const result = await ctx.db(async (tx) => {

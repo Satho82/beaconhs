@@ -15,6 +15,7 @@ const state = vi.hoisted(() => ({
     db: ReturnType<typeof vi.fn>
   },
   authCalls: 0,
+  entitled: true,
 }))
 
 vi.mock('../../../lib/auth', () => ({
@@ -22,6 +23,10 @@ vi.mock('../../../lib/auth', () => ({
     state.authCalls++
     return state.context
   },
+}))
+
+vi.mock('@/lib/module-entitlements/server', () => ({
+  loadEnabledModuleKeys: async () => new Set(state.entitled ? ['hospitality.compliance'] : []),
 }))
 
 import { GET } from './route'
@@ -34,6 +39,7 @@ describe('picker options route policy', () => {
   beforeEach(() => {
     state.context = null
     state.authCalls = 0
+    state.entitled = true
   })
 
   it('rejects unknown lookup capabilities before authentication or database work', async () => {
@@ -153,4 +159,17 @@ describe('picker options route policy', () => {
     expect(response.status).toBe(500)
     expect(db).toHaveBeenCalledOnce()
   })
+})
+
+it.each([
+  'compliance-by-person',
+  'compliance-obligation-documents',
+  'compliance-obligation-audience-people',
+  'report-obligations',
+])('denies disabled Compliance picker %s before querying', async (lookup) => {
+  state.entitled = false
+  const db = vi.fn()
+  state.context = { isSuperAdmin: true, permissions: new Set(), db }
+  expect((await request('lookup=' + lookup)).status).toBe(403)
+  expect(db).not.toHaveBeenCalled()
 })

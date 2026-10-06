@@ -6,6 +6,8 @@
 // run the report under the tenant's RLS scope, render + upload the PDF, and
 // fan out recipient emails.
 
+import { isTenantModuleEntitled } from '@beaconhs/db'
+import { filterComplianceEntities } from '@beaconhs/analytics/server'
 import type { Job } from 'bullmq'
 import { and, eq, inArray, isNull, sql } from 'drizzle-orm'
 import { discoverEntitiesWithScopedApps } from '@beaconhs/analytics/server'
@@ -38,6 +40,7 @@ import {
 import {
   loadBeaconReportCatalog,
   normalizeReportRuntimeFilters,
+  validateBeaconReportRuntimeFilters,
   runBeaconReport,
 } from '@beaconhs/reports/server'
 import {
@@ -118,6 +121,12 @@ export async function processReportRun(job: Job<ReportRunJobData>): Promise<void
     }).format(ctx.run.scheduledFor)} UTC`
     const execution = await withTenant(db, tenantId, (tx) =>
       resolveScheduledReportContext(tx, tenantId, snapshot),
+    )
+    validateBeaconReportRuntimeFilters(
+      tenantId,
+      snapshot.definition.query,
+      execution.catalog,
+      normalizeReportRuntimeFilters(snapshot.filters),
     )
     let artifact = await loadArtifact(tenantId, ctx.run.pdfAttachmentId, ctx.run.rowCount)
     if (!artifact) {
@@ -554,7 +563,14 @@ async function resolveScheduledReportContext(
   )
 
   return {
-    catalog: await loadBeaconReportCatalog(tx, sources),
+    catalog: await loadBeaconReportCatalog(
+      tx,
+      filterComplianceEntities(
+        sources,
+        (await isTenantModuleEntitled(tx, tenantId, 'hospitality.compliance')) &&
+          can(requestCtx, 'compliance.read'),
+      ),
+    ),
     locale: localePolicy.locale,
     requestCtx,
   }

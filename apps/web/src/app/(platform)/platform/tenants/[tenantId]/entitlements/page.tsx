@@ -45,7 +45,7 @@ export default async function TenantEntitlementsPage({
 
         <p className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
           {tBoard(
-            'Module configuration does not replace role or property permissions. Compliance enforcement coverage remains incomplete; an enabled setting is not a claim of complete enforcement.',
+            'Module access also requires the appropriate role and property permissions. Disabling Compliance blocks its pages, actions, reporting sources and background processing. Shared evidence records remain governed by their own modules.',
           )}
         </p>
         <div className="grid gap-4">

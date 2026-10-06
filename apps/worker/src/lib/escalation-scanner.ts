@@ -5,6 +5,7 @@
 // row). This is what turns "remind the owner" into "…then escalate to the
 // manager after 3 days, then the safety lead after 7".
 
+import { isTenantModuleEntitled } from '@beaconhs/db'
 import { and, asc, eq, gt, inArray, isNotNull, or, sql } from 'drizzle-orm'
 import { createHash } from 'node:crypto'
 import { db, withSuperAdmin, withTenant } from '@beaconhs/db'
@@ -31,6 +32,7 @@ export async function scanEscalations(): Promise<EscalationScanResult> {
 
   for (const t of tenantRows) {
     await withTenant(db, t.id, async (tx) => {
+      if (!(await isTenantModuleEntitled(tx, t.id, 'hospitality.compliance'))) return
       const [cfg] = await tx
         .select({ escalation: tenantNotificationSettings.escalation })
         .from(tenantNotificationSettings)

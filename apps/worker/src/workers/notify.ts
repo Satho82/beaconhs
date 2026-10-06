@@ -1,3 +1,4 @@
+import { isTenantModuleEntitled } from '@beaconhs/db'
 import type { Job } from 'bullmq'
 import { createHash } from 'node:crypto'
 import { and, eq, inArray, isNull } from 'drizzle-orm'
@@ -50,6 +51,11 @@ export async function processNotification(job: Job<NotifyJobData>): Promise<void
   const critical = d.isCritical ?? false
   const requestedUserIds = d.userIds
   const plan = await withTenant(db, d.tenantId, async (tx) => {
+    if (
+      d.category === 'compliance' &&
+      !(await isTenantModuleEntitled(tx, d.tenantId, 'hospitality.compliance'))
+    )
+      return { disabled: true as const }
     const [catCfg] = await tx
       .select({
         enabled: tenantNotificationSettings.enabled,
@@ -223,6 +229,7 @@ export async function processNotification(job: Job<NotifyJobData>): Promise<void
             title: d.title,
             body: d.body,
             linkPath: d.linkPath,
+            requiresComplianceEntitlement: d.category === 'compliance',
           },
           pushJobId,
         )

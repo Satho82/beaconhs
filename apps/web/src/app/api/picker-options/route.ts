@@ -1,3 +1,4 @@
+import { loadEnabledModuleKeys } from '@/lib/module-entitlements/server'
 import { NextResponse } from 'next/server'
 import {
   and,
@@ -364,6 +365,12 @@ export async function GET(request: Request): Promise<NextResponse> {
 
   const ctx = await getRequestContext()
   if (!ctx) return json({ options: [], hasMore: false }, 401)
+  if (
+    (lookupParam.startsWith('compliance-') || lookupParam === 'report-obligations') &&
+    !(await loadEnabledModuleKeys(ctx)).has('hospitality.compliance')
+  ) {
+    return json({ options: [], hasMore: false }, 403)
+  }
   if (!pickerAuthorized(ctx, lookupParam)) return json({ options: [], hasMore: false }, 403)
 
   const rawQuery = (url.searchParams.get('q') ?? '')

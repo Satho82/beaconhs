@@ -10,7 +10,11 @@ describe('scheduled report source authorization contract', () => {
       "canAccessTemplate(requestCtx, template, resolved.roleKeys, 'operate')",
     )
     expect(workerSource).toContain('discoverEntitiesWithScopedApps')
-    expect(workerSource).toContain('loadBeaconReportCatalog(tx, sources)')
+    expect(workerSource).toContain('loadBeaconReportCatalog(')
+    expect(workerSource).toContain('filterComplianceEntities(')
+    expect(workerSource).toContain("isTenantModuleEntitled(tx, tenantId, 'hospitality.compliance')")
+    expect(workerSource).toContain("can(requestCtx, 'compliance.read')")
+    expect(workerSource).toContain('validateBeaconReportRuntimeFilters')
   })
 
   it('revalidates the selected property and narrows execution to it', () => {

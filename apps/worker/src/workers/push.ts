@@ -1,3 +1,4 @@
+import { isTenantModuleEntitled } from '@beaconhs/db'
 import type { Job } from 'bullmq'
 import { and, eq } from 'drizzle-orm'
 import { db, withTenant } from '@beaconhs/db'
@@ -18,6 +19,13 @@ export async function processPush(job: Job<PushJobData>): Promise<void> {
   }
   const data = job.data
   assertPushJobData(data)
+  if (
+    (data.requiresComplianceEntitlement || data.linkPath?.startsWith('/compliance')) &&
+    !(await withTenant(db, data.tenantId, (tx) =>
+      isTenantModuleEntitled(tx, data.tenantId, 'hospitality.compliance'),
+    ))
+  )
+    return
   const subscription = await withTenant(db, data.tenantId, async (tx) => {
     const [row] = await tx
       .select()

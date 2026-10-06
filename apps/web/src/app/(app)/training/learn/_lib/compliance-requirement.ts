@@ -1,3 +1,4 @@
+import { isTenantModuleEntitled } from '@beaconhs/db'
 import { and, asc, eq, inArray, isNull, sql } from 'drizzle-orm'
 import type { Database } from '@beaconhs/db'
 import { complianceObligations, complianceStatus } from '@beaconhs/db/schema'
@@ -13,6 +14,7 @@ export async function findOutstandingCourseRequirement(
   tx: Database,
   args: { tenantId: string; personId: string; courseId: string },
 ): Promise<OutstandingCourseRequirement | null> {
+  if (!(await isTenantModuleEntitled(tx, args.tenantId, 'hospitality.compliance'))) return null
   const rows = await tx
     .select({
       obligationId: complianceObligations.id,

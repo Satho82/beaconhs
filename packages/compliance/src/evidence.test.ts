@@ -7,6 +7,7 @@ import {
   documents,
   inspectionTypes,
   trainingCourses,
+  tenantModuleEntitlements,
 } from '@beaconhs/db/schema'
 
 const mocks = vi.hoisted(() => ({
@@ -60,6 +61,8 @@ function fakeDatabase(
   const tx = {
     select: vi.fn(() => ({
       from: (table: unknown) => {
+        if (table === tenantModuleEntitlements)
+          return chain([{ tenantId: TENANT_ID, moduleKey: 'hospitality.compliance' }], {})
         if (table === ownerTable) {
           const query = chain([{ id: TARGET_ID }], {
             lock: (mode) => events.push(`target-lock:${mode}`),
@@ -232,6 +235,8 @@ describe('evidence-target compliance materialization', () => {
     const tx = {
       select: vi.fn(() => ({
         from: (table: unknown) => {
+          if (table === tenantModuleEntitlements)
+            return chain([{ tenantId: TENANT_ID, moduleKey: 'hospitality.compliance' }], {})
           if (table !== complianceObligations) throw new Error('Unexpected corrective table')
           const query = chain(obligations, {})
           query.where = (where: SQL) => {
@@ -265,6 +270,8 @@ describe('evidence-target compliance materialization', () => {
     const tx = {
       select: vi.fn(() => ({
         from: (table: unknown) => {
+          if (table === tenantModuleEntitlements)
+            return chain([{ tenantId: TENANT_ID, moduleKey: 'hospitality.compliance' }], {})
           if (table === trainingCourses) {
             let ownerId = ''
             const query = chain([{ id: 'owner' }], {

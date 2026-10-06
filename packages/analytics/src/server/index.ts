@@ -10,7 +10,12 @@ import { addTrustedSystemAppResponsesEntity, discoverEntityMap } from './discove
 export { runBhql } from './execute'
 export { compileBhql } from './compile'
 export { compileRuleGroup as compileAnalyticsRuleGroup } from './filter-sql'
-export { addTrustedSystemAppResponsesEntity, discoverEntities, discoverEntityMap } from './discover'
+export {
+  filterComplianceEntities,
+  addTrustedSystemAppResponsesEntity,
+  discoverEntities,
+  discoverEntityMap,
+} from './discover'
 export { discoverEntitiesWithScopedApps } from './custom-fields'
 
 /** Validate untrusted BHQL against the live, schema-discovered registry. The

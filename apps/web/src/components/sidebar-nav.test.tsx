@@ -10,6 +10,8 @@ vi.mock('next/link', () => ({
 }))
 vi.mock('@/i18n/generated', () => ({
   GeneratedValue: ({ value }: { value: React.ReactNode }) => value,
+  useGeneratedTranslations: () => (_key: string, values: { value0: string }) =>
+    `Expand ${values.value0}`,
   useGeneratedValueTranslations: () => (value: unknown) => value,
 }))
 vi.mock('@beaconhs/ui', () => ({ cn: (...values: unknown[]) => values.filter(Boolean).join(' ') }))

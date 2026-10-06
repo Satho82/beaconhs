@@ -5,6 +5,7 @@ import ts from 'typescript'
 import { getAppMessages, systemMessageKey } from '@beaconhs/i18n/messages'
 import { findRuntimeUserFacingLiterals } from '../../scripts/i18n-runtime-audit'
 import { findSourceAudit, findUserFacingSourceLiterals } from '../../scripts/i18n-source-audit'
+import { BOARD_ADMINISTRATION_ARTICLES } from '../lib/manual/content/board-administration'
 import { HOSPITALITY_ARTICLES } from '../lib/manual/content/hospitality'
 import { FRONTLINE_ARTICLES } from '../lib/manual/content/frontline'
 import { GETTING_STARTED_ARTICLES } from '../lib/manual/content/getting-started'
@@ -105,6 +106,7 @@ describe('i18n source coverage', () => {
   it('catalogs built-in user-guide articles and guided-tour steps', () => {
     const articles = [
       ...GETTING_STARTED_ARTICLES,
+      ...BOARD_ADMINISTRATION_ARTICLES,
       ...FRONTLINE_ARTICLES,
       ...HOSPITALITY_ARTICLES,
       ...KNOWLEDGE_ASSETS_ARTICLES,

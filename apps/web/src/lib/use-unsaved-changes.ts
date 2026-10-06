@@ -1,7 +1,9 @@
 'use client'
+import { useGeneratedValueTranslations } from '@/i18n/generated'
 import { useEffect } from 'react'
 /** Guard full unload and user-initiated links without replacing router behavior. */
 export function useUnsavedChanges(dirty: boolean) {
+  const translateValue = useGeneratedValueTranslations()
   useEffect(() => {
     if (!dirty) return
     const unload = (event: BeforeUnloadEvent) => {
@@ -20,7 +22,7 @@ export function useUnsavedChanges(dirty: boolean) {
         return
       const next = new URL(link.href, location.href)
       if (next.pathname === location.pathname && next.search === location.search) return
-      if (!window.confirm('Discard unsaved changes and leave this page?')) {
+      if (!window.confirm(translateValue('Discard unsaved changes and leave this page?'))) {
         event.preventDefault()
         event.stopPropagation()
       }
@@ -31,5 +33,5 @@ export function useUnsavedChanges(dirty: boolean) {
       window.removeEventListener('beforeunload', unload)
       document.removeEventListener('click', navigate, true)
     }
-  }, [dirty])
+  }, [dirty, translateValue])
 }

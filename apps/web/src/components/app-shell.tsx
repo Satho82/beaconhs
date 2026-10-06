@@ -1,3 +1,4 @@
+import { useGeneratedValueTranslations } from '@/i18n/generated'
 import { GeneratedValue } from '@/i18n/generated'
 import { ShieldAlert } from 'lucide-react'
 import { useTranslations } from 'next-intl'
@@ -68,6 +69,8 @@ export function AppShell({
   canUseAssistant?: boolean
   children: React.ReactNode
 }) {
+  const tBoard = useGeneratedValueTranslations()
+
   const t = useTranslations('Shell')
   return (
     <div className="flex [height:100dvh] h-screen overflow-hidden">
@@ -145,7 +148,7 @@ export function AppShell({
             </div>
             {propertyContext.properties.length > 0 && (
               <div className="flex max-w-full min-w-0 items-center gap-2">
-                <span className="shrink-0 text-slate-500">Property</span>
+                <span className="shrink-0 text-slate-500">{tBoard('Property')}</span>
                 <HospitalityPropertySwitcher {...propertyContext} />
               </div>
             )}

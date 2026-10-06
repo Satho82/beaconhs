@@ -1,3 +1,4 @@
+import { getGeneratedValueTranslations } from '@/i18n/generated.server'
 import { getGeneratedTranslations } from '@/i18n/generated.server'
 import { notFound, redirect } from 'next/navigation'
 import { and, asc, eq, isNull } from 'drizzle-orm'
@@ -30,6 +31,8 @@ export async function generateMetadata() {
 }
 
 export default async function NotificationSettingsPage() {
+  const tBoard = await getGeneratedValueTranslations()
+
   const tGenerated = await getGeneratedTranslations()
   const ctx = await requireRequestContext()
   if (!ctx.isSuperAdmin && !can(ctx, 'admin.settings.manage')) redirect('/admin')
@@ -158,7 +161,9 @@ export default async function NotificationSettingsPage() {
 
   return (
     <PageContainer>
-      <p className="mb-3 text-sm text-slate-600">{tenant.name} · Changes apply to this tenant.</p>
+      <p className="mb-3 text-sm text-slate-600">
+        {tenant.name} {tBoard('· Changes apply to this tenant.')}
+      </p>
       <SettingsNavigation navigationLabel="Tenant settings" activeSection="notifications" />
       <div className="space-y-4">
         <DetailHeader

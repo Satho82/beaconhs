@@ -1,4 +1,5 @@
 'use client'
+import { useGeneratedValueTranslations } from '@/i18n/generated'
 
 import { useRef, useState } from 'react'
 import { Button, Input, Label } from '@beaconhs/ui'
@@ -39,6 +40,8 @@ export function TenantBrandingForm({
   hasLogo?: boolean
   hasLetterhead?: boolean
 }) {
+  const tBoard = useGeneratedValueTranslations()
+
   const [state, setState] = useState(initial)
   const [pending, setPending] = useState(false)
   const [dirty, setDirty] = useState(false)
@@ -71,7 +74,9 @@ export function TenantBrandingForm({
       }}
       className="space-y-6"
     >
-      <p className="text-sm text-slate-600">{tenantName} · Changes apply to this tenant.</p>
+      <p className="text-sm text-slate-600">
+        {tenantName} {tBoard('· Changes apply to this tenant.')}
+      </p>
       <input type="hidden" name="tenantId" value={tenantId} />
       <fieldset disabled={pending} className="space-y-6">
         <section className="space-y-2">
@@ -87,8 +92,10 @@ export function TenantBrandingForm({
           ) : (
             <p className="text-sm text-slate-500">
               {hasLogo
-                ? 'An existing logo is configured but cannot be previewed here. Upload to replace it.'
-                : 'Using the Platform/Uvanoo default logo.'}
+                ? tBoard(
+                    'An existing logo is configured but cannot be previewed here. Upload to replace it.',
+                  )
+                : tBoard('Using the Platform/Uvanoo default logo.')}
             </p>
           )}
           <Input id="logo" name="logo" type="file" accept="image/png,image/jpeg,image/webp" />
@@ -115,7 +122,7 @@ export function TenantBrandingForm({
               className="h-10 w-14 p-1"
             />
             <Input
-              aria-label="Tenant accent HEX colour"
+              aria-label={tBoard('Tenant accent HEX colour')}
               aria-invalid={state.status === 'error' && state.outcome === 'invalid_hex'}
               aria-describedby={state.status === 'error' ? 'branding-result' : undefined}
               name="primaryColor"
@@ -144,8 +151,10 @@ export function TenantBrandingForm({
           ) : (
             <p className="text-sm text-slate-500">
               {hasLetterhead
-                ? 'An existing letterhead is configured but cannot be previewed here. Upload to replace it.'
-                : 'No tenant letterhead configured.'}
+                ? tBoard(
+                    'An existing letterhead is configured but cannot be previewed here. Upload to replace it.',
+                  )
+                : tBoard('No tenant letterhead configured.')}
             </p>
           )}
           <Input id="letterhead" name="letterhead" type="file" accept="application/pdf" />
@@ -170,8 +179,8 @@ export function TenantBrandingForm({
           {state.outcome ? t(OUTCOME_MESSAGE[state.outcome]) : null}
         </p>
       ) : null}
-      <section aria-label="Tenant identity preview" className="rounded-xl border p-4">
-        <p className="text-xs text-slate-500">Tenant identity preview</p>
+      <section aria-label={tBoard('Tenant identity preview')} className="rounded-xl border p-4">
+        <p className="text-xs text-slate-500">{tBoard('Tenant identity preview')}</p>
         <p
           className="mt-2 font-semibold"
           style={{
@@ -182,7 +191,9 @@ export function TenantBrandingForm({
           {tenantName}
         </p>
         <p className="mt-2 text-xs text-slate-500">
-          The master Uvanoo identity, favicon and browser title remain platform-controlled.
+          {tBoard(
+            'The master Uvanoo identity, favicon and browser title remain platform-controlled.',
+          )}
         </p>
       </section>
       <div className="flex justify-end gap-3">
@@ -197,10 +208,10 @@ export function TenantBrandingForm({
             setState(initial)
           }}
         >
-          Discard
+          {tBoard('Discard')}
         </Button>
         <Button type="submit" disabled={!dirty || pending}>
-          {pending ? 'Saving…' : 'Save branding'}
+          {pending ? tBoard('Saving…') : tBoard('Save branding')}
         </Button>
       </div>
     </form>

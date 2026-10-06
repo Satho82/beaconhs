@@ -6,10 +6,10 @@ import { requireRequestContext } from '@/lib/auth'
 import { readTenantBrandAsset } from '@/lib/tenant-brand-assets'
 import { isTenantBrandAssetKey } from '@/lib/tenant-brand-asset-url'
 export async function GET(_request: Request, { params }: { params: Promise<{ kind: string }> }) {
-  const ctx = await requireRequestContext()
-  assertCan(ctx, 'admin.settings.manage')
   const { kind } = await params
   if (kind !== 'logo' && kind !== 'letterhead') return new Response(null, { status: 404 })
+  const ctx = await requireRequestContext()
+  assertCan(ctx, 'admin.settings.manage')
   const [tenant] = await withSuperAdmin(db, (tx) =>
     tx
       .select({ branding: tenants.branding })

@@ -1,4 +1,5 @@
 'use client'
+import { useGeneratedTranslations } from '@/i18n/generated'
 
 import { GeneratedValue, useGeneratedValueTranslations } from '@/i18n/generated'
 
@@ -135,11 +136,13 @@ export function SidebarNav({
   groups: SidebarNavGroup[]
   collapsed?: boolean
 }) {
+  const tBoard = useGeneratedValueTranslations()
+
   const pathname = usePathname() ?? ''
   const activeHref = findActiveNavHref(pathname, groups)
   return (
     <nav
-      aria-label="Application navigation"
+      aria-label={tBoard('Application navigation')}
       className="app-scroll flex-1 overflow-y-auto px-2 py-4"
     >
       {groups.map((group) => (
@@ -167,6 +170,8 @@ function NavEntry({
   activeHref: string | null
   collapsed: boolean
 }) {
+  const tBoardMessage = useGeneratedTranslations()
+
   const tGeneratedValue = useGeneratedValueTranslations()
   const id = useId()
   const childActive = item.children
@@ -202,7 +207,7 @@ function NavEntry({
         {!collapsed && Boolean(item.children?.length) && (
           <button
             type="button"
-            aria-label={`Expand ${item.label}`}
+            aria-label={tBoardMessage('m_1a460d455d5128', { value0: tGeneratedValue(item.label) })}
             aria-expanded={open}
             aria-controls={id}
             onClick={() => setExpanded(!open)}

@@ -16,6 +16,8 @@ export default async function HospitalityPropertiesPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
+  const tBoard = await getGeneratedValueTranslations()
+
   const [translateHospitality, translateValue] = await Promise.all([
     getGeneratedTranslations(),
     getGeneratedValueTranslations(),
@@ -45,7 +47,7 @@ export default async function HospitalityPropertiesPage({
             {can(ctx, 'admin.settings.manage') && can(ctx, 'hospitality.manage') && (
               <Button asChild variant="outline">
                 <Link href="/admin/settings/import-export/property-structure/upload">
-                  Import property structure
+                  {tBoard('Import property structure')}
                 </Link>
               </Button>
             )}
@@ -60,7 +62,7 @@ export default async function HospitalityPropertiesPage({
         }
       />
       <p className="mt-4 text-sm text-slate-500">
-        {total} matching properties · Property → Building → Floor → Room
+        {translateHospitality('m_0b26949c7536a3', { value0: total })}
       </p>
       <div className="mt-4">
         <SearchInput />

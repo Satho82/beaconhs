@@ -1,3 +1,4 @@
+import { getGeneratedValueTranslations } from '@/i18n/generated.server'
 import { requirePlatformOperator } from '@/lib/auth'
 import { PRODUCT_NAME } from '@/lib/brand'
 import { Logo } from '@/components/brand-logo'
@@ -27,6 +28,8 @@ export async function generateMetadata() {
 
 // Authorization is enforced by /platform/layout.tsx (super-admin only).
 export default async function PlatformBrandingPage() {
+  const tBoard = await getGeneratedValueTranslations()
+
   await requirePlatformOperator()
   const branding = await getPlatformBranding()
   const tGenerated = await getGeneratedTranslations()
@@ -41,27 +44,31 @@ export default async function PlatformBrandingPage() {
           subtitle={tGenerated('m_0431e1142db314')}
         />
 
-        <section aria-label="Saved platform identity preview" className="grid gap-4 sm:grid-cols-3">
+        <section
+          aria-label={tBoard('Saved platform identity preview')}
+          className="grid gap-4 sm:grid-cols-3"
+        >
           <div className="rounded-xl bg-[rgb(var(--color-sidebar))] p-5 text-white">
-            <p className="mb-4 text-xs text-slate-300">Sidebar masthead</p>
+            <p className="mb-4 text-xs text-slate-300">{tBoard('Sidebar masthead')}</p>
             <Logo branding={branding} className="h-8 w-auto max-w-full rounded bg-white p-1" />
           </div>
           <div className="rounded-xl border bg-white p-5 dark:bg-slate-900">
-            <p className="text-xs text-slate-500">Login identity</p>
+            <p className="text-xs text-slate-500">{tBoard('Login identity')}</p>
             <p className="mt-4 text-xl font-semibold">
               {branding.productName?.trim() || PRODUCT_NAME}
             </p>
           </div>
           <div className="rounded-xl border bg-white p-5 dark:bg-slate-900">
-            <p className="text-xs text-slate-500">Browser-title example</p>
+            <p className="text-xs text-slate-500">{tBoard('Browser-title example')}</p>
             <p className="mt-4 text-sm break-words">
-              Dashboard · {branding.productName?.trim() || PRODUCT_NAME}
+              {tBoard('Dashboard ·')} {branding.productName?.trim() || PRODUCT_NAME}
             </p>
           </div>
         </section>
         <p className="text-xs text-slate-500">
-          Preview reflects the saved master branding. Light/Terra is the shared design system;
-          tenant branding cannot change this platform identity.
+          {tBoard(
+            'Preview reflects the saved master branding. Light/Terra is the shared design system; tenant branding cannot change this platform identity.',
+          )}
         </p>
         <Card>
           <CardHeader>

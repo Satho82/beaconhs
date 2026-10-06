@@ -1,4 +1,5 @@
 'use client'
+import { useGeneratedValueTranslations } from '@/i18n/generated'
 
 import { useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
@@ -95,6 +96,8 @@ export function SettingsForm({
   sidebar,
   children,
 }: SettingsFormProps) {
+  const tBoard = useGeneratedValueTranslations()
+
   const formRef = useRef<HTMLFormElement>(null)
   const [dirty, setDirty] = useState(false)
   const [pending, setPending] = useState(false)
@@ -107,11 +110,13 @@ export function SettingsForm({
     try {
       await action(formData)
       setDirty(false)
-      setMessage('Settings saved.')
+      setMessage(tBoard('Settings saved.'))
       router.refresh()
     } catch {
       setMessage(
-        'Unable to save settings. Your changes are still here. Check the values and try again.',
+        tBoard(
+          'Unable to save settings. Your changes are still here. Check the values and try again.',
+        ),
       )
     } finally {
       setPending(false)
@@ -168,7 +173,7 @@ export function SettingsForm({
           {discardLabel}
         </Button>
         <Button type="submit" disabled={!dirty || pending}>
-          {pending ? 'Saving…' : saveLabel}
+          {pending ? tBoard('Saving…') : saveLabel}
         </Button>
       </div>
     </form>

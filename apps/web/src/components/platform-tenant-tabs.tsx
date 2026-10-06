@@ -1,4 +1,5 @@
 'use client'
+import { useGeneratedValueTranslations } from '@/i18n/generated'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@beaconhs/ui'
@@ -9,6 +10,8 @@ export function PlatformTenantTabs({
   tenantId: string
   tenantName: string
 }) {
+  const tBoard = useGeneratedValueTranslations()
+
   const path = usePathname()
   const base = `/platform/tenants/${tenantId}`
   const tabs = [
@@ -21,13 +24,13 @@ export function PlatformTenantTabs({
   return (
     <div className="shrink-0 border-b bg-white px-4 pt-3 sm:px-6 dark:bg-slate-900">
       <p className="text-xs font-medium break-words text-slate-500">
-        Platform administration ·{' '}
+        {tBoard('Platform administration ·')}{' '}
         <span className="text-slate-900 dark:text-slate-100">{tenantName}</span>
       </p>
-      <nav aria-label="Tenant administration" className="mt-2 flex gap-2 overflow-x-auto">
+      <nav aria-label={tBoard('Tenant administration')} className="mt-2 flex gap-2 overflow-x-auto">
         {tabs.map(([label, suffix]) => (
           <Link
-            key={label}
+            key={tBoard(label)}
             href={`${base}${suffix}` as never}
             aria-current={path === `${base}${suffix}` ? 'page' : undefined}
             className={cn(
@@ -37,7 +40,7 @@ export function PlatformTenantTabs({
                 : 'border-transparent text-slate-500 hover:text-teal-700',
             )}
           >
-            {label}
+            {tBoard(label)}
           </Link>
         ))}
       </nav>

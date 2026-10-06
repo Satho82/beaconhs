@@ -17,6 +17,16 @@ const TEXT_PARAM_NAMES = new Set([
   'templateKey',
   'token',
 ])
+// This route selects one of two branding asset kinds, never a database UUID.
+const TEXT_PARAMS_BY_ROUTE = new Map([
+  ['(app)/admin/settings/branding/assets/[kind]/route.ts', new Set(['kind'])],
+])
+function isTextParam(file: string, param: string): boolean {
+  return (
+    TEXT_PARAM_NAMES.has(param) ||
+    (TEXT_PARAMS_BY_ROUTE.get(relative(APP_ROOT, file))?.has(param) ?? false)
+  )
+}
 // Better Auth owns this table and deliberately uses a text primary key.
 const TEXT_ID_ROUTES = new Set(['(app)/platform/users/[id]/page.tsx'])
 const LOCAL_UUID_IMPLEMENTATION =
@@ -44,12 +54,12 @@ function dynamicParamsFor(file: string): string[] {
 
 function uuidParamsFor(file: string): string[] {
   if (TEXT_ID_ROUTES.has(relative(APP_ROOT, file))) return []
-  return dynamicParamsFor(file).filter((param) => !TEXT_PARAM_NAMES.has(param))
+  return dynamicParamsFor(file).filter((param) => !isTextParam(file, param))
 }
 
 function textParamsFor(file: string): string[] {
   if (TEXT_ID_ROUTES.has(relative(APP_ROOT, file))) return dynamicParamsFor(file)
-  return dynamicParamsFor(file).filter((param) => TEXT_PARAM_NAMES.has(param))
+  return dynamicParamsFor(file).filter((param) => isTextParam(file, param))
 }
 
 function handlerChunks(source: string, isPage: boolean): string[] {

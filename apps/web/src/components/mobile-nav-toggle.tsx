@@ -1,4 +1,5 @@
 'use client'
+import { useGeneratedValueTranslations } from '@/i18n/generated'
 
 import { Menu } from 'lucide-react'
 import { Drawer } from '@beaconhs/ui'
@@ -16,6 +17,8 @@ export function MobileNavToggle({
   groups: SidebarNavGroup[]
   platformBranding?: PlatformBranding
 }) {
+  const tBoard = useGeneratedValueTranslations()
+
   const { open, setOpen } = useMobileNav()
   const navGroups = useNavGroups(groups)
   return (
@@ -23,7 +26,7 @@ export function MobileNavToggle({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        aria-label="Open navigation"
+        aria-label={tBoard('Open navigation')}
         aria-expanded={open}
         className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border text-slate-600 lg:hidden dark:text-slate-200"
       >

@@ -86,6 +86,8 @@ export default async function AdminSettingsPage() {
 }
 
 async function SettingsPage({ activeSection }: { activeSection: SettingsSection }) {
+  const tBoard = await getGeneratedValueTranslations()
+
   const tGeneratedValue = await getGeneratedValueTranslations()
   const tGenerated = await getGeneratedTranslations()
   const ctx = await requireSettingsAdmin()
@@ -153,7 +155,7 @@ async function SettingsPage({ activeSection }: { activeSection: SettingsSection 
                 {t('title')}
               </h1>
               <p className="mt-1 text-sm text-slate-600">
-                {tenant.name} · Changes apply to this tenant.
+                {tenant.name} {tBoard('· Changes apply to this tenant.')}
               </p>
             </div>
           </div>

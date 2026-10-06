@@ -52,9 +52,11 @@ it('uses the authenticated tenant, private caching and nosniff', async () => {
   expect(response.headers.get('Cache-Control')).toBe('private, no-store')
   expect(response.headers.get('X-Content-Type-Options')).toBe('nosniff')
 })
-it.each(['invalid', '../logo'])('rejects unsupported asset kind %s', async (kind) => {
+it.each(['invalid', '../logo', '', assetId])('rejects unsupported asset kind %s', async (kind) => {
   expect((await GET(request, params(kind))).status).toBe(404)
+  expect(mocks.context).not.toHaveBeenCalled()
   expect(mocks.query).not.toHaveBeenCalled()
+  expect(mocks.read).not.toHaveBeenCalled()
 })
 it.each([
   key.replace(tenantId, assetId),

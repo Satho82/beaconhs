@@ -136,12 +136,14 @@ describe('property page workflow', () => {
         (n) => n.props.href === '/hospitality/properties/new',
       ),
     ).toBe(false)
-    expect(nodes(await detail()).some((n) => n.type === 'confirm-control')).toBe(false)
+    expect(nodes(await detail({ tab: 'settings' })).some((n) => n.type === 'confirm-control')).toBe(
+      false,
+    )
     await expect(NewProperty()).rejects.toThrow()
   })
   it('requires confirmation on the manager archive form', async () => {
     fixture()
-    const rendered = nodes(await detail())
+    const rendered = nodes(await detail({ tab: 'settings' }))
     expect(rendered.find((n) => n.type === 'confirm-control')?.props).toMatchObject({
       name: 'confirmation',
       value: 'archive',
@@ -176,7 +178,7 @@ describe('property page workflow', () => {
   })
   it('uses identical tenant/property/name/code filters for building count and bounded page', async () => {
     const f = fixture({ total: 14 })
-    const rendered = nodes(await detail({ q: 'Wing', page: '2', perPage: '5' }))
+    const rendered = nodes(await detail({ tab: 'structure', q: 'Wing', page: '2', perPage: '5' }))
     expect(f.queries[1]).toEqual(f.queries[2])
     expect(f.queries[1]?.params).toEqual([tenant, id, '%Wing%', '%Wing%'])
     expect(f.queries[1]?.sql).toContain('"name" ilike')
@@ -197,7 +199,7 @@ describe('property page workflow', () => {
   })
   it('uses a search empty state instead of prompting creation for zero matches', async () => {
     fixture()
-    const rendered = nodes(await detail({ q: 'missing' }))
+    const rendered = nodes(await detail({ tab: 'structure', q: 'missing' }))
     expect(rendered.find((n) => n.type === 'empty-state')?.props).toMatchObject({
       title: 'm_0c726da8b78d42',
       description: undefined,

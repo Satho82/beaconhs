@@ -58,6 +58,8 @@ export default async function AdminTenantsPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
+  const tBoard = await getGeneratedValueTranslations()
+
   const tGeneratedValue = await getGeneratedValueTranslations()
   const tGenerated = await getGeneratedTranslations()
   await requirePlatformOperator()
@@ -172,7 +174,9 @@ export default async function AdminTenantsPage({
           }
         />
 
-        <p className="text-sm text-slate-500">{total} matching tenants</p>
+        <p className="text-sm text-slate-500">
+          {tGenerated('m_0e9cf68e660fb4', { value0: total })}
+        </p>
         <TableToolbar>
           <SearchInput placeholder={tGenerated('m_08a94e8cabaf07')} />
           <FilterChips
@@ -236,10 +240,10 @@ export default async function AdminTenantsPage({
                         </SortableTh>
                       ))}
                     />
-                    <TableHead>Properties</TableHead>
-                    <TableHead>Effective Modules</TableHead>
-                    <TableHead>Configuration</TableHead>
-                    <TableHead>Actions</TableHead>
+                    <TableHead>{tBoard('Properties')}</TableHead>
+                    <TableHead>{tBoard('Effective Modules')}</TableHead>
+                    <TableHead>{tBoard('Configuration')}</TableHead>
+                    <TableHead>{tBoard('Actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -289,7 +293,7 @@ export default async function AdminTenantsPage({
                               href={`/platform/tenants/${tenant.id}/settings`}
                               className="text-teal-700 underline"
                             >
-                              Review settings
+                              {tBoard('Review settings')}
                             </Link>
                           </TableCell>
                           <TableCell>

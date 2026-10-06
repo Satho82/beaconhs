@@ -156,7 +156,7 @@ export function Drawer({
             ref={panelRef}
             role="dialog"
             aria-labelledby={title ? titleId : undefined}
-            aria-label={title ? undefined : 'Panel'}
+            aria-label={title ? undefined : t('Panel')}
             aria-modal="true"
             tabIndex={-1}
             initial={reduce ? false : { x: side === 'left' ? '-100%' : '100%' }}

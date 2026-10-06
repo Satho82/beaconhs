@@ -82,3 +82,89 @@ Approvals/PMS/billing capabilities remain outside this batch.
   mandatory for candidate acceptance, deployment and board candidate freeze.
 
 **FAST DEV GREEN ≠ RELEASE APPROVED.**
+
+## Fast DEV regression correction for 1587c2c5
+
+The failed automatic Fast DEV run is
+[37377952347](https://github.com/Satho82/beaconhs/actions/runs/37377952347).
+It reported 1,441 passing, eight failing and one skipped web test. The runner,
+installation, static checks and disposable database migrations worked.
+
+| Failure                     | Cause and authoritative contract                                                                                                                                                                                         | Correction                                                                                                                                                                                                                                                                                  |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Untranslated JSX/attributes | Board shell commit `43cb94ca` and administration/property commit `1587c2c5` added literal copy outside the existing translators, including the shared drawer fallback label. The i18n contract remains authoritative.    | Route new display copy, labels and accessibility text through existing server/client/UI translation helpers; catalogue the copy.                                                                                                                                                            |
+| Programmatic copy           | New settings messages, leave-page confirmation, audit summary, tab/metric labels and guide/tour titles were absent from the catalogue. Existing runtime localisation remains authoritative.                              | Catalogue the new strings and translate settings messages, confirmation prompts and displayed system values.                                                                                                                                                                                |
+| Request-aware metadata      | `1587c2c5` replaced translated Platform Overview metadata with a static English export.                                                                                                                                  | Restore request-aware `generateMetadata` using the server translator.                                                                                                                                                                                                                       |
+| Manual/tour catalogue       | The Board commits changed branding, navigation guidance and tour text and added Board articles without corresponding catalogue entries. The coverage list also omitted the new article collection.                       | Update all three locale catalogues and add Board articles to the existing long-form coverage assertion. Existing English fallbacks for legacy guide bodies are retained.                                                                                                                    |
+| Dynamic UUID route audit    | The new branding asset route uses `kind` as the finite `logo`/`letterhead` discriminator. The audit classified every unrecognised segment as UUID-backed. A UUID predicate would incorrectly reject both supported URLs. | Classify only this exact route/parameter as text-backed. Move the finite-value guard before request context and privileged reads. Runtime tests reject invalid, traversal, empty and UUID-shaped values before context/database/storage access. All actual UUID route checks remain intact. |
+| Archive confirmation        | Approved Property tabs moved the existing archive form to manager-only Settings. The test still rendered default Overview.                                                                                               | Exercise Settings, retaining the confirmation name/value/destructive-variant and property-ID assertions; reader access remains denied.                                                                                                                                                      |
+| Building count/page         | Approved Structure tab contains the existing pagination control. SQL-filter equality and limit/offset assertions already passed; only lookup of the control on default Overview failed.                                  | Exercise Structure, retaining identical tenant/property/name/code predicates, page bounds and pagination assertions.                                                                                                                                                                        |
+| Search empty state          | The building empty state moved to Structure. The test still searched default Overview.                                                                                                                                   | Exercise Structure with the same zero-match title and absence-of-creation-prompt assertions; retain the property-list empty-state checks.                                                                                                                                                   |
+
+No building-query, tenant-isolation, property-scope, entitlement or archive-action
+contract is relaxed. No workflow, infrastructure, deployment or database schema
+change is included. Property tabs and the approved Board presentation remain.
+
+### Validation
+
+- Requested focused suites: 21 tests passed across three files.
+- Board regression set: 178 tests passed across 24 files (navigation, theme,
+  Platform/tenant administration, branding actions/assets, settings Save/Discard,
+  property access/actions/controls).
+- Locale catalogue consistency: 12 tests passed across two files.
+- Worker storage initialisation: two tests passed.
+- Fast DEV classifier: 37 tests passed; Fast DEV, candidate deployment and
+  repository-immutability shell contracts passed.
+- Fresh Next.js route type generation and full web TypeScript check passed.
+- Changed-file formatting and diff whitespace checks passed.
+- Changed web files: ESLint passed with three existing image-element warnings.
+
+### Publishing constraint
+
+The unchanged `.github/workflows/uvanoo-v1.4-cloud-build.yml` automatically runs
+Full Release validation on pushes to `feature/uvanoo-v1.4` touching `apps/**` or
+`packages/**`. This correction necessarily matches those paths. Pushing cannot
+currently trigger only Fast DEV. No push or manual workflow dispatch is performed
+while the instruction not to run Full Release remains in force. Resolving this
+constraint requires an explicit decision about that existing automatic trigger.
+
+### Review checklist
+
+- Confirm Settings still requires archive confirmation and hides it from readers.
+- Check Structure search, matching counts, bounded pagination and no-results copy.
+- Check translated Board labels, settings feedback, metadata and guide entries.
+- Verify unsupported branding asset kinds fail before request-context access.
+- Obtain automatic Fast DEV success for the eventual remote correction SHA before
+  closing this development batch; do not treat local checks as release approval.
+
+### Correction file manifest
+
+- `apps/web/src/app/(app)/admin/integrations/page.tsx`
+- `apps/web/src/app/(app)/admin/notifications/page.tsx`
+- `apps/web/src/app/(app)/admin/settings/branding/assets/[kind]/route.test.ts`
+- `apps/web/src/app/(app)/admin/settings/branding/assets/[kind]/route.ts`
+- `apps/web/src/app/(app)/admin/settings/branding/page.tsx`
+- `apps/web/src/app/(app)/admin/settings/page.tsx`
+- `apps/web/src/app/(app)/admin/settings/settings-form.test.tsx`
+- `apps/web/src/app/(app)/admin/settings/settings-form.tsx`
+- `apps/web/src/app/(app)/hospitality/properties/[propertyId]/page.tsx`
+- `apps/web/src/app/(app)/hospitality/properties/page.tsx`
+- `apps/web/src/app/(platform)/platform/branding/page.tsx`
+- `apps/web/src/app/(platform)/platform/page.tsx`
+- `apps/web/src/app/(platform)/platform/tenants/[tenantId]/entitlements/page.tsx`
+- `apps/web/src/app/(platform)/platform/tenants/page.tsx`
+- `apps/web/src/components/app-shell.tsx`
+- `apps/web/src/components/mobile-nav-toggle.tsx`
+- `apps/web/src/components/platform-tenant-tabs.tsx`
+- `apps/web/src/components/sidebar-nav.test.tsx`
+- `apps/web/src/components/sidebar-nav.tsx`
+- `apps/web/src/components/tenant-branding-form.tsx`
+- `apps/web/src/i18n/i18n-coverage.test.ts`
+- `apps/web/src/lib/dynamic-uuid-route-guards.test.ts`
+- `apps/web/src/lib/hospitality/properties-pages.test.tsx`
+- `apps/web/src/lib/use-unsaved-changes.ts`
+- `docs/UVANOO-V1.4-BOARD-BATCH-01.md`
+- `packages/i18n/src/messages/en.json`
+- `packages/i18n/src/messages/es.json`
+- `packages/i18n/src/messages/fr.json`
+- `packages/ui/src/drawer.tsx`

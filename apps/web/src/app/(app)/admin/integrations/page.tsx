@@ -1,3 +1,4 @@
+import { getGeneratedValueTranslations } from '@/i18n/generated.server'
 import { getGeneratedTranslations } from '@/i18n/generated.server'
 
 import { GeneratedText, GeneratedValue } from '@/i18n/generated'
@@ -72,6 +73,8 @@ type Connected = {
 }
 
 export default async function IntegrationsPage() {
+  const tBoard = await getGeneratedValueTranslations()
+
   const ctx = await requireRequestContext()
   if (!ctx.isSuperAdmin && !can(ctx, 'admin.integrations.manage')) redirect('/admin')
   const [tenant] = await ctx.db((tx) =>
@@ -182,7 +185,9 @@ export default async function IntegrationsPage() {
 
   return (
     <PageContainer>
-      <p className="mb-3 text-sm text-slate-600">{tenant.name} · Changes apply to this tenant.</p>
+      <p className="mb-3 text-sm text-slate-600">
+        {tenant.name} {tBoard('· Changes apply to this tenant.')}
+      </p>
       <SettingsNavigation navigationLabel="Tenant settings" activeSection="integrations" />
       <AdminBackLink />
       <div className="space-y-8">

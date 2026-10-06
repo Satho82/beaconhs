@@ -25,6 +25,8 @@ export default async function PropertyDetail({
   params: Promise<{ propertyId: string }>
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
+  const tBoard = await getGeneratedValueTranslations()
+
   const translateHospitality = await getGeneratedTranslations()
 
   const { propertyId: id } = await params
@@ -114,7 +116,7 @@ export default async function PropertyDetail({
       </div>
       {tab === 'overview' && (
         <section className="mt-5 rounded-xl border bg-white p-5 dark:bg-slate-900">
-          <h2 className="text-lg font-semibold">Property overview</h2>
+          <h2 className="text-lg font-semibold">{tBoard('Property overview')}</h2>
           <dl className="mt-4 grid gap-4 sm:grid-cols-3">
             {[
               ['Property', property.name],
@@ -122,20 +124,21 @@ export default async function PropertyDetail({
               ['Timezone', property.timezone],
             ].map(([label, value]) => (
               <div key={label}>
-                <dt className="text-xs text-slate-500">{label}</dt>
+                <dt className="text-xs text-slate-500">{tBoard(label)}</dt>
                 <dd className="mt-1 font-medium break-words">{value}</dd>
               </div>
             ))}
           </dl>
           <p className="mt-5 text-sm text-slate-600">
-            Manage the existing Property → Building → Floor → Room structure. Rooms remain the
-            hospitality accommodation records.
+            {tBoard(
+              'Manage the existing Property → Building → Floor → Room structure. Rooms remain the hospitality accommodation records.',
+            )}
           </p>
         </section>
       )}
       {tab === 'operations' && (
         <section className="mt-5 rounded-xl border bg-white p-5 dark:bg-slate-900">
-          <h2 className="text-lg font-semibold">Property operations</h2>
+          <h2 className="text-lg font-semibold">{tBoard('Property operations')}</h2>
           <div className="mt-4 flex flex-wrap gap-3">
             {modules.has('hospitality.manager-signoff') && (
               <Button asChild variant="outline">
@@ -155,7 +158,7 @@ export default async function PropertyDetail({
           </div>
           {!modules.has('hospitality.diary') && !modules.has('hospitality.manager-signoff') && (
             <p className="mt-3 text-sm text-slate-500">
-              No property diary or sign-off module is enabled.
+              {tBoard('No property diary or sign-off module is enabled.')}
             </p>
           )}
         </section>
@@ -163,11 +166,13 @@ export default async function PropertyDetail({
       {tab === 'structure' && (
         <div className="mt-5 grid gap-5 lg:grid-cols-[14rem_minmax(0,1fr)]">
           <aside className="rounded-xl border bg-white p-4 dark:bg-slate-900">
-            <h2 className="font-semibold">Structure</h2>
+            <h2 className="font-semibold">{tBoard('Structure')}</h2>
             <ol className="mt-3 space-y-3 border-l border-teal-700 pl-4 text-sm">
               <li className="font-medium">{property.name}</li>
-              <li>Buildings</li>
-              <li className="text-slate-500">Open a building to browse floors, then rooms.</li>
+              <li>{tBoard('Buildings')}</li>
+              <li className="text-slate-500">
+                {tBoard('Open a building to browse floors, then rooms.')}
+              </li>
             </ol>
           </aside>
           <section className="min-w-0 rounded-xl border bg-white p-5 dark:bg-slate-900">
@@ -193,13 +198,15 @@ export default async function PropertyDetail({
             )}
             <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
               <SearchInput />
-              <span className="text-sm text-slate-500">{data.total} matching buildings</span>
+              <span className="text-sm text-slate-500">
+                {translateHospitality('m_104249d25c4dfb', { value0: data.total })}
+              </span>
               {can(ctx, 'admin.settings.manage') && manage && (
                 <Link
                   href="/admin/settings/import-export/property-structure/upload"
                   className="text-sm text-teal-700 underline"
                 >
-                  Import property structure (tenant-wide)
+                  {tBoard('Import property structure (tenant-wide)')}
                 </Link>
               )}
             </div>

@@ -1,3 +1,4 @@
+import { getGeneratedValueTranslations } from '@/i18n/generated.server'
 import { getGeneratedTranslations } from '@/i18n/generated.server'
 import { isUuid } from '@/lib/list-params'
 import { notFound } from 'next/navigation'
@@ -17,6 +18,8 @@ export default async function TenantEntitlementsPage({
 }: {
   params: Promise<{ tenantId: string }>
 }) {
+  const tBoard = await getGeneratedValueTranslations()
+
   const translateHospitality = await getGeneratedTranslations()
 
   const { tenantId } = await params
@@ -41,8 +44,9 @@ export default async function TenantEntitlementsPage({
         />
 
         <p className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
-          Module configuration does not replace role or property permissions. Compliance enforcement
-          coverage remains incomplete; an enabled setting is not a claim of complete enforcement.
+          {tBoard(
+            'Module configuration does not replace role or property permissions. Compliance enforcement coverage remains incomplete; an enabled setting is not a claim of complete enforcement.',
+          )}
         </p>
         <div className="grid gap-4">
           {MODULE_CATALOGUE.map((module) => {
@@ -59,27 +63,38 @@ export default async function TenantEntitlementsPage({
                 <input type="hidden" name="tenantId" value={tenantId} />
                 <input type="hidden" name="moduleKey" value={module.key} />
                 <div className="sm:col-span-2">
-                  <h2 className="font-medium">{module.name}</h2>
-                  <p className="text-muted-foreground text-sm">{module.description}</p>
+                  <h2 className="font-medium">{tBoard(module.name)}</h2>
+                  <p className="text-muted-foreground text-sm">{tBoard(module.description)}</p>
                   <div className="mt-2 flex flex-wrap gap-2">
                     <Badge variant={effective ? 'success' : 'secondary'}>
-                      Effective now: {effective ? 'Yes' : 'No'}
+                      {translateHospitality('m_0f62e1e281e382', {
+                        value0: tBoard(effective ? 'Yes' : 'No'),
+                      })}
                     </Badge>
-                    <Badge variant="secondary">Configured: {row?.state ?? 'disabled'}</Badge>
+                    <Badge variant="secondary">
+                      {translateHospitality('m_118680b8fbbff6', {
+                        value0: tBoard(row?.state ?? 'disabled'),
+                      })}
+                    </Badge>
                   </div>
                   {module.key === 'hospitality.manager-signoff' && (
                     <p className="mt-2 text-sm text-slate-600">
-                      Requires Diary to be effective. Diary is currently{' '}
-                      {diaryEffective ? 'effective' : 'not effective'}.
+                      {tBoard(
+                        diaryEffective
+                          ? 'Requires Diary to be effective. Diary is currently effective.'
+                          : 'Requires Diary to be effective. Diary is currently not effective.',
+                      )}
                     </p>
                   )}
                   <p className="mt-2 text-xs text-slate-500">
-                    Last changed:{' '}
+                    {tBoard('Last changed:')}{' '}
                     {row?.updatedAt?.toISOString().replace('T', ' ').slice(0, 16) ??
-                      'Not configured'}
-                    {row ? ' UTC' : ''} · Changed by:{' '}
+                      tBoard('Not configured')}
+                    {row ? ` ${tBoard('UTC')}` : ''} {tBoard('· Changed by:')}{' '}
                     {row?.changedByName ??
-                      (row?.changedByUserId ? 'Recorded identity unavailable' : 'Not recorded')}
+                      (row?.changedByUserId
+                        ? tBoard('Recorded identity unavailable')
+                        : tBoard('Not recorded'))}
                   </p>
                 </div>
                 <Label>
@@ -91,7 +106,7 @@ export default async function TenantEntitlementsPage({
                 </Label>
                 <Button type="submit">{translateHospitality('m_19e6bff894c3c7')}</Button>
                 <Label>
-                  Effective from (UTC)
+                  {tBoard('Effective from (UTC)')}
                   <Input
                     type="date"
                     name="effectiveFrom"
@@ -99,7 +114,7 @@ export default async function TenantEntitlementsPage({
                   />
                 </Label>
                 <Label>
-                  Effective until (exclusive, UTC)
+                  {tBoard('Effective until (exclusive, UTC)')}
                   <Input
                     type="date"
                     name="effectiveUntil"

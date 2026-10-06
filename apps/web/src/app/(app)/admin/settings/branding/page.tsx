@@ -1,3 +1,4 @@
+import { getGeneratedTranslations, getGeneratedValueTranslations } from '@/i18n/generated.server'
 import { eq } from 'drizzle-orm'
 import { notFound } from 'next/navigation'
 import { db, withSuperAdmin } from '@beaconhs/db'
@@ -12,6 +13,9 @@ import { SettingsNavigation } from '../settings-form'
 import { saveCurrentTenantBranding } from './_actions'
 export const dynamic = 'force-dynamic'
 export default async function BrandingSettingsPage() {
+  const tBoard = await getGeneratedValueTranslations()
+  const tBoardMessage = await getGeneratedTranslations()
+
   const ctx = await requireRequestContext()
   assertCan(ctx, 'admin.settings.manage')
   const [tenant] = await withSuperAdmin(db, (tx) =>
@@ -26,12 +30,12 @@ export default async function BrandingSettingsPage() {
     <PageContainer>
       <div className="space-y-5">
         <PageHeader
-          title="Tenant Settings"
-          description={`${tenant.name} · Changes apply to this tenant.`}
+          title={tBoard('Tenant Settings')}
+          description={tBoardMessage('m_0a19f0c1debc78', { value0: tenant.name })}
         />
         <SettingsNavigation navigationLabel="Tenant Settings" activeSection="branding" />
         <section className="max-w-3xl rounded-xl border bg-white p-5 dark:bg-slate-900">
-          <h2 className="mb-5 text-lg font-semibold">Tenant Branding</h2>
+          <h2 className="mb-5 text-lg font-semibold">{tBoard('Tenant Branding')}</h2>
           <TenantBrandingForm
             key={JSON.stringify(tenant.branding)}
             tenantId={ctx.tenantId}

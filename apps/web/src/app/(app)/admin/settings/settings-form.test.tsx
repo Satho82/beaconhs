@@ -2,6 +2,9 @@
 import { act } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+vi.mock('@/i18n/generated', () => ({
+  useGeneratedValueTranslations: () => (value: string) => value,
+}))
 vi.mock('next-intl', () => ({ useTranslations: () => (value: string) => value }))
 vi.mock('next/navigation', () => ({ useRouter: () => ({ refresh: vi.fn() }) }))
 vi.mock('@beaconhs/ui', () => ({

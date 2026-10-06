@@ -1,3 +1,4 @@
+import { PlatformBrandingForm } from './_form'
 import { getGeneratedValueTranslations } from '@/i18n/generated.server'
 import { requirePlatformOperator } from '@/lib/auth'
 import { PRODUCT_NAME } from '@/lib/brand'
@@ -79,14 +80,14 @@ export default async function PlatformBrandingPage() {
           </CardHeader>
 
           <CardContent>
-            <form
+            <PlatformBrandingForm
+              key={JSON.stringify(branding)}
               action={savePlatformBrandingAction}
-              className="space-y-8"
-              encType="multipart/form-data"
             >
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <Field label={tGenerated('m_0940e3cad188a2')}>
+                <Field htmlFor="productName" label={tGenerated('m_0940e3cad188a2')}>
                   <Input
+                    id="productName"
                     name="productName"
                     defaultValue={branding.productName ?? ''}
                     placeholder={tGenerated('m_13f7e9eb21e87b')}
@@ -94,8 +95,9 @@ export default async function PlatformBrandingPage() {
                   />
                 </Field>
 
-                <Field label={tGenerated('m_035b646ef021c8')}>
+                <Field htmlFor="primaryColor" label={tGenerated('m_035b646ef021c8')}>
                   <Input
+                    id="primaryColor"
                     name="primaryColor"
                     defaultValue={branding.primaryColor ?? ''}
                     placeholder={tGenerated('m_0c59e0fdca76d8')}
@@ -163,8 +165,9 @@ export default async function PlatformBrandingPage() {
                   />
                   {tGenerated('m_8a5c1e4f7b9d26')}
                 </label>
-                <Field label={tGenerated('m_9b6d2f5a8c1e37')}>
+                <Field htmlFor="googleTagId" label={tGenerated('m_9b6d2f5a8c1e37')}>
                   <Input
+                    id="googleTagId"
                     name="googleTagId"
                     defaultValue={branding.analytics?.googleTagId ?? ''}
                     placeholder={tGenerated('m_d1e4a7c2f5b369')}
@@ -177,11 +180,7 @@ export default async function PlatformBrandingPage() {
               <p className="text-xs text-slate-500 dark:text-slate-400">
                 {tGenerated('m_1aa9e4f97037d4')}
               </p>
-
-              <div className="flex justify-end border-t border-slate-100 pt-4 dark:border-slate-800">
-                <Button type="submit">{tGenerated('m_17acc9d94c2c8c')}</Button>
-              </div>
-            </form>
+            </PlatformBrandingForm>
           </CardContent>
         </Card>
       </div>
@@ -216,7 +215,7 @@ function BrandAssetField({
     <div className="rounded-lg border border-slate-200 p-4 dark:border-slate-800">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0 space-y-1">
-          <Label>{label}</Label>
+          <Label htmlFor={name}>{label}</Label>
           <div className="flex h-12 items-center">{preview}</div>
           {!hasCustomAsset && emptyLabel ? (
             <p className="text-xs text-slate-500 dark:text-slate-400">{emptyLabel}</p>
@@ -224,10 +223,14 @@ function BrandAssetField({
           <p className="text-xs text-slate-500 dark:text-slate-400">{help}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <label className="inline-flex cursor-pointer items-center rounded-md border border-slate-300 px-3 py-2 text-sm font-medium hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800">
-            {uploadLabel}
-            <input name={name} type="file" accept={accept} className="sr-only" />
-          </label>
+          <Input
+            id={name}
+            name={name}
+            type="file"
+            accept={accept}
+            aria-label={`${label} · ${uploadLabel}`}
+            className="max-w-full"
+          />
           {hasCustomAsset ? (
             <Button type="submit" name={resetName} value="1" variant="outline">
               {resetLabel}
@@ -243,14 +246,18 @@ function Field({
   label,
   children,
   className,
+  htmlFor,
 }: {
+  htmlFor: string
   label: string
   children: React.ReactNode
   className?: string
 }) {
   return (
     <div className={className}>
-      <Label className="text-xs">{label}</Label>
+      <Label htmlFor={htmlFor} className="text-xs">
+        {label}
+      </Label>
       <div className="mt-1">{children}</div>
     </div>
   )

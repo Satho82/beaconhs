@@ -115,7 +115,7 @@ export default async function AdminTenantsPage({
         .select({ tenant: tenants, memberCount, peopleCount, incidentCount, propertyCount })
         .from(tenants)
         .where(where)
-        .orderBy(...orderBy)
+        .orderBy(...orderBy, asc(tenants.id))
         .limit(params.perPage)
         .offset((params.page - 1) * params.perPage),
     ])
@@ -215,118 +215,144 @@ export default async function AdminTenantsPage({
                 )}
               />
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <GeneratedValue
-                      value={[
-                        ['name', 'Name'],
-                        ['slug', 'Slug'],
-                        ['status', 'Status'],
-                        ['region', 'Region'],
-                        ['members', 'Members'],
-                        ['people', 'People'],
-                        ['incidents', 'Incidents'],
-                      ].map(([column, label]) => (
-                        <SortableTh
-                          key={column}
-                          basePath={BASE}
-                          currentParams={sp}
-                          dir={params.dir}
-                          column={column!}
-                          active={params.sort === column}
-                        >
-                          <GeneratedValue value={label} />
-                        </SortableTh>
-                      ))}
-                    />
-                    <TableHead>{tBoard('Properties')}</TableHead>
-                    <TableHead>{tBoard('Effective Modules')}</TableHead>
-                    <TableHead>{tBoard('Configuration')}</TableHead>
-                    <TableHead>{tBoard('Actions')}</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  <GeneratedValue
-                    value={rows.map(
-                      ({
-                        tenant,
-                        memberCount,
-                        peopleCount,
-                        incidentCount,
-                        propertyCount,
-                        effectiveCount,
-                      }) => (
-                        <TableRow key={tenant.id}>
-                          <TableCell className="font-medium">
-                            <Link
-                              className="hover:underline"
-                              href={`/platform/tenants/${tenant.id}`}
+              <>
+                <ul className="space-y-3 md:hidden">
+                  {rows.map(({ tenant, propertyCount, effectiveCount }) => (
+                    <li
+                      key={tenant.id}
+                      className="space-y-3 rounded-xl border bg-white p-4 dark:bg-slate-900"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <h2 className="min-w-0 font-semibold break-words">{tenant.name}</h2>
+                        <Badge variant={tenant.status === 'active' ? 'success' : 'secondary'}>
+                          {tBoard(tenant.status)}
+                        </Badge>
+                      </div>
+                      <dl className="grid grid-cols-2 gap-3 text-sm">
+                        <div>
+                          <dt className="text-slate-500">{tBoard('Properties')}</dt>
+                          <dd>{Number(propertyCount)}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-slate-500">{tBoard('Effective Modules')}</dt>
+                          <dd>{effectiveCount}</dd>
+                        </div>
+                      </dl>
+                      <Button asChild size="sm" variant="outline">
+                        <Link href={`/platform/tenants/${tenant.id}`}>{tBoard('Open')}</Link>
+                      </Button>
+                    </li>
+                  ))}
+                </ul>
+                <div className="hidden md:block">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <GeneratedValue
+                          value={[
+                            ['name', 'Name'],
+                            ['slug', 'Slug'],
+                            ['status', 'Status'],
+                            ['region', 'Region'],
+                            ['members', 'Members'],
+                            ['people', 'People'],
+                            ['incidents', 'Incidents'],
+                          ].map(([column, label]) => (
+                            <SortableTh
+                              key={column}
+                              basePath={BASE}
+                              currentParams={sp}
+                              dir={params.dir}
+                              column={column!}
+                              active={params.sort === column}
                             >
-                              <GeneratedValue value={tenant.name} />
-                            </Link>
-                          </TableCell>
-                          <TableCell className="font-mono text-xs">
-                            <GeneratedValue value={tenant.slug} />
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant={tenant.status === 'active' ? 'success' : 'secondary'}>
-                              <GeneratedValue value={tenant.status} />
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            <GeneratedValue value={tenant.region} />
-                          </TableCell>
-                          <TableCell>
-                            <GeneratedValue value={Number(memberCount)} />
-                          </TableCell>
-                          <TableCell>
-                            <GeneratedValue value={Number(peopleCount)} />
-                          </TableCell>
-                          <TableCell>
-                            <GeneratedValue value={Number(incidentCount)} />
-                          </TableCell>
-                          <TableCell>{Number(propertyCount)}</TableCell>
-                          <TableCell>{effectiveCount}</TableCell>
-                          <TableCell>
-                            <Link
-                              href={`/platform/tenants/${tenant.id}/settings`}
-                              className="text-teal-700 underline"
-                            >
-                              {tBoard('Review settings')}
-                            </Link>
-                          </TableCell>
-                          <TableCell>
-                            <GeneratedValue
-                              value={
-                                tenant.status === 'active' ? (
-                                  <div className="flex flex-wrap gap-2">
+                              <GeneratedValue value={label} />
+                            </SortableTh>
+                          ))}
+                        />
+                        <TableHead>{tBoard('Properties')}</TableHead>
+                        <TableHead>{tBoard('Effective Modules')}</TableHead>
+                        <TableHead>{tBoard('Configuration')}</TableHead>
+                        <TableHead>{tBoard('Actions')}</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      <GeneratedValue
+                        value={rows.map(
+                          ({
+                            tenant,
+                            memberCount,
+                            peopleCount,
+                            incidentCount,
+                            propertyCount,
+                            effectiveCount,
+                          }) => (
+                            <TableRow key={tenant.id}>
+                              <TableCell className="font-medium">
+                                <Link
+                                  className="hover:underline"
+                                  href={`/platform/tenants/${tenant.id}`}
+                                >
+                                  <GeneratedValue value={tenant.name} />
+                                </Link>
+                              </TableCell>
+                              <TableCell className="font-mono text-xs">
+                                <GeneratedValue value={tenant.slug} />
+                              </TableCell>
+                              <TableCell>
+                                <Badge
+                                  variant={tenant.status === 'active' ? 'success' : 'secondary'}
+                                >
+                                  <GeneratedValue value={tenant.status} />
+                                </Badge>
+                              </TableCell>
+                              <TableCell>
+                                <GeneratedValue value={tenant.region} />
+                              </TableCell>
+                              <TableCell>
+                                <GeneratedValue value={Number(memberCount)} />
+                              </TableCell>
+                              <TableCell>
+                                <GeneratedValue value={Number(peopleCount)} />
+                              </TableCell>
+                              <TableCell>
+                                <GeneratedValue value={Number(incidentCount)} />
+                              </TableCell>
+                              <TableCell>{Number(propertyCount)}</TableCell>
+                              <TableCell>{effectiveCount}</TableCell>
+                              <TableCell>
+                                <Link
+                                  href={`/platform/tenants/${tenant.id}/settings`}
+                                  className="text-teal-700 underline"
+                                >
+                                  {tBoard('Review settings')}
+                                </Link>
+                              </TableCell>
+                              <TableCell>
+                                <div className="flex flex-wrap gap-2">
+                                  <Button asChild type="button" size="sm" variant="outline">
+                                    <Link href={`/platform/tenants/${tenant.id}`}>
+                                      {tBoard('Open')}
+                                    </Link>
+                                  </Button>
+                                  {tenant.status === 'active' && (
                                     <form action={viewAs}>
                                       <input type="hidden" name="tenantId" value={tenant.id} />
                                       <Button type="submit" size="sm" variant="outline">
                                         <GeneratedText id="m_1583ec793bd336" />
                                       </Button>
                                     </form>
-                                    <Link href={`/platform/tenants/${tenant.id}`}>
-                                      <Button type="button" size="sm" variant="outline">
-                                        <GeneratedText id="m_107ab58c3c38bc" />
-                                      </Button>
-                                    </Link>
-                                  </div>
-                                ) : (
-                                  <span className="text-xs text-slate-400">
-                                    <GeneratedText id="m_134f2adcabdf96" />
-                                  </span>
-                                )
-                              }
-                            />
-                          </TableCell>
-                        </TableRow>
-                      ),
-                    )}
-                  />
-                </TableBody>
-              </Table>
+                                  )}
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ),
+                        )}
+                      />
+                    </TableBody>
+                  </Table>
+                </div>
+              </>
             )
           }
         />

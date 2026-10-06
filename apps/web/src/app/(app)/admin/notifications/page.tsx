@@ -16,6 +16,7 @@ import { resolveEffectiveSmsTransport } from '@beaconhs/sms'
 import { can } from '@beaconhs/tenant'
 import { DetailHeader } from '@beaconhs/ui'
 import { requireRequestContext } from '@/lib/auth'
+import { AdminLoadFailure } from '@/components/admin-load-failure'
 import { getPlatformEmailRaw, getTenantEmailRaw } from '@/lib/email-config'
 import { getPlatformSmsRaw, getTenantSmsRaw } from '@/lib/sms-config'
 import { PageContainer } from '@/components/page-layout'
@@ -41,6 +42,29 @@ export default async function NotificationSettingsPage() {
   )
   if (!tenant) notFound()
 
+  // Authentication, authorization and missing-tenant handling remain outside the
+  // configuration catch. A genuine load failure must never enable default edits.
+  const configuration = await loadConfiguration(ctx).catch(() => <AdminLoadFailure />)
+
+  return (
+    <PageContainer>
+      <p className="mb-3 text-sm text-slate-600">
+        {tenant.name} {tBoard('· Changes apply to this tenant.')}
+      </p>
+      <SettingsNavigation navigationLabel="Tenant settings" activeSection="notifications" />
+      <div className="space-y-4">
+        <DetailHeader
+          title={tGenerated('m_18d4f38ded7c87')}
+          subtitle={tGenerated('m_133c7f1d3c39a0')}
+        />
+        <NotificationsSubNav active="rules" />
+        {configuration}
+      </div>
+    </PageContainer>
+  )
+}
+
+async function loadConfiguration(ctx: Awaited<ReturnType<typeof requireRequestContext>>) {
   const { roleRows, memberRows } = await ctx.db(async (tx) => {
     const roleRows = await tx
       .select({ key: rolesTable.key, name: rolesTable.name })
@@ -60,28 +84,19 @@ export default async function NotificationSettingsPage() {
     return { roleRows, memberRows }
   })
 
-  // Read separately + guarded: the settings/policy tables are additive, so the
-  // page still renders with defaults during the window before their DDL applies.
-  let settingRows: (typeof tenantNotificationSettings.$inferSelect)[] = []
-  let policyRow: typeof tenantNotificationPolicy.$inferSelect | null = null
-  try {
-    settingRows = await ctx.db((tx) =>
-      tx
-        .select()
-        .from(tenantNotificationSettings)
-        .where(eq(tenantNotificationSettings.tenantId, ctx.tenantId)),
-    )
-    const [p] = await ctx.db((tx) =>
-      tx
-        .select()
-        .from(tenantNotificationPolicy)
-        .where(eq(tenantNotificationPolicy.tenantId, ctx.tenantId))
-        .limit(1),
-    )
-    policyRow = p ?? null
-  } catch {
-    settingRows = []
-  }
+  const settingRows = await ctx.db((tx) =>
+    tx
+      .select()
+      .from(tenantNotificationSettings)
+      .where(eq(tenantNotificationSettings.tenantId, ctx.tenantId)),
+  )
+  const [policyRow] = await ctx.db((tx) =>
+    tx
+      .select()
+      .from(tenantNotificationPolicy)
+      .where(eq(tenantNotificationPolicy.tenantId, ctx.tenantId))
+      .limit(1),
+  )
 
   const initial: Record<
     string,
@@ -127,61 +142,32 @@ export default async function NotificationSettingsPage() {
     .map((m) => ({ value: m.userId ?? '', label: m.displayName ?? m.email }))
     .filter((m) => m.value)
 
-  // Channel availability — surfaced so admins know which channels actually
-  // deliver before they enable them. Guarded; defaults to "not set up".
-  let emailAvailability: ChannelAvailability = 'unconfigured'
-  let smsAvailability: ChannelAvailability = 'unconfigured'
-  try {
-    const [platformEmail, tenantEmail] = await Promise.all([
-      getPlatformEmailRaw(),
-      getTenantEmailRaw(ctx),
-    ])
-    const delivery = resolveEffectiveTransport(platformEmail, tenantEmail, { tenantScoped: true })
-    emailAvailability =
-      delivery.kind === 'transport'
-        ? 'ready'
-        : delivery.kind === 'suppressed'
-          ? 'disabled'
-          : 'unconfigured'
-  } catch {
-    // Email settings unavailable — leave email as unconfigured.
-  }
-  try {
-    const [platformSms, tenantSms] = await Promise.all([getPlatformSmsRaw(), getTenantSmsRaw(ctx)])
-    const delivery = resolveEffectiveSmsTransport(platformSms, tenantSms, { tenantScoped: true })
-    smsAvailability =
-      delivery.kind === 'transport'
-        ? 'ready'
-        : delivery.kind === 'suppressed'
-          ? 'disabled'
-          : 'unconfigured'
-  } catch {
-    // SMS settings unavailable — leave SMS as unconfigured.
-  }
+  // A failed lookup is not evidence that a transport is unconfigured.
+  const [platformEmail, tenantEmail, platformSms, tenantSms] = await Promise.all([
+    getPlatformEmailRaw(),
+    getTenantEmailRaw(ctx),
+    getPlatformSmsRaw(),
+    getTenantSmsRaw(ctx),
+  ])
+  const emailDelivery = resolveEffectiveTransport(platformEmail, tenantEmail, {
+    tenantScoped: true,
+  })
+  const smsDelivery = resolveEffectiveSmsTransport(platformSms, tenantSms, { tenantScoped: true })
+  const availability = (kind: string): ChannelAvailability =>
+    kind === 'transport' ? 'ready' : kind === 'suppressed' ? 'disabled' : 'unconfigured'
+  const emailAvailability = availability(emailDelivery.kind)
+  const smsAvailability = availability(smsDelivery.kind)
 
   return (
-    <PageContainer>
-      <p className="mb-3 text-sm text-slate-600">
-        {tenant.name} {tBoard('· Changes apply to this tenant.')}
-      </p>
-      <SettingsNavigation navigationLabel="Tenant settings" activeSection="notifications" />
-      <div className="space-y-4">
-        <DetailHeader
-          title={tGenerated('m_18d4f38ded7c87')}
-          subtitle={tGenerated('m_133c7f1d3c39a0')}
-        />
-        <NotificationsSubNav active="rules" />
-        <NotificationSettingsForm
-          categories={NOTIFICATION_CATEGORIES}
-          roles={roleRows}
-          members={members}
-          groups={groups}
-          initial={initial}
-          policy={policy}
-          emailAvailability={emailAvailability}
-          smsAvailability={smsAvailability}
-        />
-      </div>
-    </PageContainer>
+    <NotificationSettingsForm
+      categories={NOTIFICATION_CATEGORIES}
+      roles={roleRows}
+      members={members}
+      groups={groups}
+      initial={initial}
+      policy={policy}
+      emailAvailability={emailAvailability}
+      smsAvailability={smsAvailability}
+    />
   )
 }

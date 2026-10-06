@@ -57,6 +57,7 @@ export default async function TenantEntitlementsPage({
             return (
               <form
                 key={module.key}
+                aria-label={tBoard(module.name)}
                 action={saveTenantModuleEntitlementAction}
                 className="grid gap-3 rounded-xl border bg-white p-5 sm:grid-cols-4 sm:items-end dark:bg-slate-900"
               >

@@ -20,7 +20,18 @@ Open [Branding](/admin/settings/branding) for the tenant logo, supported accent 
 These tabs open the existing dedicated administration pages. Their own permissions continue to apply. Advanced is no longer a primary settings tab.
 
 ## Platform administration
-Platform operators use the separate Platform administration area to manage master branding, tenant lifecycle and module configuration. Tenant admins cannot activate licensed modules. Platform Overview shows real counts, not service-health or financial claims.`,
+Platform operators use the separate Platform administration area to manage master branding, tenant lifecycle and module configuration. Tenant admins cannot activate licensed modules. Platform Overview shows real counts, not service-health or financial claims.
+
+## If notification settings cannot load
+The page keeps the selected tenant visible and shows **Retry**. Settings cannot be edited until configuration loads successfully. A failed lookup does not mean there are no settings or that email or SMS is unconfigured. Choose **Retry** to reload the current page; if the problem continues, contact your administrator.
+
+## Review the tenant portfolio
+Platform operators open **Tenants**, search by name, slug or region, and filter by Active, Suspended or Archived. The result count and pagination follow the filters. **Open** is available in every lifecycle state; entering a tenant workspace is available only for active tenants. On a phone, each card shows status, property count and effective module count.
+
+## Master branding and modules
+In **Platform Branding**, upload the master logo or favicon and edit the supported platform identity. **Save branding** saves changes; **Discard** restores saved values. A failed save keeps edits available and displays a safe message. Tenant Branding remains separate.
+
+For each tenant, **Modules** shows configured and effective states, the effective period, and the recorded last change. Manager Sign-off requires effective Diary access. Compliance entitlement enforcement is still incomplete. **Overview**, **Branding**, **Properties** and **Activity** remain within Platform administration for the named tenant.`,
   },
   {
     slug: 'property-board-journey',

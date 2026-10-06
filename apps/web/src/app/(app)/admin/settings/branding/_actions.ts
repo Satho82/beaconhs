@@ -21,6 +21,9 @@ export async function saveCurrentTenantBranding(
   // Derive tenant exclusively from authenticated context, never the form.
   const ctx = await requireRequestContext()
   assertCan(ctx, 'admin.settings.manage')
+  const submittedTenant = formData.get('tenantId')
+  if (submittedTenant !== null && submittedTenant !== ctx.tenantId)
+    return { status: 'error', outcome: 'invalid_tenant' }
   const rawColour = String(formData.get('primaryColor') ?? '').trim()
   const primaryColor = normalizeThemeColor(rawColour)
   if (rawColour && !primaryColor) return { status: 'error', outcome: 'invalid_hex' }

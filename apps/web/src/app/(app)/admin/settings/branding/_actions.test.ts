@@ -72,9 +72,25 @@ describe('tenant-admin branding authorization and persistence', () => {
     })
     expect(mocks.transaction).not.toHaveBeenCalled()
   })
-  it('ignores a forged tenant id and unrelated master fields, preserving existing letterhead', async () => {
+  it.each(['other-tenant', '', '22222222-2222-4222-8222-222222222222'])(
+    'rejects forged tenant ID %s before reads, storage or writes',
+    async (forgedId) => {
+      const form = new FormData()
+      form.set('tenantId', forgedId)
+      form.set('primaryColor', '#0f766e')
+      form.set('logo', new File(['png'], 'logo.png', { type: 'image/png' }))
+      expect(await saveCurrentTenantBranding({ status: 'idle' }, form)).toEqual({
+        status: 'error',
+        outcome: 'invalid_tenant',
+      })
+      expect(mocks.upload).not.toHaveBeenCalled()
+      expect(mocks.transaction).not.toHaveBeenCalled()
+      expect(mocks.audit).not.toHaveBeenCalled()
+    },
+  )
+  it('ignores unrelated master fields and preserves existing letterhead for the authenticated tenant', async () => {
     const form = new FormData()
-    form.set('tenantId', 'other-tenant')
+    form.set('tenantId', tenantId)
     form.set('productName', 'Changed master')
     form.set('primaryColor', '#0f766e')
     form.set('logo', new File(['png'], 'logo.png', { type: 'image/png' }))

@@ -124,7 +124,7 @@ export default async function PlatformHubPage() {
               <>
                 <p className="text-sm text-slate-500">{tBoard(metric.label)}</p>
                 <p className="mt-2 text-3xl font-semibold tracking-tight">{metric.value}</p>
-                <p className="mt-2 text-xs text-slate-500">{metric.detail}</p>
+                <p className="mt-2 text-xs text-slate-500">{tBoard(metric.detail)}</p>
               </>
             )
             return metric.href ? (

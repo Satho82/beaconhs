@@ -488,6 +488,8 @@ require '^  push:$' "$cloud"
 forbid '^[[:space:]]*uses:.*deploy-dev\.yml' "$cloud"
 forbid 'runs-on: \[self-hosted, dokploy\]' "$cloud"
 
+# Shell-invoked Node tests must remain visible to the dead-code gate.
+require 'scripts/cluster/dev-writer-fence\.test\.mjs' knip.ts
 node --test scripts/cluster/dev-writer-fence.test.mjs
 
 ruby <<'RUBY'

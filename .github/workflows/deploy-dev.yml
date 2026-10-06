@@ -1037,8 +1037,13 @@ jobs:
       - name: Wait for external readiness
         env:
           APP_URL: ${{ secrets.DEV_APP_URL }}
+          FEATURE_CANDIDATE_VERIFIED: ${{ inputs.feature_candidate_verified }}
         run: |
           set -euo pipefail
+          if [ "$FEATURE_CANDIDATE_VERIFIED" = true ]; then
+            node .deployment-governance/scripts/cluster/dev-readiness.mjs
+            exit 0
+          fi
           ready_url="${APP_URL%/}/api/health/ready"
           login_url="${APP_URL%/}/login"
           deadline=$((SECONDS + 600))

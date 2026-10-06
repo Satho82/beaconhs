@@ -491,6 +491,7 @@ forbid 'runs-on: \[self-hosted, dokploy\]' "$cloud"
 # Shell-invoked Node tests must remain visible to the dead-code gate.
 require 'scripts/cluster/dev-writer-fence\.test\.mjs' knip.ts
 node --test scripts/cluster/dev-writer-fence.test.mjs
+node --test scripts/cluster/dev-readiness.test.mjs
 
 ruby <<'RUBY'
 require 'yaml'
@@ -511,6 +512,27 @@ names = [
 ]
 positions = names.map { |name| steps.index { |s| s['name'] == name } }
 abort 'Writer fence ordering is incomplete or unsafe' unless positions.all? && positions == positions.sort
+readiness = steps[positions.last]
+abort 'Protected readiness must use verified governance and remain success-gated' unless
+  readiness.dig('env', 'FEATURE_CANDIDATE_VERIFIED') == '${{ inputs.feature_candidate_verified }}' &&
+  !readiness.key?('if') && !readiness.key?('continue-on-error') &&
+  readiness['run'].include?(%q{if [ "$FEATURE_CANDIDATE_VERIFIED" = true ]; then}) &&
+  readiness['run'].include?('node .deployment-governance/scripts/cluster/dev-readiness.mjs') &&
+  readiness['run'].index('dev-readiness.mjs') < readiness['run'].index('ready_url=')
+# Execute the workflow branch: failure must propagate; success must not fall
+# through to the old unauthenticated external application-readiness check.
+Dir.mktmpdir('dev-readiness-contract-') do |dir|
+  File.write("#{dir}/node", "#!/bin/sh\nexit \"$PROBE_EXIT\"\n")
+  File.write("#{dir}/curl", "#!/bin/sh\ntouch \"$CURL_MARKER\"\nexit 1\n")
+  FileUtils.chmod(0755, ["#{dir}/node", "#{dir}/curl"])
+  [0, 1].each do |code|
+    _, _, status = Open3.capture3({ 'PATH' => "#{dir}:#{ENV['PATH']}",
+      'FEATURE_CANDIDATE_VERIFIED' => 'true', 'PROBE_EXIT' => code.to_s,
+      'CURL_MARKER' => "#{dir}/curl-ran" }, 'bash', '-c', readiness['run'])
+    abort 'Protected readiness failure swallowed or legacy probe executed' unless
+      status.exitstatus == code && !File.exist?("#{dir}/curl-ran")
+  end
+end
 fence = steps[positions[1]]
 restore = steps[positions[6]]
 [fence, restore].each do |step|

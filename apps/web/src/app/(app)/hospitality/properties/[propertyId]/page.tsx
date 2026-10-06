@@ -1,3 +1,4 @@
+import { PropertyBreadcrumbs } from '@/components/hospitality/property-breadcrumbs'
 import { TabNav, pickActiveTab } from '@/components/tab-nav'
 import { PageContainer } from '@/components/page-layout'
 import { SearchInput } from '@/components/search-input'
@@ -90,6 +91,7 @@ export default async function PropertyDetail({
   )
   return (
     <PageContainer>
+      <PropertyBreadcrumbs current={property.name} />
       <PageHeader
         title={property.name}
         description={`${property.code} · ${property.timezone}`}

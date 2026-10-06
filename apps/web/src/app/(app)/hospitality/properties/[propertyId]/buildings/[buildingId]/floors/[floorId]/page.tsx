@@ -1,3 +1,5 @@
+import { PropertyBreadcrumbs } from '@/components/hospitality/property-breadcrumbs'
+import { PageContainer } from '@/components/page-layout'
 import { SearchInput } from '@/components/search-input'
 import { FilterChips } from '@/components/filter-bar'
 import { Pagination } from '@/components/pagination'
@@ -63,7 +65,11 @@ export default async function FloorPage({
   )
   const d = await ctx.db(async (tx) => {
     const [result] = await tx
-      .select({ floor: hospitalityFloors })
+      .select({
+        floor: hospitalityFloors,
+        propertyName: hospitalityProperties.name,
+        buildingName: hospitalityBuildings.name,
+      })
       .from(hospitalityFloors)
       .innerJoin(
         hospitalityBuildings,
@@ -97,6 +103,8 @@ export default async function FloorPage({
       : []
     return {
       floor,
+      propertyName: result?.propertyName,
+      buildingName: result?.buildingName,
       total: total?.value ?? 0,
       rooms: floor
         ? await tx
@@ -112,7 +120,14 @@ export default async function FloorPage({
   if (!d.floor) notFound()
   const manage = can(ctx, 'hospitality.manage')
   return (
-    <main className="mx-auto max-w-5xl p-4">
+    <PageContainer>
+      <PropertyBreadcrumbs
+        propertyId={propertyId}
+        propertyName={d.propertyName}
+        buildingId={buildingId}
+        buildingName={d.buildingName}
+        current={d.floor.name}
+      />
       <PageHeader title={d.floor.name} description={d.floor.code} />
       {manage && (
         <>
@@ -201,6 +216,6 @@ export default async function FloorPage({
         page={list.page}
         perPage={list.perPage}
       />
-    </main>
+    </PageContainer>
   )
 }

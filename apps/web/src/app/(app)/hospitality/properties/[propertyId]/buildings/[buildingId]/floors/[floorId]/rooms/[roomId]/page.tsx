@@ -1,3 +1,5 @@
+import { PropertyBreadcrumbs } from '@/components/hospitality/property-breadcrumbs'
+import { PageContainer } from '@/components/page-layout'
 import { getGeneratedTranslations, getGeneratedValueTranslations } from '@/i18n/generated.server'
 import { isUuid } from '@/lib/list-params'
 import { and, desc, eq, isNull } from 'drizzle-orm'
@@ -45,7 +47,12 @@ export default async function RoomPage({
 
   const d = await ctx.db(async (tx) => {
     const [result] = await tx
-      .select({ room: hospitalityRooms })
+      .select({
+        room: hospitalityRooms,
+        propertyName: hospitalityProperties.name,
+        buildingName: hospitalityBuildings.name,
+        floorName: hospitalityFloors.name,
+      })
       .from(hospitalityRooms)
       .innerJoin(
         hospitalityFloors,
@@ -93,6 +100,9 @@ export default async function RoomPage({
         : []
     return {
       row,
+      propertyName: result?.propertyName,
+      buildingName: result?.buildingName,
+      floorName: result?.floorName,
       qr: qr[0] ?? null,
       issues:
         row && maintenanceEnabled
@@ -113,7 +123,16 @@ export default async function RoomPage({
   if (!d.row) notFound()
   const row = d.row
   return (
-    <main className="mx-auto max-w-5xl p-4">
+    <PageContainer>
+      <PropertyBreadcrumbs
+        propertyId={propertyId}
+        propertyName={d.propertyName}
+        buildingId={buildingId}
+        buildingName={d.buildingName}
+        floorId={floorId}
+        floorName={d.floorName}
+        current={row.name || row.code}
+      />
       <PageHeader
         title={row.name || row.code}
         description={`${row.roomType ?? 'room'} · ${row.status}`}
@@ -229,6 +248,6 @@ export default async function RoomPage({
           )}
         </section>
       )}
-    </main>
+    </PageContainer>
   )
 }

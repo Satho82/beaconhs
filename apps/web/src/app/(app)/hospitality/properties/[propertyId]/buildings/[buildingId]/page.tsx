@@ -1,6 +1,10 @@
 import { getGeneratedTranslations } from '@/i18n/generated.server'
-import { isUuid } from '@/lib/list-params'
-import { and, eq, isNull } from 'drizzle-orm'
+import { SearchInput } from '@/components/search-input'
+import { Pagination } from '@/components/pagination'
+import { PageContainer } from '@/components/page-layout'
+import { PropertyBreadcrumbs } from '@/components/hospitality/property-breadcrumbs'
+import { isUuid, parseListParams } from '@/lib/list-params'
+import { and, asc, count, eq, ilike, isNull, or } from 'drizzle-orm'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { Button, EmptyState, Input, Label, PageHeader } from '@beaconhs/ui'
@@ -13,8 +17,10 @@ import { can } from '@beaconhs/tenant'
 import { createFloorAction, updateBuildingAction } from '../../../actions'
 export default async function BuildingPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ propertyId: string; buildingId: string }>
+  searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
   const translateHospitality = await getGeneratedTranslations()
 
@@ -24,6 +30,20 @@ export default async function BuildingPage({
   await assertTenantModuleEntitled(ctx, 'hospitality.properties')
   assertCan(ctx, 'hospitality.read')
   assertCanAccessProperty(ctx, propertyId)
+  const search = await searchParams
+  const list = parseListParams(search, { sort: 'name', dir: 'asc', allowedSorts: ['name'] })
+  const basePath = `/hospitality/properties/${propertyId}/buildings/${buildingId}`
+  const floorWhere = and(
+    eq(hospitalityFloors.tenantId, ctx.tenantId),
+    eq(hospitalityFloors.buildingId, buildingId),
+    isNull(hospitalityFloors.deletedAt),
+    list.q
+      ? or(
+          ilike(hospitalityFloors.name, `%${list.q}%`),
+          ilike(hospitalityFloors.code, `%${list.q}%`),
+        )
+      : undefined,
+  )
   const d = await ctx.db(async (tx) => {
     const [property] = await tx
       .select()
@@ -54,20 +74,25 @@ export default async function BuildingPage({
       ? await tx
           .select()
           .from(hospitalityFloors)
-          .where(
-            and(
-              eq(hospitalityFloors.tenantId, ctx.tenantId),
-              eq(hospitalityFloors.buildingId, buildingId),
-              isNull(hospitalityFloors.deletedAt),
-            ),
-          )
+          .where(floorWhere)
+          .orderBy(asc(hospitalityFloors.name), asc(hospitalityFloors.id))
+          .limit(list.perPage)
+          .offset((list.page - 1) * list.perPage)
       : []
-    return { property, building, floors }
+    const [total] = building
+      ? await tx.select({ value: count() }).from(hospitalityFloors).where(floorWhere)
+      : []
+    return { property, building, floors, total: total?.value ?? 0 }
   })
   if (!d.building) notFound()
   const manage = can(ctx, 'hospitality.manage')
   return (
-    <main className="mx-auto max-w-5xl p-4">
+    <PageContainer>
+      <PropertyBreadcrumbs
+        propertyId={propertyId}
+        propertyName={d.property?.name}
+        current={d.building.name}
+      />
       <PageHeader
         title={d.building.name}
         description={`${d.property?.name} · ${d.building.code}`}
@@ -108,22 +133,35 @@ export default async function BuildingPage({
           </form>
         </>
       )}
+      <div className="my-4">
+        <SearchInput />
+      </div>
       {d.floors.length ? (
         d.floors.map((f) => (
           <Link
-            className="block border p-3"
+            className="mb-2 block rounded-lg border p-3 break-words hover:border-teal-600 focus-visible:outline-2 focus-visible:outline-offset-2"
             href={`/hospitality/properties/${propertyId}/buildings/${buildingId}/floors/${f.id}`}
             key={f.id}
           >
-            {f.name}
+            <strong>{f.name}</strong>
+            <p className="text-muted-foreground text-sm">{f.code}</p>
           </Link>
         ))
       ) : (
         <EmptyState
-          title={translateHospitality('m_1e51098a8c5d40')}
-          description={translateHospitality('m_0c9a6639aa5683')}
+          title={translateHospitality(
+            list.q || d.total > 0 ? 'm_0c726da8b78d42' : 'm_1e51098a8c5d40',
+          )}
+          description={list.q || d.total > 0 ? undefined : translateHospitality('m_0c9a6639aa5683')}
         />
       )}
-    </main>
+      <Pagination
+        basePath={basePath}
+        currentParams={search}
+        total={d.total}
+        page={list.page}
+        perPage={list.perPage}
+      />
+    </PageContainer>
   )
 }

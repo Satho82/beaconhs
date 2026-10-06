@@ -141,6 +141,27 @@ describe('property page workflow', () => {
     )
     await expect(NewProperty()).rejects.toThrow()
   })
+  it('exposes the tenant-wide governed importer only with both management permissions', async () => {
+    const f = fixture()
+    expect(
+      nodes(await detail({ tab: 'structure' })).some(
+        (n) => n.props.href === '/admin/settings/import-export/property-structure/upload',
+      ),
+    ).toBe(false)
+    f.ctx.permissions.add('admin.settings.manage')
+    const rendered = nodes(await detail({ tab: 'structure' }))
+    expect(
+      rendered.find(
+        (n) => n.props.href === '/admin/settings/import-export/property-structure/upload',
+      )?.props.children,
+    ).toBe('Import property structure (tenant-wide)')
+    f.ctx.permissions.delete('hospitality.manage')
+    expect(
+      nodes(await detail({ tab: 'structure' })).some(
+        (n) => n.props.href === '/admin/settings/import-export/property-structure/upload',
+      ),
+    ).toBe(false)
+  })
   it('requires confirmation on the manager archive form', async () => {
     fixture()
     const rendered = nodes(await detail({ tab: 'settings' }))

@@ -25,6 +25,13 @@ Use the search box to find properties or buildings by name or code. Use the page
 Open a building and then a floor to browse its rooms and apartments. Search by room number/code, name, or type (for example, apartment). Choose **Status** to filter the list; choose **All** to clear that filter. Search and status filters work together. Use the page controls for longer lists. Each entry shows its code, optional name, type, and current status. Open an entry to view or manage the room. Changing a search or status filter returns to the first page.
 
 Archived properties disappear from active property lists. Existing records are retained. Their building, floor, and room pages are no longer available. You cannot add or edit a building, floor, or room beneath an archived parent. Creating a property, building, floor, or room records an audit entry. These pages manage properties in your current organisation only.
+
+
+## Browse the property structure
+
+Open a property and choose **Structure**. Open a building, then a floor, then a room. The breadcrumbs return to each parent. Search floors by name or code and use the page controls for longer lists. Clear the search when no floors match.
+
+Managers with settings permission can choose **Import property structure (tenant-wide)** from Structure. This opens the existing upload, validation, preview, review and confirmation workflow for the organisation; it is not restricted to the currently selected property. To archive a property, open **Settings**, then **Property management** and confirm **Archive property**.
 `,
   },
   {

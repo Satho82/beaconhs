@@ -3,7 +3,7 @@ import { isUuid } from '@/lib/list-params'
 import { and, eq } from 'drizzle-orm'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { Button, Label, PageHeader, Select } from '@beaconhs/ui'
+import { Badge, Button, Label, PageHeader, Select } from '@beaconhs/ui'
 import {
   hospitalityBuildings,
   hospitalityFloors,
@@ -120,18 +120,41 @@ export default async function IssuePage({ params }: { params: Promise<{ issueId:
   const { issue: r } = data.row
   const selectedStatus =
     r.status === 'triaged' ? 'assigned' : r.status === 'work_ordered' ? 'in_progress' : r.status
+  const assignee = data.members.find((member) => member.id === r.assignedToTenantUserId)
   return (
     <PageContainer>
       <PageHeader
         title={r.summary}
-        description={`${r.reference} · ${r.priority} · ${r.status.replaceAll('_', ' ')}`}
+        description={r.reference}
         actions={
           <Button asChild variant="outline">
             <Link href="/hospitality/maintenance">{translateValue('Back to queue')}</Link>
           </Button>
         }
       />
-      <section className="mt-4 grid gap-3 rounded-lg border p-4 sm:grid-cols-2">
+      <section className="mt-4 grid gap-3 rounded-lg border p-4 break-words sm:grid-cols-2 lg:grid-cols-4">
+        <div>
+          <p className="text-muted-foreground text-sm">{translateValue('Status')}</p>
+          <Badge variant="secondary">{translateValue(r.status.replaceAll('_', ' '))}</Badge>
+        </div>
+        <div>
+          <p className="text-muted-foreground text-sm">{translateValue('Priority')}</p>
+          <Badge
+            variant={r.priority === 'critical' || r.priority === 'high' ? 'destructive' : 'outline'}
+          >
+            {translateValue(r.priority)}
+          </Badge>
+        </div>
+        <div className="sm:col-span-2">
+          <p className="text-muted-foreground text-sm">{translateValue('Assigned to')}</p>
+          <p>
+            {assignee?.name ||
+              assignee?.email ||
+              translateValue(
+                r.assignedToTenantUserId ? 'Assigned member unavailable' : 'Unassigned',
+              )}
+          </p>
+        </div>
         <div>
           <p className="text-muted-foreground text-sm">{translateValue('Location')}</p>
           <p>
@@ -141,11 +164,11 @@ export default async function IssuePage({ params }: { params: Promise<{ issueId:
         </div>
         <div>
           <p className="text-muted-foreground text-sm">{translateValue('Reported via')}</p>
-          <p>{r.source.replaceAll('_', ' ')}</p>
+          <p>{translateValue(r.source.replaceAll('_', ' '))}</p>
         </div>
         <div className="sm:col-span-2">
           <p className="text-muted-foreground text-sm">{translateValue('Details')}</p>
-          <p className="whitespace-pre-wrap">
+          <p className="break-words whitespace-pre-wrap">
             {r.description || translateValue('No description supplied.')}
           </p>
         </div>
@@ -160,69 +183,19 @@ export default async function IssuePage({ params }: { params: Promise<{ issueId:
           </div>
         )}
       </section>
-      <section className="mt-4 space-y-4 rounded-lg border p-4">
-        <div>
-          <h2 className="font-semibold">{translateValue('Evidence')}</h2>
-          <p className="text-muted-foreground text-sm">
-            {translateValue('Reported, before-work, after-work and completion evidence.')}
-          </p>
-        </div>
-        {(['reported', 'before_work', 'after_work', 'completion'] as const).map((stage) => {
-          const items = data.evidence.filter((item) => item.stage === stage)
-          return (
-            <div key={stage} className="space-y-2">
-              <h3 className="text-sm font-medium">{translateValue(stage.replaceAll('_', ' '))}</h3>
-              {items.length ? (
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                  {items.map((item) => (
-                    <a
-                      key={item.id}
-                      href={attachmentUrl(item.attachmentId)}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="overflow-hidden rounded-md border"
-                    >
-                      {item.contentType.startsWith('image/') ? (
-                        <RawImage
-                          src={attachmentUrl(item.attachmentId)}
-                          alt={item.filename}
-                          optimizationReason="authenticated"
-                          className="h-36 w-full object-cover"
-                        />
-                      ) : null}
-                      <span className="block p-2 text-xs">
-                        {item.filename} - {item.source.replaceAll('_', ' ')} -{' '}
-                        {item.createdAt.toLocaleString()}
-                      </span>
-                    </a>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-muted-foreground text-sm">
-                  {translateValue('No evidence yet.')}
-                </p>
-              )}
-              {can(ctx, 'maintenance.update') ? (
-                <PhotoUploaderSection
-                  attachAction={attachMaintenanceEvidenceAction.bind(null, r.id, stage)}
-                />
-              ) : null}
-            </div>
-          )
-        })}
-      </section>
       {can(ctx, 'maintenance.update') && (
         <form
           action={updateMaintenanceIssueAction}
           className="mt-4 grid gap-4 rounded-lg border p-4 sm:grid-cols-2"
         >
+          <h2 className="font-semibold sm:col-span-2">{translateValue('Update work')}</h2>
           <input type="hidden" name="issueId" value={r.id} />
           <Label>
             {translateHospitality('m_00f0e2904a371c')}
             <Select name="priority" defaultValue={r.priority}>
               {['low', 'medium', 'high', 'critical'].map((priority) => (
                 <option key={priority} value={priority}>
-                  {priority}
+                  {translateValue(priority)}
                 </option>
               ))}
             </Select>
@@ -232,7 +205,7 @@ export default async function IssuePage({ params }: { params: Promise<{ issueId:
             <Select name="status" defaultValue={selectedStatus}>
               {MAINTENANCE_STATUSES.map((status) => (
                 <option key={status} value={status}>
-                  {status.replaceAll('_', ' ')}
+                  {translateValue(status.replaceAll('_', ' '))}
                 </option>
               ))}
             </Select>
@@ -263,6 +236,79 @@ export default async function IssuePage({ params }: { params: Promise<{ issueId:
           </Button>
         </form>
       )}
+      <section className="mt-4 space-y-4 rounded-lg border p-4">
+        <div>
+          <h2 className="font-semibold">{translateValue('Evidence')}</h2>
+          <p className="text-muted-foreground text-sm">
+            {translateValue('Reported, before-work, after-work and completion evidence.')}
+          </p>
+        </div>
+        {(['reported', 'before_work', 'after_work', 'completion'] as const).map((stage) => {
+          const items = data.evidence.filter((item) => item.stage === stage)
+          return (
+            <div key={stage} className="space-y-2">
+              <h3 className="text-sm font-medium">{translateValue(stage.replaceAll('_', ' '))}</h3>
+              {items.length ? (
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {items.map((item) => (
+                    <a
+                      key={item.id}
+                      href={attachmentUrl(item.attachmentId)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="overflow-hidden rounded-md border"
+                    >
+                      {item.contentType.startsWith('image/') ? (
+                        <RawImage
+                          src={attachmentUrl(item.attachmentId)}
+                          alt={item.filename}
+                          optimizationReason="authenticated"
+                          className="h-36 w-full object-cover"
+                        />
+                      ) : null}
+                      <span className="block p-2 text-xs break-words">
+                        {item.filename} - {translateValue(item.source.replaceAll('_', ' '))} -{' '}
+                        {item.createdAt.toLocaleString()}
+                      </span>
+                    </a>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-muted-foreground text-sm">
+                  {translateValue('No evidence yet.')}
+                </p>
+              )}
+              {can(ctx, 'maintenance.update') ? (
+                <PhotoUploaderSection
+                  attachAction={attachMaintenanceEvidenceAction.bind(null, r.id, stage)}
+                />
+              ) : null}
+            </div>
+          )
+        })}
+      </section>
+      <section className="mt-4 rounded-lg border p-4 break-words">
+        <h2 className="font-semibold">{translateValue('Resolution and record history')}</h2>
+        <p className="mt-2 whitespace-pre-wrap">
+          {r.resolutionNotes || translateValue('No resolution recorded.')}
+        </p>
+        <dl className="mt-3 grid gap-3 text-sm sm:grid-cols-3">
+          <div>
+            <dt className="text-muted-foreground">{translateValue('Reported')}</dt>
+            <dd>{r.createdAt.toLocaleString()}</dd>
+          </div>
+          <div>
+            <dt className="text-muted-foreground">{translateValue('Last updated')}</dt>
+            <dd>{r.updatedAt.toLocaleString()}</dd>
+          </div>
+          {r.completedAt && (
+            <div>
+              <dt className="text-muted-foreground">{translateValue('Completed')}</dt>
+              <dd>{r.completedAt.toLocaleString()}</dd>
+            </div>
+          )}
+        </dl>
+      </section>
     </PageContainer>
   )
 }

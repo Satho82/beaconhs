@@ -1,4 +1,4 @@
-import { GeneratedText, GeneratedValue } from '@/i18n/generated'
+import { GeneratedText, GeneratedValue, useGeneratedValueTranslations } from '@/i18n/generated'
 // Shared presentational bits for the compliance hub. Pure UI — no data logic.
 
 import { Badge } from '@beaconhs/ui'
@@ -42,9 +42,15 @@ export function StatusBadge({ status }: { status: string }) {
 }
 
 export function PercentBar({ percent, large = false }: { percent: number; large?: boolean }) {
+  const t = useGeneratedValueTranslations()
   const tone = percent >= 80 ? 'bg-green-500' : percent >= 50 ? 'bg-amber-500' : 'bg-red-500'
   return (
     <div
+      role="meter"
+      aria-label={t('Completion')}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={Math.max(0, Math.min(100, percent))}
       className={`relative w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800 ${large ? 'h-3' : 'h-2'}`}
     >
       <div

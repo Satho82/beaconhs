@@ -17,6 +17,7 @@ import { ListPageLayout } from '@/components/page-layout'
 import { Pagination } from '@/components/pagination'
 import { SearchInput } from '@/components/search-input'
 import { GeneratedText } from '@/i18n/generated'
+import { parseListParams } from '@/lib/list-params'
 import { getGeneratedTranslations } from '@/i18n/generated.server'
 import { requireRequestContext } from '@/lib/auth'
 import { DeleteReportButton } from './_delete-report-button.client'
@@ -36,7 +37,7 @@ export default async function ReportsPage({
   const params = await searchParams
   const query = typeof params.q === 'string' ? params.q.trim().toLowerCase() : ''
   const category = typeof params.category === 'string' ? params.category : ''
-  const page = Math.max(1, Number(typeof params.page === 'string' ? params.page : 1) || 1)
+  const { page } = parseListParams(params, { sort: 'name', dir: 'asc', allowedSorts: ['name'] })
   const definitions = await loadVisibleDefinitions(ctx.tenantId!)
   const categories = [...new Set(definitions.map((definition) => definition.category))].sort()
   const filtered = definitions.filter(
@@ -88,7 +89,7 @@ export default async function ReportsPage({
       }
     >
       <div className="overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
-        <Table>
+        <Table aria-label={tGenerated('m_09bb00824b733b')}>
           <TableHeader>
             <TableRow>
               <TableHead>
@@ -103,7 +104,9 @@ export default async function ReportsPage({
               <TableHead>
                 <GeneratedText id="m_014ca61c68ab13" />
               </TableHead>
-              <TableHead className="w-48" />
+              <TableHead className="w-48">
+                <span className="sr-only">{tGenerated('m_107ab58c3c38bc')}</span>
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -118,7 +121,7 @@ export default async function ReportsPage({
                       {definition.name}
                     </Link>
                     {definition.description ? (
-                      <p className="mt-1 max-w-3xl text-xs text-slate-500">
+                      <p className="mt-1 max-w-3xl text-xs break-words text-slate-500">
                         {definition.description}
                       </p>
                     ) : null}
@@ -146,7 +149,9 @@ export default async function ReportsPage({
             ) : (
               <TableRow>
                 <TableCell colSpan={5} className="h-32 text-center text-slate-500">
-                  <GeneratedText id="m_1841d2703b10cc" />
+                  <GeneratedText
+                    id={query || category || page > 1 ? 'm_0c726da8b78d42' : 'm_1841d2703b10cc'}
+                  />
                 </TableCell>
               </TableRow>
             )}

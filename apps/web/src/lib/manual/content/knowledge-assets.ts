@@ -660,7 +660,10 @@ ${CSV_EXPORT_LIMIT_GUIDANCE}
 
 - A red **missing** badge means someone reported the unit missing. If you find it, tell your supervisor.
 - **Print / PDF** on a unit gives you its asset record sheet. The **QR label** button beside it prints the tag that goes on the unit — they are two different documents.
-- Need to inspect a unit before use? See [Equipment checks](/help/equipment-inspections).`,
+- Need to inspect a unit before use? See [Equipment checks](/help/equipment-inspections).
+
+On the Maintenance page, the paginated work list is available on phones and tablets; the calendar appears on larger screens. Overdue work shows an **Overdue** label beside its due date so the state does not depend on colour.
+`,
   },
   {
     slug: 'equipment-station',

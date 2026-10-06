@@ -531,9 +531,9 @@ export default async function EquipmentMaintenancePage({
           </TableToolbar>
         </>
       }
-      className="flex h-full min-h-0 flex-col gap-4"
+      className="flex flex-col gap-4 lg:h-full lg:min-h-0"
     >
-      <div className="flex h-full min-h-0 flex-col gap-4">
+      <div className="flex flex-col gap-4 lg:h-full lg:min-h-0">
         <div className="grid shrink-0 grid-cols-2 gap-3 lg:grid-cols-4">
           <StatTile
             icon={AlarmClock}
@@ -565,11 +565,9 @@ export default async function EquipmentMaintenancePage({
           />
         </div>
 
-        {/* 1/3 work list + 2/3 calendar, filling the viewport — the page never
-            scrolls; only the work list's rows scroll. The calendar is
-            desktop-only — the paginated list is the mobile surface. */}
-        <div className="flex min-h-0 flex-1 gap-4">
-          <Card className="flex h-full min-h-0 w-full flex-col lg:w-1/3">
+        {/* Desktop keeps the split calendar; the paginated list flows naturally on mobile. */}
+        <div className="flex flex-1 gap-4 lg:min-h-0">
+          <Card className="flex w-full flex-col lg:h-full lg:min-h-0 lg:w-1/3">
             <CardHeader className="shrink-0 pb-3">
               <CardTitle>
                 <GeneratedText id="m_0e45cb7349c90b" />
@@ -577,7 +575,7 @@ export default async function EquipmentMaintenancePage({
               </CardTitle>
             </CardHeader>
             <CardContent className="flex min-h-0 flex-1 flex-col gap-2 pt-0">
-              <div className="app-scroll min-h-0 flex-1 overflow-y-auto pr-1">
+              <div className="pr-1 lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
                 <GeneratedValue
                   value={
                     pageEntries.length === 0 ? (
@@ -840,7 +838,7 @@ function WorkList({
                 <Link
                   href={mergeHref(BASE, sp, { drawer: `unit-${e.itemId}` }) as never}
                   scroll={false}
-                  className="font-medium text-slate-900 hover:underline dark:text-slate-100"
+                  className="font-medium break-words text-slate-900 hover:underline dark:text-slate-100"
                 >
                   <GeneratedValue value={e.itemName} />
                 </Link>
@@ -863,6 +861,11 @@ function WorkList({
                   }
                 >
                   <GeneratedValue value={e.dueOn} />
+                  {e.dueOn < today && (
+                    <span className="ml-2">
+                      <GeneratedText id="m_1e40bdcf2d1ba1" />
+                    </span>
+                  )}
                 </span>
                 <GeneratedValue value={e.detail ? ` · ${e.detail}` : ''} />
               </div>

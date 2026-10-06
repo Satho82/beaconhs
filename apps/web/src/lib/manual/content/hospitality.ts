@@ -74,6 +74,11 @@ Guests do not need a staff account. They scan the code, choose an issue type and
 6. Completed issues can return to **in progress** when more work is needed. Closed issues cannot be reopened.
 
 Room pages also show their maintenance history. All QR and maintenance actions remain within the current organisation and respect the customer module settings.
+
+
+## Review an issue
+
+The queue shows the active property context, or all accessible properties. Open an issue to review **Status**, **Priority**, **Assigned to**, location and details. **Resolution and record history** shows saved resolution notes and reported, last-updated and completion timestamps where recorded. These timestamps are not a complete audit timeline. **Evidence** groups files by reported, before-work, after-work and completion stages. Readers can review the saved resolution; staff with update permission can use **Update work** and upload evidence.
 `,
   },
   {

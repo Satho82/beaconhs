@@ -53,6 +53,9 @@ export default async function PeoplePage({
     ? (rawStatus as StatusFilter)
     : 'active'
   const departmentFilter = pickString(sp.department) ?? null
+  const filteredView = Boolean(
+    params.q || departmentFilter || statusFilter !== 'active' || params.page > 1,
+  )
   const ctx = await requireRequestContext()
   const canManage = canManageModule(ctx, 'people')
   const canExport = can(ctx, 'admin.data.export') && can(ctx, 'admin.users.manage')
@@ -230,11 +233,17 @@ export default async function PeoplePage({
               title={tGeneratedValue(
                 params.q
                   ? tGenerated('m_095a16654a31f4', { value0: params.q })
-                  : tGenerated('m_1038b241626b2d'),
+                  : filteredView
+                    ? tGenerated('m_0c726da8b78d42')
+                    : tGenerated('m_1038b241626b2d'),
               )}
-              description={tGenerated('m_0f568be312d6e7')}
+              description={
+                filteredView
+                  ? tGeneratedValue('Adjust the search or filters to find matching records.')
+                  : tGenerated('m_0f568be312d6e7')
+              }
               action={
-                canManage ? (
+                canManage && !filteredView ? (
                   <Link href="/people/new">
                     <Button>
                       <GeneratedText id="m_12634c941f2fb6" />
@@ -256,16 +265,16 @@ export default async function PeoplePage({
                 canManage={canManage}
                 canExport={canExport}
               />
-              <Pagination
-                basePath="/people"
-                currentParams={sp}
-                total={total}
-                page={params.page}
-                perPage={params.perPage}
-              />
             </>
           )
         }
+      />
+      <Pagination
+        basePath="/people"
+        currentParams={sp}
+        total={total}
+        page={params.page}
+        perPage={params.perPage}
       />
     </ListPageLayout>
   )

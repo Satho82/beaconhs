@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { Children, isValidElement, type ReactNode } from 'react'
 import { getTableName, type SQL } from 'drizzle-orm'
 import { PgDialect } from 'drizzle-orm/pg-core'
+import type { RequestContext } from '@beaconhs/tenant'
 const mocks = vi.hoisted(() => ({ auth: vi.fn(), entitlement: vi.fn(), list: vi.fn() }))
 vi.mock('@/lib/auth', () => ({ requireRequestContext: mocks.auth }))
 vi.mock('@/lib/module-entitlements/server', () => ({
@@ -99,7 +100,7 @@ function fixture({ visible = true, manage = true, total = 0 } = {}) {
     tenantId: tenant,
     timezone: 'UTC',
     isSuperAdmin: false,
-    scopes: [{ type: 'tenant' }],
+    scopes: [{ type: 'tenant' }] as RequestContext['scopes'],
     permissions: new Set(
       manage ? ['hospitality.read', 'hospitality.manage'] : ['hospitality.read'],
     ),
@@ -151,11 +152,15 @@ describe('building floor browsing', () => {
     await expect(page()).rejects.toThrow('404')
     expect(f.queries).toHaveLength(1)
   })
+  it('allows a reader assigned to the requested property', async () => {
+    const f = fixture({ manage: false })
+    f.ctx.scopes = [{ type: 'properties', propertyIds: [id] }]
+    await expect(page()).resolves.toBeDefined()
+    expect(f.ctx.db).toHaveBeenCalledOnce()
+  })
   it('denies readers from another property before querying', async () => {
     const f = fixture()
-    f.ctx.scopes = [
-      { type: 'property', id: '20000000-0000-4000-8000-000000000099' },
-    ] as typeof f.ctx.scopes
+    f.ctx.scopes = [{ type: 'properties', propertyIds: ['20000000-0000-4000-8000-000000000099'] }]
     await expect(page()).rejects.toThrow()
     expect(f.ctx.db).not.toHaveBeenCalled()
   })

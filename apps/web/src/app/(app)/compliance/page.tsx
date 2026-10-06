@@ -87,7 +87,7 @@ export default async function ComplianceOverviewPage({
       }
     >
       <div className="space-y-6">
-        <div className="grid gap-3 sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           <Kpi label={tGenerated('m_1b97e9ccfe9667')} value={overview.summary.obligations} />
           <Kpi label={tGenerated('m_09db1dfbe5978e')} value={totalSubjects.toLocaleString()} />
           <Kpi
@@ -138,7 +138,7 @@ export default async function ComplianceOverviewPage({
               </div>
             ) : (
               <>
-                <Table>
+                <Table aria-label={tGenerated('m_096d47f60747b3')}>
                   <TableHeader>
                     <TableRow>
                       <TableHead>
@@ -173,7 +173,7 @@ export default async function ComplianceOverviewPage({
                           <TableCell>
                             <Link
                               href={`/compliance/obligations/${r.id}`}
-                              className="font-medium text-slate-900 hover:underline dark:text-slate-100"
+                              className="font-medium break-words text-slate-900 hover:underline dark:text-slate-100"
                             >
                               <GeneratedValue value={r.title} />
                             </Link>

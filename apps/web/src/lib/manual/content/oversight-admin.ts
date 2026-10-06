@@ -114,7 +114,10 @@ ${CSV_EXPORT_LIMIT_GUIDANCE}
 ## Tips
 
 - Some companies sync people from another system. Synced fields show as read-only and cannot be edited here. If a locked field is wrong, fix it in the source system and it will update on the next sync.
-- Overdue training and other requirements for one person live on their **Compliance** tab. For the whole company, see [Managing compliance](/help/compliance-management).`,
+- Overdue training and other requirements for one person live on their **Compliance** tab. For the whole company, see [Managing compliance](/help/compliance-management).
+
+When a search, department or status filter has no matches, adjust the filters instead of creating another person. The page controls remain available on empty pages so you can return to existing records.
+`,
   },
   {
     slug: 'locations',
@@ -271,7 +274,10 @@ Seeded and team-created reports use the same editable report definition. There i
 
 Every published Builder app you can currently open appears as its own named data source under **Apps**. The source is automatically limited to that app's responses. Draft, archived, and role-restricted apps are not exposed. Timed check-ins appear as **Monitored sessions**; they are a general Builder app capability, not a separate native module.
 
-The report list, full viewer, exports, and schedules all run this same saved definition. Seed provenance only lets BeaconHS restore a missing default during setup; it does not make the report read-only.`,
+The report list, full viewer, exports, and schedules all run this same saved definition. Seed provenance only lets BeaconHS restore a missing default during setup; it does not make the report read-only.
+
+Use search and category filters in Reports to find saved definitions. **No results** means the current search, filter or page has no matching definitions; clear the filters or use pagination to return to available reports.
+`,
   },
   {
     slug: 'insights',
@@ -418,7 +424,10 @@ Recurring periods use the compliance scan timezone under **Admin** → **Notific
 - Each person's own view lives on the **Mine** tab and on their profile, so they can see the same list you see.
 - Requiring people to fill a custom form is also done here — see [Builder (custom forms & apps)](/help/builder) for how the two connect.
 - A setup record used by an active obligation cannot be deleted, deactivated, or unpublished. Turn off or delete the obligation first, then retire the inspection type, assessment, document, equipment type, or PPE type.
-- Turning an obligation off keeps its history. Edit the obligation and disable it instead of deleting it.`,
+- Turning an obligation off keeps its history. Edit the obligation and disable it instead of deleting it.
+
+The overview table includes a completion percentage for each obligation, alongside completed, total and overdue counts. Completion bars also expose their numeric value to assistive technology.
+`,
   },
   {
     slug: 'builder',

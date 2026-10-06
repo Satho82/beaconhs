@@ -49,6 +49,7 @@ jobs:
         id: verify
         env:
           CANDIDATE_SHA: ${{ inputs.source_sha }}
+          CALLER_SHA: ${{ github.workflow_sha }}
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
@@ -62,6 +63,11 @@ jobs:
           fi
           if ! git merge-base --is-ancestor "$CANDIDATE_SHA" origin/feature/uvanoo-v1.4; then
             echo "::error::source_sha is not in feature/uvanoo-v1.4 history"
+            exit 1
+          fi
+          if [ "$CANDIDATE_SHA" != "$(git rev-parse origin/feature/uvanoo-v1.4)" ] \
+            || [ "$CALLER_SHA" != "$CANDIDATE_SHA" ]; then
+            echo '::error::Dispatch from the current feature branch and use its exact validated head; superseded candidates are forbidden'
             exit 1
           fi
 

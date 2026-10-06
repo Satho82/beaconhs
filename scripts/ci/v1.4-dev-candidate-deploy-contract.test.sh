@@ -488,4 +488,64 @@ require '^  push:$' "$cloud"
 forbid '^[[:space:]]*uses:.*deploy-dev\.yml' "$cloud"
 forbid 'runs-on: \[self-hosted, dokploy\]' "$cloud"
 
-echo 'PASS V1.4 candidate deployment is manual, DEV-only, and digest-bound'
+node --test scripts/cluster/dev-writer-fence.test.mjs
+
+ruby <<'RUBY'
+require 'yaml'
+require 'tmpdir'
+require 'fileutils'
+require 'open3'
+core = YAML.safe_load(File.read('.github/workflows/deploy-dev.yml'), aliases: true)
+steps = core.dig('jobs', 'deploy', 'steps')
+names = [
+  'Validate verified deployment identity',
+  'Persist apply and verify DEV writer fence',
+  'Preflight all migration database roles',
+  'Run database migrations',
+  'Update the Dokploy compose environment',
+  'Deploy the compose on Dokploy',
+  'Restore verified DEV candidate writers',
+  'Wait for external readiness'
+]
+positions = names.map { |name| steps.index { |s| s['name'] == name } }
+abort 'Writer fence ordering is incomplete or unsafe' unless positions.all? && positions == positions.sort
+fence = steps[positions[1]]
+restore = steps[positions[6]]
+[fence, restore].each do |step|
+  abort 'Fence/restore must use only the verified DEV API path under default success gating' unless
+    step['if'] == 'inputs.feature_candidate_verified' &&
+    !step.key?('continue-on-error') &&
+    step['run'].start_with?('node .deployment-governance/scripts/cluster/dev-writer-fence.mjs ')
+end
+abort 'Fence must perform persist, rollout and runtime proof' unless fence['run'].end_with?(' fence')
+abort 'Restore must validate candidate before raising replicas' unless restore['run'].end_with?(' restore')
+migration = steps[positions[3]]
+abort 'Migration must recheck zero writers before docker run' unless
+  migration['run'].index('dev-writer-fence.mjs verify-zero') < migration['run'].index('docker run') &&
+  migration['run'].include?('set -euo pipefail') && !migration.key?('if') && !migration.key?('continue-on-error')
+steps[positions[2]..positions[5]].each do |step|
+  abort 'No deployment step may ignore fence/migration failure' if step['continue-on-error'] || step['if'].to_s.match?(/always|failure|cancelled/)
+end
+update = steps[positions[4]]
+abort 'Candidate rollout must keep writers at zero' unless update['run'].include?(%q{if [ "$FEATURE_CANDIDATE_VERIFIED" = true ]; then}) &&
+  update['run'].include?(%q{printf 'WRITER_REPLICAS=0\n'})
+report = steps.find { |s| s['name'] == 'Report DEV writer recovery state' }
+abort 'Failure reporting must not restore or deploy anything' unless report && report['if'].include?('failure() || cancelled()') &&
+  !report['run'].match?(/compose\.deploy|compose\.update|docker service|dev-writer-fence\.mjs restore/)
+caller = YAML.safe_load(File.read('.github/workflows/deploy-v1.4-dev-candidate.yml'), aliases: true)
+verify = caller.dig('jobs', 'verify-candidate', 'steps').find { |s| s['id'] == 'verify' }
+abort 'Old candidates or old governance must not be deployed' unless verify['run'].include?(%q{"$CALLER_SHA" != "$CANDIDATE_SHA"}) &&
+  verify['run'].include?(%q{git rev-parse origin/feature/uvanoo-v1.4})
+# Execute the actual migration shell with a failing zero-writer guard. The
+# mocked docker marker must remain absent: no database operation is allowed.
+Dir.mktmpdir('dev-fence-contract-') do |dir|
+  File.write("#{dir}/node", "#!/bin/sh\nexit 1\n")
+  File.write("#{dir}/docker", "#!/bin/sh\ntouch \"$DOCKER_MARKER\"\n")
+  FileUtils.chmod(0755, ["#{dir}/node", "#{dir}/docker"])
+  _, _, status = Open3.capture3({ 'PATH' => "#{dir}:#{ENV['PATH']}", 'FEATURE_CANDIDATE_VERIFIED' => 'true',
+    'DOCKER_MARKER' => "#{dir}/docker-ran" }, 'bash', '-c', migration['run'])
+  abort 'Migration ran after zero-writer guard failure' if status.success? || File.exist?("#{dir}/docker-ran")
+end
+RUBY
+
+echo 'PASS V1.4 candidate deployment is manual, DEV-only, digest-bound and writer-fenced'

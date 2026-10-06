@@ -644,6 +644,15 @@ jobs:
             console.log("Selected Redis credential matches the deployment topology");
           '
 
+      - name: Persist apply and verify DEV writer fence
+        if: inputs.feature_candidate_verified
+        id: writer-fence
+        env:
+          FEATURE_CANDIDATE_VERIFIED: ${{ inputs.feature_candidate_verified }}
+          DOKPLOY_URL: ${{ secrets.DOKPLOY_URL }}
+          DOKPLOY_TOKEN: ${{ secrets.DOKPLOY_TOKEN }}
+        run: node .deployment-governance/scripts/cluster/dev-writer-fence.mjs fence
+
       - name: Preflight all migration database roles
         env:
           NODE_ENV: production
@@ -822,13 +831,21 @@ jobs:
             '
 
       - name: Run database migrations
+        id: migrations
         env:
+          FEATURE_CANDIDATE_VERIFIED: ${{ inputs.feature_candidate_verified }}
+          DOKPLOY_URL: ${{ secrets.DOKPLOY_URL }}
+          DOKPLOY_TOKEN: ${{ secrets.DOKPLOY_TOKEN }}
           NODE_ENV: production
           MIGRATION_DATABASE_URL: ${{ env.MIGRATION_DATABASE_URL }}
           DATABASE_URL: ${{ env.DATABASE_URL }}
           SUPERADMIN_DATABASE_URL: ${{ env.SUPERADMIN_DATABASE_URL }}
           DATABASE_OWNER_ROLE: beaconhs_owner
         run: |
+          set -euo pipefail
+          if [ "$FEATURE_CANDIDATE_VERIFIED" = true ]; then
+            node .deployment-governance/scripts/cluster/dev-writer-fence.mjs verify-zero
+          fi
           docker run --rm --pull=never --network "$MIGRATION_DOCKER_NETWORK" \
             -v "$GITHUB_WORKSPACE:/workspace" \
             -v "$MIGRATION_PNPM_TOOLCHAIN_ROOT:/pnpm-toolchain:ro" \
@@ -869,6 +886,7 @@ jobs:
       - name: Update the Dokploy compose environment
         if: env.DOKPLOY_DEPLOY_MODE == 'api'
         env:
+          FEATURE_CANDIDATE_VERIFIED: ${{ inputs.feature_candidate_verified }}
           DOKPLOY_URL: ${{ secrets.DOKPLOY_URL }}
           DOKPLOY_TOKEN: ${{ secrets.DOKPLOY_TOKEN }}
           COMPOSE_ID: ${{ env.DOKPLOY_COMPOSE_ID }}
@@ -903,7 +921,13 @@ jobs:
           {
             printf 'IMAGE=%s\n' "$IMAGE"
             printf 'APP_VERSION=%s\n' "$DEPLOY_SOURCE_SHA"
-            printf 'WRITER_REPLICAS=1\n'
+            # Install candidate service specs while the persisted fence remains
+            # closed. Only the verified restore step may start new writers.
+            if [ "$FEATURE_CANDIDATE_VERIFIED" = true ]; then
+              printf 'WRITER_REPLICAS=0\n'
+            else
+              printf 'WRITER_REPLICAS=1\n'
+            fi
             printf 'COLLABORA_IMAGE=%s\n' "$COLLABORA_IMAGE"
             printf 'COLLABORA_URL=%s\n' "$APP_URL"
             printf 'COLLABORA_WOPI_URL=%s\n' "$APP_URL"
@@ -971,6 +995,29 @@ jobs:
                 -X POST "${DOKPLOY_URL%/}/api/compose.deploy" \
                 -H "content-type: application/json" --data @- >/dev/null
           echo "Dokploy compose deployment requested"
+
+      - name: Restore verified DEV candidate writers
+        if: inputs.feature_candidate_verified
+        id: writer-restore
+        env:
+          FEATURE_CANDIDATE_VERIFIED: ${{ inputs.feature_candidate_verified }}
+          DOKPLOY_URL: ${{ secrets.DOKPLOY_URL }}
+          DOKPLOY_TOKEN: ${{ secrets.DOKPLOY_TOKEN }}
+        run: node .deployment-governance/scripts/cluster/dev-writer-fence.mjs restore
+
+      - name: Report DEV writer recovery state
+        if: ${{ always() && inputs.feature_candidate_verified && (failure() || cancelled()) }}
+        env:
+          FENCE_OUTCOME: ${{ steps.writer-fence.outcome }}
+          MIGRATION_OUTCOME: ${{ steps.migrations.outcome }}
+          RESTORE_OUTCOME: ${{ steps.writer-restore.outcome }}
+        run: |
+          {
+            echo 'DEV deployment failed or was cancelled; no automatic writer recovery.'
+            echo "Fence: $FENCE_OUTCOME; migration: $MIGRATION_OUTCOME; restore: $RESTORE_OUTCOME."
+            echo 'If fencing began, assume writers remain fenced or state is uncertain until inspected.'
+            echo 'After any migration failure, require explicit database recovery review before restoring writers.'
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Roll the immutable image directly on Swarm
         if: env.DOKPLOY_DEPLOY_MODE == 'direct'

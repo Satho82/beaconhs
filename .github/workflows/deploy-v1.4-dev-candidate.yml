@@ -1,174 +1,124 @@
-name: Deploy validated V1.4 candidate to DEV
+name: Recover Run 21 DEV writers only
 
-# This is deliberately the only feature-candidate deployment entrypoint. Pushes
-# publish candidates through uvanoo-v1.4-cloud-build.yml but never deploy them.
+# Recovery branch only. The validated feature and main dispatchers are unchanged.
+# Reuse this registered workflow path to dispatch without changing main.
 on:
   workflow_dispatch:
     inputs:
       source_sha:
-        description: Exact, already-green V1.4 candidate commit SHA to deploy to DEV
+        description: Must equal the authorised Run 21 candidate SHA
         required: true
         type: string
 
 permissions:
-  actions: read
   contents: read
-  packages: read
+  actions: read
 
 concurrency:
-  # The reusable workflow owns deploy-dev so the actual rollout is serialized
-  # with main-branch deployments. This outer dispatcher must not hold that
-  # same lease while invoking it.
-  group: v1.4-dev-candidate-dispatch
+  group: deploy-dev
   cancel-in-progress: false
 
-env:
-  CANDIDATE_IMAGE_NAME: ghcr.io/satho82/uvanoo-staging-private
-
 jobs:
-  verify-candidate:
-    name: Verify immutable V1.4 DEV candidate
-    runs-on: ubuntu-24.04
+  recover:
+    name: Re-fence and restore approved DEV writers
+    if: github.repository == 'Satho82/beaconhs' && github.ref == 'refs/heads/recovery/uvanoo-v1.4-run21'
+    runs-on: [self-hosted, dokploy]
     timeout-minutes: 20
-    outputs:
-      source_sha: ${{ steps.verify.outputs.source_sha }}
-      image_digest: ${{ steps.verify.outputs.image_digest }}
+    env:
+      FEATURE_CANDIDATE_VERIFIED: 'true'
+      DOKPLOY_DEPLOY_MODE: api
+      DOKPLOY_TARGET_STACK: uvanoo-v1-4-dev-gniriv
+      DOKPLOY_COMPOSE_ID: wYb0LxLQrvj2FPI21i-Oj
+      EXPECTED_APP_HOST: dev.uvanoo.com
+      DEPLOY_SOURCE_SHA: 3e753ac2306e7866fe2d3e8af3fd64188bc9e13a
+      IMAGE_DIGEST: sha256:28ecd078f472b4402fffdcf88c3b932a97e93bde45ca6b39a440668862c27144
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
-          ref: feature/uvanoo-v1.4
-          fetch-depth: 0
+          ref: 3e753ac2306e7866fe2d3e8af3fd64188bc9e13a
           persist-credentials: false
-      - uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4
-      - uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 # v4
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ github.token }}
-      - name: Verify source, authoritative validation, and published image
-        id: verify
+          ref: ${{ github.workflow_sha }}
+          path: .recovery-governance
+          persist-credentials: false
+      - name: Verify pinned source and authoritative run evidence
         env:
-          CANDIDATE_SHA: ${{ inputs.source_sha }}
-          CALLER_SHA: ${{ github.workflow_sha }}
+          REQUESTED_SHA: ${{ inputs.source_sha }}
+          RECOVERY_SHA: ${{ github.workflow_sha }}
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          if ! [[ "$CANDIDATE_SHA" =~ ^[0-9a-f]{40}$ ]]; then
-            echo "::error::source_sha must be a full lowercase commit SHA"
+          test "$REQUESTED_SHA" = "$DEPLOY_SOURCE_SHA"
+          test "$(git rev-parse HEAD)" = "$DEPLOY_SOURCE_SHA"
+          test "$(git -C .recovery-governance rev-parse HEAD)" = "$RECOVERY_SHA"
+          node .recovery-governance/scripts/ci/run21-recovery-preflight.mjs evidence
+      - name: Configure TLS-preserving Dokploy split-DNS resolution
+        env:
+          DOKPLOY_URL: ${{ secrets.DOKPLOY_URL }}
+          DOKPLOY_RESOLVE_IP: ${{ secrets.DOKPLOY_RESOLVE_IP }}
+        run: |
+          set -euo pipefail
+          dokploy_host="${DOKPLOY_URL#https://}"
+          if [ "$dokploy_host" = "$DOKPLOY_URL" ] \
+            || [ "${#dokploy_host}" -gt 253 ] \
+            || ! [[ "$dokploy_host" =~ ^([A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?\.)+[A-Za-z]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?$ ]]; then
+            echo "::error::DOKPLOY_URL must be an HTTPS origin with a DNS hostname, no port, path, query, fragment, or trailing slash"
             exit 1
           fi
-          if ! git cat-file -e "${CANDIDATE_SHA}^{commit}" 2>/dev/null; then
-            echo "::error::source_sha does not identify a repository commit"
+          if ! [[ "$DOKPLOY_RESOLVE_IP" =~ ^(0|[1-9][0-9]{0,2})\.(0|[1-9][0-9]{0,2})\.(0|[1-9][0-9]{0,2})\.(0|[1-9][0-9]{0,2})$ ]]; then
+            echo "::error::DOKPLOY_RESOLVE_IP must be a canonical private IPv4 address"
             exit 1
           fi
-          if ! git merge-base --is-ancestor "$CANDIDATE_SHA" origin/feature/uvanoo-v1.4; then
-            echo "::error::source_sha is not in feature/uvanoo-v1.4 history"
+          IFS=. read -r ip_a ip_b ip_c ip_d <<< "$DOKPLOY_RESOLVE_IP"
+          for octet in "$ip_a" "$ip_b" "$ip_c" "$ip_d"; do
+            if [ "$((10#$octet))" -gt 255 ]; then
+              echo "::error::DOKPLOY_RESOLVE_IP must be a canonical private IPv4 address"
+              exit 1
+            fi
+          done
+          if ! (( ip_a == 10 \
+            || (ip_a == 172 && ip_b >= 16 && ip_b <= 31) \
+            || (ip_a == 192 && ip_b == 168) )); then
+            echo "::error::DOKPLOY_RESOLVE_IP must be an RFC 1918 private IPv4 address"
             exit 1
           fi
-          if [ "$CANDIDATE_SHA" != "$(git rev-parse origin/feature/uvanoo-v1.4)" ] \
-            || [ "$CALLER_SHA" != "$CANDIDATE_SHA" ]; then
-            echo '::error::Dispatch from the current feature branch and use its exact validated head; superseded candidates are forbidden'
-            exit 1
-          fi
+          printf 'DOKPLOY_CURL_RESOLVE=%s\n' \
+            "${dokploy_host}:443:${DOKPLOY_RESOLVE_IP}" >> "$GITHUB_ENV"
 
-          redact_gh_stderr() {
-            sed -E \
-              -e 's/(gh[pousr]_[[:alnum:]_]+|github_pat_[[:alnum:]_]+)/[REDACTED]/g' \
-              -e 's/(Authorization: )[^[:space:]]+/\1[REDACTED]/Ig' \
-              "$1" | tr '\n' ' ' | cut -c1-1000
-          }
-          api_failure() {
-            local operation="$1"
-            local status="$2"
-            local stderr_file="$3"
-            local safe_stderr
-            safe_stderr="$(redact_gh_stderr "$stderr_file")"
-            echo "::error::${operation} failed (gh exit ${status}): ${safe_stderr:-no stderr captured}" >&2
-            exit 1
-          }
-
-          # A SHA-specific lookup returns at most the first 100 completed
-          # runs. Require an unambiguous successful result; never select one.
-          run_ids_file="$(mktemp)"
-          required_jobs_file="$(mktemp)"
-          gh_stderr_file="$(mktemp)"
-          trap 'rm -f "$run_ids_file" "$required_jobs_file" "$gh_stderr_file"' EXIT
-          if gh api \
-            "repos/${GITHUB_REPOSITORY}/actions/workflows/uvanoo-v1.4-cloud-build.yml/runs?head_sha=${CANDIDATE_SHA}&status=completed&per_page=100" \
-            --jq '.workflow_runs[] | select(.conclusion == "success") | .id' > "$run_ids_file" 2> "$gh_stderr_file"; then
-            :
-          else
-            api_failure "authoritative-run lookup" "$?" "$gh_stderr_file"
-          fi
-          mapfile -t run_ids < "$run_ids_file"
-          if [ "${#run_ids[@]}" -ne 1 ] || ! [[ "${run_ids[0]}" =~ ^[0-9]+$ ]]; then
-            echo "::error::No successful authoritative V1.4 validation run exists for source_sha"
-            exit 1
-          fi
-          run_id="${run_ids[0]}"
-          if gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}/jobs?per_page=100" \
-            --jq '.jobs[] | select(.name == "Validate frozen V1.4 source" or .name == "Publish immutable V1.4 DEV candidate") | [.name, .conclusion] | @tsv' \
-            > "$required_jobs_file" 2> "$gh_stderr_file"; then
-            :
-          else
-            api_failure "authoritative-run jobs lookup" "$?" "$gh_stderr_file"
-          fi
-          required_jobs="$(< "$required_jobs_file")"
-          if [ "$(grep -c $'^Validate frozen V1.4 source\tsuccess$' <<< "$required_jobs")" -ne 1 ] \
-            || [ "$(grep -c $'^Publish immutable V1.4 DEV candidate\tsuccess$' <<< "$required_jobs")" -ne 1 ]; then
-            echo "::error::The authoritative V1.4 run did not complete both validation and candidate publication"
-            exit 1
-          fi
-
-          image_tag="${CANDIDATE_IMAGE_NAME}:v1.4-dev-${CANDIDATE_SHA}"
-          echo "Candidate API verification passed; inspecting immutable image"
-          # Consume all buildx output before parsing: an early pipe reader exit
-          # can make buildx exit 255 even after it prints a valid digest.
-          inspect_stderr="$(mktemp)"
-          if inspect_output="$(docker buildx imagetools inspect "$image_tag" 2>"$inspect_stderr")"; then
-            :
-          else
-            status="$?"
-            echo "::error::Candidate image inspection failed (exit ${status}): $(redact_gh_stderr "$inspect_stderr")" >&2
-            rm -f "$inspect_stderr"
-            exit 1
-          fi
-          rm -f "$inspect_stderr"
-          digest="$(awk '$1 == "Digest:" {print $2; exit}' <<< "$inspect_output")"
-          if ! [[ "$digest" =~ ^sha256:[0-9a-f]{64}$ ]]; then
-            echo "::error::The published candidate tag did not resolve to an immutable sha256 digest"
-            exit 1
-          fi
-          image="${CANDIDATE_IMAGE_NAME}@${digest}"
-          docker pull "$image" >/dev/null
-          revision="$(docker image inspect "$image" --format '{{ index .Config.Labels "org.opencontainers.image.revision" }}')"
-          version="$(docker image inspect "$image" --format '{{ index .Config.Labels "org.opencontainers.image.version" }}')"
-          if [ "$revision" != "$CANDIDATE_SHA" ] \
-            || [ "$version" != "v1.4-dev-${CANDIDATE_SHA}" ]; then
-            echo "::error::Candidate tag, digest, and OCI source labels do not identify the requested source_sha"
-            exit 1
-          fi
-          {
-            echo "source_sha=$CANDIDATE_SHA"
-            echo "image_digest=$digest"
-          } >> "$GITHUB_OUTPUT"
-          {
-            echo "Verified DEV-only candidate source: $CANDIDATE_SHA"
-            echo "Verified immutable image: $image"
-            echo "Authoritative validation run: $run_id"
-          } >> "$GITHUB_STEP_SUMMARY"
-  deploy-dev:
-    name: Deploy verified V1.4 candidate to DEV
-    needs: verify-candidate
-    permissions:
-      contents: read
-      # The reusable workflow retains its skipped main-build job, which needs
-      # package write access when called from main. GitHub validates that
-      # nested permission edge before evaluating the candidate-only job path.
-      packages: write
-    uses: ./.github/workflows/deploy-dev.yml
-    with:
-      source_sha: ${{ needs.verify-candidate.outputs.source_sha }}
-      image_digest: ${{ needs.verify-candidate.outputs.image_digest }}
-      feature_candidate_verified: true
-    secrets: inherit
+      - name: Check database safety legacy writer and exact service identities
+        env:
+          DOKPLOY_URL: ${{ secrets.DOKPLOY_URL }}
+          DOKPLOY_TOKEN: ${{ secrets.DOKPLOY_TOKEN }}
+        run: node .recovery-governance/scripts/ci/run21-recovery-preflight.mjs before
+      - name: Apply existing governed writer fence
+        env:
+          DOKPLOY_URL: ${{ secrets.DOKPLOY_URL }}
+          DOKPLOY_TOKEN: ${{ secrets.DOKPLOY_TOKEN }}
+        run: node scripts/cluster/dev-writer-fence.mjs fence
+      - name: Verify persisted fence and zero governed writers
+        env:
+          DOKPLOY_URL: ${{ secrets.DOKPLOY_URL }}
+          DOKPLOY_TOKEN: ${{ secrets.DOKPLOY_TOKEN }}
+        run: |
+          set -euo pipefail
+          node scripts/cluster/dev-writer-fence.mjs verify-zero
+          node .recovery-governance/scripts/ci/run21-recovery-preflight.mjs zero
+          node .recovery-governance/scripts/ci/run21-recovery-preflight.mjs settled
+      - name: Restore using existing governed writer mechanism
+        env:
+          DOKPLOY_URL: ${{ secrets.DOKPLOY_URL }}
+          DOKPLOY_TOKEN: ${{ secrets.DOKPLOY_TOKEN }}
+        run: node scripts/cluster/dev-writer-fence.mjs restore
+      - name: Verify final writers and database clients
+        run: node .recovery-governance/scripts/ci/run21-recovery-preflight.mjs after
+      - name: Verify internal exact-SHA readiness and external Basic Auth
+        run: node scripts/cluster/dev-readiness.mjs
+      - name: Report recovery outcome
+        if: always()
+        env:
+          RECOVERY_STATUS: ${{ job.status }}
+        run: |
+          printf 'Run 21 writer recovery: %s\nCandidate: %s\nDigest: %s\n' \
+            "$RECOVERY_STATUS" "$DEPLOY_SOURCE_SHA" "$IMAGE_DIGEST" >> "$GITHUB_STEP_SUMMARY"
+          echo 'No migration, build, image change or automatic failure recovery was performed.' >> "$GITHUB_STEP_SUMMARY"

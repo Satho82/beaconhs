@@ -112,7 +112,7 @@ function snapshot() {
   const sql = `SELECT json_build_object(
     'open',(SELECT count(*) FROM pg_stat_activity WHERE datname='beaconhs' AND backend_type='client backend' AND xact_start IS NOT NULL),
     'prepared',(SELECT count(*) FROM pg_prepared_xacts WHERE database='beaconhs'),
-    'sessions',COALESCE((SELECT json_agg(t) FROM (SELECT usename,client_addr::text,state FROM pg_stat_activity WHERE datname='beaconhs' AND backend_type='client backend') t),'[]'::json));`
+    'sessions',COALESCE((SELECT json_agg(t) FROM (SELECT usename,host(client_addr) AS client_addr,state FROM pg_stat_activity WHERE datname='beaconhs' AND backend_type='client backend') t),'[]'::json));`
   const db = JSON.parse(
     exec(
       'docker',

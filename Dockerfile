@@ -47,7 +47,8 @@ RUN pnpm turbo run build --filter=@beaconhs/web --filter=@beaconhs/worker
 # nests them and the bundle can't find them).
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
     npm_config_node_linker=hoisted \
-    pnpm --filter=@beaconhs/worker deploy --prod --legacy /prod/worker
+    npm_config_inject_workspace_packages=true \
+    pnpm --filter=@beaconhs/worker deploy --prod /prod/worker
 
 # --- Runtime ---
 FROM base AS runner

@@ -16,7 +16,9 @@
   "scripts": {
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "clean": "rm -rf dist .turbo"
+    "clean": "rm -rf dist .turbo",
+    "credentials:cycas-demo": "pnpm --filter @beaconhs/db exec tsx ../auth/src/create-cycas-demo-credentials.ts",
+    "test:cycas-board": "pnpm --filter @beaconhs/db exec tsx ../auth/src/cycas-board.integration.ts"
   },
   "dependencies": {
     "@beaconhs/compliance": "workspace:*",

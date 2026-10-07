@@ -90,6 +90,7 @@ type DemoHotelSeedPlanOptions = {
   seedKey?: string
   tenantId?: string
   namespace?: string
+  roomsPerFloor?: readonly number[]
 }
 
 export function buildDemoHotelSeedPlan(
@@ -128,17 +129,21 @@ export function buildDemoHotelSeedPlan(
     metadata: { demoSeedKey: seedKey },
   }))
 
-  const roomNumbers = [
-    '001',
-    '002',
-    '003',
-    '004',
-    '005',
-    ...Array.from({ length: 7 }, (_, i) => `10${i + 1}`),
-    ...Array.from({ length: 7 }, (_, i) => `20${i + 1}`),
-    ...Array.from({ length: 7 }, (_, i) => `30${i + 1}`),
-    ...Array.from({ length: 7 }, (_, i) => `40${i + 1}`),
-  ]
+  const roomNumbers = options.roomsPerFloor
+    ? options.roomsPerFloor.flatMap((count, floor) =>
+        Array.from({ length: count }, (_, i) => `${floor}${String(i + 1).padStart(2, '0')}`),
+      )
+    : [
+        '001',
+        '002',
+        '003',
+        '004',
+        '005',
+        ...Array.from({ length: 7 }, (_, i) => `10${i + 1}`),
+        ...Array.from({ length: 7 }, (_, i) => `20${i + 1}`),
+        ...Array.from({ length: 7 }, (_, i) => `30${i + 1}`),
+        ...Array.from({ length: 7 }, (_, i) => `40${i + 1}`),
+      ]
   const roomStatuses = [
     'occupied',
     'maintenance',
@@ -164,7 +169,7 @@ export function buildDemoHotelSeedPlan(
     code,
     name: `Room ${code}`,
     roomType: roomTypeFor(code),
-    status: roomStatuses[index]!,
+    status: roomStatuses[index] ?? 'available',
     metadata: {
       beds: roomTypeFor(code).includes('Twin') ? 2 : 1,
       demoSeedKey: seedKey,
@@ -871,8 +876,8 @@ export function buildDemoHotelSeedPlan(
     properties: 1,
     buildings: 1,
     floors: 5,
-    rooms: 33,
-    roomQrTargets: 33,
+    rooms: rooms.length,
+    roomQrTargets: rooms.length,
     users: 5,
     activePeople: 8,
     contractors: 3,

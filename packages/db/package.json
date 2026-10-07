@@ -13,7 +13,10 @@
     "./canonical-templates": "./src/canonical-templates.ts",
     "./seed/lift-plan-template": "./src/seed/lift-plan-template.ts",
     "./seed/pdf-templates": "./src/seed/pdf-templates.ts",
-    "./seed/report-definitions": "./src/seed/report-definitions.ts"
+    "./seed/report-definitions": "./src/seed/report-definitions.ts",
+    "./cycas-demo-seed-plan": "./src/cycas-demo-seed-plan.ts",
+    "./cycas-demo-seed-runner": "./src/cycas-demo-seed-runner.ts",
+    "./cycas-demo-seed-rows": "./src/cycas-demo-seed-rows.ts"
   },
   "scripts": {
     "generate": "drizzle-kit generate",

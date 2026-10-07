@@ -44,7 +44,7 @@ describe('Cycas Hospitality portfolio seed plan', () => {
     const accounts = getCycasDemoAccounts(plan)
     const contractors = [...plan.hotels.fenchurch.contractors, ...plan.hotels.lincoln.contractors]
     const allPeopleEmails = [...accounts, ...contractors].map((identity) => identity.email)
-    expect(accounts).toHaveLength(18)
+    expect(accounts).toHaveLength(19)
     expect(contractors).toHaveLength(6)
     expect(new Set(allPeopleEmails).size).toBe(allPeopleEmails.length)
     expect(allPeopleEmails.every((email) => email.endsWith('@cycas.demo.uvanoo.invalid'))).toBe(
@@ -123,10 +123,10 @@ describe('Cycas Hospitality portfolio seed plan', () => {
 
   it('contains meaningful, varied operations and H&S registry records for both hotels', () => {
     const plan = buildCycasDemoSeedPlan(anchor)
-    expect(plan.expected.rooms).toEqual({ fenchurch: 33, lincoln: 33 })
+    expect(plan.expected.rooms).toEqual({ fenchurch: 33, lincoln: 54 })
     expect(plan.expected.maintenanceIssues).toEqual({ fenchurch: 12, lincoln: 12 })
     expect(plan.expected.operationalRecords).toEqual({ fenchurch: 21, lincoln: 21 })
-    expect(plan.expected.users).toBe(18)
+    expect(plan.expected.users).toBe(19)
     expect(plan.expected.complianceRegistry).toEqual({ fenchurch: 22, lincoln: 22 })
     for (const property of plan.properties) {
       const records = plan.registry.filter((record) => record.propertyId === property.id)
@@ -159,5 +159,52 @@ describe('Cycas seed safety guard', () => {
         SUPERADMIN_DATABASE_URL: 'postgres://user:pass@localhost/beaconhs',
       }),
     ).not.toThrow()
+  })
+})
+
+describe('Board acceptance plan', () => {
+  it('uses the frozen Board anchor, 87 room keys and immediate property assignments', () => {
+    const plan = buildCycasDemoSeedPlan()
+    expect(plan.now.toISOString()).toBe('2026-10-15T12:00:00.000Z')
+    expect(plan.hotels.lincoln.floors).toHaveLength(5)
+    expect(
+      plan.hotels.lincoln.floors.map(
+        (floor) => plan.hotels.lincoln.rooms.filter((room) => room.floorId === floor.id).length,
+      ),
+    ).toEqual([10, 11, 11, 11, 11])
+    expect(new Set(plan.staff.map((member) => member.key)).size).toBe(19)
+    expect(new Set(plan.staff.map((member) => member.userId)).size).toBe(19)
+    expect(plan.staff.every((member) => member.propertyIds.length > 0)).toBe(true)
+    const safety = plan.staff.find((member) => member.key === 'safety-compliance')!
+    expect(safety.propertyIds).toHaveLength(2)
+    expect(plan.roles.find((role) => role.key === 'safety')!.permissions).toContain(
+      'compliance.read',
+    )
+    expect(
+      plan.roles
+        .find((role) => role.key === 'restricted')!
+        .permissions.every((permission) => permission.endsWith('.read')),
+    ).toBe(true)
+  })
+
+  it('refuses staging and unspecified runtime environments', () => {
+    for (const runtime of [undefined, 'staging', 'production']) {
+      expect(() =>
+        assertCycasSeedEnvironment({
+          UVANOO_CYCAS_SEED_TARGET: 'development',
+          UVANOO_CYCAS_SEED_CONFIRM: 'SEED_CYCAS_HOSPITALITY_DEVELOPMENT',
+          SUPERADMIN_DATABASE_URL: 'postgres://user@localhost/beaconhs_test',
+          NODE_ENV: runtime,
+        }),
+      ).toThrow()
+    }
+    expect(() =>
+      assertCycasSeedEnvironment({
+        UVANOO_CYCAS_SEED_TARGET: 'staging',
+        UVANOO_CYCAS_SEED_CONFIRM: 'SEED_CYCAS_HOSPITALITY_STAGING',
+        SUPERADMIN_DATABASE_URL: 'postgres://user@localhost/uvanoo_staging',
+        NODE_ENV: 'development',
+      }),
+    ).toThrow()
   })
 })

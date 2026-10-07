@@ -43,6 +43,10 @@ const config: KnipConfig = {
       // must still resolve it at runtime.
       ignoreDependencies: ['qrcode'],
     },
+    'packages/auth': {
+      // CLI entrypoints launched through the db package's existing tsx runtime.
+      entry: ['src/create-cycas-demo-credentials.ts', 'src/cycas-board.integration.ts'],
+    },
     'packages/db': {
       entry: ['src/scripts/reseed-lift-plan.ts', 'src/forward-migration-cli.ts'],
     },

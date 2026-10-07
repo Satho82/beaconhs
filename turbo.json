@@ -49,7 +49,8 @@
     },
     "test": {
       "dependsOn": ["^build"],
-      "outputs": []
+      "outputs": [],
+      "env": ["CI", "GITHUB_ACTIONS", "CYCAS_TEST_DATABASE_URL"]
     },
     "clean": {
       "cache": false

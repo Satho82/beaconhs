@@ -3,6 +3,7 @@ import { buildDemoHotelSeedPlan } from './demo-hotel-seed-plan'
 
 export const CYCAS_DEMO_TENANT_SLUG = 'cycas-hospitality-demo'
 export const CYCAS_DEMO_SEED_KEY = 'cycas-hospitality-portfolio-v1'
+export const CYCAS_BOARD_ANCHOR = '2026-10-15T12:00:00.000Z'
 
 export function cycasId(key: string): string {
   const bytes = createHash('sha256')
@@ -26,24 +27,26 @@ type CycasSeedEnvironment = {
 
 export function assertCycasSeedEnvironment(env: CycasSeedEnvironment): void {
   const target = env.UVANOO_CYCAS_SEED_TARGET
-  if (target !== 'development' && target !== 'staging')
-    throw new Error('UVANOO_CYCAS_SEED_TARGET must be exactly development or staging')
-  const expected = `SEED_CYCAS_HOSPITALITY_${target.toUpperCase()}`
-  if (env.UVANOO_CYCAS_SEED_CONFIRM !== expected)
-    throw new Error(`UVANOO_CYCAS_SEED_CONFIRM must be exactly ${expected}`)
+  if (target !== 'development')
+    throw new Error(
+      'UVANOO_CYCAS_SEED_TARGET must be exactly development; staging/production forbidden',
+    )
+  if (env.UVANOO_CYCAS_SEED_CONFIRM !== 'SEED_CYCAS_HOSPITALITY_DEVELOPMENT')
+    throw new Error('UVANOO_CYCAS_SEED_CONFIRM must be exactly SEED_CYCAS_HOSPITALITY_DEVELOPMENT')
   const rawUrl = env.SUPERADMIN_DATABASE_URL ?? env.DATABASE_URL
   if (!rawUrl) throw new Error('A database URL is required')
-  const url = new URL(rawUrl)
-  const database = url.pathname.replace(/^\//, '')
-  if (target === 'staging') {
-    if (env.SENTRY_ENVIRONMENT !== 'staging' || database !== 'uvanoo_staging')
-      throw new Error(
-        'Staging seed requires SENTRY_ENVIRONMENT=staging and database uvanoo_staging',
-      )
-    return
+  let url: URL
+  try {
+    url = new URL(rawUrl)
+  } catch {
+    throw new Error('Invalid database URL')
   }
+  const database = url.pathname.replace(/^\//, '')
+  if (env.SENTRY_ENVIRONMENT && !['development', 'test'].includes(env.SENTRY_ENVIRONMENT))
+    throw new Error('Only development/test environments are permitted')
   if (
-    env.NODE_ENV === 'production' ||
+    !['development', 'test'].includes(env.NODE_ENV ?? '') ||
+    !['postgres:', 'postgresql:'].includes(url.protocol) ||
     !new Set(['localhost', '127.0.0.1', '::1', 'db', 'postgres']).has(url.hostname)
   )
     throw new Error('Development seed requires a non-production runtime and local database host')
@@ -54,6 +57,17 @@ export function assertCycasSeedEnvironment(env: CycasSeedEnvironment): void {
 const permissions = {
   admin: [
     'admin.users.manage',
+    'admin.org.manage',
+    'dashboards.read',
+    'equipment.read.all',
+    'equipment.manage',
+    'inspections.read.all',
+    'inspections.create',
+    'inspections.update',
+    'documents.read',
+    'training.read.all',
+    'incidents.read.all',
+    'ca.read.all',
     'hospitality.read',
     'hospitality.manage',
     'maintenance.read',
@@ -67,6 +81,13 @@ const permissions = {
     'hospitality.signoff.complete',
   ],
   manager: [
+    'dashboards.read',
+    'equipment.read.all',
+    'inspections.read.all',
+    'documents.read',
+    'training.read.all',
+    'incidents.read.all',
+    'ca.read.all',
     'hospitality.read',
     'hospitality.manage',
     'maintenance.read',
@@ -85,6 +106,10 @@ const permissions = {
     'operational_tasks.read',
   ],
   engineer: [
+    'equipment.read.all',
+    'equipment.inspect',
+    'inspections.read.all',
+    'ca.read.all',
     'hospitality.read',
     'maintenance.read',
     'maintenance.create',
@@ -92,6 +117,22 @@ const permissions = {
     'maintenance.verify',
     'operational_tasks.read',
     'operational_tasks.complete',
+  ],
+  safety: [
+    'hospitality.read',
+    'compliance.read',
+    'compliance.manage',
+    'inspections.read.all',
+    'inspections.create',
+    'inspections.update',
+    'incidents.read.all',
+    'incidents.create',
+    'documents.read',
+    'training.read.all',
+    'equipment.read.all',
+    'ca.read.all',
+    'operational_tasks.read',
+    'dashboards.read',
   ],
   restricted: ['hospitality.read', 'maintenance.read', 'operational_tasks.read'],
 } as const
@@ -109,6 +150,29 @@ function namespaceHotelPlan(
     rooms: hotel.rooms.map((room) => ({
       ...room,
       code: `${codePrefix}-${room.code}`,
+      roomType:
+        property === 'lincoln'
+          ? room.code === '001'
+            ? 'Accessible Studio'
+            : Number(room.code) % 3 === 0
+              ? 'One Bedroom Suite'
+              : 'Studio'
+          : room.roomType,
+    })),
+    incidents: hotel.incidents.map((incident) => ({
+      ...incident,
+      reference: `${codePrefix}-${incident.reference}`,
+    })),
+    complianceObligations: hotel.complianceObligations.map((obligation) => ({
+      ...obligation,
+      sourceKey: `${codePrefix}-${obligation.sourceKey}`,
+    })),
+    documentVersions: hotel.documentVersions.map((version, index) => ({
+      ...version,
+      textContent: `${propertyName} — ${hotel.documents[index]!.title}
+
+Fictional Cycas Board demonstration record.
+Owner: hotel management. Escalate overdue actions to the Cluster GM.`,
     })),
     maintenanceIssues: hotel.maintenanceIssues.map((issue) => ({
       ...issue,
@@ -134,8 +198,14 @@ function namespaceHotelPlan(
       ...document,
       key: `${codePrefix}-${document.key}`,
     })),
-    staff: hotel.staff.map((member) => ({
+    staff: hotel.staff.map((member, index) => ({
       ...member,
+      ...(property === 'lincoln'
+        ? {
+            firstName: ['Oliver', 'Aisha', 'Isabel', 'Leo', 'Freya'][index]!,
+            lastName: ['Grant', 'Khan', 'Costa', 'Martin', 'Wilson'][index]!,
+          }
+        : {}),
       email: `${property}.${member.key}@${CYCAS_DEMO_EMAIL_DOMAIN}`,
     })),
     contractors: hotel.contractors.map((contractor) => ({
@@ -145,7 +215,7 @@ function namespaceHotelPlan(
   }
 }
 
-export function buildCycasDemoSeedPlan(anchor = new Date()) {
+export function buildCycasDemoSeedPlan(anchor = new Date(CYCAS_BOARD_ANCHOR)) {
   const tenantId = cycasId('tenant')
   const fenchurch = namespaceHotelPlan(
     buildDemoHotelSeedPlan(anchor, {
@@ -155,12 +225,13 @@ export function buildCycasDemoSeedPlan(anchor = new Date()) {
     }),
     'fenchurch',
   )
-  const lincolnAnchor = new Date(anchor.getTime() + 5 * 86_400_000)
+  const lincolnAnchor = new Date(anchor)
   const lincoln = namespaceHotelPlan(
     buildDemoHotelSeedPlan(lincolnAnchor, {
       seedKey: CYCAS_DEMO_SEED_KEY,
       tenantId,
       namespace: 'lincoln',
+      roomsPerFloor: [10, 11, 11, 11, 11],
     }),
     'lincoln',
   )
@@ -191,10 +262,10 @@ export function buildCycasDemoSeedPlan(anchor = new Date()) {
   ]
   const identities = [
     [
-      'super-admin',
+      'demo-admin',
       'Avery',
       'Morgan',
-      'Super Admin',
+      'Demo Administrator',
       'admin',
       [fenchurch.propertyId, lincoln.propertyId],
     ],
@@ -233,6 +304,14 @@ export function buildCycasDemoSeedPlan(anchor = new Date()) {
       [fenchurch.propertyId, lincoln.propertyId],
     ],
     [
+      'safety-compliance',
+      'Riley',
+      'Brooks',
+      'Cluster Safety and Compliance Manager',
+      'safety',
+      [fenchurch.propertyId, lincoln.propertyId],
+    ],
+    [
       'restricted-operations',
       'Jamie',
       'Blake',
@@ -241,7 +320,7 @@ export function buildCycasDemoSeedPlan(anchor = new Date()) {
       [lincoln.propertyId],
     ],
   ] as const
-  const staff = identities.map(([key, firstName, lastName, title, roleKey, propertyIds]) => ({
+  const boardStaff = identities.map(([key, firstName, lastName, title, roleKey, propertyIds]) => ({
     key,
     userId: cycasId(`user:${key}`),
     tenantUserId: cycasId(`member:${key}`),
@@ -253,6 +332,21 @@ export function buildCycasDemoSeedPlan(anchor = new Date()) {
     roleKey,
     propertyIds: [...propertyIds],
   }))
+  const staff = [
+    ...boardStaff,
+    ...[fenchurch, lincoln].flatMap((hotel, propertyIndex) =>
+      hotel.staff.map((member) => ({
+        ...member,
+        key: `${propertyIndex === 0 ? 'fenchurch' : 'lincoln'}-ops-${member.key}`,
+        roleKey: (member.key === 'gm' || member.key === 'duty'
+          ? 'manager'
+          : member.key === 'front-office'
+            ? 'frontOffice'
+            : 'engineer') as keyof typeof permissions,
+        propertyIds: [hotel.propertyId],
+      })),
+    ),
+  ]
   const roles = Object.entries(permissions).map(([key, rolePermissions]) => ({
     id: cycasId(`role:${key}`),
     key,
@@ -328,7 +422,7 @@ export function buildCycasDemoSeedPlan(anchor = new Date()) {
       managementCompanies: 1,
       properties: 2,
       propertyNames: properties.map((property) => property.name),
-      users: staff.length + fenchurch.staff.length + lincoln.staff.length,
+      users: staff.length,
       clusterGmPropertyAssignments: 2,
       rooms: { fenchurch: fenchurch.rooms.length, lincoln: lincoln.rooms.length },
       maintenanceIssues: {
@@ -354,7 +448,7 @@ type CycasDemoAccount = {
 }
 
 export function getCycasDemoAccounts(plan: ReturnType<typeof buildCycasDemoSeedPlan>) {
-  const accounts = [...plan.staff, ...plan.hotels.fenchurch.staff, ...plan.hotels.lincoln.staff]
+  const accounts = plan.staff
   return [...new Map(accounts.map((account) => [account.userId, account])).values()]
 }
 

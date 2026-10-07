@@ -4,7 +4,7 @@ import { cn } from './utils'
 
 const buttonVariants = cva(
   [
-    'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium',
+    'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium',
     'ring-offset-white dark:ring-offset-slate-950 transition-[background-color,box-shadow,border-color,transform,color] duration-150 ease-out',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--color-focus))] focus-visible:ring-offset-2',
     'active:scale-[0.98] motion-reduce:active:scale-100',

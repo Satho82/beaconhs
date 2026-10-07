@@ -38,8 +38,8 @@ export function HospitalityPropertySwitcher({
   if (properties.length === 0) return null
   if (properties.length === 1) {
     return (
-      <span className="flex max-w-full min-w-0 items-center gap-2 rounded-md px-2 py-1 text-sm text-slate-700 dark:text-slate-200">
-        <Building2 size={14} />
+      <span className="flex max-w-full min-w-0 items-center gap-2 rounded-lg bg-[rgb(var(--color-primary)/0.06)] px-3 py-2 text-sm text-slate-700 dark:text-slate-200">
+        <Building2 size={16} className="shrink-0 text-teal-700 dark:text-teal-300" />
         <span className="truncate">{properties[0]?.name}</span>
       </span>
     )
@@ -49,17 +49,17 @@ export function HospitalityPropertySwitcher({
       open={open}
       onOpenChange={setOpen}
       align="start"
-      className="w-64"
+      className="w-72 max-w-[calc(100vw-2rem)]"
       trigger={
         <button
           type="button"
           onClick={() => setOpen((value) => !value)}
           disabled={pending}
-          className="flex max-w-full min-w-0 items-center gap-2 rounded-md border border-slate-200 bg-white px-2.5 py-1 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800/60"
+          className="flex max-w-full min-w-0 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800/60"
         >
-          <Building2 size={14} />
+          <Building2 size={16} className="shrink-0 text-teal-700 dark:text-teal-300" />
           <span className="truncate">{pending ? t('m_0bec5451fa832e') : label}</span>
-          <ChevronDown size={14} className="text-slate-400" />
+          <ChevronDown size={14} className="shrink-0 text-slate-400" />
         </button>
       }
     >

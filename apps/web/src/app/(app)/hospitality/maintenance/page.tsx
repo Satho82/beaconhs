@@ -175,26 +175,47 @@ export default async function MaintenanceQueue({
         />
       </TableToolbar>
       {data.rows.length === 0 ? (
-        <EmptyState title={translateValue('No maintenance issues found')} />
+        <EmptyState className="mt-4" title={translateValue('No maintenance issues found')} />
       ) : (
         <div className="mt-4 grid gap-3">
           {data.rows.map(({ issue, roomCode, roomName, propertyName }) => (
             <Link
               key={issue.id}
               href={`/hospitality/maintenance/${issue.id}`}
-              className="hover:bg-muted/40 min-w-0 rounded-lg border p-4 break-words transition-colors focus-visible:outline-2 focus-visible:outline-offset-2"
+              className="uv-record-link p-5"
             >
               <div className="flex flex-wrap items-start justify-between gap-2">
-                <strong>
-                  {issue.reference} · {issue.summary}
-                </strong>
-                <Badge variant="secondary">
-                  {translateValue(issue.status.replaceAll('_', ' '))}
-                </Badge>
+                <div className="min-w-0 flex-1">
+                  <p className="mb-1 font-mono text-xs font-medium text-slate-500 dark:text-slate-400">
+                    {issue.reference}
+                  </p>
+                  <strong className="text-base font-semibold">{issue.summary}</strong>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <Badge
+                    variant={
+                      issue.priority === 'critical'
+                        ? 'destructive'
+                        : issue.priority === 'high'
+                          ? 'warning'
+                          : 'outline'
+                    }
+                  >
+                    {translateValue(issue.priority)}
+                  </Badge>
+                  <Badge
+                    variant={
+                      issue.status === 'completed' || issue.status === 'closed'
+                        ? 'success'
+                        : 'secondary'
+                    }
+                  >
+                    {translateValue(issue.status.replaceAll('_', ' '))}
+                  </Badge>
+                </div>
               </div>
-              <p className="text-muted-foreground mt-1 text-sm">
-                {propertyName} · {translateValue('Room')} {roomName || roomCode} ·{' '}
-                {translateValue(issue.priority)} ·{' '}
+              <p className="mt-3 text-sm text-slate-600 dark:text-slate-400">
+                {propertyName} · {roomName || `${translateValue('Room')} ${roomCode}`} ·{' '}
                 {translateValue(issue.source.replaceAll('_', ' '))}
               </p>
             </Link>

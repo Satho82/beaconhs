@@ -85,3 +85,43 @@
     transform: translateY(0);
   }
 }
+
+/* Shared Light / Terra surfaces. Use explicit classes on operational records;
+   no global element selectors or changes to status / authorisation semantics. */
+@layer components {
+  .uv-surface {
+    border: 1px solid rgb(var(--color-border));
+    border-radius: 0.75rem;
+    background: rgb(var(--color-surface));
+    box-shadow: 0 1px 2px rgb(15 23 42 / 0.025);
+  }
+
+  .uv-record-link {
+    display: block;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    border: 1px solid rgb(var(--color-border));
+    border-radius: 0.75rem;
+    background: rgb(var(--color-surface));
+    padding: 1rem;
+    transition:
+      border-color 150ms,
+      background-color 150ms;
+  }
+
+  .uv-record-link:hover {
+    border-color: rgb(var(--color-primary) / 0.5);
+    background: color-mix(in srgb, rgb(var(--color-primary)) 3%, rgb(var(--color-surface)));
+  }
+
+  .uv-record-link:focus-visible {
+    outline: 2px solid rgb(var(--color-focus));
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .uv-record-link {
+      transition: none;
+    }
+  }
+}

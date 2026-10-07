@@ -23,7 +23,12 @@ export function TableToolbar({
   className?: string
 }) {
   return (
-    <div className={cn('flex flex-wrap items-center gap-2', className)}>
+    <div
+      className={cn(
+        'flex min-w-0 flex-wrap items-center gap-2 rounded-xl bg-slate-100/70 p-2.5 dark:bg-slate-800/50',
+        className,
+      )}
+    >
       <GeneratedValue value={children} />
       <GeneratedValue
         value={

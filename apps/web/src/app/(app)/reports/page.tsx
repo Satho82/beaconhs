@@ -3,6 +3,7 @@ import { ArrowRight, Plus } from 'lucide-react'
 import {
   Badge,
   Button,
+  EmptyState,
   PageHeader,
   Table,
   TableBody,
@@ -88,7 +89,7 @@ export default async function ReportsPage({
         </>
       }
     >
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+      <div className="min-w-0 space-y-4">
         <Table aria-label={tGenerated('m_09bb00824b733b')}>
           <TableHeader>
             <TableRow>
@@ -149,8 +150,11 @@ export default async function ReportsPage({
             ) : (
               <TableRow>
                 <TableCell colSpan={5} className="h-32 text-center text-slate-500">
-                  <GeneratedText
-                    id={query || category || page > 1 ? 'm_0c726da8b78d42' : 'm_1841d2703b10cc'}
+                  <EmptyState
+                    className="border-0 shadow-none"
+                    title={tGenerated(
+                      query || category || page > 1 ? 'm_0c726da8b78d42' : 'm_1841d2703b10cc',
+                    )}
                   />
                 </TableCell>
               </TableRow>

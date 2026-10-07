@@ -71,7 +71,7 @@ export default async function SignoffPage({
           Overdue: summary.overdue,
           Escalated: summary.escalated,
         }).map(([label, value]) => (
-          <div className="rounded-lg border p-3" key={label}>
+          <div className="uv-surface p-4" key={label}>
             <p className="text-muted-foreground text-xs">{label}</p>
             <p className="text-2xl font-semibold">{value}</p>
           </div>
@@ -86,7 +86,7 @@ export default async function SignoffPage({
         </p>
       )}
       {manage && (
-        <form action={confirmSignoffAction} className="mt-5 grid gap-3 rounded-lg border p-4">
+        <form action={confirmSignoffAction} className="uv-surface mt-5 grid gap-3 p-5">
           <input type="hidden" name="propertyId" value={propertyId} />
           <input type="hidden" name="kind" value={kind} />
           <Label>
@@ -103,7 +103,7 @@ export default async function SignoffPage({
         {history.rows.length ? (
           <div className="mt-3 grid gap-2">
             {history.rows.map((row) => (
-              <div className="rounded border p-3" key={row.id}>
+              <div className="uv-surface p-4" key={row.id}>
                 {row.kind} · {row.periodStart.toLocaleDateString()} –{' '}
                 {row.periodEnd.toLocaleDateString()} {translateHospitality('m_0c745bfb66df3b')}{' '}
                 {row.confirmedAt.toLocaleString()}

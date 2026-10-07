@@ -56,7 +56,7 @@ A normal password or magic-link sign-in does not activate a pending invitation. 
 
 ## Finding your way around
 
-The left menu lists everything you can use. Items are grouped:
+The navy left menu lists everything you can use. The highlighted item shows your current page. Your organisation stays in the top header; role and property controls sit directly below it on desktop, tablet and phone. Long page titles and page actions wrap on smaller screens. Items are grouped:
 
 - **Overview** — the **Dashboard**, your [Workspace](/my), and the activity feed.
 - **Properties** — the existing Property → Building → Floor → Room structure.

@@ -102,14 +102,14 @@ export function PeopleRecordsTable({
       </MobileCardList>
 
       {/* Tablet/desktop: full sortable table. */}
-      <div className="hidden overflow-x-auto rounded-lg border border-slate-200 bg-white sm:block dark:border-slate-800 dark:bg-slate-900">
-        <table className="w-full text-sm">
+      <div className="uv-surface hidden overflow-x-auto sm:block">
+        <table className="w-full text-sm [&_th]:px-4 [&_th]:py-3">
           <thead>
             <tr className="border-b border-slate-200 bg-slate-50/60 text-left text-xs tracking-wide text-slate-500 uppercase dark:border-slate-800 dark:bg-slate-900/80 dark:text-slate-400">
               <GeneratedValue
                 value={
                   canBulk ? (
-                    <th className="w-8 px-3 py-2">
+                    <th className="w-8 px-4 py-3">
                       <SelectVisibleRowsButton allSelected={allSelected} onToggleAll={toggleAll} />
                     </th>
                   ) : null
@@ -154,7 +154,7 @@ export function PeopleRecordsTable({
                     <GeneratedValue
                       value={
                         canBulk ? (
-                          <td className="w-8 px-3 py-2">
+                          <td className="w-8 px-4 py-3">
                             <RowSelectionButton
                               id={r.id}
                               selected={isSelected}
@@ -164,7 +164,7 @@ export function PeopleRecordsTable({
                         ) : null
                       }
                     />
-                    <td className="px-3 py-2">
+                    <td className="px-4 py-3">
                       <Link
                         href={`/people/${r.id}` as any}
                         className="font-medium text-slate-900 hover:underline dark:text-slate-100"
@@ -173,22 +173,22 @@ export function PeopleRecordsTable({
                         <GeneratedValue value={r.firstName} />
                       </Link>
                     </td>
-                    <td className="px-3 py-2 text-slate-600 dark:text-slate-400">
+                    <td className="px-4 py-3 text-slate-600 dark:text-slate-400">
                       <GeneratedValue value={r.employeeNo ?? '—'} />
                     </td>
-                    <td className="px-3 py-2 text-slate-600 dark:text-slate-400">
+                    <td className="px-4 py-3 text-slate-600 dark:text-slate-400">
                       <GeneratedValue value={r.primaryTitleName ?? '—'} />
                     </td>
-                    <td className="px-3 py-2 text-slate-600 dark:text-slate-400">
+                    <td className="px-4 py-3 text-slate-600 dark:text-slate-400">
                       <GeneratedValue value={r.departmentName ?? '—'} />
                     </td>
-                    <td className="px-3 py-2 text-slate-600 dark:text-slate-400">
+                    <td className="px-4 py-3 text-slate-600 dark:text-slate-400">
                       <GeneratedValue value={r.tradeName ?? '—'} />
                     </td>
-                    <td className="px-3 py-2 text-slate-600 dark:text-slate-400">
+                    <td className="px-4 py-3 text-slate-600 dark:text-slate-400">
                       <GeneratedValue value={r.hireDate ?? '—'} />
                     </td>
-                    <td className="px-3 py-2">
+                    <td className="px-4 py-3">
                       <Badge
                         variant={
                           r.status === 'active'

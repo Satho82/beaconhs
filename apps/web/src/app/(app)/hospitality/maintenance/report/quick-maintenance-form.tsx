@@ -25,12 +25,16 @@ export function QuickMaintenanceForm({
   )
 
   return (
-    <form action={reportMaintenanceIssueAction} className="mt-5 grid gap-4 rounded-lg border p-4">
+    <form action={reportMaintenanceIssueAction} className="uv-surface mt-6 grid gap-5 p-5 sm:p-6">
       <input type="hidden" name="source" value="front_office" />
       {properties.length === 1 ? (
-        <input type="hidden" name="propertyId" value={properties[0]!.id} />
+        <div className="rounded-lg bg-[rgb(var(--color-primary)/0.06)] px-4 py-3">
+          <p className="text-xs text-slate-500 dark:text-slate-400">{t('Property')}</p>
+          <p className="mt-1 text-sm font-semibold">{properties[0]!.name}</p>
+          <input type="hidden" name="propertyId" value={properties[0]!.id} />
+        </div>
       ) : (
-        <Label>
+        <Label className="space-y-2">
           {t('Property')}
           <Select
             name="propertyId"
@@ -47,7 +51,7 @@ export function QuickMaintenanceForm({
           </Select>
         </Label>
       )}
-      <Label>
+      <Label className="space-y-2">
         {t('Location / room')}
         <Select name="roomId" required disabled={!propertyId}>
           <option value="">{t('Choose a room')}</option>
@@ -58,19 +62,20 @@ export function QuickMaintenanceForm({
           ))}
         </Select>
       </Label>
-      <Label>
+      <Label className="space-y-2">
         {t('Problem')}
         <Input name="title" required maxLength={200} placeholder={t('What is broken?')} />
       </Label>
-      <Label>
+      <Label className="space-y-2">
         {t('Details')}
         <Textarea
           name="description"
+          className="min-h-24"
           maxLength={2000}
           placeholder={t('Add a short description (optional)')}
         />
       </Label>
-      <Label>
+      <Label className="space-y-2">
         {t('Priority')}
         <Select name="priority" defaultValue="medium">
           <option value="low">{t('Low')}</option>
@@ -91,7 +96,9 @@ export function QuickMaintenanceForm({
           />
         ))}
       </div>
-      <Button type="submit">{t('Submit maintenance issue')}</Button>
+      <Button type="submit" className="w-full sm:w-auto sm:justify-self-start">
+        {t('Submit maintenance issue')}
+      </Button>
     </form>
   )
 }

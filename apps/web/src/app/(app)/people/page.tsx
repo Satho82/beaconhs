@@ -16,6 +16,7 @@ import { SearchInput } from '@/components/search-input'
 import { FilterChips } from '@/components/filter-bar'
 import { Pagination } from '@/components/pagination'
 import { ListPageLayout } from '@/components/page-layout'
+import { TableToolbar } from '@/components/table-toolbar'
 import { PeopleSubNav } from './_components/people-sub-nav'
 import { listPersonDepartmentsForBulk, listPersonGroupsForBulk } from './_actions/bulk'
 import { PeopleRecordsTable, type PeopleTableRow } from './_records-table'
@@ -187,7 +188,7 @@ export default async function PeoplePage({
             }
           />
           <PeopleSubNav active="directory" />
-          <div className="flex flex-wrap items-center gap-3">
+          <TableToolbar>
             <SearchInput placeholder={tGenerated('m_1561c55102f953')} />
             <FilterChips
               basePath="/people"
@@ -221,7 +222,7 @@ export default async function PeoplePage({
                 ) : null
               }
             />
-          </div>
+          </TableToolbar>
         </>
       }
     >

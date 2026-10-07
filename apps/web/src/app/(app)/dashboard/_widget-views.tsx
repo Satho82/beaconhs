@@ -390,7 +390,7 @@ function CountTile({
       // drag fires alongside the grid's pointer drag — janky movement and a
       // ghost left behind. Disabling native drag leaves only the grid's drag.
       draggable={false}
-      className="group relative flex h-full flex-col rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-all hover:border-teal-200 hover:shadow-md dark:border-slate-800 dark:bg-slate-900 dark:hover:border-teal-800/60"
+      className="uv-surface group relative flex h-full flex-col p-4 transition-colors hover:border-teal-600/40"
     >
       <div className="flex items-start justify-between">
         <span className="text-[10px] font-semibold tracking-[0.14em] text-slate-500 uppercase dark:text-slate-400">
@@ -467,7 +467,7 @@ function RateTile({
       title={tGeneratedValue(tooltip)}
       // See CountTile: stop the browser's native anchor drag fighting the grid.
       draggable={false}
-      className="group relative flex h-full flex-col rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-all hover:border-teal-200 hover:shadow-md dark:border-slate-800 dark:bg-slate-900 dark:hover:border-teal-800/60"
+      className="uv-surface group relative flex h-full flex-col p-4 transition-colors hover:border-teal-600/40"
     >
       <div className="flex items-start justify-between">
         <span className="text-[10px] font-semibold tracking-[0.14em] text-slate-500 uppercase dark:text-slate-400">
@@ -543,26 +543,16 @@ function DaysSinceCard({ days, lastDate }: { days: number | null; lastDate: Date
   const tone = days === null ? 'muted' : days >= 90 ? 'good' : days >= 30 ? 'ok' : 'attention'
   const bgClass =
     tone === 'good'
-      ? 'from-emerald-700 via-emerald-800 to-teal-900'
+      ? 'bg-emerald-800'
       : tone === 'ok'
-        ? 'from-teal-700 via-teal-800 to-slate-900'
+        ? 'bg-teal-800'
         : tone === 'attention'
-          ? 'from-amber-700 via-orange-800 to-rose-900'
-          : 'from-slate-700 via-slate-800 to-slate-900'
+          ? 'bg-amber-800'
+          : 'bg-slate-800'
   return (
     <div
-      className={`relative flex h-full flex-col overflow-hidden rounded-xl bg-gradient-to-br ${bgClass} p-4 text-white shadow-sm`}
+      className={`relative flex h-full flex-col overflow-hidden rounded-xl ${bgClass} p-4 text-white shadow-sm`}
     >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-10"
-        style={{
-          backgroundImage:
-            'linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)',
-          backgroundSize: '24px 24px',
-          maskImage: 'radial-gradient(ellipse at top right, black 0%, transparent 70%)',
-        }}
-      />
       <div className="relative flex h-full min-h-0 flex-col">
         <div className="flex items-center gap-1.5 text-[10px] font-semibold tracking-[0.16em] text-white/70 uppercase">
           <ShieldCheck size={12} />

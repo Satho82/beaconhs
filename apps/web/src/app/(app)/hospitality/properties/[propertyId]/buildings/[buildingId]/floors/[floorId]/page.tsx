@@ -133,7 +133,7 @@ export default async function FloorPage({
         <>
           <form
             action={updateFloorAction}
-            className="my-4 grid gap-2 rounded border p-3 sm:grid-cols-3"
+            className="uv-surface my-4 grid items-end gap-4 p-5 sm:grid-cols-3"
           >
             <input type="hidden" name="propertyId" value={propertyId} />
             <input type="hidden" name="buildingId" value={buildingId} />
@@ -150,7 +150,7 @@ export default async function FloorPage({
           </form>
           <form
             action={createRoomAction}
-            className="my-4 grid gap-2 rounded border p-3 sm:grid-cols-4"
+            className="uv-surface my-4 grid items-end gap-4 p-5 sm:grid-cols-4"
           >
             <input type="hidden" name="propertyId" value={propertyId} />
             <input type="hidden" name="buildingId" value={buildingId} />
@@ -187,7 +187,7 @@ export default async function FloorPage({
       {d.rooms.length ? (
         d.rooms.map((r) => (
           <Link
-            className="block border p-3 break-words"
+            className="uv-record-link mb-3"
             href={`/hospitality/properties/${propertyId}/buildings/${buildingId}/floors/${floorId}/rooms/${r.id}`}
             key={r.id}
           >

@@ -29,7 +29,7 @@ export const OVERSIGHT_ADMIN_ARTICLES: ManualArticle[] = [
       'transcript qr',
       'custom fields',
     ],
-    body: `The People directory lists everyone in your company — workers, contractors, and supervisors.
+    body: `The People directory lists everyone in your company — workers, contractors, and supervisors. Search and status filters sit together below the page heading. Phones show individual cards; larger screens show the sortable table.
 
 ## What this is for
 
@@ -208,7 +208,7 @@ ${CSV_EXPORT_LIMIT_GUIDANCE}
       'print preview',
       'page setup',
     ],
-    body: `Reports turn your records into print-ready documents you can preview, export, and email on a schedule.
+    body: `Reports turn your records into print-ready documents you can preview, export, and email on a schedule. Choose a report from the searchable table. On its page, the filter panel sits beside the results on larger screens and above them on phones.
 
 ## What this is for
 

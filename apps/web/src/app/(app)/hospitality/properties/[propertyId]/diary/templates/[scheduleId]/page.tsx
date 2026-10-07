@@ -49,7 +49,7 @@ export default async function DiaryTemplatePage({
           </Button>
         }
       />
-      <section className="mt-5 rounded-lg border p-4">
+      <section className="uv-surface mt-5 p-5">
         <p className="text-sm">
           {template.instructions || translateHospitality('m_0e95ab8396ef45')}
         </p>
@@ -73,7 +73,7 @@ export default async function DiaryTemplatePage({
         </dl>
       </section>
       {manage && (
-        <section className="mt-5 rounded-lg border p-4">
+        <section className="uv-surface mt-5 p-5">
           <h2 className="font-semibold">{translateHospitality('m_1e56d76ad7e861')}</h2>
           <form action={updateDiaryTemplateAction} className="mt-3 grid gap-3 sm:grid-cols-2">
             <input type="hidden" name="propertyId" value={propertyId} />

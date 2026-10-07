@@ -21,7 +21,7 @@ const RowIndexContext = React.createContext<RowIndexContextValue | null>(null)
 
 export const Table = React.forwardRef<HTMLTableElement, React.HTMLAttributes<HTMLTableElement>>(
   ({ className, ...props }, ref) => (
-    <div className="w-full overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <div className="uv-surface w-full min-w-0 overflow-x-auto">
       <table ref={ref} className={cn('w-full caption-bottom text-sm', className)} {...props} />
     </div>
   ),
@@ -111,7 +111,7 @@ export const TableHead = React.forwardRef<
   <th
     ref={ref}
     className={cn(
-      'h-10 px-3 text-left align-middle text-xs font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400',
+      'h-11 px-4 text-left align-middle text-xs font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400',
       className,
     )}
     {...props}
@@ -123,6 +123,6 @@ export const TableCell = React.forwardRef<
   HTMLTableCellElement,
   React.TdHTMLAttributes<HTMLTableCellElement>
 >(({ className, ...props }, ref) => (
-  <td ref={ref} className={cn('px-3 py-3 align-middle', className)} {...props} />
+  <td ref={ref} className={cn('px-4 py-3.5 align-middle', className)} {...props} />
 ))
 TableCell.displayName = 'TableCell'

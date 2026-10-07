@@ -40,9 +40,9 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
         tabIndex={clickable ? 0 : undefined}
         onKeyDown={handleKeyDown}
         className={cn(
-          'rounded-lg border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900',
+          'uv-surface',
           isInteractive &&
-            'cursor-pointer transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md focus-visible:ring-2 focus-visible:ring-teal-500/40 focus-visible:outline-none motion-reduce:transition-none motion-reduce:hover:translate-y-0 dark:hover:border-slate-600',
+            'cursor-pointer transition-colors hover:border-teal-600/40 focus-visible:ring-2 focus-visible:ring-[rgb(var(--color-focus))] focus-visible:outline-none motion-reduce:transition-none',
           className,
         )}
         {...props}

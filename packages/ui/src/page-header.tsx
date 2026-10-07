@@ -31,23 +31,23 @@ export function PageHeader({
           className="text-xs text-slate-500 hover:text-teal-700 dark:text-slate-400 dark:hover:text-teal-300"
         />
       ) : null}
-      {/* One row at every breakpoint: title on the left (truncates to make
-          room), actions pinned right. Phones drop the description to keep the
-          header to a single line; sm+ shows it below and bottom-aligns the
-          actions. */}
-      <header className="flex items-center justify-between gap-3 sm:items-end sm:gap-4">
+      {/* Keep names and context readable on phones; actions wrap beneath the
+          heading until there is room for a side-by-side layout. */}
+      <header className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between md:gap-6">
         <div className="min-w-0 space-y-1">
-          <h1 className="truncate text-xl font-semibold text-slate-900 sm:text-2xl dark:text-slate-100">
+          <h1 className="text-2xl font-semibold tracking-tight break-words text-slate-900 lg:text-3xl dark:text-slate-100">
             {t(title)}
           </h1>
           {description ? (
-            <p className="hidden text-sm text-slate-500 sm:block dark:text-slate-400">
+            <p className="max-w-3xl text-sm leading-relaxed text-slate-600 dark:text-slate-400">
               {t(description)}
             </p>
           ) : null}
         </div>
         {actions ? (
-          <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">{actions}</div>
+          <div className="flex max-w-full flex-wrap items-center gap-2 md:justify-end">
+            {actions}
+          </div>
         ) : null}
       </header>
     </div>
@@ -79,7 +79,7 @@ export function DetailHeader({
       ) : null}
       <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
         <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1.5">
-          <h1 className="text-xl font-semibold text-slate-900 sm:truncate sm:text-2xl dark:text-slate-100">
+          <h1 className="text-2xl font-semibold tracking-tight break-words text-slate-900 lg:text-3xl dark:text-slate-100">
             {t(title)}
           </h1>
           {badge}

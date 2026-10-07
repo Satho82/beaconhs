@@ -86,7 +86,7 @@ export default async function ReportMaintenancePage() {
   })
 
   return (
-    <PageContainer>
+    <PageContainer className="max-w-3xl">
       <PageHeader
         title={t('Report maintenance issue')}
         description={t(

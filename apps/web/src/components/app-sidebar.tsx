@@ -71,12 +71,12 @@ export function AppSidebar({
       className={cn(
         'hidden shrink-0 flex-col border-r border-slate-800 bg-[rgb(var(--color-sidebar))] text-slate-100 motion-safe:transition-[width] motion-safe:duration-200 lg:flex',
         'dark:border-slate-800',
-        collapsed ? 'w-[4.25rem]' : 'w-60',
+        collapsed ? 'w-[4.25rem]' : 'w-64',
       )}
     >
       <div
         className={cn(
-          'flex h-14 items-center border-b border-white/10 px-3 dark:border-slate-800',
+          'flex h-16 shrink-0 items-center border-b border-white/10 px-4 dark:border-slate-800',
           collapsed ? 'justify-center' : 'gap-2',
         )}
       >
@@ -84,7 +84,7 @@ export function AppSidebar({
           value={
             collapsed ? null : (
               <Logo
-                className="h-7 w-auto max-w-[10rem] overflow-hidden rounded bg-white px-1 dark:text-slate-900"
+                className="h-9 w-auto max-w-[10rem] overflow-hidden rounded-lg bg-white px-2 py-1 dark:text-slate-900"
                 branding={platformBranding}
               />
             )

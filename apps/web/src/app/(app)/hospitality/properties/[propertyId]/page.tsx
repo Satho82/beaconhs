@@ -117,7 +117,7 @@ export default async function PropertyDetail({
         />
       </div>
       {tab === 'overview' && (
-        <section className="mt-5 rounded-xl border bg-white p-5 dark:bg-slate-900">
+        <section className="uv-surface mt-5 p-5">
           <h2 className="text-lg font-semibold">{tBoard('Property overview')}</h2>
           <dl className="mt-4 grid gap-4 sm:grid-cols-3">
             {[
@@ -139,7 +139,7 @@ export default async function PropertyDetail({
         </section>
       )}
       {tab === 'operations' && (
-        <section className="mt-5 rounded-xl border bg-white p-5 dark:bg-slate-900">
+        <section className="uv-surface mt-5 p-5">
           <h2 className="text-lg font-semibold">{tBoard('Property operations')}</h2>
           <div className="mt-4 flex flex-wrap gap-3">
             {modules.has('hospitality.manager-signoff') && (
@@ -167,7 +167,7 @@ export default async function PropertyDetail({
       )}
       {tab === 'structure' && (
         <div className="mt-5 grid gap-5 lg:grid-cols-[14rem_minmax(0,1fr)]">
-          <aside className="rounded-xl border bg-white p-4 dark:bg-slate-900">
+          <aside className="uv-surface p-4">
             <h2 className="font-semibold">{tBoard('Structure')}</h2>
             <ol className="mt-3 space-y-3 border-l border-teal-700 pl-4 text-sm">
               <li className="font-medium">{property.name}</li>
@@ -177,12 +177,12 @@ export default async function PropertyDetail({
               </li>
             </ol>
           </aside>
-          <section className="min-w-0 rounded-xl border bg-white p-5 dark:bg-slate-900">
+          <section className="uv-surface min-w-0 p-5">
             <h2 className="text-lg font-semibold">{translateHospitality('m_120c894d671916')}</h2>
             {manage && (
               <form
                 action={createBuildingAction}
-                className="mt-3 grid gap-2 rounded-lg border p-3 sm:grid-cols-3"
+                className="uv-surface mt-3 grid gap-2 p-4 sm:grid-cols-3"
               >
                 <input type="hidden" name="propertyId" value={property.id} />
                 <Label>
@@ -225,7 +225,7 @@ export default async function PropertyDetail({
               <div className="mt-3 grid gap-3 sm:grid-cols-2">
                 {data.buildings.map((b) => (
                   <Link
-                    className="rounded-xl border bg-white p-4 hover:border-teal-600 dark:bg-slate-900"
+                    className="uv-record-link"
                     href={`/hospitality/properties/${property.id}/buildings/${b.id}`}
                     key={b.id}
                   >
@@ -246,7 +246,7 @@ export default async function PropertyDetail({
         </div>
       )}
       {manage && tab === 'settings' && (
-        <section className="mt-6 rounded-lg border p-4">
+        <section className="uv-surface mt-6 p-5">
           <h2 className="font-semibold">{translateValue('Property management')}</h2>
           <form action={archivePropertyAction} className="mt-3">
             <input type="hidden" name="id" value={property.id} />

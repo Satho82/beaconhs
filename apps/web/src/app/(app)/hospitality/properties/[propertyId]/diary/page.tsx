@@ -62,7 +62,7 @@ export default async function PropertyDiaryPage({
         }
       />
       {manage && (
-        <section className="mt-5 rounded-lg border p-4">
+        <section className="uv-surface mt-5 p-5">
           <h2 className="font-semibold">{translateHospitality('m_180c6726b01545')}</h2>
           <form action={createDiaryTemplateAction} className="mt-3 grid gap-3 sm:grid-cols-3">
             <input type="hidden" name="propertyId" value={propertyId} />
@@ -181,7 +181,7 @@ function DiarySection({
       ) : (
         <div className="mt-3 grid gap-3">
           {rows.map(({ occurrence, schedule, template, overdue, overdueHours }) => (
-            <article className="rounded-lg border p-4" key={occurrence.id}>
+            <article className="uv-surface p-5" key={occurrence.id}>
               <div className="flex flex-wrap justify-between gap-2">
                 <div>
                   <h3 className="font-medium">{template.title}</h3>

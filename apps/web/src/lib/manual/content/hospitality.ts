@@ -22,7 +22,7 @@ Your organisation must have the properties module enabled and you need hospitali
 
 Use the search box to find properties or buildings by name or code. Use the page controls to browse longer lists. If a search shows **No results**, clear the search using the × button. Changing or clearing a search returns to the first page. If a page is no longer available, use the page link to return to the last available page.
 
-Open a building and then a floor to browse its rooms and apartments. Search by room number/code, name, or type (for example, apartment). Choose **Status** to filter the list; choose **All** to clear that filter. Search and status filters work together. Use the page controls for longer lists. Each entry shows its code, optional name, type, and current status. Open an entry to view or manage the room. Changing a search or status filter returns to the first page.
+Open a building and then a floor to browse its rooms and apartments. Search by room number/code, name, or type (for example, apartment). Choose **Status** to filter the list; choose **All** to clear that filter. Search and status filters work together. Use the page controls for longer lists. Each room appears in a separate card showing its code, optional name, type, and current status. Open an entry to view or manage the room. Changing a search or status filter returns to the first page.
 
 Archived properties disappear from active property lists. Existing records are retained. Their building, floor, and room pages are no longer available. You cannot add or edit a building, floor, or room beneath an archived parent. Creating a property, building, floor, or room records an audit entry. These pages manage properties in your current organisation only.
 
@@ -60,7 +60,7 @@ Guests do not need a staff account. They scan the code, choose an issue type and
 ## Report a problem from Front Office
 
 1. Open **Maintenance queue** in the left menu, then choose **+ Report maintenance issue**.
-2. If you work at one hotel, that property is selected automatically. Portfolio users choose only from their assigned properties.
+2. If you work at one hotel, that property is selected automatically and its name appears above the room field. Portfolio users choose only from their assigned properties.
 3. Choose the room or location, describe the problem, select a priority when needed, then submit.
 4. The report enters the same maintenance queue used by guest QR and engineering reports. Front Office does not need to assign a contractor, create a work order, or enter resolution details.
 
@@ -78,7 +78,7 @@ Room pages also show their maintenance history. All QR and maintenance actions r
 
 ## Review an issue
 
-The queue shows the active property context, or all accessible properties. Open an issue to review **Status**, **Priority**, **Assigned to**, location and details. **Resolution and record history** shows saved resolution notes and reported, last-updated and completion timestamps where recorded. These timestamps are not a complete audit timeline. **Evidence** groups files by reported, before-work, after-work and completion stages. Readers can review the saved resolution; staff with update permission can use **Update work** and upload evidence.
+The queue shows the active property context, or all accessible properties. Each issue card separates the reference and problem from the property and room. Priority and status appear as labelled badges; colour supplements the text. Open an issue to review **Status**, **Priority**, **Assigned to**, location and details. **Resolution and record history** shows saved resolution notes and reported, last-updated and completion timestamps where recorded. These timestamps are not a complete audit timeline. **Evidence** groups files by reported, before-work, after-work and completion stages. Readers can review the saved resolution; staff with update permission can use **Update work** and upload evidence.
 `,
   },
   {

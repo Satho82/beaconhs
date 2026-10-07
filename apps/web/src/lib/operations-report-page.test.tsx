@@ -26,6 +26,7 @@ vi.mock('@beaconhs/ui', () => ({
   Badge: 'badge',
   Button: 'button',
   PageHeader: 'header',
+  EmptyState: 'empty-state',
   Table: 'table',
   TableBody: 'tbody',
   TableCell: 'td',
@@ -73,7 +74,9 @@ describe('Operations report browsing', () => {
   )
   it('distinguishes filtered empty results while retaining navigation', async () => {
     const rendered = await page({ q: 'missing' })
-    expect(rendered.some((n) => n.props.id === 'm_0c726da8b78d42')).toBe(true)
+    expect(
+      rendered.some((n) => n.type === 'empty-state' && n.props.title === 'm_0c726da8b78d42'),
+    ).toBe(true)
     expect(rendered.find((n) => n.type === 'pagination')?.props.total).toBe(0)
   })
 })

@@ -4,6 +4,7 @@ import { Pagination } from '@/components/pagination'
 import { can } from '@beaconhs/tenant'
 import { getGeneratedTranslations, getGeneratedValueTranslations } from '@/i18n/generated.server'
 import Link from 'next/link'
+import { Building2, ChevronRight } from 'lucide-react'
 import { Button, EmptyState, PageHeader } from '@beaconhs/ui'
 import { requireRequestContext } from '@/lib/auth'
 import { listProperties } from '@/lib/hospitality/properties'
@@ -75,17 +76,29 @@ export default async function HospitalityPropertiesPage({
           description={params.q || total > 0 ? undefined : translateHospitality('m_0cfd202fe1132e')}
         />
       ) : (
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
           {properties.map((property) => (
             <Link
-              className="rounded-xl border bg-white p-5 hover:border-teal-600 focus-visible:outline-2 focus-visible:outline-teal-600 dark:bg-slate-900"
+              className="uv-record-link group p-5 sm:p-6"
               href={`/hospitality/properties/${property.id}`}
               key={property.id}
             >
-              <strong>{property.name}</strong>
-              <p className="text-muted-foreground text-sm">
-                {property.code} · {property.timezone}
-              </p>
+              <div className="flex items-start gap-4">
+                <span className="rounded-xl bg-[rgb(var(--color-accent)/0.08)] p-3 text-[rgb(var(--color-accent))]">
+                  <Building2 size={22} aria-hidden="true" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <strong className="text-lg font-semibold tracking-tight">{property.name}</strong>
+                  <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+                    {property.code} · {property.timezone}
+                  </p>
+                </div>
+                <ChevronRight
+                  size={18}
+                  aria-hidden="true"
+                  className="mt-1 shrink-0 text-slate-400 group-hover:text-teal-700"
+                />
+              </div>
             </Link>
           ))}
         </div>

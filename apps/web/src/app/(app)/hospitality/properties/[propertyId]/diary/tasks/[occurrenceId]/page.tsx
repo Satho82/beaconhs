@@ -46,7 +46,7 @@ export default async function DiaryTaskPage({
           </Button>
         }
       />
-      <section className="mt-5 rounded-lg border p-4">
+      <section className="uv-surface mt-5 p-5">
         <p>{task.template.instructions || translateHospitality('m_0e95ab8396ef45')}</p>
         <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
           <div>
@@ -84,7 +84,7 @@ export default async function DiaryTaskPage({
           </div>
         </dl>
       </section>
-      <section className="mt-5 rounded-lg border p-4">
+      <section className="uv-surface mt-5 p-5">
         <h2 className="font-semibold">{translateHospitality('m_0180eccbdf9214')}</h2>
         <ol className="mt-3 space-y-2 text-sm">
           {task.events.length ? (
@@ -101,7 +101,7 @@ export default async function DiaryTaskPage({
           )}
         </ol>
       </section>
-      <section className="mt-5 rounded-lg border p-4">
+      <section className="uv-surface mt-5 p-5">
         <h2 className="font-semibold">{translateHospitality('m_004f8059566564')}</h2>
         {task.correctiveAction ? (
           <p className="mt-2">

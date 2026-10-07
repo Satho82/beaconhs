@@ -141,7 +141,7 @@ export default async function RoomPage({
         <>
           <form
             action={updateRoomAction}
-            className="my-4 grid gap-2 rounded border p-3 sm:grid-cols-3"
+            className="uv-surface my-4 grid items-end gap-4 p-5 sm:grid-cols-3"
           >
             <input type="hidden" name="propertyId" value={p.propertyId} />
             <input type="hidden" name="buildingId" value={p.buildingId} />
@@ -165,7 +165,7 @@ export default async function RoomPage({
             <Button type="submit">{translateHospitality('m_1ab9025ed1067c')}</Button>
           </form>
           {maintenanceEnabled && (
-            <section className="mb-4 rounded border p-3">
+            <section className="uv-surface mb-4 p-4">
               <h2 className="font-semibold">{translateValue('Guest maintenance QR')}</h2>
               <p className="text-muted-foreground mt-1 text-sm">
                 {translateValue('The code opens a mobile guest form already linked to this room.')}
@@ -201,7 +201,10 @@ export default async function RoomPage({
             </section>
           )}
           {maintenanceEnabled && (
-            <form action={reportMaintenanceIssueAction} className="grid gap-2 rounded border p-3">
+            <form
+              action={reportMaintenanceIssueAction}
+              className="uv-surface grid items-end gap-4 p-5"
+            >
               <input type="hidden" name="roomId" value={p.roomId} />
               <Label>
                 {' '}
@@ -230,14 +233,14 @@ export default async function RoomPage({
             </Link>
           </div>
           {d.issues.length === 0 ? (
-            <p className="text-muted-foreground rounded border p-3 text-sm">
+            <p className="text-muted-foreground uv-surface p-4 text-sm">
               {translateValue('No issues reported.')}
             </p>
           ) : (
             <div className="grid gap-2">
               {d.issues.map((i) => (
                 <Link
-                  className="rounded border p-3"
+                  className="uv-surface p-4"
                   href={`/hospitality/maintenance/${i.id}`}
                   key={i.id}
                 >

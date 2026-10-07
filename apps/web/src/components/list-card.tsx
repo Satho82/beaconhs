@@ -167,8 +167,7 @@ export function ListCard({
     </div>
   )
 
-  const shell =
-    'flex gap-3 rounded-xl border border-slate-200 bg-white p-3.5 shadow-sm dark:border-slate-800 dark:bg-slate-900'
+  const shell = 'uv-surface flex gap-3 p-4'
 
   const content = (
     <>

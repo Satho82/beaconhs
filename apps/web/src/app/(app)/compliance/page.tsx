@@ -245,14 +245,13 @@ function Kpi({
         <GeneratedValue value={label} />
       </div>
       <div
-        className={`mt-1 text-2xl font-semibold ${tone === 'danger' ? 'text-red-700 dark:text-red-400' : 'text-slate-900 dark:text-slate-100'}`}
+        className={`mt-2 text-3xl font-semibold tracking-tight tabular-nums ${tone === 'danger' ? 'text-red-700 dark:text-red-400' : 'text-slate-900 dark:text-slate-100'}`}
       >
         <GeneratedValue value={value} />
       </div>
     </>
   )
-  const cls =
-    'block rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900'
+  const cls = 'uv-surface block border-t-2 border-t-[rgb(var(--color-accent)/0.4)] p-5'
   if (href) {
     return (
       <Link

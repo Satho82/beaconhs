@@ -15,9 +15,9 @@ export function DashboardHeader({
   tenantSummary?: string | null
 }) {
   return (
-    <header className="flex flex-wrap items-end justify-between gap-3">
+    <header className="uv-surface flex flex-wrap items-end justify-between gap-4 border-l-4 border-l-[rgb(var(--color-accent))] p-5 sm:p-6">
       <div className="min-w-0">
-        <h1 className="truncate text-2xl font-semibold tracking-tight text-slate-900 dark:text-white">
+        <h1 className="text-2xl font-semibold tracking-tight break-words text-slate-900 lg:text-3xl dark:text-white">
           <GeneratedValue value={greeting} />
         </h1>
         <GeneratedValue

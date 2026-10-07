@@ -130,7 +130,7 @@ export function BeaconReportViewer({
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         {entity ? (
           <aside className="lg:col-span-1">
-            <div className="border-border bg-surface space-y-4 rounded-lg border p-4 lg:sticky lg:top-0">
+            <div className="uv-surface space-y-5 p-5 lg:sticky lg:top-0">
               <div className="flex items-center gap-2 text-sm font-semibold">
                 <Filter size={15} />
                 <GeneratedText id="m_128cb01c068b95" />

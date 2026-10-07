@@ -143,10 +143,10 @@ export function SidebarNav({
   return (
     <nav
       aria-label={tBoard('Application navigation')}
-      className="app-scroll flex-1 overflow-y-auto px-2 py-4"
+      className="app-scroll flex-1 overflow-y-auto px-3 py-5"
     >
       {groups.map((group) => (
-        <section key={group.label} className="mb-5">
+        <section key={group.label} className="mb-6 space-y-1">
           {!collapsed && (
             <h2 className="px-3 pb-2 text-[10px] font-semibold tracking-widest text-slate-400 uppercase">
               {group.label}
@@ -193,7 +193,7 @@ function NavEntry({
             'flex min-w-0 flex-1 items-center gap-3 rounded-lg px-3 py-2.5 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-300',
             collapsed && 'justify-center px-2',
             active
-              ? 'bg-teal-900 text-white ring-1 ring-teal-700'
+              ? 'bg-white/10 font-semibold text-white shadow-[inset_3px_0_0_rgb(var(--color-accent))]'
               : 'text-slate-300 hover:bg-white/10 hover:text-white',
           )}
         >

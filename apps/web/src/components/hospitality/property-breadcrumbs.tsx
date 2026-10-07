@@ -33,13 +33,16 @@ export async function PropertyBreadcrumbs({
       : []),
   ]
   return (
-    <nav aria-label={t('Property hierarchy')} className="mb-4 text-sm">
+    <nav
+      aria-label={t('Property hierarchy')}
+      className="mb-5 text-xs leading-relaxed text-slate-500 dark:text-slate-400"
+    >
       <ol className="flex flex-wrap items-center gap-2 break-words">
         {links.map((link) => (
           <li key={link.href} className="min-w-0">
             <Link
               href={link.href}
-              className="text-teal-700 underline underline-offset-4 focus-visible:outline-2 dark:text-teal-300"
+              className="rounded py-1 text-slate-600 hover:text-teal-700 hover:underline focus-visible:outline-2 focus-visible:outline-teal-600 dark:text-slate-300 dark:hover:text-teal-300"
             >
               {link.label}
             </Link>
@@ -48,7 +51,10 @@ export async function PropertyBreadcrumbs({
             </span>
           </li>
         ))}
-        <li aria-current="page" className="min-w-0 font-medium">
+        <li
+          aria-current="page"
+          className="min-w-0 font-semibold text-slate-900 dark:text-slate-100"
+        >
           {current}
         </li>
       </ol>

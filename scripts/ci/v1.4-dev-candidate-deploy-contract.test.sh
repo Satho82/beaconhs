@@ -567,14 +567,42 @@ Dir.mktmpdir('candidate-verifier-contract-') do |dir|
     #!/bin/bash
     if [ "$1" = rev-parse ]; then printf '%s\n' "$CANDIDATE_SHA"; fi
   SH
-  File.write("#{dir}/gh", <<~'SH')
-    #!/bin/bash
-    if [[ "$2" == *'/jobs?'* ]]; then
-      printf 'Validate frozen V1.4 source\tsuccess\nPublish immutable V1.4 DEV candidate\tsuccess\n'
+  # Feed realistic API responses through the workflow's actual jq expression.
+  # Deliberately return unrelated/mismatched rows too: verify response identity
+  # independently of the server-side query, and never choose the newest run.
+  File.write("#{dir}/gh", <<~'RUBY_FIXTURE')
+    #!/usr/bin/env ruby
+    require 'json'
+    require 'open3'
+    endpoint = ARGV.fetch(1)
+    if endpoint.include?('/jobs?')
+      abort 'Wrong authoritative run selected' unless endpoint.include?('/runs/123/jobs?')
+      puts "Validate frozen V1.4 source\tsuccess\nPublish immutable V1.4 DEV candidate\tsuccess"
     else
-      printf '123\n'
-    fi
-  SH
+      run = { 'id' => 123, 'head_sha' => ENV.fetch('CANDIDATE_SHA'),
+        'head_branch' => 'feature/uvanoo-v1.4', 'event' => 'push',
+        'status' => 'completed', 'conclusion' => 'success' }
+      visual = run.merge('id' => 999, 'head_branch' => 'feature/uvanoo-v1.4-board-visual-polish',
+        'event' => 'workflow_dispatch')
+      runs = case ENV['CASE']
+      when 'feature-plus-visual' then [visual, run]
+      when 'ambiguous-feature' then [run.merge('id' => 456), run]
+      when 'failed-feature' then [run.merge('conclusion' => 'failure')]
+      when 'incomplete-feature' then [run.merge('status' => 'in_progress')]
+      when 'sha-mismatch' then [run.merge('head_sha' => 'd' * 40)]
+      when 'visual-only' then [visual]
+      else [run]
+      end
+      abort 'Authoritative API lookup must constrain the branch' unless
+        endpoint.include?('&branch=feature%2Fuvanoo-v1.4&')
+      filter = ARGV.fetch(ARGV.index('--jq') + 1)
+      stdout, stderr, status = Open3.capture3('jq', '-r', filter,
+        stdin_data: JSON.generate('total_count' => ENV['CASE'] == 'truncated-runs' ? 101 : runs.length, 'workflow_runs' => runs))
+      print stdout
+      warn stderr unless stderr.empty?
+      exit status.exitstatus
+    end
+  RUBY_FIXTURE
   File.write("#{dir}/docker", <<~'RUBY_FIXTURE')
     #!/usr/bin/env ruby
     case ARGV.first
@@ -584,7 +612,12 @@ Dir.mktmpdir('candidate-verifier-contract-') do |dir|
         exit 255
       end
       STDOUT.sync = true
-      puts "Digest: #{ENV['CASE'] == 'invalid-digest' ? 'invalid' : ENV.fetch('DIGEST')}"
+      image_digest = case ENV['CASE']
+      when 'invalid-digest' then 'invalid'
+      when 'digest-mismatch' then "sha256:#{'c' * 64}"
+      else ENV.fetch('DIGEST')
+      end
+      puts "Digest: #{image_digest}"
       sleep 0.05
       begin
         STDOUT.write('trailing manifest detail' * 16384)
@@ -594,6 +627,11 @@ Dir.mktmpdir('candidate-verifier-contract-') do |dir|
     when 'pull'
       File.write(ENV.fetch('PULL_MARKER'), ARGV.fetch(1))
       exit 1 if ENV['CASE'] == 'pull-failure'
+      # Docker rejects content that does not match the requested digest.
+      if ARGV.fetch(1) != "#{ENV.fetch('CANDIDATE_IMAGE_NAME')}@#{ENV.fetch('DIGEST')}"
+        warn 'content digest does not match requested digest'
+        exit 1
+      end
     when 'image'
       if ARGV.last.include?('image.revision')
         puts ENV['CASE'] == 'wrong-revision' ? 'wrong' : ENV.fetch('CANDIDATE_SHA')
@@ -616,19 +654,20 @@ Dir.mktmpdir('candidate-verifier-contract-') do |dir|
   _, _, broken = Open3.capture3(env, 'bash', '-c',
     %q{set -euo pipefail; digest="$(docker buildx imagetools inspect fixture | awk '$1 == "Digest:" {print $2; exit}')"})
   abort 'Regression fixture must reproduce original exit 255' unless broken.exitstatus == 255
-  %w[success inspect-failure invalid-digest pull-failure wrong-revision wrong-version old-caller].each do |scenario|
+  %w[success feature-plus-visual ambiguous-feature failed-feature incomplete-feature sha-mismatch
+    visual-only truncated-runs digest-mismatch inspect-failure invalid-digest pull-failure wrong-revision wrong-version old-caller].each do |scenario|
     FileUtils.rm_f([env['GITHUB_OUTPUT'], env['PULL_MARKER']])
     overrides = { 'CASE' => scenario }
     overrides['CALLER_SHA'] = 'c' * 40 if scenario == 'old-caller'
     stdout, stderr, status = Open3.capture3(env.merge(overrides), 'bash', '-c', verify.fetch('run'))
     outputs = File.exist?(env['GITHUB_OUTPUT']) ? File.read(env['GITHUB_OUTPUT']) : ''
-    if scenario == 'success'
-      abort 'Complete image output must pass digest and OCI verification' unless status.success? &&
+    if %w[success feature-plus-visual].include?(scenario)
+      abort "Verifier rejected valid authoritative run in #{scenario}: #{stdout}#{stderr}" unless status.success? &&
         outputs == "source_sha=#{sha}\nimage_digest=#{digest}\n" &&
         File.read(env['PULL_MARKER']) == "ghcr.io/example/candidate@#{digest}"
     else
       abort "Verifier accepted #{scenario}" if status.success? || !outputs.empty?
-      if %w[inspect-failure invalid-digest old-caller].include?(scenario)
+      if %w[ambiguous-feature failed-feature incomplete-feature sha-mismatch visual-only truncated-runs inspect-failure invalid-digest old-caller].include?(scenario)
         abort "Verifier pulled image after #{scenario}" if File.exist?(env['PULL_MARKER'])
       end
       if scenario == 'inspect-failure'
@@ -636,6 +675,7 @@ Dir.mktmpdir('candidate-verifier-contract-') do |dir|
           (stdout + stderr).include?('exit 255') && !(stdout + stderr).include?('ghp_fixtureSecret123')
       end
     end
+    puts "PASS candidate verifier #{scenario}"
   end
 end
 # Execute the actual migration shell with a failing zero-writer guard. The

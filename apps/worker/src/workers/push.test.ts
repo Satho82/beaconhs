@@ -13,6 +13,14 @@ vi.mock('@beaconhs/db', () => ({
   withTenant: async (_db: unknown, _tenantId: string, run: (tx: unknown) => unknown) =>
     run({ select: mocks.select }),
 }))
+// Keep this unit test from loading the entire schema graph inside its first timed import.
+vi.mock('@beaconhs/db/schema', () => ({
+  webpushSubscriptions: {
+    id: 'webpush_subscriptions.id',
+    tenantId: 'webpush_subscriptions.tenant_id',
+    userId: 'webpush_subscriptions.user_id',
+  },
+}))
 vi.mock('@beaconhs/jobs', () => ({
   assertPushJobData: vi.fn(),
   validateWebPushSubscription: (value: unknown) => value,

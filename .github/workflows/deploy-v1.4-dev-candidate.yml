@@ -122,12 +122,14 @@ jobs:
 
           image_tag="${CANDIDATE_IMAGE_NAME}:v1.4-dev-${CANDIDATE_SHA}"
           echo "Candidate API verification passed; inspecting immutable image"
+          # Consume all buildx output before parsing: an early pipe reader exit
+          # can make buildx exit 255 even after it prints a valid digest.
           inspect_stderr="$(mktemp)"
           if inspect_output="$(docker buildx imagetools inspect "$image_tag" 2>"$inspect_stderr")"; then
             :
           else
             status="$?"
-            echo "::error::Candidate image inspection failed (exit ${status}): $(cat "$inspect_stderr" | head -c 1000)" >&2
+            echo "::error::Candidate image inspection failed (exit ${status}): $(redact_gh_stderr "$inspect_stderr")" >&2
             rm -f "$inspect_stderr"
             exit 1
           fi

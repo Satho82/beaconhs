@@ -560,6 +560,84 @@ caller = YAML.safe_load(File.read('.github/workflows/deploy-v1.4-dev-candidate.y
 verify = caller.dig('jobs', 'verify-candidate', 'steps').find { |s| s['id'] == 'verify' }
 abort 'Old candidates or old governance must not be deployed' unless verify['run'].include?(%q{"$CALLER_SHA" != "$CANDIDATE_SHA"}) &&
   verify['run'].include?(%q{git rev-parse origin/feature/uvanoo-v1.4})
+# Execute the actual verifier with a delayed image-output producer. An early
+# awk exit closes its pipe before the trailing write and reproduces exit 255.
+Dir.mktmpdir('candidate-verifier-contract-') do |dir|
+  File.write("#{dir}/git", <<~'SH')
+    #!/bin/bash
+    if [ "$1" = rev-parse ]; then printf '%s\n' "$CANDIDATE_SHA"; fi
+  SH
+  File.write("#{dir}/gh", <<~'SH')
+    #!/bin/bash
+    if [[ "$2" == *'/jobs?'* ]]; then
+      printf 'Validate frozen V1.4 source\tsuccess\nPublish immutable V1.4 DEV candidate\tsuccess\n'
+    else
+      printf '123\n'
+    fi
+  SH
+  File.write("#{dir}/docker", <<~'RUBY_FIXTURE')
+    #!/usr/bin/env ruby
+    case ARGV.first
+    when 'buildx'
+      if ENV['CASE'] == 'inspect-failure'
+        warn 'inspection failed ghp_fixtureSecret123'
+        exit 255
+      end
+      STDOUT.sync = true
+      puts "Digest: #{ENV['CASE'] == 'invalid-digest' ? 'invalid' : ENV.fetch('DIGEST')}"
+      sleep 0.05
+      begin
+        STDOUT.write('trailing manifest detail' * 16384)
+      rescue Errno::EPIPE
+        exit 255
+      end
+    when 'pull'
+      File.write(ENV.fetch('PULL_MARKER'), ARGV.fetch(1))
+      exit 1 if ENV['CASE'] == 'pull-failure'
+    when 'image'
+      if ARGV.last.include?('image.revision')
+        puts ENV['CASE'] == 'wrong-revision' ? 'wrong' : ENV.fetch('CANDIDATE_SHA')
+      else
+        puts ENV['CASE'] == 'wrong-version' ? 'wrong' : "v1.4-dev-#{ENV.fetch('CANDIDATE_SHA')}"
+      end
+    else
+      abort 'Unexpected docker command'
+    end
+  RUBY_FIXTURE
+  FileUtils.chmod(0755, %w[git gh docker].map { |name| "#{dir}/#{name}" })
+  sha = 'a' * 40
+  digest = "sha256:#{'b' * 64}"
+  env = {
+    'PATH' => "#{dir}:#{ENV['PATH']}", 'CANDIDATE_SHA' => sha, 'CALLER_SHA' => sha,
+    'CANDIDATE_IMAGE_NAME' => 'ghcr.io/example/candidate', 'DIGEST' => digest,
+    'GITHUB_REPOSITORY' => 'example/repo', 'GITHUB_OUTPUT' => "#{dir}/outputs",
+    'GITHUB_STEP_SUMMARY' => "#{dir}/summary", 'PULL_MARKER' => "#{dir}/pull"
+  }
+  _, _, broken = Open3.capture3(env, 'bash', '-c',
+    %q{set -euo pipefail; digest="$(docker buildx imagetools inspect fixture | awk '$1 == "Digest:" {print $2; exit}')"})
+  abort 'Regression fixture must reproduce original exit 255' unless broken.exitstatus == 255
+  %w[success inspect-failure invalid-digest pull-failure wrong-revision wrong-version old-caller].each do |scenario|
+    FileUtils.rm_f([env['GITHUB_OUTPUT'], env['PULL_MARKER']])
+    overrides = { 'CASE' => scenario }
+    overrides['CALLER_SHA'] = 'c' * 40 if scenario == 'old-caller'
+    stdout, stderr, status = Open3.capture3(env.merge(overrides), 'bash', '-c', verify.fetch('run'))
+    outputs = File.exist?(env['GITHUB_OUTPUT']) ? File.read(env['GITHUB_OUTPUT']) : ''
+    if scenario == 'success'
+      abort 'Complete image output must pass digest and OCI verification' unless status.success? &&
+        outputs == "source_sha=#{sha}\nimage_digest=#{digest}\n" &&
+        File.read(env['PULL_MARKER']) == "ghcr.io/example/candidate@#{digest}"
+    else
+      abort "Verifier accepted #{scenario}" if status.success? || !outputs.empty?
+      if %w[inspect-failure invalid-digest old-caller].include?(scenario)
+        abort "Verifier pulled image after #{scenario}" if File.exist?(env['PULL_MARKER'])
+      end
+      if scenario == 'inspect-failure'
+        abort 'Inspection error must preserve exit context and redact credentials' unless
+          (stdout + stderr).include?('exit 255') && !(stdout + stderr).include?('ghp_fixtureSecret123')
+      end
+    end
+  end
+end
 # Execute the actual migration shell with a failing zero-writer guard. The
 # mocked docker marker must remain absent: no database operation is allowed.
 Dir.mktmpdir('dev-fence-contract-') do |dir|

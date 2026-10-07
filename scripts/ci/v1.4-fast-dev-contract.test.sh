@@ -120,8 +120,8 @@ check(regressions == ['set -euo pipefail', 'scripts/cluster/dokploy-curl.test.sh
 # Future intentional release changes must update this contract explicitly.
 protected_blobs = {
   '.github/workflows/uvanoo-v1.4-cloud-build.yml' => 'c4fb18afeab96f3eec53bb6dd1c6a019c6b27cce',
-  # Reviewed verifier: consume full image inspection output; retain current SHA governance.
-  '.github/workflows/deploy-v1.4-dev-candidate.yml' => 'eefeb79e5c5f0c7035614c837099b3ccc496bd51'
+  # Reviewed verifier: exact authoritative branch/SHA selection; retain immutable-image and deployment governance.
+  '.github/workflows/deploy-v1.4-dev-candidate.yml' => 'd10159f3a087a01171321a68a3e6ab4b6771cf98'
 }
 protected_blobs.each do |file, expected|
   bytes = File.binread(file)

@@ -9,9 +9,11 @@ import { useUnsavedChanges } from '@/lib/use-unsaved-changes'
 export function PlatformBrandingForm({
   action,
   children,
+  saveLabel,
 }: {
   action: (data: FormData) => Promise<void>
   children: React.ReactNode
+  saveLabel?: string
 }) {
   const t = useGeneratedValueTranslations()
   const router = useRouter()
@@ -78,7 +80,7 @@ export function PlatformBrandingForm({
           {t('Discard')}
         </Button>
         <Button type="submit" disabled={!dirty || pending}>
-          {pending ? t('Saving…') : t('Save branding')}
+          {pending ? t('Saving…') : (saveLabel ?? t('Save branding'))}
         </Button>
       </div>
     </form>

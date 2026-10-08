@@ -28,10 +28,19 @@ export function findActiveNavHref(
   return activeHref
 }
 
-function matchesNavPath(pathname: string, item: ActiveNavItem): boolean {
-  if (pathname === item.href) return true
-  if (item.exact || item.href === '/') return false
-  return pathname.startsWith(item.href + '/')
+function matchesNavPath(current: string, item: ActiveNavItem): boolean {
+  const currentUrl = new URL(current, 'https://navigation.invalid')
+  const target = new URL(item.href, 'https://navigation.invalid')
+  if (currentUrl.origin !== target.origin) return false
+  const pathMatches =
+    currentUrl.pathname === target.pathname ||
+    (!item.exact &&
+      target.pathname !== '/' &&
+      currentUrl.pathname.startsWith(target.pathname + '/'))
+  if (!pathMatches) return false
+  return [...target.searchParams].every(
+    ([key, value]) => currentUrl.searchParams.get(key) === value,
+  )
 }
 
 function flatten(items: ActiveNavItem[]): ActiveNavItem[] {

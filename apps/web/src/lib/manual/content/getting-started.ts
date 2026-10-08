@@ -31,7 +31,9 @@ export const GETTING_STARTED_ARTICLES: ManualArticle[] = [
       'basics',
       'start',
     ],
-    body: `Uvanoo is where your crew reports hazards, fills out forms, and keeps safety records in one place. This article covers signing in and finding your way around.
+    body: `Use the menu group buttons to expand or collapse available destinations. The active destination and its parent are highlighted. On a phone or tablet, use **Menu** to open the navigation drawer. Only available, permitted destinations are shown. Existing workspace tools and pinned forms remain accessible.
+
+Uvanoo is where your crew reports hazards, fills out forms, and keeps safety records in one place. This article covers signing in and finding your way around.
 
 ## Signing in
 

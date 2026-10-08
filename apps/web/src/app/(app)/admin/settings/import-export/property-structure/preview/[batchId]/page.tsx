@@ -1,8 +1,14 @@
+import { requireRequestContext } from '@/lib/auth'
+import { PropertyImportSteps } from '@/components/property-import-steps'
+import { can } from '@beaconhs/tenant'
 import Link from 'next/link'
 import { ArrowLeft, ArrowRight, FileWarning, Upload } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
 import { notFound } from 'next/navigation'
-import { isUuid } from '@/lib/list-params'
+import { isUuid, parseListParams, pickString } from '@/lib/list-params'
+import { SearchInput } from '@/components/search-input'
+import { Pagination } from '@/components/pagination'
+import { FilterChips } from '@/components/filter-bar'
 import { Button, Card, CardContent, CardHeader, CardTitle } from '@beaconhs/ui'
 import { SettingsNavigation } from '../../../../settings-form'
 import {
@@ -23,14 +29,41 @@ export default async function PropertyStructurePreviewPage({
   searchParams,
 }: {
   params: Promise<{ batchId: string }>
-  searchParams: Promise<{ filter?: string }>
+  searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
+  const ctx = await requireRequestContext()
   const { batchId } = await params
   if (!isUuid(batchId)) notFound()
-  const { filter: requestedFilter } = await searchParams
-  const filter = filterFrom(requestedFilter)
+  const sp = await searchParams
+  const filter = filterFrom(pickString(sp.filter))
+  const list = parseListParams(sp, { sort: 'row', dir: 'asc', perPage: 25, allowedSorts: ['row'] })
+  const query = (list.q ?? '').trim().toLowerCase()
+  const recordType = pickString(sp.recordType)
+  const basePath = `/admin/settings/import-export/property-structure/preview/${batchId}`
+  const filterHref = (value: string) => {
+    const search = new URLSearchParams({ filter: value })
+    if (query) search.set('q', query)
+    if (recordType) search.set('recordType', recordType)
+    return `${basePath}?${search}`
+  }
   const preview = await getPropertyStructurePreview(batchId, filter)
   if (!preview) notFound()
+  const filteredRows = preview.rows.filter(
+    (row) =>
+      (!recordType || row.recordType === recordType) &&
+      (!query ||
+        [
+          row.sourceRowNumber,
+          row.reference,
+          row.name,
+          ...row.messages.map((message) => message.message),
+        ]
+          .join(' ')
+          .toLowerCase()
+          .includes(query)),
+  )
+  const page = Math.min(list.page, Math.max(1, Math.ceil(filteredRows.length / list.perPage)))
+  const rows = filteredRows.slice((page - 1) * list.perPage, page * list.perPage)
   const t = await getTranslations('TenantSettings')
   const filterLabel: Record<PreviewFilter, string> = {
     all: t('previewAllRows'),
@@ -56,7 +89,12 @@ export default async function PropertyStructurePreviewPage({
 
   return (
     <main className="space-y-6">
-      <SettingsNavigation navigationLabel={t('title')} activeSection="importExport" />
+      <PropertyImportSteps current="Preview" />
+      <SettingsNavigation
+        canManageIntegrations={can(ctx, 'admin.integrations.manage')}
+        navigationLabel={t('title')}
+        activeSection="importExport"
+      />
       <header className="space-y-2">
         <p className="text-sm text-blue-700">{t('importExport')}</p>
         <h1 className="text-3xl font-bold text-slate-950">{t('previewValidationTitle')}</h1>
@@ -98,11 +136,22 @@ export default async function PropertyStructurePreviewPage({
                 variant={candidate === filter ? 'default' : 'outline'}
                 size="sm"
               >
-                <Link href={`?filter=${candidate}`}>{filterLabel[candidate]}</Link>
+                <Link href={filterHref(candidate) as never}>{filterLabel[candidate]}</Link>
               </Button>
             ))}
           </nav>
-          {preview.rows.length === 0 ? (
+          <SearchInput placeholder="Search rows, names, references or issues" />
+          <FilterChips
+            basePath={basePath}
+            currentParams={sp}
+            paramKey="recordType"
+            label="Record type"
+            options={['Property', 'Building', 'Floor', 'Room'].map((value) => ({
+              value,
+              label: value,
+            }))}
+          />
+          {rows.length === 0 ? (
             <p className="text-sm text-slate-600">{t('previewNoRows')}</p>
           ) : (
             <div className="overflow-x-auto">
@@ -117,7 +166,7 @@ export default async function PropertyStructurePreviewPage({
                   </tr>
                 </thead>
                 <tbody>
-                  {preview.rows.map((row) => (
+                  {rows.map((row) => (
                     <tr key={row.sourceRowNumber} className="border-b align-top">
                       <td className="p-2">{row.sourceRowNumber}</td>
                       <td className="p-2">
@@ -154,6 +203,13 @@ export default async function PropertyStructurePreviewPage({
               </table>
             </div>
           )}
+          <Pagination
+            basePath={basePath}
+            currentParams={sp}
+            total={filteredRows.length}
+            page={page}
+            perPage={list.perPage}
+          />
         </CardContent>
       </Card>
       {preview.eligibleForReview ? (

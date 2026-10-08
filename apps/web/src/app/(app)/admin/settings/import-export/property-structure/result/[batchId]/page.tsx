@@ -1,3 +1,6 @@
+import { requireRequestContext } from '@/lib/auth'
+import { PropertyImportSteps } from '@/components/property-import-steps'
+import { can } from '@beaconhs/tenant'
 import Link from 'next/link'
 import { CheckCircle2, Download, FileWarning, History, Upload } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
@@ -12,6 +15,7 @@ export default async function PropertyStructureResultPage({
 }: {
   params: Promise<{ batchId: string }>
 }) {
+  const ctx = await requireRequestContext()
   const { batchId } = await params
   if (!isUuid(batchId)) notFound()
   const result = await getPropertyStructureResult(batchId)
@@ -29,7 +33,12 @@ export default async function PropertyStructureResultPage({
   ] as const
   return (
     <main className="space-y-6">
-      <SettingsNavigation navigationLabel={t('title')} activeSection="importExport" />
+      <PropertyImportSteps current="Result" />
+      <SettingsNavigation
+        canManageIntegrations={can(ctx, 'admin.integrations.manage')}
+        navigationLabel={t('title')}
+        activeSection="importExport"
+      />
       <header className="space-y-2">
         <p className="text-sm text-blue-700">{t('importExport')}</p>
         <h1 className="text-3xl font-bold text-slate-950">{t('resultTitle')}</h1>

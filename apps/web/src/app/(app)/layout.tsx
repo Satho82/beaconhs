@@ -1,5 +1,6 @@
 import { GeneratedValue } from '@/i18n/generated'
 import { Fragment } from 'react'
+import { createHash } from 'node:crypto'
 import type { CSSProperties } from 'react'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
@@ -29,6 +30,7 @@ import { RegulatoryTerminologyProvider } from '@/components/regulatory-terminolo
 import { getPlatformBranding } from '@/lib/platform-branding-config'
 import { resolveHospitalityPropertyContext } from '@/lib/hospitality/property-context'
 import { resolveTenantPrimaryAction } from '@/lib/theme-governance'
+import { isTenantBrandAssetKey } from '@/lib/tenant-brand-asset-url'
 
 type TenantThemeStyle = CSSProperties & Record<'--tenant-primary-action', string>
 
@@ -53,7 +55,6 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     available,
     roles,
     unread,
-    navGroups,
     sessionUser,
     walkthroughs,
     platformBranding,
@@ -81,9 +82,6 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         .where(and(eq(notifications.userId, ctx.userId), isNull(notifications.readAt)))
       return Number(row?.c ?? 0)
     }),
-    // Build the sidebar from the registry + this tenant's saved nav config,
-    // filtered to what this user is permitted to open.
-    ctx.db((tx) => resolveNavGroups(ctx, tx)),
     getSessionUser(),
     // Guided tours this user may launch + the first-run auto-start pick.
     ctx.db((tx) => resolveWalkthroughs(ctx, tx)),
@@ -91,6 +89,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     resolveHospitalityPropertyContext(ctx),
   ])
   if (!tenant) redirect('/login')
+  const navGroups = await ctx.db((tx) =>
+    resolveNavGroups(ctx, tx, propertyContext.activePropertyId),
+  )
   const themeStyle: TenantThemeStyle = {
     '--tenant-primary-action': resolveTenantPrimaryAction(
       platformBranding.primaryColor,
@@ -131,7 +132,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <div style={themeStyle}>
         <NavigationProvider>
           <AppShell
-            platformBranding={platformBranding}
+            platformBranding={{
+              ...platformBranding,
+              logoUrl: isTenantBrandAssetKey(ctx.tenantId, tenant.branding.logoUrl, 'logo')
+                ? `/tenant-branding/logo?tenant=${encodeURIComponent(ctx.tenantId)}&v=${createHash('sha256').update(tenant.branding.logoUrl!).digest('hex').slice(0, 16)}`
+                : platformBranding.logoUrl,
+            }}
             ctx={{
               isSuperAdmin: ctx.isSuperAdmin,
               membership: ctx.membership,

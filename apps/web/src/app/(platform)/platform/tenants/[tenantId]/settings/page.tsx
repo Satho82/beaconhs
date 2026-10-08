@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import { Button, DetailHeader, Input, Label, Select } from '@beaconhs/ui'
 import { db, withSuperAdmin } from '@beaconhs/db'
 import { tenants } from '@beaconhs/db/schema'
+import { LOCALE_OPTIONS } from '@beaconhs/i18n'
 import { requirePlatformOperator } from '@/lib/auth'
 import { isUuid } from '@/lib/list-params'
 import { PageContainer } from '@/components/page-layout'
@@ -47,9 +48,11 @@ export default async function PlatformTenantSettingsPage({
           <Label>
             {tGenerated('m_1a07c774d6ca11')}
             <Select name="defaultLanguage" defaultValue={tenant.defaultLanguage}>
-              <option value="en">English</option>
-              <option value="fr">French</option>
-              <option value="es">Spanish</option>
+              {LOCALE_OPTIONS.map((locale) => (
+                <option key={locale.value} value={locale.value}>
+                  {locale.label}
+                </option>
+              ))}
             </Select>
           </Label>
           <Button type="submit">{tGenerated('m_0bdcc953ae29cd')}</Button>

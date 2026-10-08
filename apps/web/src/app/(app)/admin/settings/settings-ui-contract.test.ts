@@ -22,7 +22,7 @@ describe('Tenant Settings General UI contract', () => {
       expect(page).toContain(`id=\"${section}\"`)
     }
     expect(form).toContain('aria-label={navigationLabel}')
-    for (const tab of ['general', 'branding', 'notifications', 'integrations']) {
+    for (const tab of ['general', 'branding', 'notifications', 'integrations', 'advanced']) {
       expect(form).toContain(`id: '${tab}'`)
       expect(form).toContain(`label: '${tab}'`)
     }
@@ -35,7 +35,7 @@ describe('Tenant Settings General UI contract', () => {
     ]) {
       expect(form).toContain(href)
     }
-    expect(form).not.toContain("id: 'advanced'")
+    expect(form).toContain("id: 'advanced'")
     expect(page).not.toContain('name="logoUrl"')
     expect(page).not.toContain('name="primaryColor"')
     expect(form).not.toContain('#additional-controls')
@@ -49,7 +49,7 @@ describe('Tenant Settings General UI contract', () => {
     for (const href of [
       '/admin/users/invite',
       '/admin/users',
-      '/admin/navigation',
+      '/admin/settings/modules',
       '/admin/audit',
     ]) {
       expect(page).toContain(`href: '${href}'`)

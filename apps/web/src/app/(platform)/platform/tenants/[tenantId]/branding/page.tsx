@@ -1,3 +1,5 @@
+import { getPlatformBranding } from '@/lib/platform-branding-config'
+import { resolveTenantPrimaryAction } from '@/lib/theme-governance'
 import Link from 'next/link'
 import { eq } from 'drizzle-orm'
 import { notFound } from 'next/navigation'
@@ -31,9 +33,10 @@ export default async function PlatformTenantBrandingPage({
       .limit(1),
   )
   if (!tenant) notFound()
+  const platformBranding = await getPlatformBranding()
   return (
     <PageContainer>
-      <div className="mx-auto max-w-2xl space-y-5">
+      <div className="mx-auto max-w-6xl space-y-5">
         <DetailHeader
           back={{ href: `/platform/tenants/${tenantId}`, label: t('m_137b646c00feff') }}
           title={t('m_131c0fe5c2d6db', { value0: tenant.name })}
@@ -46,6 +49,11 @@ export default async function PlatformTenantBrandingPage({
             tenantName={tenant.name}
             saveAction={saveTenantBranding}
             primaryColor={tenant.branding.primaryColor}
+            platformPrimaryColor={resolveTenantPrimaryAction(
+              platformBranding.primaryColor,
+              undefined,
+            )}
+            platformLogoUrl={platformBranding.logoUrl}
             logoUrl={tenant.branding.logoUrl ? tenantBrandAssetUrl(tenantId, 'logo') : undefined}
             letterheadUrl={
               tenant.branding.pdfLetterhead

@@ -91,13 +91,13 @@ export default async function PlatformHubPage() {
       detail: 'Global identities, including disabled accounts',
     },
     {
-      label: 'Modules',
+      label: 'Module types',
       value: MODULE_CATALOGUE.length,
       href: '/platform/tenants',
       detail: 'Available entitlement catalogue entries',
     },
     {
-      label: 'Templates',
+      label: 'Tenant form templates',
       value: data.templateCount,
       href: null,
       detail: 'Non-deleted tenant form templates',

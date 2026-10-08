@@ -44,6 +44,8 @@ import {
 import { PageContainer } from '@/components/page-layout'
 import { saveSettings } from './_actions'
 import { SettingsForm } from './settings-form'
+import { loadEnabledModuleKeys } from '@/lib/module-entitlements/server'
+import type { RequestContext } from '@beaconhs/tenant'
 
 export async function generateMetadata() {
   const tGenerated = await getGeneratedTranslations()
@@ -131,6 +133,7 @@ async function SettingsPage({ activeSection }: { activeSection: SettingsSection 
     }
   })
   if (!tenant) return null
+  overview.modules = (await loadEnabledModuleKeys(ctx)).size
 
   const enabled = new Set(tenant.enabledLanguages)
   const regulatory = resolveRegulatoryTerminology(tenant.settings)
@@ -167,7 +170,8 @@ async function SettingsPage({ activeSection }: { activeSection: SettingsSection 
           discardLabel={tGenerated('m_056c8c15d77140')}
           navigationLabel={tGeneratedValue(t('title'))}
           activeSection={activeSection}
-          sidebar={<SettingsSidebar tenant={tenant} overview={overview} />}
+          canManageIntegrations={can(ctx, 'admin.integrations.manage')}
+          sidebar={<SettingsSidebar tenant={tenant} overview={overview} ctx={ctx} />}
         >
           <Card
             id="operational-defaults"
@@ -407,7 +411,9 @@ function Field({
 async function SettingsSidebar({
   tenant,
   overview,
+  ctx,
 }: {
+  ctx: RequestContext
   tenant: { name: string; slug: string }
   overview: {
     properties: number
@@ -421,13 +427,33 @@ async function SettingsSidebar({
     [t('properties'), overview.properties],
     [t('rooms'), overview.rooms],
     [t('users'), overview.users],
-    ['Configured modules', overview.modules],
+    ['Enabled modules', overview.modules],
   ]
   const actions = [
-    { href: '/admin/users/invite', label: t('inviteUser'), icon: UserPlus },
-    { href: '/admin/users', label: t('manageUsers'), icon: Users },
-    { href: '/admin/navigation', label: t('manageModules'), icon: LayoutGrid },
-    { href: '/admin/audit', label: t('viewAuditLog'), icon: FileText },
+    {
+      href: '/admin/users/invite',
+      label: t('inviteUser'),
+      icon: UserPlus,
+      permission: 'admin.users.manage',
+    },
+    {
+      href: '/admin/users',
+      label: t('manageUsers'),
+      icon: Users,
+      permission: 'admin.users.manage',
+    },
+    {
+      href: '/admin/settings/modules',
+      label: t('manageModules'),
+      icon: LayoutGrid,
+      permission: 'admin.settings.manage',
+    },
+    {
+      href: '/admin/audit',
+      label: t('viewAuditLog'),
+      icon: FileText,
+      permission: 'admin.audit.read',
+    },
   ]
   return (
     <>
@@ -466,16 +492,18 @@ async function SettingsSidebar({
           </CardTitle>
         </CardHeader>
         <CardContent className="grid grid-cols-2 gap-2">
-          {actions.map(({ href, label, icon: Icon }) => (
-            <Link
-              key={href}
-              href={href}
-              className="flex min-h-12 items-center gap-2 rounded-md border border-slate-200 px-3 py-2 text-sm font-medium text-teal-700 transition-colors hover:bg-teal-50 dark:border-slate-800"
-            >
-              <Icon size={20} />
-              {label}
-            </Link>
-          ))}
+          {actions
+            .filter((action) => can(ctx, action.permission))
+            .map(({ href, label, icon: Icon }) => (
+              <Link
+                key={href}
+                href={href}
+                className="flex min-h-12 items-center gap-2 rounded-md border border-slate-200 px-3 py-2 text-sm font-medium text-teal-700 transition-colors hover:bg-teal-50 dark:border-slate-800"
+              >
+                <Icon size={20} />
+                {label}
+              </Link>
+            ))}
         </CardContent>
       </Card>
       <Card className="border-slate-200 bg-teal-50/60 shadow-none dark:border-slate-800">

@@ -15,6 +15,7 @@ const SETTINGS_DESTINATIONS = {
   integrations: '/admin/integrations',
   advanced: '/admin/settings/advanced',
   importExport: '/admin/settings/import-export',
+  modules: '/admin/settings/modules',
 } as const
 
 type SettingsSection = keyof typeof SETTINGS_DESTINATIONS
@@ -31,6 +32,7 @@ const SETTINGS_NAVIGATION: readonly SettingsNavigationEntry[] = [
   { id: 'branding', label: 'branding', href: '/admin/settings/branding', icon: Palette },
   { id: 'notifications', label: 'notifications', href: '/admin/notifications', icon: Bell },
   { id: 'integrations', label: 'integrations', href: '/admin/integrations', icon: Cable },
+  { id: 'advanced', label: 'advanced', href: '/admin/settings/advanced', icon: Settings2 },
 ]
 
 type SettingsFormProps = {
@@ -38,6 +40,7 @@ type SettingsFormProps = {
   saveLabel: string
   discardLabel: string
   navigationLabel: string
+  canManageIntegrations?: boolean
   activeSection?: SettingsSection
   sidebar?: React.ReactNode
   children: React.ReactNode
@@ -46,9 +49,11 @@ type SettingsFormProps = {
 export function SettingsNavigation({
   navigationLabel,
   activeSection,
+  canManageIntegrations = false,
 }: {
   navigationLabel: string
   activeSection: SettingsSection
+  canManageIntegrations?: boolean
 }) {
   const t = useTranslations('TenantSettings')
 
@@ -57,7 +62,10 @@ export function SettingsNavigation({
       aria-label={navigationLabel}
       className="flex gap-1 overflow-x-auto border-b border-slate-200 pb-px"
     >
-      {SETTINGS_NAVIGATION.map((entry) => {
+      {SETTINGS_NAVIGATION.filter(
+        (entry) =>
+          entry.id !== 'integrations' || canManageIntegrations || activeSection === 'integrations',
+      ).map((entry) => {
         const active = activeSection === entry.id
         const Icon = entry.icon
         return (
@@ -93,6 +101,7 @@ export function SettingsForm({
   discardLabel,
   navigationLabel,
   activeSection = 'general',
+  canManageIntegrations = false,
   sidebar,
   children,
 }: SettingsFormProps) {
@@ -138,13 +147,17 @@ export function SettingsForm({
       }}
       className="space-y-6"
     >
-      <input type="hidden" name="settingsSection" value="general" />
+      <input type="hidden" name="settingsSection" value={activeSection} />
       {message && (
         <p role={dirty ? 'alert' : 'status'} className="rounded-lg border p-3 text-sm">
           {message}
         </p>
       )}
-      <SettingsNavigation navigationLabel={navigationLabel} activeSection={activeSection} />
+      <SettingsNavigation
+        navigationLabel={navigationLabel}
+        activeSection={activeSection}
+        canManageIntegrations={canManageIntegrations}
+      />
       <div className="xl:grid xl:grid-cols-[minmax(0,1fr)_25rem] xl:gap-5">
         <fieldset disabled={pending} className="min-w-0 space-y-4">
           {children}

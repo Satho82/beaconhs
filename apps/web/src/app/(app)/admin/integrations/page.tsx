@@ -188,7 +188,11 @@ export default async function IntegrationsPage() {
       <p className="mb-3 text-sm text-slate-600">
         {tenant.name} {tBoard('· Changes apply to this tenant.')}
       </p>
-      <SettingsNavigation navigationLabel="Tenant settings" activeSection="integrations" />
+      <SettingsNavigation
+        canManageIntegrations={can(ctx, 'admin.integrations.manage')}
+        navigationLabel="Tenant settings"
+        activeSection="integrations"
+      />
       <AdminBackLink />
       <div className="space-y-8">
         <header className="space-y-1">

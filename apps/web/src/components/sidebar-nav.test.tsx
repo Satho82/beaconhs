@@ -2,7 +2,10 @@
 import { act } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-vi.mock('next/navigation', () => ({ usePathname: () => '/dashboard' }))
+vi.mock('next/navigation', () => ({
+  usePathname: () => '/dashboard',
+  useSearchParams: () => new URLSearchParams(),
+}))
 vi.mock('next/link', () => ({
   default: ({ children, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
     <a {...props}>{children}</a>

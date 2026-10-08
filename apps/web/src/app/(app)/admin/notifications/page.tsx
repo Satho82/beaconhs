@@ -51,7 +51,11 @@ export default async function NotificationSettingsPage() {
       <p className="mb-3 text-sm text-slate-600">
         {tenant.name} {tBoard('· Changes apply to this tenant.')}
       </p>
-      <SettingsNavigation navigationLabel="Tenant settings" activeSection="notifications" />
+      <SettingsNavigation
+        canManageIntegrations={can(ctx, 'admin.integrations.manage')}
+        navigationLabel="Tenant settings"
+        activeSection="notifications"
+      />
       <div className="space-y-4">
         <DetailHeader
           title={tGenerated('m_18d4f38ded7c87')}

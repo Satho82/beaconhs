@@ -3,7 +3,13 @@ import { and, count, eq, isNull } from 'drizzle-orm'
 import { notFound } from 'next/navigation'
 import { Button, DetailHeader } from '@beaconhs/ui'
 import { db, withSuperAdmin } from '@beaconhs/db'
-import { attachments, orgUnits, people, tenantUsers, tenants } from '@beaconhs/db/schema'
+import {
+  attachments,
+  hospitalityProperties,
+  people,
+  tenantUsers,
+  tenants,
+} from '@beaconhs/db/schema'
 import { requirePlatformOperator } from '@/lib/auth'
 import { isUuid } from '@/lib/list-params'
 import { PageContainer } from '@/components/page-layout'
@@ -39,12 +45,11 @@ export default async function PlatformTenantUsagePage({
         .where(and(eq(people.tenantId, tenantId), isNull(people.deletedAt))),
       tx
         .select({ value: count() })
-        .from(orgUnits)
+        .from(hospitalityProperties)
         .where(
           and(
-            eq(orgUnits.tenantId, tenantId),
-            eq(orgUnits.level, 'site'),
-            isNull(orgUnits.deletedAt),
+            eq(hospitalityProperties.tenantId, tenantId),
+            isNull(hospitalityProperties.deletedAt),
           ),
         ),
       tx.select({ value: count() }).from(attachments).where(eq(attachments.tenantId, tenantId)),

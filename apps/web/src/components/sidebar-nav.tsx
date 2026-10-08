@@ -5,7 +5,7 @@ import { GeneratedValue, useGeneratedValueTranslations } from '@/i18n/generated'
 
 import Link from 'next/link'
 import { useId, useState } from 'react'
-import { usePathname } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 import {
   AlertTriangle,
   Award,
@@ -101,6 +101,8 @@ const ICONS: Record<string, LucideIcon> = {
 export type SidebarNavItem = {
   href: string
   label: string
+  groupOnly?: boolean
+  colour?: 'blue' | 'orange' | 'emerald' | 'rose' | 'purple'
   /** Built-in message key. Omitted for tenant-authored/custom labels. */
   labelKey?: string
   iconKey: keyof typeof ICONS | string
@@ -138,7 +140,9 @@ export function SidebarNav({
 }) {
   const tBoard = useGeneratedValueTranslations()
 
-  const pathname = usePathname() ?? ''
+  const path = usePathname() ?? ''
+  const search = useSearchParams()
+  const pathname = search?.size ? `${path}?${search}` : path
   const activeHref = findActiveNavHref(pathname, groups)
   return (
     <nav
@@ -177,34 +181,61 @@ function NavEntry({
   const childActive = item.children
     ? findActiveNavHref(activeHref, [{ items: item.children }]) !== null
     : false
-  const [expanded, setExpanded] = useState<boolean | null>(null)
-  const open = expanded ?? childActive
+  const [disclosure, setDisclosure] = useState<{ route: string | null; open: boolean } | null>(null)
+  const open = disclosure?.route === activeHref ? disclosure.open : childActive
+  const setExpanded = (next: boolean) => setDisclosure({ route: activeHref, open: next })
   const active = item.href === activeHref
   const Icon = ICONS[item.iconKey] ?? Gauge
+  const iconColour = {
+    blue: 'text-blue-300',
+    orange: 'text-orange-300',
+    emerald: 'text-emerald-300',
+    rose: 'text-rose-300',
+    purple: 'text-purple-300',
+  }[item.colour ?? 'blue']
   return (
     <div>
       <div className="flex items-center gap-1">
-        <Link
-          href={item.href as never}
-          aria-current={active ? 'page' : undefined}
-          title={tGeneratedValue(collapsed ? item.label : undefined)}
-          data-walkthrough={`nav:${item.href}`}
-          className={cn(
-            'flex min-w-0 flex-1 items-center gap-3 rounded-lg px-3 py-2.5 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-300',
-            collapsed && 'justify-center px-2',
-            active
-              ? 'bg-white/10 font-semibold text-white shadow-[inset_3px_0_0_rgb(var(--color-accent))]'
-              : 'text-slate-300 hover:bg-white/10 hover:text-white',
-          )}
-        >
-          <Icon size={18} className="shrink-0" />
-          {!collapsed && (
-            <span className="truncate">
+        {item.groupOnly && !collapsed ? (
+          <button
+            type="button"
+            aria-expanded={open}
+            aria-controls={id}
+            onClick={() => setExpanded(!open)}
+            className={cn(
+              'flex min-h-11 w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm text-slate-200 hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-blue-300',
+              childActive && 'bg-blue-600/30 font-semibold text-white',
+            )}
+          >
+            <Icon size={18} className={cn('shrink-0', iconColour)} />
+            <span className="min-w-0 flex-1 truncate">
               <GeneratedValue value={item.label} />
             </span>
-          )}
-        </Link>
-        {!collapsed && Boolean(item.children?.length) && (
+            <ChevronDown size={16} className={open ? 'rotate-180' : ''} />
+          </button>
+        ) : (
+          <Link
+            href={item.href as never}
+            aria-current={active ? 'page' : undefined}
+            title={tGeneratedValue(collapsed ? item.label : undefined)}
+            data-walkthrough={`nav:${item.href}`}
+            className={cn(
+              'flex min-w-0 flex-1 items-center gap-3 rounded-lg px-3 py-2.5 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-300',
+              collapsed && 'justify-center px-2',
+              active || childActive
+                ? 'bg-blue-600/30 font-semibold text-white shadow-[inset_3px_0_0_#60a5fa]'
+                : 'text-slate-300 hover:bg-white/10 hover:text-white',
+            )}
+          >
+            <Icon size={18} className={cn('shrink-0', iconColour)} />
+            {!collapsed && (
+              <span className="truncate">
+                <GeneratedValue value={item.label} />
+              </span>
+            )}
+          </Link>
+        )}
+        {!item.groupOnly && !collapsed && Boolean(item.children?.length) && (
           <button
             type="button"
             aria-label={tBoardMessage('m_1a460d455d5128', { value0: tGeneratedValue(item.label) })}

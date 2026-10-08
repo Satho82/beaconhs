@@ -44,14 +44,14 @@ export function PropertyStructureUploadForm({ copy }: { copy: Copy }) {
     if (!file) return
     startTransition(async () => {
       setError(null)
-      const reservation = await requestUpload({
-        kind: 'document',
-        filename: file.name,
-        contentType: 'text/csv',
-        sizeBytes: file.size,
-      })
-      if (!reservation.ok) return setError(reservation.error)
       try {
+        const reservation = await requestUpload({
+          kind: 'document',
+          filename: file.name,
+          contentType: 'text/csv',
+          sizeBytes: file.size,
+        })
+        if (!reservation.ok) return setError(reservation.error)
         const finalized = await finalizeUpload(await uploadReservedFile(reservation, file))
         if (!finalized.ok) return setError(finalized.error)
         const outcome = await validatePropertyStructureUpload({
@@ -74,6 +74,7 @@ export function PropertyStructureUploadForm({ copy }: { copy: Copy }) {
         <input
           ref={inputRef}
           type="file"
+          disabled={pending}
           accept="text/csv,.csv"
           className="sr-only"
           onChange={(event) => selectFile(event.target.files?.item(0) ?? null)}
@@ -81,6 +82,12 @@ export function PropertyStructureUploadForm({ copy }: { copy: Copy }) {
         <button
           type="button"
           className="flex w-full flex-col items-center gap-2 rounded-lg border border-dashed border-blue-300 bg-blue-50/50 px-6 py-10 text-sm text-slate-700 hover:border-blue-500"
+          disabled={pending}
+          onDragOver={(event) => event.preventDefault()}
+          onDrop={(event) => {
+            event.preventDefault()
+            if (!pending) selectFile(event.dataTransfer.files.item(0))
+          }}
           onClick={() => inputRef.current?.click()}
         >
           <FileUp className="h-7 w-7 text-blue-600" />
@@ -89,7 +96,20 @@ export function PropertyStructureUploadForm({ copy }: { copy: Copy }) {
         </button>
         {file ? (
           <p className="text-sm text-slate-700">
-            {copy.selectedFile}: {file.name}
+            {copy.selectedFile}: {file.name} · {file.size.toLocaleString()} bytes
+            <Button
+              type="button"
+              variant="outline"
+              disabled={pending}
+              className="ml-3"
+              onClick={() => {
+                setFile(null)
+                setError(null)
+                if (inputRef.current) inputRef.current.value = ''
+              }}
+            >
+              Remove file
+            </Button>
           </p>
         ) : null}
         {error ? (

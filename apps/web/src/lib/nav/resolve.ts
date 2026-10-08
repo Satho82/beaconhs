@@ -1,5 +1,5 @@
 import { isNavModuleEntitled } from './entitlements'
-import { boardNavigation } from './board-presentation'
+import { approvedNavigation } from './approved-structure'
 // Server-side nav resolver.
 //
 // Turns the code-defined module registry + a tenant's saved overrides
@@ -98,6 +98,7 @@ export async function loadNavConfig(tx: Database): Promise<TenantNavConfig> {
 export async function resolveNavGroups(
   ctx: RequestContext,
   tx: Database,
+  activePropertyId?: string | null,
 ): Promise<SidebarNavGroup[]> {
   const config = await loadNavConfig(tx)
   const effectiveRoleKeys = await getEffectiveRoleKeys(ctx, tx)
@@ -171,7 +172,12 @@ export async function resolveNavGroups(
       })
     }
   }
-  return boardNavigation(groups)
+  return approvedNavigation(
+    groups,
+    (permission) => can(ctx, permission),
+    entitledModules,
+    activePropertyId,
+  )
 }
 
 function resolveItem(

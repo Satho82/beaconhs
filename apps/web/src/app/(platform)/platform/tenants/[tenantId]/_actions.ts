@@ -1,6 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { isAppLocale } from '@beaconhs/i18n'
 import { redirect } from 'next/navigation'
 import { getLocale } from 'next-intl/server'
 import { and, eq, isNull, sql } from 'drizzle-orm'
@@ -66,7 +67,7 @@ export async function saveTenantPlatformSettings(formData: FormData): Promise<vo
   const tenantId = String(formData.get('tenantId') ?? '')
   const region = String(formData.get('region') ?? '').trim()
   const defaultLanguage = String(formData.get('defaultLanguage') ?? '').trim()
-  if (!isUuid(tenantId) || !region || !['en', 'fr', 'es'].includes(defaultLanguage))
+  if (!isUuid(tenantId) || !region || !isAppLocale(defaultLanguage))
     throw new Error('Invalid tenant settings request.')
   const [changed] = await withSuperAdmin(db, async (tx) =>
     tx

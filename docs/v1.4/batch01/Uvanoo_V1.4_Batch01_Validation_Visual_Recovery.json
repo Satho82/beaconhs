@@ -1,0 +1,983 @@
+{
+  "title": "Uvanoo V1.4 Batch 01 — Validation & Visual Recovery",
+  "date": "2026-10-08",
+  "baseline_sha": "81710b5e80d9081fe05bd875f436a2bc2893bb03",
+  "remote_feature_head": "81710b5e80d9081fe05bd875f436a2bc2893bb03",
+  "working_branch": "feature/uvanoo-v1.4-batch01-implementation",
+  "workspace": "/home/ubuntu/uvanoo-workspaces/batch01-implementation",
+  "device": "vps-c54e0b88",
+  "final_status": {
+    "BATCH 01 IMPLEMENTATION": "PARTIAL",
+    "VALIDATION": "INCOMPLETE",
+    "VISUAL COMPARISON": "INCOMPLETE",
+    "ANTONIO APPROVAL": "PENDING",
+    "GIT PUSH": "NOT PERFORMED",
+    "MERGE": "NOT PERFORMED",
+    "DEV": "UNCHANGED",
+    "COMMIT": "NOT PERFORMED",
+    "DATABASE OPERATIONS": "NONE",
+    "INFRASTRUCTURE CHANGES": "NONE"
+  },
+  "readiness": "NOT READY for visual approval. Tested corrections are reviewable; full source/build, persistence and rendered acceptance remain incomplete. Antonio approval PENDING.",
+  "preservation": {
+    "starting_source_changes": 43,
+    "source_changes_after_recovery": 45,
+    "prior_manifest_drift_before_work": [],
+    "existing_implementation_report": "Preserved unchanged. This recovery report supersedes its validation status and D05/D06/D07 observations.",
+    "modified_this_turn": [
+      {
+        "path": "apps/web/src/components/tenant-branding-form.tsx",
+        "change": "Selecting a valid replacement logo clears a pending reset. Preview upload limit now matches the existing server limit of 2 × 1024 × 1024 bytes. Added Copy colour with honest clipboard-failure feedback and a colour-only Reset to Platform Default. Existing whole-identity reset remains."
+      },
+      {
+        "path": "apps/web/src/components/tenant-branding-form.test.tsx",
+        "change": "Three additional interaction regressions cover replacement after reset, colour-only reset/discard and clipboard success/failure without persistence."
+      },
+      {
+        "path": "apps/web/src/lib/manual/content/board-administration.ts",
+        "change": "Documents colour copy, separate reset scopes, replacement-logo behaviour and Save/Discard."
+      },
+      {
+        "path": "apps/web/src/app/(platform)/platform/tenants/[tenantId]/_actions.ts",
+        "change": "Reuses isAppLocale for supported-language validation. No new locale, permission, data field or persistence contract."
+      },
+      {
+        "path": "apps/web/src/app/(platform)/platform/tenants/[tenantId]/settings/page.tsx",
+        "change": "Reuses LOCALE_OPTIONS for the selector. English, French and Spanish remain the supported choices."
+      }
+    ]
+  },
+  "inventory": {
+    "menu_entries": 316,
+    "screen_control_groups": 77,
+    "findings": "F01–F12",
+    "ledger_json": "Uvanoo_V1.4_Batch01_Implementation.json",
+    "ledger_html": "Uvanoo_V1.4_Batch01_Implementation.html",
+    "remote_ledger_sha256": "41fcb51d41d0a1878035b9210df8826262daf80aaec3cc3ff5b537cc51276fcb",
+    "coverage": {
+      "application_approved_groups": [
+        "Dashboard",
+        "Daily Hotel",
+        "Diary & Tasks",
+        "Maintenance",
+        "Compliance",
+        "Risk",
+        "Inspections",
+        "Incidents",
+        "Action Plans",
+        "Training",
+        "People",
+        "Handover",
+        "Assets & PPM",
+        "Metering",
+        "Reporting",
+        "Reports",
+        "Approvals",
+        "Tenant Settings"
+      ],
+      "static_application_submenu_destinations": 61,
+      "authorized_property_submenu_destinations": 2,
+      "application_entries_total": 165,
+      "platform_direct_approved_submenu_destinations": 8,
+      "platform_entries_total": 151,
+      "platform_rendered_groups": 8,
+      "platform_approved_group_requirement": 14,
+      "platform_ledger_headings_including_unresolved_systetics": 15,
+      "menu_classifications": {
+        "DEFERRED": 237,
+        "PARTIAL": 71,
+        "BLOCKED": 8
+      },
+      "screen_classifications": {
+        "PARTIAL": 55,
+        "DEFERRED": 18,
+        "TESTED": 3,
+        "IMPLEMENTED": 1
+      },
+      "visually_matched_requirements": 0
+    },
+    "all_requirements_retained": true
+  },
+  "validation": {
+    "format": "PASS — all changed TypeScript/TSX source files",
+    "lint": "PASS — all changed TypeScript/TSX source files",
+    "web_regressions": "PASS — 182 tests in 31 files on final source",
+    "i18n": "PASS — 12 tests in 2 files",
+    "diff_check": "PASS",
+    "full_typecheck": "BLOCKED — not rerun. Previous 2048 MB heap attempt exited 134. No full type verdict.",
+    "production_build": "BLOCKED — not run. No resource escalation.",
+    "database_integration": "INCOMPLETE — no verified disposable Batch 01 database used.",
+    "visual_acceptance": "INCOMPLETE — 0 actual application screenshots.",
+    "ci": "Baseline Full Release run 37673787746 jobs rechecked successful; no new CI run covers the uncommitted source.",
+    "warning": "Older React component tests emit act-environment notices; they passed. Mocked and source-contract isolation tests do not prove runtime database isolation."
+  },
+  "executed_checks": {
+    "recovery-final-format": {
+      "exit_code": 0,
+      "command": [
+        "pnpm",
+        "exec",
+        "prettier",
+        "--check",
+        "apps/web/src/app/(app)/admin/integrations/page.tsx",
+        "apps/web/src/app/(app)/admin/notifications/page.tsx",
+        "apps/web/src/app/(app)/admin/settings/advanced/_actions.test.ts",
+        "apps/web/src/app/(app)/admin/settings/advanced/_actions.ts",
+        "apps/web/src/app/(app)/admin/settings/advanced/page.tsx",
+        "apps/web/src/app/(app)/admin/settings/branding/page.tsx",
+        "apps/web/src/app/(app)/admin/settings/import-export/page.tsx",
+        "apps/web/src/app/(app)/admin/settings/import-export/property-structure/preview/[batchId]/page.tsx",
+        "apps/web/src/app/(app)/admin/settings/import-export/property-structure/result/[batchId]/page.tsx",
+        "apps/web/src/app/(app)/admin/settings/import-export/property-structure/review/[batchId]/page.tsx",
+        "apps/web/src/app/(app)/admin/settings/import-export/property-structure/upload/page.tsx",
+        "apps/web/src/app/(app)/admin/settings/import-export/property-structure/upload/upload-form.tsx",
+        "apps/web/src/app/(app)/admin/settings/modules/page.tsx",
+        "apps/web/src/app/(app)/admin/settings/page.tsx",
+        "apps/web/src/app/(app)/admin/settings/settings-form.tsx",
+        "apps/web/src/app/(app)/admin/settings/settings-ui-contract.test.ts",
+        "apps/web/src/app/(app)/layout.tsx",
+        "apps/web/src/app/(app)/tenant-branding/logo/route.test.ts",
+        "apps/web/src/app/(app)/tenant-branding/logo/route.ts",
+        "apps/web/src/app/(platform)/platform/branding/_form.tsx",
+        "apps/web/src/app/(platform)/platform/page.tsx",
+        "apps/web/src/app/(platform)/platform/settings/_actions.test.ts",
+        "apps/web/src/app/(platform)/platform/settings/_actions.ts",
+        "apps/web/src/app/(platform)/platform/settings/page.tsx",
+        "apps/web/src/app/(platform)/platform/tenants/[tenantId]/_actions.ts",
+        "apps/web/src/app/(platform)/platform/tenants/[tenantId]/branding/page.tsx",
+        "apps/web/src/app/(platform)/platform/tenants/[tenantId]/settings/page.tsx",
+        "apps/web/src/app/(platform)/platform/tenants/[tenantId]/usage/page.tsx",
+        "apps/web/src/components/mobile-tab-bar.tsx",
+        "apps/web/src/components/platform-shell.tsx",
+        "apps/web/src/components/property-import-steps.tsx",
+        "apps/web/src/components/sidebar-nav-active.ts",
+        "apps/web/src/components/sidebar-nav.test.tsx",
+        "apps/web/src/components/sidebar-nav.tsx",
+        "apps/web/src/components/tenant-branding-form.test.tsx",
+        "apps/web/src/components/tenant-branding-form.tsx",
+        "apps/web/src/components/use-platform-nav.ts",
+        "apps/web/src/lib/manual/content/board-administration.ts",
+        "apps/web/src/lib/manual/content/getting-started.ts",
+        "apps/web/src/lib/nav/approved-structure.test.ts",
+        "apps/web/src/lib/nav/approved-structure.ts",
+        "apps/web/src/lib/nav/resolve.ts",
+        "apps/web/src/lib/walkthroughs/registry.ts"
+      ]
+    },
+    "recovery-final-lint": {
+      "exit_code": 0,
+      "command": [
+        "pnpm",
+        "--filter",
+        "@beaconhs/web",
+        "exec",
+        "eslint",
+        "src/app/(app)/admin/integrations/page.tsx",
+        "src/app/(app)/admin/notifications/page.tsx",
+        "src/app/(app)/admin/settings/advanced/_actions.test.ts",
+        "src/app/(app)/admin/settings/advanced/_actions.ts",
+        "src/app/(app)/admin/settings/advanced/page.tsx",
+        "src/app/(app)/admin/settings/branding/page.tsx",
+        "src/app/(app)/admin/settings/import-export/page.tsx",
+        "src/app/(app)/admin/settings/import-export/property-structure/preview/[batchId]/page.tsx",
+        "src/app/(app)/admin/settings/import-export/property-structure/result/[batchId]/page.tsx",
+        "src/app/(app)/admin/settings/import-export/property-structure/review/[batchId]/page.tsx",
+        "src/app/(app)/admin/settings/import-export/property-structure/upload/page.tsx",
+        "src/app/(app)/admin/settings/import-export/property-structure/upload/upload-form.tsx",
+        "src/app/(app)/admin/settings/modules/page.tsx",
+        "src/app/(app)/admin/settings/page.tsx",
+        "src/app/(app)/admin/settings/settings-form.tsx",
+        "src/app/(app)/admin/settings/settings-ui-contract.test.ts",
+        "src/app/(app)/layout.tsx",
+        "src/app/(app)/tenant-branding/logo/route.test.ts",
+        "src/app/(app)/tenant-branding/logo/route.ts",
+        "src/app/(platform)/platform/branding/_form.tsx",
+        "src/app/(platform)/platform/page.tsx",
+        "src/app/(platform)/platform/settings/_actions.test.ts",
+        "src/app/(platform)/platform/settings/_actions.ts",
+        "src/app/(platform)/platform/settings/page.tsx",
+        "src/app/(platform)/platform/tenants/[tenantId]/_actions.ts",
+        "src/app/(platform)/platform/tenants/[tenantId]/branding/page.tsx",
+        "src/app/(platform)/platform/tenants/[tenantId]/settings/page.tsx",
+        "src/app/(platform)/platform/tenants/[tenantId]/usage/page.tsx",
+        "src/components/mobile-tab-bar.tsx",
+        "src/components/platform-shell.tsx",
+        "src/components/property-import-steps.tsx",
+        "src/components/sidebar-nav-active.ts",
+        "src/components/sidebar-nav.test.tsx",
+        "src/components/sidebar-nav.tsx",
+        "src/components/tenant-branding-form.test.tsx",
+        "src/components/tenant-branding-form.tsx",
+        "src/components/use-platform-nav.ts",
+        "src/lib/manual/content/board-administration.ts",
+        "src/lib/manual/content/getting-started.ts",
+        "src/lib/nav/approved-structure.test.ts",
+        "src/lib/nav/approved-structure.ts",
+        "src/lib/nav/resolve.ts",
+        "src/lib/walkthroughs/registry.ts"
+      ]
+    },
+    "recovery-final-tests": {
+      "exit_code": 0,
+      "command": [
+        "pnpm",
+        "--filter",
+        "@beaconhs/web",
+        "exec",
+        "vitest",
+        "run",
+        "--maxWorkers=1",
+        "src/lib/nav/approved-structure.test.ts",
+        "src/lib/nav/resolve.entitlements.test.ts",
+        "src/components/sidebar-nav.test.tsx",
+        "src/components/sidebar-nav-active.test.ts",
+        "src/components/tenant-branding-form.test.tsx",
+        "src/app/(platform)/platform/settings/_actions.test.ts",
+        "src/app/(app)/admin/settings/advanced/_actions.test.ts",
+        "src/app/(app)/tenant-branding/logo/route.test.ts",
+        "src/app/(app)/admin/settings/settings-form.test.tsx",
+        "src/app/(app)/admin/settings/settings-ui-contract.test.ts",
+        "src/app/(app)/admin/settings/branding/_actions.test.ts",
+        "src/app/(app)/admin/settings/branding/assets/[kind]/route.test.ts",
+        "src/app/(platform)/platform/branding/_actions.test.ts",
+        "src/app/(platform)/platform/branding/_form.test.tsx",
+        "src/app/(platform)/platform/tenants/[tenantId]/branding/_actions.test.ts",
+        "src/lib/module-entitlements/platform.test.ts",
+        "src/lib/module-entitlements/policy.test.ts",
+        "src/lib/module-entitlements/server.test.ts",
+        "src/lib/hospitality/property-access.test.ts",
+        "src/lib/hospitality/property-context.test.ts",
+        "src/lib/imports/engine.test.ts",
+        "src/lib/imports/property-structure.test.ts",
+        "src/lib/imports/property-structure-storage-path.test.ts",
+        "src/lib/access-delegation.test.ts",
+        "src/lib/property-evidence-integration.test.ts",
+        "src/lib/report-property-security-contract.test.ts",
+        "src/lib/tenant-operational-defaults.test.ts",
+        "src/lib/platform-control-centre-contract.test.ts",
+        "src/lib/platform-tenant-administration-contract.test.ts",
+        "src/lib/risk-assessments.test.ts",
+        "src/app/(app)/apps/_lib/access-policy.test.ts"
+      ]
+    },
+    "recovery-i18n-tests": {
+      "exit_code": 0,
+      "command": ["pnpm", "--filter", "@beaconhs/i18n", "test"]
+    },
+    "recovery-final-diff": {
+      "exit_code": 0,
+      "command": ["git", "diff", "--check"]
+    }
+  },
+  "logs_directory": "/home/ubuntu/uvanoo-workspaces/batch01-references",
+  "runner_investigation": [
+    {
+      "candidate": "Connected Desktop Commander devices",
+      "evidence": "One online device: vps-c54e0b88. No second validation device.",
+      "outcome": "BLOCKED for full typecheck/build: do not repeat the previous 2048 MB heap failure."
+    },
+    {
+      "candidate": "Registered GitHub self-hosted runners",
+      "evidence": "GET repos/Satho82/beaconhs/actions/runners returned total_count=1: beaconhs-ovh, online, idle; labels self-hosted/Linux/X64/dokploy.",
+      "outcome": "Existing deployment host, not a separate cloud validation executor."
+    },
+    {
+      "candidate": "V1.4 Full Release cloud workflow",
+      "evidence": ".github/workflows/uvanoo-v1.4-cloud-build.yml: ubuntu-latest; source_sha checkout; web build NODE_OPTIONS=--max-old-space-size=8192; subsequent image job has push:true. Baseline run 37673787746 validation and publication jobs succeeded.",
+      "outcome": "Historical evidence only. No patch/archive input or validation-only dispatch. Dispatching it would not test these uncommitted changes and would publish an image."
+    },
+    {
+      "candidate": "Other repository workflows",
+      "evidence": "Fast DEV checks immutable feature-branch push SHA. ci.yml dispatch includes deploy-dev. Older V1.3.1 validation/build-only workflows checkout repository commits. All workflow files inspected; no uncommitted snapshot input found.",
+      "outcome": "No workflow dispatched, altered or bypassed."
+    }
+  ],
+  "runtime_evidence": {
+    "isolated_env_file": false,
+    "web_env_local_file": false,
+    "postgres_initdb_psql_binaries": false,
+    "chromium_chrome_binaries": false,
+    "playwright_cache": false,
+    "preview_started": false,
+    "database_connections_made": false,
+    "existing_test_container": "cycas-board-test-20261007 observed only; not verified for Batch 01 or used."
+  },
+  "references": {
+    "requirements_page": "https://chatgpt.com/space/page_87b090be2a588191870fd5b3ee43f7b0",
+    "originals": [
+      {
+        "reference": "B01",
+        "file_id": "file_00000000d2ec81f49dd51ef967c61359",
+        "file_name": "Pasted text.txt",
+        "bytes": 12395,
+        "retrieval": "Original bytes rendered/read successfully via authorised file reader; no replacement generated.",
+        "recovery_access": "Previously reviewed original; unchanged audit retained."
+      },
+      {
+        "reference": "G01",
+        "file_id": "file_00000000888c81f4a1b031f515708542",
+        "file_name": "Platform Admin General Settings Dashboard.png",
+        "bytes": 2028794,
+        "retrieval": "Original bytes rendered/read successfully via authorised file reader; no replacement generated.",
+        "recovery_access": "Original graphics G01–G09 rendered again successfully; no substitution."
+      },
+      {
+        "reference": "G02",
+        "file_id": "file_00000000dd7c82108a3bc0f0b94775fc",
+        "file_name": "Uvanoo Platform Admin Dashboard(2) (1).png",
+        "bytes": 2101068,
+        "retrieval": "Original bytes rendered/read successfully via authorised file reader; no replacement generated.",
+        "recovery_access": "Original graphics G01–G09 rendered again successfully; no substitution."
+      },
+      {
+        "reference": "G03",
+        "file_id": "file_00000000b62881f497df8928893f7d43",
+        "file_name": "Uvanoo Platform Menu Structure Infographic (1).png",
+        "bytes": 2679733,
+        "retrieval": "Original bytes rendered/read successfully via authorised file reader; no replacement generated.",
+        "recovery_access": "Original graphics G01–G09 rendered again successfully; no substitution."
+      },
+      {
+        "reference": "G04",
+        "file_id": "file_00000000b7a481f490a888ac18649987",
+        "file_name": "Uvanoo Approvals Module Dashboard (1).png",
+        "bytes": 2453078,
+        "retrieval": "Original bytes rendered/read successfully via authorised file reader; no replacement generated.",
+        "recovery_access": "Original graphics G01–G09 rendered again successfully; no substitution."
+      },
+      {
+        "reference": "G05",
+        "file_id": "file_000000005f7481f5b4752fd7093d06e1",
+        "file_name": "Uvanoo Template Management Dashboard.png",
+        "bytes": 2159586,
+        "retrieval": "Original bytes rendered/read successfully via authorised file reader; no replacement generated.",
+        "recovery_access": "Original graphics G01–G09 rendered again successfully; no substitution."
+      },
+      {
+        "reference": "G06",
+        "file_id": "file_000000002bfc8210a6a631e12e5e5e51",
+        "file_name": "Uvanoo Data Import Dashboard Mockup.png",
+        "bytes": 2366754,
+        "retrieval": "Original bytes rendered/read successfully via authorised file reader; no replacement generated.",
+        "recovery_access": "Original graphics G01–G09 rendered again successfully; no substitution."
+      },
+      {
+        "reference": "G07",
+        "file_id": "file_00000000da6c81f4a4892fc7d6ea6a24",
+        "file_name": "Uvanoo Property Import Workflow Mockup.png",
+        "bytes": 2251266,
+        "retrieval": "Original bytes rendered/read successfully via authorised file reader; no replacement generated.",
+        "recovery_access": "Original graphics G01–G09 rendered again successfully; no substitution."
+      },
+      {
+        "reference": "G08",
+        "file_id": "file_0000000032188210bceee06d88b64148",
+        "file_name": "Uvanoo Tenant Settings Dashboard.png",
+        "bytes": 2171116,
+        "retrieval": "Original bytes rendered/read successfully via authorised file reader; no replacement generated.",
+        "recovery_access": "Original graphics G01–G09 rendered again successfully; no substitution."
+      },
+      {
+        "reference": "G09",
+        "file_id": "file_00000000b58882109d6c6ee46b7880b8",
+        "file_name": "Uvanoo Branding Settings Dashboard.png",
+        "bytes": 2050074,
+        "retrieval": "Original bytes rendered/read successfully via authorised file reader; no replacement generated.",
+        "recovery_access": "Original graphics G01–G09 rendered again successfully; no substitution."
+      }
+    ],
+    "logo_candidates": [
+      {
+        "file_id": "file_00000000107481f48f613e2857387e5f",
+        "name": "Modern UVANOO Property Logo.png",
+        "verdict": "Viewed; does not match exact approved asset."
+      },
+      {
+        "file_id": "file_00000000d7a881f4ad84d26ce4e516b3",
+        "name": "UVANOO Teal and Coral Logo.png",
+        "verdict": "Viewed; does not match exact approved asset."
+      }
+    ]
+  },
+  "dependencies": [
+    {
+      "id": "D01",
+      "status": "DEFERRED",
+      "feature": "Platform-wide regional defaults",
+      "needed": "Approved persistence/schema contract; do not add fields that normalization discards."
+    },
+    {
+      "id": "D02",
+      "status": "DEFERRED",
+      "feature": "Tenant accent, Email Branding and Login & Welcome",
+      "needed": "Approved tenant branding schema/contracts and propagation paths; existing primary/logo/PDF remain supported."
+    },
+    {
+      "id": "D03",
+      "status": "DEFERRED",
+      "feature": "Unified master Template Library",
+      "needed": "Approved safe master/adoption/version/availability/property-access contracts using existing engines; no duplicate template engine."
+    },
+    {
+      "id": "D04",
+      "status": "DEFERRED",
+      "feature": "XLSX, 10 MB and partial-import semantics",
+      "needed": "Explicit scope/format/policy authorization and actual parser/validation implementation. Current CSV and whole-batch policy retained."
+    },
+    {
+      "id": "D05",
+      "status": "BLOCKED",
+      "feature": "Official bundled default logo",
+      "needed": "Supply or identify the original flat house/target asset used by G02/G03/G04. The two retrieved standalone logo candidates have a glowing background, different roof/target geometry and different wordmark/tagline composition; neither is accepted as the exact approved asset. Existing configured logos remain unchanged."
+    },
+    {
+      "id": "D06",
+      "status": "BLOCKED",
+      "feature": "Visual and full runtime acceptance",
+      "needed": "Access to an existing isolated runner that can receive the uncommitted snapshot without publication, plus a verified disposable database and browser. Only the OVH/Dokploy runner is registered; hosted workflows checkout immutable commits, and the V1.4 release workflow publishes an image. No compliant uncommitted-source execution path was found."
+    },
+    {
+      "id": "D07",
+      "status": "PARTIAL",
+      "feature": "Tenant slug policy and remaining language acceptance",
+      "needed": "General slug syntax/downstream-reference policy remains unresolved. Correction: the previous platform list and shared list both already supported en/fr/es; no current option mismatch was demonstrated. Platform UI/action now reuse the shared definitions. G08 additionally shows Italian, which is not supported by the current application locale contract; no unsupported locale was exposed."
+    }
+  ],
+  "outstanding_issues": [
+    {
+      "id": "R01",
+      "status": "BLOCKED",
+      "area": "Full typecheck and production build",
+      "detail": "D06: no compliant cloud execution path for the uncommitted snapshot. Prior typecheck exit 134 is a resource failure, not a source pass or a demonstrated source failure."
+    },
+    {
+      "id": "R02",
+      "status": "BLOCKED",
+      "area": "Persistence and runtime isolation acceptance",
+      "detail": "No Batch 01 disposable DB configuration. No database test or mutation was run. An existing cycas-board-test-20261007 container was observed, but its ownership/fixtures and suitability for this workspace were not verified; it was not reused or modified."
+    },
+    {
+      "id": "R03",
+      "status": "BLOCKED",
+      "area": "Real preview and screenshots",
+      "detail": "No authenticated isolated application preview; remote browser binaries and Playwright cache absent. Zero actual screenshots; desktop, tablet and mobile visual acceptance all incomplete."
+    },
+    {
+      "id": "R04",
+      "status": "BLOCKED",
+      "area": "Official bundled default logo",
+      "detail": "D05: known standalone candidates do not match the approved flat house/target asset. No replacement generated or installed."
+    },
+    {
+      "id": "R05",
+      "status": "PARTIAL",
+      "area": "Shared shell/navigation parity",
+      "detail": "63 connected application submenu entries and 8 direct approved platform submenu entries; 316 requirements retained. Exact spacing, typography, module colours, responsive clipping and keyboard behaviour still require rendered acceptance. No full Approvals engine."
+    },
+    {
+      "id": "R06",
+      "status": "PARTIAL",
+      "area": "Platform Admin General Settings",
+      "detail": "Existing identity persistence implemented; D01 global regional defaults and exact five-tab/card/help composition remain incomplete."
+    },
+    {
+      "id": "R07",
+      "status": "PARTIAL",
+      "area": "Tenant Branding",
+      "detail": "Copy and scoped reset fixed/tested; D02 accent/email/login persistence, complete branding subsections, colour picker/swatches and full preview composition remain gaps."
+    },
+    {
+      "id": "R08",
+      "status": "DEFERRED",
+      "area": "Unified Template Library",
+      "detail": "D03: safe engine reuse is documented, but master catalogue/adoption lineage/availability/property access and generic lifecycle contracts remain unresolved."
+    },
+    {
+      "id": "R09",
+      "status": "PARTIAL",
+      "area": "Import/Export",
+      "detail": "D04: existing CSV and whole-batch policy preserved. No XLSX/10 MB/partial import claim; preview/error downloads and execution-progress parity remain absent."
+    },
+    {
+      "id": "R10",
+      "status": "PARTIAL",
+      "area": "General Settings identity/language",
+      "detail": "D07: slug validation/downstream policy unresolved. Current language lists were already equal; shared definitions now remove duplication. Italian shown in G08 remains unsupported."
+    },
+    {
+      "id": "R11",
+      "status": "BLOCKED",
+      "area": "Taxonomy decisions",
+      "detail": "Systetics, Usage Fields and Reporting/Metering overlap remain literal inventory requirements pending Antonio’s interpretation; Reports and Approvals stay separate."
+    }
+  ],
+  "findings_updates": [
+    {
+      "id": "F05",
+      "status": "PARTIAL",
+      "update": "Selecting a valid replacement logo clears a pending reset. Preview upload limit now matches the existing server limit of 2 × 1024 × 1024 bytes. Added Copy colour with honest clipboard-failure feedback and a colour-only Reset to Platform Default. Existing whole-identity reset remains. Three new interaction tests passed; no visual match claimed."
+    },
+    {
+      "id": "F11",
+      "status": "PARTIAL",
+      "update": "General slug syntax/downstream-reference policy remains unresolved. Correction: the previous platform list and shared list both already supported en/fr/es; no current option mismatch was demonstrated. Platform UI/action now reuse the shared definitions. G08 additionally shows Italian, which is not supported by the current application locale contract; no unsupported locale was exposed."
+    },
+    {
+      "id": "F12",
+      "status": "BLOCKED",
+      "update": "194 focused tests passed across 33 files; full type/build, actual DB isolation/persistence and screenshot acceptance remain incomplete."
+    }
+  ],
+  "screen_updates": [
+    {
+      "id": "E022",
+      "status": "PARTIAL",
+      "update": "Replacement upload cancels reset, with client preview size aligned to server contract; interaction regression passed."
+    },
+    {
+      "id": "E023",
+      "status": "PARTIAL",
+      "update": "Colour copy implemented and tested; custom saturation/hue control and suggested swatches remain absent."
+    },
+    {
+      "id": "E025",
+      "status": "TESTED",
+      "update": "Explicit default/custom state and colour-only Reset to Platform Default tested with Discard. Visual acceptance not assessed."
+    },
+    {
+      "id": "E014",
+      "status": "PARTIAL",
+      "update": "Both scopes use shared en/fr/es definitions; G08 Italian unsupported."
+    }
+  ],
+  "template_engine_reuse": [
+    {
+      "requirement": "Tenant-owned catalogue and customisation",
+      "reuse": "/apps; /apps/templates/new; /apps/templates/{id}/designer; forms-core and formTemplates",
+      "supported": "Existing tenant-bound form list/create/designer and role-based access.",
+      "limit": "Not the approved Available from Uvanoo / My Templates master catalogue. Do not label the generic Builder as full G05 parity."
+    },
+    {
+      "requirement": "Published versions",
+      "reuse": "publishNewVersion in apps/web/src/app/(app)/apps/templates/[id]/designer/actions.ts; formTemplateVersions",
+      "supported": "Validated immutable schema snapshots, serialized version publication, forms.template.publish permission and audit.",
+      "limit": "No verified unified master-source/tenant-copy version lineage or G05 version-history experience."
+    },
+    {
+      "requirement": "Risk catalogue, preview and adoption",
+      "reuse": "/hospitality/risk/templates/{templateId}; listRiskTemplates/getRiskTemplate/adoptRiskAssessment in apps/web/src/lib/risk-assessments.ts",
+      "supported": "Stored risk-template display; adoption creates a tenant/property risk assessment with source version/snapshot and hazards. Checks hospitality.manage, membership, property access and active global/current-tenant template.",
+      "limit": "An adopted risk assessment is not an organisation-owned reusable template copy. Cannot substitute this for generic G05 adoption."
+    },
+    {
+      "requirement": "Tenant availability and property access",
+      "reuse": "Existing tenant RLS, form allowedRoles/access policy, risk global/current-tenant availability and property access helpers",
+      "supported": "Preserve and reuse these enforcement primitives.",
+      "limit": "Generic per-master tenant availability and per-template property assignment UI/contracts are not established."
+    },
+    {
+      "requirement": "Duplication and archiving",
+      "reuse": "Existing schema includes form draft/published/archived state",
+      "supported": "Schema state is evidence of a data shape only.",
+      "limit": "No safe generic duplicate/archive action was located in inspected app/template actions. Do not ship controls based only on the enum."
+    },
+    {
+      "requirement": "PDF preview/download",
+      "reuse": "Existing form response PDF and tenant PDF-template engine",
+      "supported": "Document generation capabilities exist.",
+      "limit": "A response PDF is not an unfilled master-template preview. Reuse only after the exact source/version/permission contract is verified."
+    }
+  ],
+  "visual_acceptance": [
+    {
+      "screen": "Application sidebar with expanded groups",
+      "original": "G03",
+      "approved": "Approved hierarchy, navy sidebar, parent/child states",
+      "implemented_source": "Grouped navigation, permission/entitlement filtering and dynamic property links; missing modules remain deferred.",
+      "screenshot": null,
+      "tablet_screenshot": null,
+      "mobile_screenshot": null,
+      "status": "BLOCKED",
+      "visual_matches": "Not assessed: no actual application screenshots.",
+      "visual_differences": "Rendered differences cannot be measured without an actual application screenshot. Source-confirmed gaps are listed in the implementation column.",
+      "working_controls": "Source and focused test evidence only; no runtime acceptance.",
+      "outstanding": "Isolated preview and real desktop/tablet/mobile capture; no live DEV data or authentication bypass."
+    },
+    {
+      "screen": "Platform Admin dashboard",
+      "original": "G01 / G02",
+      "approved": "Portfolio summary and approved shell",
+      "implemented_source": "Existing dashboard retained, metric labels clarified and header improved; summary icons/layout still need comparison.",
+      "screenshot": null,
+      "tablet_screenshot": null,
+      "mobile_screenshot": null,
+      "status": "BLOCKED",
+      "visual_matches": "Not assessed: no actual application screenshots.",
+      "visual_differences": "Rendered differences cannot be measured without an actual application screenshot. Source-confirmed gaps are listed in the implementation column.",
+      "working_controls": "Source and focused test evidence only; no runtime acceptance.",
+      "outstanding": "Isolated preview and real desktop/tablet/mobile capture; no live DEV data or authentication bypass."
+    },
+    {
+      "screen": "Platform General Settings",
+      "original": "G01 / G02",
+      "approved": "Regional defaults, identity, tabs, quick actions and help",
+      "implemented_source": "Supported identity form exists; regional persistence, exact five-tab composition and help parity are incomplete.",
+      "screenshot": null,
+      "tablet_screenshot": null,
+      "mobile_screenshot": null,
+      "status": "BLOCKED",
+      "visual_matches": "Not assessed: no actual application screenshots.",
+      "visual_differences": "Rendered differences cannot be measured without an actual application screenshot. Source-confirmed gaps are listed in the implementation column.",
+      "working_controls": "Source and focused test evidence only; no runtime acceptance.",
+      "outstanding": "Isolated preview and real desktop/tablet/mobile capture; no live DEV data or authentication bypass."
+    },
+    {
+      "screen": "Platform tenant/module management",
+      "original": "G01 / G02 / G03",
+      "approved": "Tenant-scoped supported entitlement management",
+      "implemented_source": "Existing guarded interface preserved, no entitlement mutations performed; no new catalogue claimed.",
+      "screenshot": null,
+      "tablet_screenshot": null,
+      "mobile_screenshot": null,
+      "status": "BLOCKED",
+      "visual_matches": "Not assessed: no actual application screenshots.",
+      "visual_differences": "Rendered differences cannot be measured without an actual application screenshot. Source-confirmed gaps are listed in the implementation column.",
+      "working_controls": "Source and focused test evidence only; no runtime acceptance.",
+      "outstanding": "Isolated preview and real desktop/tablet/mobile capture; no live DEV data or authentication bypass."
+    },
+    {
+      "screen": "Tenant General Settings",
+      "original": "G08",
+      "approved": "Five tabs, regional settings, overview and actions",
+      "implemented_source": "Effective module count and permission-aware actions corrected. Platform language definitions now shared; slug policy remains unresolved and G08 Italian is unsupported.",
+      "screenshot": null,
+      "tablet_screenshot": null,
+      "mobile_screenshot": null,
+      "status": "BLOCKED",
+      "visual_matches": "Not assessed: no actual application screenshots.",
+      "visual_differences": "Rendered differences cannot be measured without an actual application screenshot. Source-confirmed gaps are listed in the implementation column.",
+      "working_controls": "Source and focused test evidence only; no runtime acceptance.",
+      "outstanding": "Isolated preview and real desktop/tablet/mobile capture; no live DEV data or authentication bypass."
+    },
+    {
+      "screen": "Tenant Branding",
+      "original": "G09",
+      "approved": "Five brand sections, colour controls and full preview",
+      "implemented_source": "Primary/logo/PDF controls and scoped shell-logo reader retained. Added tested colour copy, colour-only reset and replacement-after-reset fix. Five brand subsections, accent/email/login contracts, custom saturation/hue picker, suggested swatches and full G09 preview composition remain incomplete.",
+      "screenshot": null,
+      "tablet_screenshot": null,
+      "mobile_screenshot": null,
+      "status": "BLOCKED",
+      "visual_matches": "Not assessed: no actual application screenshots.",
+      "visual_differences": "Rendered differences cannot be measured without an actual application screenshot. Source-confirmed gaps are listed in the implementation column.",
+      "working_controls": "Source and focused test evidence only; no runtime acceptance.",
+      "outstanding": "Isolated preview and real desktop/tablet/mobile capture; no live DEV data or authentication bypass."
+    },
+    {
+      "screen": "Tenant Modules",
+      "original": "G03 / G08",
+      "approved": "Entitlements distinct from menu preferences and RBAC",
+      "implemented_source": "New effective-entitlement screen with guarded links to separate administration functions.",
+      "screenshot": null,
+      "tablet_screenshot": null,
+      "mobile_screenshot": null,
+      "status": "BLOCKED",
+      "visual_matches": "Not assessed: no actual application screenshots.",
+      "visual_differences": "Rendered differences cannot be measured without an actual application screenshot. Source-confirmed gaps are listed in the implementation column.",
+      "working_controls": "Source and focused test evidence only; no runtime acceptance.",
+      "outstanding": "Isolated preview and real desktop/tablet/mobile capture; no live DEV data or authentication bypass."
+    },
+    {
+      "screen": "Templates",
+      "original": "G05",
+      "approved": "Master catalogue, adoption, tenant copies, versions and access",
+      "implemented_source": "Existing engines preserved; misleading seed label corrected. Approved unified library remains deferred.",
+      "screenshot": null,
+      "tablet_screenshot": null,
+      "mobile_screenshot": null,
+      "status": "BLOCKED",
+      "visual_matches": "Not assessed: no actual application screenshots.",
+      "visual_differences": "Rendered differences cannot be measured without an actual application screenshot. Source-confirmed gaps are listed in the implementation column.",
+      "working_controls": "Source and focused test evidence only; no runtime acceptance.",
+      "outstanding": "Isolated preview and real desktop/tablet/mobile capture; no live DEV data or authentication bypass."
+    },
+    {
+      "screen": "Import/Export",
+      "original": "G06 / G07",
+      "approved": "Import cards and five-stage workflow",
+      "implemented_source": "CSV workflow improved without changing parser/limit/confirmation semantics. XLSX, complete result/preview downloads and execution progress remain gaps.",
+      "screenshot": null,
+      "tablet_screenshot": null,
+      "mobile_screenshot": null,
+      "status": "BLOCKED",
+      "visual_matches": "Not assessed: no actual application screenshots.",
+      "visual_differences": "Rendered differences cannot be measured without an actual application screenshot. Source-confirmed gaps are listed in the implementation column.",
+      "working_controls": "Source and focused test evidence only; no runtime acceptance.",
+      "outstanding": "Isolated preview and real desktop/tablet/mobile capture; no live DEV data or authentication bypass."
+    },
+    {
+      "screen": "Property Import workflow (supplemental acceptance view)",
+      "original": "G06 / G07",
+      "approved": "Upload, preview/validation, review/confirmation and results; representative responsive states.",
+      "implemented_source": "Existing CSV ≤5,000,000-byte whole-batch workflow and added step indicator/search/filter/pagination remain. XLSX/10 MB/partial import semantics, preview/error downloads and detailed execution progress remain deferred.",
+      "screenshot": null,
+      "tablet_screenshot": null,
+      "mobile_screenshot": null,
+      "status": "BLOCKED",
+      "visual_matches": "Not assessed: no actual application screenshots.",
+      "visual_differences": "Rendered differences cannot be measured without an actual application screenshot. Source-confirmed gaps are listed in the implementation column.",
+      "working_controls": "Source and focused test evidence only; no runtime acceptance.",
+      "outstanding": "Isolated preview and real desktop/tablet/mobile capture; no live DEV data or authentication bypass."
+    }
+  ],
+  "side_by_side_mockup_comparison": "UNAVAILABLE: originals are accessible, but no actual application captures exist. The table compares requirements to source evidence only; no visual match or fabricated screenshot is claimed.",
+  "antonio_decisions": [
+    "Identify/provide the exact approved standalone flat Uvanoo logo asset.",
+    "Provide access to an existing isolated runner/runtime able to receive the uncommitted snapshot while retaining the publication fence.",
+    "Approve contracts before D01 platform defaults, D02 extended branding or D03 generic master adoption/library changes.",
+    "Resolve D04 import format/limit and partial-import policy before implementation.",
+    "Resolve Systetics, Usage Fields and Reporting overlap; confirm slug-change policy and whether Italian translation delivery is a separate batch."
+  ],
+  "changed_file_manifest": [
+    {
+      "path": "apps/web/src/app/(app)/admin/integrations/page.tsx",
+      "change": "M",
+      "sha256": "30d1a610c6cce5b835c7549f7ac5df26d937683c73bfed896e958670aa7e623d"
+    },
+    {
+      "path": "apps/web/src/app/(app)/admin/notifications/page.tsx",
+      "change": "M",
+      "sha256": "bd514a1eed4b1a2649e51eb6344e7dbbd98af808cd95cc785ad92b489fdae502"
+    },
+    {
+      "path": "apps/web/src/app/(app)/admin/settings/advanced/_actions.test.ts",
+      "change": "A",
+      "sha256": "71911371e77dd9b1a4b13b859acb69705be888ad61e07a11aa99677a2c2bb5ba"
+    },
+    {
+      "path": "apps/web/src/app/(app)/admin/settings/advanced/_actions.ts",
+      "change": "A",
+      "sha256": "619a59bb010d3ea30a9efda55eb5fa4408be646bc967b01e96d65cebd519b161"
+    },
+    {
+      "path": "apps/web/src/app/(app)/admin/settings/advanced/page.tsx",
+      "change": "M",
+      "sha256": "2ccfb0a66ca8e4b22dbc2639ef62f00908a5f34dc7d63801aafa9dd230311ada"
+    },
+    {
+      "path": "apps/web/src/app/(app)/admin/settings/branding/page.tsx",
+      "change": "M",
+      "sha256": "9625e3978a48d8b61a7b5626e4830651beaa5bb244dc96532988e995b8209e0d"
+    },
+    {
+      "path": "apps/web/src/app/(app)/admin/settings/import-export/page.tsx",
+      "change": "M",
+      "sha256": "f872cffccde9033af89d4193eceefa083c0b280efd48536afc3c8316c54537b5"
+    },
+    {
+      "path": "apps/web/src/app/(app)/admin/settings/import-export/property-structure/preview/[batchId]/page.tsx",
+      "change": "M",
+      "sha256": "86c81889842c94cf6252f96f2360cde539b7c5f661330c3b382b72ef0ec0aff1"
+    },
+    {
+      "path": "apps/web/src/app/(app)/admin/settings/import-export/property-structure/result/[batchId]/page.tsx",
+      "change": "M",
+      "sha256": "8611695ab16be27ff241c6f50e0c57e2c7fb3bfa701e7b3f33cc9a64d9056521"
+    },
+    {
+      "path": "apps/web/src/app/(app)/admin/settings/import-export/property-structure/review/[batchId]/page.tsx",
+      "change": "M",
+      "sha256": "4374d21593e2f831ddc51be0567b0f6c6e19510e9b9dd7f930e83650580913ae"
+    },
+    {
+      "path": "apps/web/src/app/(app)/admin/settings/import-export/property-structure/upload/page.tsx",
+      "change": "M",
+      "sha256": "81df21adf0687f9370e96076b1049c73401f465035145ef4a8680582f6a00704"
+    },
+    {
+      "path": "apps/web/src/app/(app)/admin/settings/import-export/property-structure/upload/upload-form.tsx",
+      "change": "M",
+      "sha256": "d585bdca162a013ac0b6d6b3e3e39226479bad0bb71326cfff961349c0c081de"
+    },
+    {
+      "path": "apps/web/src/app/(app)/admin/settings/modules/page.tsx",
+      "change": "A",
+      "sha256": "567759709feb637ab23df4c0a00a3e72dcbc2b8911f25acd1ad1d21853a831c1"
+    },
+    {
+      "path": "apps/web/src/app/(app)/admin/settings/page.tsx",
+      "change": "M",
+      "sha256": "a2539e09f2e90313734665826b89fff48d994e63465c4deefc28934c0d738848"
+    },
+    {
+      "path": "apps/web/src/app/(app)/admin/settings/settings-form.tsx",
+      "change": "M",
+      "sha256": "db99ccb52a581f7a4d785fa4af29493e9ae892b4bca15ef8eb0e734818e05e85"
+    },
+    {
+      "path": "apps/web/src/app/(app)/admin/settings/settings-ui-contract.test.ts",
+      "change": "M",
+      "sha256": "b00adccb7eabc53016bc2dffd9928845248f3db1389f248b17e3ed8bca198e93"
+    },
+    {
+      "path": "apps/web/src/app/(app)/layout.tsx",
+      "change": "M",
+      "sha256": "335154c1e1fa6c485deb0554af37465134a5ab3a22e8c5df71a7eb3d30dce0a4"
+    },
+    {
+      "path": "apps/web/src/app/(app)/tenant-branding/logo/route.test.ts",
+      "change": "A",
+      "sha256": "6b23aeb9eb50d71b03f89814a645855c568d2be2966d846936e2e99ed98f1082"
+    },
+    {
+      "path": "apps/web/src/app/(app)/tenant-branding/logo/route.ts",
+      "change": "A",
+      "sha256": "aa2bb47d8e06ee3d215b029c51d4c505382205ed51a63c84a01bba85dab980b5"
+    },
+    {
+      "path": "apps/web/src/app/(platform)/platform/branding/_form.tsx",
+      "change": "M",
+      "sha256": "27af8bdb48cc99fe73ff955b4b445f1928b137bafa08c1c40addfe6931bb9edf"
+    },
+    {
+      "path": "apps/web/src/app/(platform)/platform/page.tsx",
+      "change": "M",
+      "sha256": "621206047e36dd6ca89231b79c1bfb89b5820e1ae3d76f3a3e433c500899098d"
+    },
+    {
+      "path": "apps/web/src/app/(platform)/platform/settings/_actions.test.ts",
+      "change": "A",
+      "sha256": "6b0848043f2869d50638785a76a36ef74891fa212d596f30e3b5f367a54be7a7"
+    },
+    {
+      "path": "apps/web/src/app/(platform)/platform/settings/_actions.ts",
+      "change": "A",
+      "sha256": "930a93bc342d7adb9d2363dec2e99b2f7237f79b3b91828d9da2d68394c0dadb"
+    },
+    {
+      "path": "apps/web/src/app/(platform)/platform/settings/page.tsx",
+      "change": "A",
+      "sha256": "9d3116e4ecea40a450e00c8b3959431562f1c45d894b00e1c877cd1335216936"
+    },
+    {
+      "path": "apps/web/src/app/(platform)/platform/tenants/[tenantId]/_actions.ts",
+      "change": "M",
+      "sha256": "21ba9bd4b279f2c3b21d185e4e41f13bcdf5dfb0eab6c400d5cb16c9ba796b20"
+    },
+    {
+      "path": "apps/web/src/app/(platform)/platform/tenants/[tenantId]/branding/page.tsx",
+      "change": "M",
+      "sha256": "e474fe4420efb4f551cad7d0cd2e1512a70f836037e5ae413fdf76978f2f0897"
+    },
+    {
+      "path": "apps/web/src/app/(platform)/platform/tenants/[tenantId]/settings/page.tsx",
+      "change": "M",
+      "sha256": "47b9536a1b2cfaebfd38109481848609eab66978c2f4f97c59be74ca3dad5b6a"
+    },
+    {
+      "path": "apps/web/src/app/(platform)/platform/tenants/[tenantId]/usage/page.tsx",
+      "change": "M",
+      "sha256": "4d916c4d1c786a2a789b1d97744be60a3d1d5604f6bcc32cc817031262887d6a"
+    },
+    {
+      "path": "apps/web/src/components/mobile-tab-bar.tsx",
+      "change": "M",
+      "sha256": "6cd845ec9352a30c4ed2c54cef2accb63c4eca2eaacee8287af903edc95c1cb4"
+    },
+    {
+      "path": "apps/web/src/components/platform-shell.tsx",
+      "change": "M",
+      "sha256": "c470ac81781b30d4eab497795f8afd66368cf043cd617f46f683f56d7c929eea"
+    },
+    {
+      "path": "apps/web/src/components/property-import-steps.tsx",
+      "change": "A",
+      "sha256": "27eb6b3740cadbd8e973722b9277dbf6bd7274331477ef2fdd2f60c4bba275ff"
+    },
+    {
+      "path": "apps/web/src/components/sidebar-nav-active.ts",
+      "change": "M",
+      "sha256": "3d25dc02b9f8110bfa9341286d448f5097256c219d6f594a96ed607fc907a44b"
+    },
+    {
+      "path": "apps/web/src/components/sidebar-nav.test.tsx",
+      "change": "M",
+      "sha256": "6de595180808d4250038adc1cee37fea9a2f6202f525415d471798c627765f90"
+    },
+    {
+      "path": "apps/web/src/components/sidebar-nav.tsx",
+      "change": "M",
+      "sha256": "622f25293a7fc5ed714357b12eeb8c7658e3d9de2c51d70e6c038a53fa3ef75f"
+    },
+    {
+      "path": "apps/web/src/components/tenant-branding-form.test.tsx",
+      "change": "A",
+      "sha256": "2f0250a17133cde346afc9054e7e442530fa30945818324a1157f77d1b00644e"
+    },
+    {
+      "path": "apps/web/src/components/tenant-branding-form.tsx",
+      "change": "M",
+      "sha256": "d4f54f5ef27d0bf9318af5f60a287a88f714bdcc5d51453fb80ddc53374fef8e"
+    },
+    {
+      "path": "apps/web/src/components/use-platform-nav.ts",
+      "change": "M",
+      "sha256": "3de0b05fd171fb3e83bdbea3c82716bb501d56f9d74708de88d41044c4b82409"
+    },
+    {
+      "path": "apps/web/src/lib/manual/content/board-administration.ts",
+      "change": "M",
+      "sha256": "77694c5d02d6e0807ad637cef8c9d7cf4172c3d7b1cdcb2a6b4bb06cd0e0101c"
+    },
+    {
+      "path": "apps/web/src/lib/manual/content/getting-started.ts",
+      "change": "M",
+      "sha256": "21baebbbd31f21176f23659205b1a2f888cc4e1f5c36c819f40072c4c9de162e"
+    },
+    {
+      "path": "apps/web/src/lib/nav/approved-structure.test.ts",
+      "change": "A",
+      "sha256": "17900fad47cad91c4c21e054672f43a5cc8b779c074934c052c07201431d77a5"
+    },
+    {
+      "path": "apps/web/src/lib/nav/approved-structure.ts",
+      "change": "A",
+      "sha256": "39dbe3a7f4daa5ebecc5ff9652f028d849e738e61b230c28b3f7a444bbdfb466"
+    },
+    {
+      "path": "apps/web/src/lib/nav/board-presentation.test.ts",
+      "change": "D",
+      "sha256": null
+    },
+    {
+      "path": "apps/web/src/lib/nav/board-presentation.ts",
+      "change": "D",
+      "sha256": null
+    },
+    {
+      "path": "apps/web/src/lib/nav/resolve.ts",
+      "change": "M",
+      "sha256": "3ba2422506798273fc4c37155fc2d172a075f2a93b1a8f0006d3f7aac3644fe5"
+    },
+    {
+      "path": "apps/web/src/lib/walkthroughs/registry.ts",
+      "change": "M",
+      "sha256": "8e5d7a98c661026e73fef8cc7f8c83514cde75a853c60d052f79a25ac1f128cf"
+    },
+    {
+      "path": "docs/v1.4/batch01/Uvanoo_V1.4_Batch01_Implementation.html",
+      "change": "A",
+      "sha256": "98da2c8575103331c3ea40cd727aa1fc3835098c1ec5cfaca45e65b44d0fba45"
+    },
+    {
+      "path": "docs/v1.4/batch01/Uvanoo_V1.4_Batch01_Implementation.json",
+      "change": "A",
+      "sha256": "41fcb51d41d0a1878035b9210df8826262daf80aaec3cc3ff5b537cc51276fcb"
+    }
+  ],
+  "review_checklist": [
+    "Review the five recovery file changes, especially logo replacement after reset and the two reset scopes.",
+    "Review the runner blockers, engine reuse matrix and D01–D07 decisions.",
+    "Complete full typecheck/build, disposable DB tests and real responsive screenshot comparisons before visual approval."
+  ]
+}

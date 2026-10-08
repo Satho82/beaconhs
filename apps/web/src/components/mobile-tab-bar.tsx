@@ -9,7 +9,7 @@ import { GeneratedValue, useGeneratedValueTranslations } from '@/i18n/generated'
 // hides behind it; safe-area padding clears the iOS home indicator.
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Menu } from 'lucide-react'
 import { cn } from '@beaconhs/ui'
@@ -31,7 +31,9 @@ const tabClass = (active: boolean) =>
 export function MobileTabBar({ groups }: { groups: SidebarNavGroup[] }) {
   const tGeneratedValue = useGeneratedValueTranslations()
   const t = useTranslations('Shell')
-  const pathname = usePathname()
+  const path = usePathname() ?? ''
+  const search = useSearchParams()
+  const pathname = search?.size ? `${path}?${search}` : path
   const { setOpen } = useMobileNav()
   const navGroups = useNavGroups(groups)
 
@@ -50,7 +52,9 @@ export function MobileTabBar({ groups }: { groups: SidebarNavGroup[] }) {
     >
       <GeneratedValue
         value={tabs.map((t) => {
-          const active = activeHref === t.href
+          const active =
+            activeHref === t.href ||
+            Boolean(t.children && findActiveNavHref(activeHref, [{ items: t.children }]))
           return (
             <Link key={t.href} href={t.href as never} className={tabClass(active)}>
               <NavIcon iconKey={t.iconKey} size={20} />

@@ -3,7 +3,7 @@ import { eq } from 'drizzle-orm'
 import { notFound } from 'next/navigation'
 import { db, withSuperAdmin } from '@beaconhs/db'
 import { tenants } from '@beaconhs/db/schema'
-import { assertCan } from '@beaconhs/tenant'
+import { assertCan, can } from '@beaconhs/tenant'
 import { PageHeader } from '@beaconhs/ui'
 import { requireRequestContext } from '@/lib/auth'
 import { PageContainer } from '@/components/page-layout'
@@ -11,6 +11,8 @@ import { TenantBrandingForm } from '@/components/tenant-branding-form'
 import { isTenantBrandAssetKey } from '@/lib/tenant-brand-asset-url'
 import { SettingsNavigation } from '../settings-form'
 import { saveCurrentTenantBranding } from './_actions'
+import { getPlatformBranding } from '@/lib/platform-branding-config'
+import { resolveTenantPrimaryAction } from '@/lib/theme-governance'
 export const dynamic = 'force-dynamic'
 export default async function BrandingSettingsPage() {
   const tBoard = await getGeneratedValueTranslations()
@@ -26,6 +28,7 @@ export default async function BrandingSettingsPage() {
       .limit(1),
   )
   if (!tenant) notFound()
+  const platformBranding = await getPlatformBranding()
   return (
     <PageContainer>
       <div className="space-y-5">
@@ -33,8 +36,12 @@ export default async function BrandingSettingsPage() {
           title={tBoard('Tenant Settings')}
           description={tBoardMessage('m_0a19f0c1debc78', { value0: tenant.name })}
         />
-        <SettingsNavigation navigationLabel="Tenant Settings" activeSection="branding" />
-        <section className="max-w-3xl rounded-xl border bg-white p-5 dark:bg-slate-900">
+        <SettingsNavigation
+          canManageIntegrations={can(ctx, 'admin.integrations.manage')}
+          navigationLabel="Tenant Settings"
+          activeSection="branding"
+        />
+        <section className="rounded-xl border bg-white p-5 dark:bg-slate-900">
           <h2 className="mb-5 text-lg font-semibold">{tBoard('Tenant Branding')}</h2>
           <TenantBrandingForm
             key={JSON.stringify(tenant.branding)}
@@ -42,6 +49,11 @@ export default async function BrandingSettingsPage() {
             tenantName={tenant.name}
             saveAction={saveCurrentTenantBranding}
             primaryColor={tenant.branding.primaryColor}
+            platformPrimaryColor={resolveTenantPrimaryAction(
+              platformBranding.primaryColor,
+              undefined,
+            )}
+            platformLogoUrl={platformBranding.logoUrl}
             hasLogo={!!tenant.branding.logoUrl}
             hasLetterhead={!!tenant.branding.pdfLetterhead}
             logoUrl={

@@ -1,3 +1,6 @@
+import { requireRequestContext } from '@/lib/auth'
+import { PropertyImportSteps } from '@/components/property-import-steps'
+import { can } from '@beaconhs/tenant'
 import Link from 'next/link'
 import { ArrowLeft, AlertTriangle } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
@@ -13,6 +16,7 @@ export default async function PropertyStructureReviewPage({
 }: {
   params: Promise<{ batchId: string }>
 }) {
+  const ctx = await requireRequestContext()
   const { batchId } = await params
   if (!isUuid(batchId)) notFound()
   const review = await getPropertyStructureReview(batchId)
@@ -34,7 +38,12 @@ export default async function PropertyStructureReviewPage({
   ] as const
   return (
     <main className="space-y-6">
-      <SettingsNavigation navigationLabel={t('title')} activeSection="importExport" />
+      <PropertyImportSteps current="Review" />
+      <SettingsNavigation
+        canManageIntegrations={can(ctx, 'admin.integrations.manage')}
+        navigationLabel={t('title')}
+        activeSection="importExport"
+      />
       <header className="space-y-2">
         <p className="text-sm text-blue-700">{t('importExport')}</p>
         <h1 className="text-3xl font-bold text-slate-950">{t('reviewImportTitle')}</h1>

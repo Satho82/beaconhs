@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 vi.mock('next/navigation', () => ({
   usePathname: () => '/hospitality/maintenance',
+  useSearchParams: () => new URLSearchParams(),
   useRouter: () => ({ refresh: vi.fn() }),
 }))
 vi.mock('next/link', () => ({

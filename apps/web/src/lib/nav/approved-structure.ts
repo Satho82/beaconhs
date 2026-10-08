@@ -34,7 +34,7 @@ type ApprovedDestination = {
   entitlement: ModuleKey | null
 }
 
-export const APPROVED_DESTINATIONS: readonly ApprovedDestination[] = [
+const APPROVED_DESTINATIONS: readonly ApprovedDestination[] = [
   {
     id: 'A004',
     group: 'Dashboard',

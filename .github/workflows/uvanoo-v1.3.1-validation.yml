@@ -1,19 +1,36 @@
-name: Uvanoo V1.3.1 validation only
+name: Uvanoo Batch 01 candidate validation only
 
-# This workflow is intentionally isolated from deployment. It is scoped solely
-# to the V1.3.1 remediation branch and may safely be dispatched for that branch.
+# PROPOSED branch-local replacement of the already registered validation workflow.
+# Apply only after Antonio authorises this exact patch. No deployment approval.
+on:
+  workflow_dispatch:
+    inputs:
+      source_sha:
+        description: Exact approved Batch 01 source commit
+        required: true
+        type: string
+        default: '043d266b7e6ef4782bb7d4a90aaa810bc9e275e5'
+      workflow_sha:
+        description: Reviewed isolated-branch commit containing this workflow
+        required: true
+        type: string
+
 permissions:
   contents: read
 
-on:
-  push:
-    branches: [remediation/uvanoo-v1.3.1]
-  workflow_dispatch:
+concurrency:
+  group: uvanoo-batch01-validation-only
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
 
 jobs:
   validate:
-    name: Linux validation
-    runs-on: ubuntu-latest
+    name: Exact candidate quality, isolation and production build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
     services:
       postgres:
         image: postgres:16-alpine@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777
@@ -23,44 +40,143 @@ jobs:
           POSTGRES_DB: beaconhs_test
         ports: ['5432:5432']
         options: >-
-          --health-cmd="pg_isready -U postgres"
-          --health-interval=5s
-          --health-timeout=5s
-          --health-retries=10
+          --health-cmd="pg_isready -U postgres -d beaconhs_test"
+          --health-interval=5s --health-timeout=5s --health-retries=10
       redis:
         image: redis:7-alpine@sha256:6ab0b6e7381779332f97b8ca76193e45b0756f38d4c0dcda72dbb3c32061ab99
         ports: ['6379:6379']
         options: >-
           --health-cmd="redis-cli ping"
-          --health-interval=5s
-          --health-timeout=5s
-          --health-retries=10
+          --health-interval=5s --health-timeout=5s --health-retries=10
     env:
+      CI: 'true'
+      NODE_OPTIONS: --max-old-space-size=6144
+      NEXT_TELEMETRY_DISABLED: '1'
+      TURBO_TELEMETRY_DISABLED: '1'
+      # Public, disposable fixtures only. No repository/environment secrets.
       DATABASE_URL: postgresql://beaconhs_app:beaconhs_app@localhost:5432/beaconhs_test
       MIGRATION_DATABASE_URL: postgresql://beaconhs_migrator:beaconhs_migrator@localhost:5432/beaconhs_test
       SUPERADMIN_DATABASE_URL: postgresql://beaconhs_super:beaconhs_super@localhost:5432/beaconhs_test
       DATABASE_OWNER_ROLE: beaconhs_owner
       DATABASE_BACKUP_ROLE: beaconhs_backup
       REDIS_URL: redis://localhost:6379
-      BETTER_AUTH_SECRET: ci-secret-not-used-in-prod
+      BETTER_AUTH_SECRET: batch01-disposable-ci-secret-not-used-in-production
       ATTACHMENT_CAPABILITY_SECRET: ci-attachment-capability-secret-32-chars
       BETTER_AUTH_URL: http://localhost:3000
       APP_URL: http://localhost:3000
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+      - name: Verify manual control ref and approved source before checkout
+        id: gate
+        env:
+          REQUESTED_SOURCE: ${{ inputs.source_sha }}
+          REQUESTED_WORKFLOW: ${{ inputs.workflow_sha }}
+          ACTUAL_WORKFLOW: ${{ github.workflow_sha }}
+          ACTUAL_WORKFLOW_REF: ${{ github.workflow_ref }}
+        run: |
+          set -euo pipefail
+          test "$GITHUB_EVENT_NAME" = workflow_dispatch
+          test "$GITHUB_REPOSITORY" = Satho82/beaconhs
+          test "$GITHUB_REF" = refs/heads/feature/uvanoo-v1.4-batch01-implementation
+          test "$ACTUAL_WORKFLOW_REF" = Satho82/beaconhs/.github/workflows/uvanoo-v1.3.1-validation.yml@refs/heads/feature/uvanoo-v1.4-batch01-implementation
+          test "$REQUESTED_SOURCE" = 043d266b7e6ef4782bb7d4a90aaa810bc9e275e5
+          [[ "$REQUESTED_WORKFLOW" =~ ^[0-9a-f]{40}$ ]]
+          test "$REQUESTED_WORKFLOW" = "$ACTUAL_WORKFLOW"
+          test "$REQUESTED_WORKFLOW" = "$GITHUB_SHA"
+          test "$RUNNER_ENVIRONMENT" = github-hosted
+          mkdir -p "$RUNNER_TEMP/batch01-evidence"
+          {
+            printf 'source_sha=%s\nworkflow_sha=%s\n' "$REQUESTED_SOURCE" "$ACTUAL_WORKFLOW"
+            printf 'run_id=%s\nrun_attempt=%s\n' "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT"
+            printf 'runner=%s/%s\n' "$RUNNER_OS" "$RUNNER_ARCH"
+            free -m
+            df -h "$RUNNER_TEMP"
+          } | tee "$RUNNER_TEMP/batch01-evidence/provenance.log"
+          memory_kib="$(awk '/^MemTotal:/ {print $2}' /proc/meminfo)"
+          test "$memory_kib" -ge 12000000
+
+      - name: Checkout immutable product candidate, not workflow branch HEAD
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
+          repository: Satho82/beaconhs
+          ref: 043d266b7e6ef4782bb7d4a90aaa810bc9e275e5
           persist-credentials: false
-      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+          fetch-depth: 1
+
+      - name: Verify candidate and absence of environment files
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = 043d266b7e6ef4782bb7d4a90aaa810bc9e275e5
+          python3 - <<'PY'
+          from pathlib import Path
+          # Template files are documentation, never loaded as runtime configuration.
+          unexpected = [str(p) for p in Path('.').rglob('.env*')
+                        if p.is_file() and not p.name.endswith(('.example', '.sample', '.template'))]
+          if unexpected:
+              raise SystemExit('Unapproved environment files: ' + ', '.join(unexpected))
+          PY
+          sha256sum pnpm-lock.yaml >> "$RUNNER_TEMP/batch01-evidence/provenance.log"
+
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
+        with:
+          run_install: false
+          cache: false
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
-          node-version: 24.18.0
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - name: Provision isolated owner, migration, and RLS roles
-        env:
-          PGPASSWORD: postgres
+          node-version-file: .nvmrc
+          package-manager-cache: false
+
+      - name: Verify pinned toolchain
         run: |
-          psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 <<'SQL'
+          set -euo pipefail
+          test "$(node --version)" = "v$(tr -d '\r\n' < .nvmrc)"
+          expected_pnpm="$(node -p 'JSON.parse(require("node:fs").readFileSync("package.json", "utf8")).packageManager')"
+          test "pnpm@$(pnpm --version)" = "$expected_pnpm"
+          printf 'node=%s\npnpm=%s\n' "$(node --version)" "$(pnpm --version)" >> "$RUNNER_TEMP/batch01-evidence/provenance.log"
+
+      - name: Frozen dependency install
+        id: install
+        run: pnpm install --frozen-lockfile 2>&1 | tee "$RUNNER_TEMP/batch01-evidence/install.log"
+      - name: Formatting
+        id: format
+        run: pnpm format:check 2>&1 | tee "$RUNNER_TEMP/batch01-evidence/format.log"
+      - name: Fresh Next route types
+        id: route_types
+        run: |
+          test ! -d apps/web/.next
+          pnpm --filter @beaconhs/web exec next typegen 2>&1 | tee "$RUNNER_TEMP/batch01-evidence/route-types.log"
+          git diff --exit-code -- apps/web/tsconfig.json apps/web/next.config.ts
+      - name: Full workspace typecheck
+        id: typecheck
+        run: pnpm typecheck --concurrency=1 2>&1 | tee "$RUNNER_TEMP/batch01-evidence/typecheck.log"
+      - name: Full lint
+        id: lint
+        run: pnpm lint --concurrency=1 2>&1 | tee "$RUNNER_TEMP/batch01-evidence/lint.log"
+      - name: Dead-code gate
+        id: deadcode
+        run: pnpm deadcode:check 2>&1 | tee "$RUNNER_TEMP/batch01-evidence/deadcode.log"
+
+      - name: Verify test service boundaries and provision isolated roles
+        id: provision
+        env:
+          POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os
+          from urllib.parse import urlparse
+          for name, user in [('DATABASE_URL', 'beaconhs_app'),
+                             ('MIGRATION_DATABASE_URL', 'beaconhs_migrator'),
+                             ('SUPERADMIN_DATABASE_URL', 'beaconhs_super')]:
+              u = urlparse(os.environ[name])
+              if (u.scheme, u.hostname, u.port, u.path, u.username, u.password, u.query) != (
+                  'postgresql', 'localhost', 5432, '/beaconhs_test', user, user, ''):
+                  raise SystemExit('Rejected database boundary: ' + name)
+          if os.environ['REDIS_URL'] != 'redis://localhost:6379':
+              raise SystemExit('Rejected Redis boundary')
+          if os.environ.get('CYCAS_TEST_DATABASE_URL'):
+              raise SystemExit('Cycas integration is outside this validation contract')
+          PY
+          docker exec -i "$POSTGRES_CONTAINER" psql -U postgres -d postgres -v ON_ERROR_STOP=1 <<'SQL' 2>&1 | tee "$RUNNER_TEMP/batch01-evidence/provision.log"
           CREATE ROLE beaconhs_owner NOLOGIN NOSUPERUSER NOBYPASSRLS;
           CREATE ROLE beaconhs_migrator LOGIN NOINHERIT NOSUPERUSER NOBYPASSRLS PASSWORD 'beaconhs_migrator';
           CREATE ROLE beaconhs_app LOGIN NOINHERIT NOSUPERUSER NOBYPASSRLS PASSWORD 'beaconhs_app';
@@ -75,30 +191,68 @@ jobs:
           ALTER SCHEMA public OWNER TO beaconhs_owner;
           REVOKE ALL ON SCHEMA public FROM PUBLIC;
           SQL
-      - run: pnpm format:check
-      - run: pnpm typecheck
-      - run: pnpm lint
-      - run: pnpm deadcode:check
-      - name: Apply test-database migrations
-        run: pnpm --filter @beaconhs/db exec tsx src/migrate.ts
-      - name: Prove test-database migration idempotency
-        run: pnpm --filter @beaconhs/db exec tsx src/migrate.ts
-      - run: pnpm test
 
-  build:
-    name: Production web build
-    needs: validate
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-        with:
-          persist-credentials: false
-      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
-      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
-        with:
-          node-version: 24.18.0
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @beaconhs/web build
+      - name: Existing migrations on disposable test database
+        id: migration
+        run: pnpm --filter @beaconhs/db exec tsx src/migrate.ts 2>&1 | tee "$RUNNER_TEMP/batch01-evidence/migration.log"
+      - name: Migration idempotency on disposable test database
+        id: idempotence
+        run: pnpm --filter @beaconhs/db exec tsx src/migrate.ts 2>&1 | tee "$RUNNER_TEMP/batch01-evidence/idempotence.log"
+      - name: Full regression suite including Batch 01 tests
+        id: tests
+        run: pnpm test --concurrency=1 2>&1 | tee "$RUNNER_TEMP/batch01-evidence/tests.log"
+      - name: Real property delegation and cross-tenant enforcement
+        id: property_integration
         env:
-          NODE_OPTIONS: --max-old-space-size=6144
+          UVANOO_PROPERTY_DELEGATION_INTEGRATION: '1'
+          SUPERADMIN_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/beaconhs_test
+        run: >-
+          pnpm --filter @beaconhs/web exec vitest run src/lib/property-delegation.integration.test.ts
+          2>&1 | tee "$RUNNER_TEMP/batch01-evidence/property-integration.log"
+      - name: Real action property RLS SQL regression
+        id: rls
+        env:
+          POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
+        run: |
+          pnpm --silent --filter @beaconhs/db run test:action-property-sql > "$RUNNER_TEMP/action-property.sql"
+          docker exec -i "$POSTGRES_CONTAINER" psql -U postgres -d beaconhs_test -v ON_ERROR_STOP=1 < "$RUNNER_TEMP/action-property.sql" 2>&1 | tee "$RUNNER_TEMP/batch01-evidence/rls.log"
+      - name: Repository workflow immutability regression
+        id: workflow_contract
+        run: bash scripts/ci/workflow-repository-immutability.test.sh 2>&1 | tee "$RUNNER_TEMP/batch01-evidence/workflow-contract.log"
+
+      - name: Full production build including web and worker bundles
+        id: build
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
+        run: |
+          pnpm build --concurrency=1 2>&1 | tee "$RUNNER_TEMP/batch01-evidence/build.log"
+          test -s apps/web/.next/BUILD_ID
+          test -f apps/web/.next/standalone/apps/web/server.js
+          test -f apps/worker/dist/index.js
+          sha256sum apps/web/.next/BUILD_ID >> "$RUNNER_TEMP/batch01-evidence/provenance.log"
+          git diff --exit-code -- pnpm-lock.yaml package.json pnpm-workspace.yaml
+
+      - name: Record individual gate outcomes, including failures and skips
+        if: ${{ always() && steps.gate.outcome == 'success' }}
+        env:
+          STEP_RESULTS: ${{ toJSON(steps) }}
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          statuses = {k: {'outcome': v['outcome'], 'conclusion': v['conclusion']}
+                      for k, v in json.loads(os.environ['STEP_RESULTS']).items()}
+          p = Path(os.environ['RUNNER_TEMP']) / 'batch01-evidence' / 'gate-results.json'
+          p.write_text(json.dumps(statuses, indent=2) + '\n')
+          PY
+      - name: Upload validation evidence only
+        if: ${{ always() && steps.gate.outcome == 'success' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: batch01-043d266-validation-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/batch01-evidence/*.log
+            ${{ runner.temp }}/batch01-evidence/gate-results.json
+          retention-days: 7
+          if-no-files-found: error
+          include-hidden-files: false

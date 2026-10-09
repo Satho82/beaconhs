@@ -9,7 +9,7 @@ on:
         description: Exact approved Batch 01 source commit
         required: true
         type: string
-        default: 'f1cbf63e11f8054cda6720ef087511a2e28793c9'
+        default: '0a4a04ca13758b68068f9483a3c0816b741478d8'
       workflow_sha:
         description: Reviewed isolated-branch commit containing this workflow
         required: true
@@ -78,7 +78,7 @@ jobs:
           test "$GITHUB_REPOSITORY" = Satho82/beaconhs
           test "$GITHUB_REF" = refs/heads/feature/uvanoo-v1.4-batch01-implementation
           test "$ACTUAL_WORKFLOW_REF" = Satho82/beaconhs/.github/workflows/uvanoo-v1.3.1-validation.yml@refs/heads/feature/uvanoo-v1.4-batch01-implementation
-          test "$REQUESTED_SOURCE" = f1cbf63e11f8054cda6720ef087511a2e28793c9
+          test "$REQUESTED_SOURCE" = 0a4a04ca13758b68068f9483a3c0816b741478d8
           [[ "$REQUESTED_WORKFLOW" =~ ^[0-9a-f]{40}$ ]]
           test "$REQUESTED_WORKFLOW" = "$ACTUAL_WORKFLOW"
           test "$REQUESTED_WORKFLOW" = "$GITHUB_SHA"
@@ -98,14 +98,14 @@ jobs:
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           repository: Satho82/beaconhs
-          ref: f1cbf63e11f8054cda6720ef087511a2e28793c9
+          ref: 0a4a04ca13758b68068f9483a3c0816b741478d8
           persist-credentials: false
           fetch-depth: 1
 
       - name: Verify candidate and absence of environment files
         run: |
           set -euo pipefail
-          test "$(git rev-parse HEAD)" = f1cbf63e11f8054cda6720ef087511a2e28793c9
+          test "$(git rev-parse HEAD)" = 0a4a04ca13758b68068f9483a3c0816b741478d8
           python3 - <<'PY'
           from pathlib import Path
           # Template files are documentation, never loaded as runtime configuration.
@@ -277,7 +277,7 @@ jobs:
         if: ${{ always() && steps.gate.outcome == 'success' }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: batch01-f1cbf63-validation-${{ github.run_id }}-${{ github.run_attempt }}
+          name: batch01-0a4a04c-validation-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
             ${{ runner.temp }}/batch01-evidence/*.log
             ${{ runner.temp }}/batch01-evidence/gate-results.json

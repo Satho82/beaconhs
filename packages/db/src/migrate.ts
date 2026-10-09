@@ -335,6 +335,11 @@ async function applyRuntimeGrants(
   await db.transaction(async (transaction) => {
     const tx = transaction as unknown as MigrationDatabase
     for (const statement of [
+      `REVOKE ALL ON SCHEMA security FROM PUBLIC`,
+      `REVOKE CREATE ON SCHEMA security FROM ${runtime}, ${maintenance}, ${backup}`,
+      `GRANT USAGE ON SCHEMA security TO ${runtime}`,
+      `REVOKE ALL ON FUNCTION security.person_allows_scope(uuid, uuid) FROM PUBLIC`,
+      `GRANT EXECUTE ON FUNCTION security.person_allows_scope(uuid, uuid) TO ${runtime}`,
       `REVOKE CREATE ON SCHEMA public FROM PUBLIC, ${runtime}, ${maintenance}`,
       `REVOKE CREATE ON SCHEMA public FROM ${backup}`,
       `GRANT USAGE ON SCHEMA public TO ${runtime}, ${maintenance}, ${backup}`,

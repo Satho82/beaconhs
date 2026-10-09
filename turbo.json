@@ -50,7 +50,7 @@
     "test": {
       "dependsOn": ["^build"],
       "outputs": [],
-      "env": ["CI", "GITHUB_ACTIONS", "CYCAS_TEST_DATABASE_URL"]
+      "env": ["CI", "GITHUB_ACTIONS", "CYCAS_TEST_DATABASE_URL", "PUPPETEER_EXECUTABLE_PATH"]
     },
     "clean": {
       "cache": false

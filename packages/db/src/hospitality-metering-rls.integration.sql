@@ -1,6 +1,8 @@
 -- Run only in a disposable database after migrations and RLS installation.
 BEGIN;
 CREATE ROLE uvanoo_metering_test NOLOGIN;
+GRANT USAGE ON SCHEMA security TO uvanoo_metering_test;
+GRANT EXECUTE ON FUNCTION security.person_allows_scope(uuid, uuid) TO uvanoo_metering_test;
 GRANT USAGE ON SCHEMA public TO uvanoo_metering_test;
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO uvanoo_metering_test;
 

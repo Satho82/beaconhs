@@ -28,6 +28,7 @@
     "seed:demo-hotel": "tsx src/seed-demo-hotel.ts",
     "test": "vitest run",
     "test:action-property-sql": "tsx src/action-property-test-sql.ts",
+    "test:people-provenance": "tsx src/people-provenance.integration.ts",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist .turbo",
     "seed:cycas-demo": "tsx src/seed-cycas-demo.ts"

@@ -2,6 +2,8 @@
 -- RLS_POLICY_SQL installer, and REPORT_VIEWS_SQL installer. All fixtures roll back.
 BEGIN;
 CREATE ROLE uvanoo_g0_test NOLOGIN;
+GRANT USAGE ON SCHEMA security TO uvanoo_g0_test;
+GRANT EXECUTE ON FUNCTION security.person_allows_scope(uuid, uuid) TO uvanoo_g0_test;
 GRANT USAGE ON SCHEMA public TO uvanoo_g0_test;
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO uvanoo_g0_test;
 INSERT INTO tenants (id,slug,name) VALUES
@@ -47,6 +49,8 @@ INSERT INTO audit_log (tenant_id,entity_type,entity_id,action) VALUES
 ('10000000-0000-4000-8000-000000000001','corrective_action','60000000-0000-4000-8000-000000000001','create'),
 ('10000000-0000-4000-8000-000000000001','corrective_action','60000000-0000-4000-8000-000000000002','create');
 
+CREATE TEMP TABLE legacy_action_ids (id uuid, reference text);
+GRANT SELECT, INSERT ON legacy_action_ids TO uvanoo_g0_test;
 CREATE TEMP TABLE report_scope_cases (pdf_attachment_id uuid, row_count integer, request_snapshot jsonb);
 GRANT SELECT ON report_scope_cases TO uvanoo_g0_test;
 INSERT INTO report_scope_cases VALUES
@@ -125,9 +129,93 @@ INSERT INTO corrective_actions (tenant_id,reference,title,site_org_unit_id,sourc
 ('10000000-0000-4000-8000-000000000001','G0-CONFLICT','Conflicting location','80000000-0000-4000-8000-000000000001','incident','90000000-0000-4000-8000-000000000001');
 SELECT set_config('app.action_scope_mode','legacy',true);
 SELECT pg_temp.expect_count('SELECT count(*) FROM corrective_actions WHERE reference=''G0-CONFLICT''',0);
+
+-- Legacy provenance must be positively visible under the restricted role.
+SELECT pg_temp.expect_count($query$SELECT count(*) FROM pg_roles WHERE rolname=current_user AND NOT rolsuper AND NOT rolbypassrls$query$,1);
+SELECT pg_temp.expect_count($query$SELECT count(*) FROM org_units WHERE id='80000000-0000-4000-8000-000000000001'$query$,0);
+SELECT set_config('app.action_scope_mode','tenant',true);
+INSERT INTO org_units (id,tenant_id,level,name,metadata) VALUES ('80000000-0000-4000-8000-000000000002','10000000-0000-4000-8000-000000000001','site','Legacy site','{}');
+SELECT set_config('app.tenant_id','10000000-0000-4000-8000-000000000002',true);
+INSERT INTO org_units (id,tenant_id,level,name,metadata) VALUES ('80000000-0000-4000-8000-000000000003','10000000-0000-4000-8000-000000000002','site','Foreign site','{}');
+INSERT INTO incidents (id,tenant_id,reference,type,severity,title,occurred_at) VALUES ('90000000-0000-4000-8000-000000000002','10000000-0000-4000-8000-000000000002','G0-OTHER-INC','other','no_injury','Foreign source',now());
+SELECT set_config('app.tenant_id','10000000-0000-4000-8000-000000000001',true);
+INSERT INTO corrective_actions (tenant_id,reference,title,site_org_unit_id,source_entity_type,source_entity_id) VALUES ('10000000-0000-4000-8000-000000000001','G0-FOREIGN-SITE','Security fixture','80000000-0000-4000-8000-000000000003','incident','90000000-0000-4000-8000-000000000001');
+INSERT INTO corrective_actions (tenant_id,reference,title,site_org_unit_id,source_entity_type,source_entity_id) VALUES ('10000000-0000-4000-8000-000000000001','G0-MISSING-SOURCE','Security fixture',NULL,'incident','90000000-0000-4000-8000-000000000009');
+INSERT INTO corrective_actions (tenant_id,reference,title,site_org_unit_id,source_entity_type,source_entity_id) VALUES ('10000000-0000-4000-8000-000000000001','G0-FOREIGN-SOURCE','Security fixture',NULL,'incident','90000000-0000-4000-8000-000000000002');
+SELECT set_config('app.action_scope_mode','legacy',true);
+INSERT INTO corrective_actions (tenant_id,reference,title,site_org_unit_id,source_entity_type,source_entity_id) VALUES ('10000000-0000-4000-8000-000000000001','G0-LEGACY-NONE','Security fixture',NULL,'incident','90000000-0000-4000-8000-000000000001');
+INSERT INTO corrective_actions (tenant_id,reference,title,site_org_unit_id,source_entity_type,source_entity_id) VALUES ('10000000-0000-4000-8000-000000000001','G0-LEGACY-SITE','Security fixture','80000000-0000-4000-8000-000000000002','incident','90000000-0000-4000-8000-000000000001');
+SELECT pg_temp.expect_count($query$SELECT count(*) FROM corrective_actions WHERE reference IN ('G0-LEGACY-NONE','G0-LEGACY-SITE')$query$,2);
+SELECT pg_temp.expect_count($query$SELECT count(*) FROM corrective_actions WHERE reference IN ('G0-CONFLICT','G0-FOREIGN-SITE','G0-MISSING-SOURCE','G0-FOREIGN-SOURCE')$query$,0);
+SELECT pg_temp.expect_denied($query$INSERT INTO corrective_actions (tenant_id,reference,title,site_org_unit_id,source_entity_type,source_entity_id) VALUES ('10000000-0000-4000-8000-000000000001','G0-DENIED','Security fixture','80000000-0000-4000-8000-000000000001','incident','90000000-0000-4000-8000-000000000001')$query$);
+SELECT pg_temp.expect_denied($query$UPDATE corrective_actions SET site_org_unit_id='80000000-0000-4000-8000-000000000001' WHERE reference='G0-LEGACY-SITE'$query$);
+SELECT pg_temp.expect_denied($query$INSERT INTO corrective_actions (tenant_id,reference,title,site_org_unit_id,source_entity_type,source_entity_id) VALUES ('10000000-0000-4000-8000-000000000001','G0-DENIED','Security fixture','80000000-0000-4000-8000-000000000003','incident','90000000-0000-4000-8000-000000000001')$query$);
+SELECT pg_temp.expect_denied($query$UPDATE corrective_actions SET site_org_unit_id='80000000-0000-4000-8000-000000000003' WHERE reference='G0-LEGACY-SITE'$query$);
+SELECT pg_temp.expect_denied($query$INSERT INTO corrective_actions (tenant_id,reference,title,site_org_unit_id,source_entity_type,source_entity_id) VALUES ('10000000-0000-4000-8000-000000000001','G0-DENIED','Security fixture','80000000-0000-4000-8000-000000000009','incident','90000000-0000-4000-8000-000000000001')$query$);
+SELECT pg_temp.expect_denied($query$UPDATE corrective_actions SET site_org_unit_id='80000000-0000-4000-8000-000000000009' WHERE reference='G0-LEGACY-SITE'$query$);
+SELECT pg_temp.expect_denied($query$INSERT INTO corrective_actions (tenant_id,reference,title,site_org_unit_id,source_entity_type,source_entity_id) VALUES ('10000000-0000-4000-8000-000000000001','G0-DENIED-SOURCE','Security fixture',NULL,'incident','90000000-0000-4000-8000-000000000009')$query$);
+SELECT pg_temp.expect_denied($query$INSERT INTO corrective_actions (tenant_id,reference,title,site_org_unit_id,source_entity_type,source_entity_id) VALUES ('10000000-0000-4000-8000-000000000001','G0-DENIED-SOURCE','Security fixture',NULL,'incident','90000000-0000-4000-8000-000000000002')$query$);
+SELECT pg_temp.expect_count($query$WITH changed AS (UPDATE corrective_actions SET title='Allowed' WHERE reference='G0-LEGACY-SITE' RETURNING id) SELECT count(*) FROM changed$query$,1);
+SELECT pg_temp.expect_count($query$WITH changed AS (UPDATE corrective_actions SET title='Forbidden' WHERE reference='G0-CONFLICT' RETURNING id) SELECT count(*) FROM changed$query$,0);
+SELECT pg_temp.expect_count($query$WITH changed AS (DELETE FROM corrective_actions WHERE reference='G0-CONFLICT' RETURNING id) SELECT count(*) FROM changed$query$,0);
+SELECT pg_temp.expect_count($query$WITH changed AS (DELETE FROM corrective_actions WHERE reference='G0-LEGACY-NONE' RETURNING id) SELECT count(*) FROM changed$query$,1);
+SELECT pg_temp.expect_count($query$SELECT count(*) FROM corrective_actions WHERE tenant_id='10000000-0000-4000-8000-000000000002'$query$,0);
+SELECT set_config('app.action_scope_mode','tenant',true);
+INSERT INTO ca_photos (tenant_id,ca_id,attachment_id) SELECT tenant_id,id,'70000000-0000-4000-8000-000000000001' FROM corrective_actions WHERE reference IN ('G0-CONFLICT','G0-LEGACY-SITE');
+INSERT INTO ca_complete_steps (tenant_id,ca_id,kind) SELECT tenant_id,id,'action_taken' FROM corrective_actions WHERE reference IN ('G0-CONFLICT','G0-LEGACY-SITE');
+INSERT INTO audit_log (tenant_id,entity_type,entity_id,action) SELECT tenant_id,'corrective_action',id,'create' FROM corrective_actions WHERE reference IN ('G0-CONFLICT','G0-LEGACY-SITE');
+INSERT INTO legacy_action_ids SELECT id,reference FROM corrective_actions WHERE reference IN ('G0-CONFLICT','G0-LEGACY-SITE');
+SELECT pg_temp.expect_count($query$SELECT count(*) FROM corrective_actions WHERE reference='G0-CONFLICT'$query$,1);
+SELECT set_config('app.action_scope_mode','legacy',true);
+SELECT pg_temp.expect_count($query$SELECT count(*) FROM ca_photos WHERE ca_id IN (SELECT id FROM legacy_action_ids WHERE reference='G0-CONFLICT')$query$,0);
+SELECT pg_temp.expect_count($query$SELECT count(*) FROM ca_complete_steps WHERE ca_id IN (SELECT id FROM legacy_action_ids WHERE reference='G0-CONFLICT')$query$,0);
+SELECT pg_temp.expect_count($query$SELECT count(*) FROM audit_log WHERE entity_id IN (SELECT id FROM legacy_action_ids WHERE reference='G0-CONFLICT')$query$,0);
+SELECT pg_temp.expect_count($query$SELECT count(*) FROM report_corrective_actions WHERE reference='G0-CONFLICT'$query$,0);
+SELECT pg_temp.expect_count($query$SELECT count(*) FROM ca_photos WHERE ca_id IN (SELECT id FROM legacy_action_ids WHERE reference='G0-LEGACY-SITE')$query$,1);
+SELECT pg_temp.expect_count($query$SELECT count(*) FROM ca_complete_steps WHERE ca_id IN (SELECT id FROM legacy_action_ids WHERE reference='G0-LEGACY-SITE')$query$,1);
+SELECT pg_temp.expect_count($query$SELECT count(*) FROM audit_log WHERE entity_id IN (SELECT id FROM legacy_action_ids WHERE reference='G0-LEGACY-SITE')$query$,1);
+SELECT pg_temp.expect_count($query$SELECT count(*) FROM report_corrective_actions WHERE reference='G0-LEGACY-SITE'$query$,1);
+SELECT pg_temp.expect_denied($query$INSERT INTO ca_complete_steps (tenant_id,ca_id,kind) SELECT '10000000-0000-4000-8000-000000000001',id,'action_taken' FROM legacy_action_ids WHERE reference='G0-CONFLICT'$query$);
+SELECT pg_temp.expect_count($query$WITH changed AS (DELETE FROM ca_photos WHERE ca_id IN (SELECT id FROM legacy_action_ids WHERE reference='G0-CONFLICT') RETURNING id) SELECT count(*) FROM changed$query$,0);
+
 SELECT set_config('app.action_scope_mode','tenant',true);
 SELECT set_config('app.tenant_id','10000000-0000-4000-8000-000000000002',true);
 SELECT pg_temp.expect_count('SELECT count(*) FROM corrective_actions',1);
+-- Hidden Incident sites and conflicting Action/source sites fail closed.
+SELECT set_config('app.tenant_id','10000000-0000-4000-8000-000000000001',true);
+SELECT set_config('app.action_scope_mode','tenant',true);
+INSERT INTO incidents (id,tenant_id,reference,type,severity,title,occurred_at,site_org_unit_id) VALUES ('90000000-0000-4000-8000-000000000003','10000000-0000-4000-8000-000000000001','G0-HOTEL-INC','other','no_injury','Hotel incident',now(),'80000000-0000-4000-8000-000000000001');
+INSERT INTO corrective_actions (tenant_id,reference,title,source_entity_type,source_entity_id,site_org_unit_id) VALUES ('10000000-0000-4000-8000-000000000001','G0-HIDDEN-SOURCE','Hidden hotel source','incident','90000000-0000-4000-8000-000000000003',NULL), ('10000000-0000-4000-8000-000000000001','G0-PROPERTY-CONFLICT','Conflicting source','risk_hazard','50000000-0000-4000-8000-000000000003','80000000-0000-4000-8000-000000000001');
+SELECT set_config('app.action_scope_mode','legacy',true);
+SELECT pg_temp.expect_count($query$SELECT count(*) FROM incidents WHERE reference='G0-HOTEL-INC'$query$,0);
+SELECT pg_temp.expect_count($query$SELECT count(*) FROM corrective_actions WHERE reference='G0-HIDDEN-SOURCE'$query$,0);
+SELECT pg_temp.expect_denied($query$INSERT INTO incidents (tenant_id,reference,type,severity,title,occurred_at,site_org_unit_id) VALUES ('10000000-0000-4000-8000-000000000001','G0-INC-DENIED','other','no_injury','Denied',now(),'80000000-0000-4000-8000-000000000001')$query$);
+SELECT pg_temp.expect_denied($query$UPDATE incidents SET site_org_unit_id='80000000-0000-4000-8000-000000000001' WHERE reference='G0-INC'$query$);
+SELECT pg_temp.expect_denied($query$INSERT INTO incidents (tenant_id,reference,type,severity,title,occurred_at,site_org_unit_id) VALUES ('10000000-0000-4000-8000-000000000001','G0-INC-DENIED','other','no_injury','Denied',now(),'80000000-0000-4000-8000-000000000003')$query$);
+SELECT pg_temp.expect_denied($query$UPDATE incidents SET site_org_unit_id='80000000-0000-4000-8000-000000000003' WHERE reference='G0-INC'$query$);
+SELECT pg_temp.expect_denied($query$INSERT INTO incidents (tenant_id,reference,type,severity,title,occurred_at,site_org_unit_id) VALUES ('10000000-0000-4000-8000-000000000001','G0-INC-DENIED','other','no_injury','Denied',now(),'80000000-0000-4000-8000-000000000009')$query$);
+SELECT pg_temp.expect_denied($query$UPDATE incidents SET site_org_unit_id='80000000-0000-4000-8000-000000000009' WHERE reference='G0-INC'$query$);
+SELECT pg_temp.expect_count($query$SELECT count(*) FROM incidents WHERE reference='G0-INC'$query$,1);
+SELECT pg_temp.expect_count($query$WITH changed AS (UPDATE incidents SET title='Forbidden' WHERE reference='G0-HOTEL-INC' RETURNING id) SELECT count(*) FROM changed$query$,0);
+SELECT pg_temp.expect_count($query$WITH changed AS (DELETE FROM incidents WHERE reference='G0-HOTEL-INC' RETURNING id) SELECT count(*) FROM changed$query$,0);
+SELECT set_config('app.action_scope_mode','property',true);
+SELECT set_config('app.action_property_ids','["20000000-0000-4000-8000-000000000002"]',true);
+SELECT pg_temp.expect_count($query$SELECT count(*) FROM corrective_actions WHERE reference='G0-PROPERTY-CONFLICT'$query$,0);
+SELECT pg_temp.expect_denied($query$INSERT INTO corrective_actions (tenant_id,reference,title,source_entity_type,source_entity_id,site_org_unit_id) VALUES ('10000000-0000-4000-8000-000000000001','G0-CONFLICT-WRITE','Denied','risk_hazard','50000000-0000-4000-8000-000000000003','80000000-0000-4000-8000-000000000001')$query$);
+SELECT pg_temp.expect_denied($query$UPDATE corrective_actions SET site_org_unit_id='80000000-0000-4000-8000-000000000001' WHERE reference='G0-R'$query$);
+SELECT pg_temp.expect_count($query$WITH changed AS (UPDATE corrective_actions SET title='Forbidden' WHERE reference='G0-PROPERTY-CONFLICT' RETURNING id) SELECT count(*) FROM changed$query$,0);
+SELECT pg_temp.expect_count($query$WITH changed AS (DELETE FROM corrective_actions WHERE reference='G0-PROPERTY-CONFLICT' RETURNING id) SELECT count(*) FROM changed$query$,0);
+SELECT set_config('app.action_property_ids','["20000000-0000-4000-8000-000000000001","20000000-0000-4000-8000-000000000002"]',true);
+SELECT pg_temp.expect_count($query$SELECT count(*) FROM corrective_actions WHERE reference='G0-PROPERTY-CONFLICT'$query$,0);
+SELECT pg_temp.expect_denied($query$INSERT INTO corrective_actions (tenant_id,reference,title,source_entity_type,source_entity_id,site_org_unit_id) VALUES ('10000000-0000-4000-8000-000000000001','G0-CONFLICT-WRITE','Denied','risk_hazard','50000000-0000-4000-8000-000000000003','80000000-0000-4000-8000-000000000001')$query$);
+SELECT pg_temp.expect_denied($query$UPDATE corrective_actions SET site_org_unit_id='80000000-0000-4000-8000-000000000001' WHERE reference='G0-R'$query$);
+SELECT pg_temp.expect_count($query$WITH changed AS (UPDATE corrective_actions SET title='Forbidden' WHERE reference='G0-PROPERTY-CONFLICT' RETURNING id) SELECT count(*) FROM changed$query$,0);
+SELECT pg_temp.expect_count($query$WITH changed AS (DELETE FROM corrective_actions WHERE reference='G0-PROPERTY-CONFLICT' RETURNING id) SELECT count(*) FROM changed$query$,0);
+SELECT set_config('app.action_property_ids','["20000000-0000-4000-8000-000000000001"]',true);
+SELECT pg_temp.expect_count($query$SELECT count(*) FROM incidents WHERE reference='G0-HOTEL-INC'$query$,1);
+SELECT pg_temp.expect_count($query$SELECT count(*) FROM corrective_actions WHERE reference='G0-HIDDEN-SOURCE'$query$,1);
+SELECT set_config('app.action_scope_mode','tenant',true);
+SELECT pg_temp.expect_count($query$SELECT count(*) FROM corrective_actions WHERE reference IN ('G0-HIDDEN-SOURCE','G0-PROPERTY-CONFLICT')$query$,2);
 RESET ROLE;
 ROLLBACK;
 SELECT 'Action property RLS integration: PASS' AS result;

@@ -79,6 +79,16 @@ export function propertyParentPredicate(
       AND property_parent.${parentColumn}=${table}.${localColumn})`
 }
 
+/** A referenced site must be visible and positively non-property. */
+function legacySitePredicate(table: string, column = 'site_org_unit_id'): string {
+  return `(${table}.${column} IS NULL OR EXISTS (
+    SELECT 1 FROM org_units site
+    WHERE site.tenant_id=${table}.tenant_id AND site.id=${table}.${column}
+      AND jsonb_typeof(site.metadata) = 'object'
+      AND NOT (site.metadata ? 'hospitalityPropertyId')
+  ))`
+}
+
 /** Site-owned records resolve their hotel through the canonical org-unit metadata.
  * Property principals fail closed for missing/unknown sites; legacy principals
  * retain only genuinely non-hotel records. */
@@ -90,7 +100,7 @@ export function sitePropertyPredicate(table: string, column = 'site_org_unit_id'
     AND (${ids}) ? ${property}
     AND ${activePropertyExists(`${table}.tenant_id`, property)}
   ) OR (
-    ${mode} = 'legacy' AND coalesce(${property}, '') = ''
+    ${mode} = 'legacy' AND ${legacySitePredicate(table, column)}
   ))`
 }
 
@@ -104,38 +114,16 @@ export function orgUnitPropertyPredicate(): string {
     ${mode} = 'property'
     AND (${ids}) ? ${property}
     AND ${activePropertyExists('org_units.tenant_id', property)}
-  ) OR (${mode} = 'legacy' AND coalesce(${property}, '') = ''))`
+  ) OR (${mode} = 'legacy'
+    AND jsonb_typeof(org_units.metadata) = 'object'
+    AND NOT (org_units.metadata ? 'hospitalityPropertyId')))`
 }
 
 /** People are reportable for a hotel only through a current org-unit assignment. */
 export function peoplePropertyPredicate(): string {
-  return `(${mode} = 'tenant' OR (
-    ${mode} = 'property' AND EXISTS (
-      SELECT 1 FROM people_assignments assignment
-      JOIN org_units unit
-        ON unit.tenant_id=assignment.tenant_id AND unit.id=assignment.org_unit_id
-      JOIN hospitality_properties property_scope
-        ON property_scope.tenant_id=unit.tenant_id
-       AND property_scope.id::text=unit.metadata->>'hospitalityPropertyId'
-       AND property_scope.deleted_at IS NULL
-      WHERE assignment.tenant_id=people.tenant_id
-        AND assignment.person_id=people.id
-        AND assignment.valid_from <= current_date
-        AND (assignment.valid_to IS NULL OR assignment.valid_to >= current_date)
-        AND (${ids}) ? (unit.metadata->>'hospitalityPropertyId')
-    )
-  ) OR (
-    ${mode} = 'legacy' AND NOT EXISTS (
-      SELECT 1 FROM people_assignments assignment
-      JOIN org_units unit
-        ON unit.tenant_id=assignment.tenant_id AND unit.id=assignment.org_unit_id
-      WHERE assignment.tenant_id=people.tenant_id
-        AND assignment.person_id=people.id
-        AND unit.metadata->>'hospitalityPropertyId' IS NOT NULL
-        AND assignment.valid_from <= current_date
-        AND (assignment.valid_to IS NULL OR assignment.valid_to >= current_date)
-    )
-  ))`
+  // Both restricted modes resolve provenance after the writer lock, in a fresh
+  // snapshot. Runtime-filtered assignments cannot prove that a Person is legacy.
+  return 'security.person_allows_scope(people.tenant_id, people.id)'
 }
 
 /** Inventory PPE follows its current holder. Unassigned stock has no provable
@@ -166,11 +154,15 @@ export function inspectionPropertyPredicate(table: string): string {
   return `(${mode} = 'tenant' OR (
     ${mode} = 'property'
     AND (${ids}) ? (${property})
-    AND (${hint} IS NULL OR ${site} IS NULL OR ${hint} = ${site})
+    AND (${table}.site_org_unit_id IS NULL OR EXISTS (
+      SELECT 1 FROM org_units u
+      WHERE u.tenant_id=${table}.tenant_id AND u.id=${table}.site_org_unit_id
+        AND u.metadata->>'hospitalityPropertyId' = (${property})
+    ))
     AND EXISTS (SELECT 1 FROM hospitality_properties p
       WHERE p.tenant_id=${table}.tenant_id AND p.id::text=${property}
         AND p.deleted_at IS NULL)
-  ) OR (${mode} = 'legacy' AND ${property} IS NULL))`
+  ) OR (${mode} = 'legacy' AND ${hint} IS NULL AND ${legacySitePredicate(table)}))`
 }
 
 export function inspectionChildPredicate(table: string, parent: string): string {
@@ -194,23 +186,7 @@ export function complianceChildPredicate(table: string): string {
 }
 
 export function incidentPropertyPredicate(): string {
-  return `(${mode} = 'tenant' OR (
-    ${mode} = 'property'
-    AND EXISTS (
-      SELECT 1 FROM org_units site
-      WHERE site.tenant_id=incidents.tenant_id
-        AND site.id=incidents.site_org_unit_id
-        AND (${ids}) ? (site.metadata->>'hospitalityPropertyId')
-    )
-  ) OR (
-    ${mode} = 'legacy'
-    AND NOT EXISTS (
-      SELECT 1 FROM org_units site
-      WHERE site.tenant_id=incidents.tenant_id
-        AND site.id=incidents.site_org_unit_id
-        AND site.metadata->>'hospitalityPropertyId' IS NOT NULL
-    )
-  ))`
+  return sitePropertyPredicate('incidents')
 }
 
 export function incidentChildPredicate(table: string): string {
@@ -291,7 +267,8 @@ function sourceProperty(table: string): string {
       JOIN operational_task_schedules s ON s.tenant_id=o.tenant_id AND s.id=o.schedule_id
       WHERE o.tenant_id=${tenant} AND o.id=${sourceId})
     WHEN ${source} = 'inspection_record' THEN (
-      SELECT CASE WHEN r.metadata->>'propertyId' IS NOT NULL
+      SELECT CASE WHEN r.site_org_unit_id IS NOT NULL AND u.id IS NULL THEN NULL
+        WHEN r.metadata->>'propertyId' IS NOT NULL
         AND u.metadata->>'hospitalityPropertyId' IS NOT NULL
         AND r.metadata->>'propertyId' IS DISTINCT FROM u.metadata->>'hospitalityPropertyId'
         THEN NULL ELSE coalesce(r.metadata->>'propertyId', u.metadata->>'hospitalityPropertyId', '') END
@@ -299,7 +276,8 @@ function sourceProperty(table: string): string {
       LEFT JOIN org_units u ON u.tenant_id=r.tenant_id AND u.id=r.site_org_unit_id
       WHERE r.tenant_id=${tenant} AND r.id=${sourceId})
     WHEN ${source} = 'equipment_inspection_record' THEN (
-      SELECT CASE WHEN r.metadata->>'propertyId' IS NOT NULL
+      SELECT CASE WHEN r.site_org_unit_id IS NOT NULL AND u.id IS NULL THEN NULL
+        WHEN r.metadata->>'propertyId' IS NOT NULL
         AND u.metadata->>'hospitalityPropertyId' IS NOT NULL
         AND r.metadata->>'propertyId' IS DISTINCT FROM u.metadata->>'hospitalityPropertyId'
         THEN NULL ELSE coalesce(r.metadata->>'propertyId', u.metadata->>'hospitalityPropertyId', '') END
@@ -307,23 +285,28 @@ function sourceProperty(table: string): string {
       LEFT JOIN org_units u ON u.tenant_id=r.tenant_id AND u.id=r.site_org_unit_id
       WHERE r.tenant_id=${tenant} AND r.id=${sourceId})
     WHEN ${source} = 'incident' THEN (
-      SELECT coalesce(u.metadata->>'hospitalityPropertyId', '') FROM incidents r
+      SELECT CASE WHEN r.site_org_unit_id IS NOT NULL AND u.id IS NULL THEN NULL
+        ELSE coalesce(u.metadata->>'hospitalityPropertyId', '') END FROM incidents r
       LEFT JOIN org_units u ON u.tenant_id=r.tenant_id AND u.id=r.site_org_unit_id
       WHERE r.tenant_id=${tenant} AND r.id=${sourceId})
     WHEN ${source} = 'form_response' THEN (
-      SELECT coalesce(u.metadata->>'hospitalityPropertyId', '') FROM form_responses r
+      SELECT CASE WHEN r.site_org_unit_id IS NOT NULL AND u.id IS NULL THEN NULL
+        ELSE coalesce(u.metadata->>'hospitalityPropertyId', '') END FROM form_responses r
       LEFT JOIN org_units u ON u.tenant_id=r.tenant_id AND u.id=r.site_org_unit_id
       WHERE r.tenant_id=${tenant} AND r.id=${sourceId})
     WHEN ${source} = 'hazid_assessment' THEN (
-      SELECT coalesce(u.metadata->>'hospitalityPropertyId', '') FROM hazid_assessments r
+      SELECT CASE WHEN r.site_org_unit_id IS NOT NULL AND u.id IS NULL THEN NULL
+        ELSE coalesce(u.metadata->>'hospitalityPropertyId', '') END FROM hazid_assessments r
       LEFT JOIN org_units u ON u.tenant_id=r.tenant_id AND u.id=r.site_org_unit_id
       WHERE r.tenant_id=${tenant} AND r.id=${sourceId})
     WHEN ${source} = 'journal_entry' THEN (
-      SELECT coalesce(u.metadata->>'hospitalityPropertyId', '') FROM journal_entries r
+      SELECT CASE WHEN r.site_org_unit_id IS NOT NULL AND u.id IS NULL THEN NULL
+        ELSE coalesce(u.metadata->>'hospitalityPropertyId', '') END FROM journal_entries r
       LEFT JOIN org_units u ON u.tenant_id=r.tenant_id AND u.id=r.site_org_unit_id
       WHERE r.tenant_id=${tenant} AND r.id=${sourceId})
     WHEN ${source} = 'ppe_inspection' THEN (
-      SELECT coalesce(u.metadata->>'hospitalityPropertyId', '') FROM ppe_inspections r
+      SELECT CASE WHEN r.site_org_unit_id IS NOT NULL AND u.id IS NULL THEN NULL
+        ELSE coalesce(u.metadata->>'hospitalityPropertyId', '') END FROM ppe_inspections r
       LEFT JOIN org_units u ON u.tenant_id=r.tenant_id AND u.id=r.site_org_unit_id
       WHERE r.tenant_id=${tenant} AND r.id=${sourceId})
     WHEN ${source} = 'maintenance_issue' THEN (
@@ -342,6 +325,7 @@ function sourceProperty(table: string): string {
     ELSE NULL END`
 }
 
+// A hidden site is unresolved provenance, never proof of a non-property site.
 export function actionPropertyPredicate(table = 'corrective_actions'): string {
   const property = sourceProperty(table)
   const hint = `${table}.metadata->>'propertyId'`
@@ -351,12 +335,11 @@ export function actionPropertyPredicate(table = 'corrective_actions'): string {
       ${mode} = 'property'
       AND (${ids}) ? (${property})
       AND (${hint} IS NULL OR ${hint} = (${property}))
-      AND NOT EXISTS (
+      AND (${table}.site_org_unit_id IS NULL OR EXISTS (
         SELECT 1 FROM org_units site
         WHERE site.tenant_id=${table}.tenant_id AND site.id=${table}.site_org_unit_id
-          AND site.metadata->>'hospitalityPropertyId' IS NOT NULL
-          AND site.metadata->>'hospitalityPropertyId' IS DISTINCT FROM (${property})
-      )
+          AND site.metadata->>'hospitalityPropertyId' = (${property})
+      ))
       AND (${table}.source_form_response_id IS NULL OR (
         ${table}.source_entity_type='form_response'
         AND ${table}.source_form_response_id=${table}.source_entity_id
@@ -370,11 +353,7 @@ export function actionPropertyPredicate(table = 'corrective_actions'): string {
     OR (
       ${mode} = 'legacy'
       AND ${hint} IS NULL
-      AND NOT EXISTS (
-        SELECT 1 FROM org_units site
-        WHERE site.tenant_id=${table}.tenant_id AND site.id=${table}.site_org_unit_id
-          AND site.metadata->>'hospitalityPropertyId' IS NOT NULL
-      )
+      AND ${legacySitePredicate(table)}
       AND ${table}.source_entity_type IS DISTINCT FROM 'risk_hazard'
       AND ${table}.source_entity_type IS DISTINCT FROM 'operational_task_occurrence'
       AND ${table}.source_entity_type IS DISTINCT FROM 'hospitality_handover'

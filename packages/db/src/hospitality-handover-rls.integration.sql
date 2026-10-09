@@ -2,6 +2,8 @@
 -- All fixtures, grants, and the temporary production-style role roll back.
 BEGIN;
 CREATE ROLE uvanoo_handover_test NOLOGIN;
+GRANT USAGE ON SCHEMA security TO uvanoo_handover_test;
+GRANT EXECUTE ON FUNCTION security.person_allows_scope(uuid, uuid) TO uvanoo_handover_test;
 GRANT USAGE ON SCHEMA public TO uvanoo_handover_test;
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO uvanoo_handover_test;
 

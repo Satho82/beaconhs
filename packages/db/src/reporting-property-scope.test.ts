@@ -29,7 +29,9 @@ describe('property-scoped reporting database contracts', () => {
     expect(policy).toContain('property_scope.tenant_id=org_units.tenant_id')
     expect(policy).toContain('property_scope.deleted_at IS NULL')
     expect(policy).toContain("current_setting('app.action_scope_mode', true) = 'legacy'")
-    expect(policy).toContain(
+    expect(policy).toContain("jsonb_typeof(org_units.metadata) = 'object'")
+    expect(policy).toContain("NOT (org_units.metadata ? 'hospitalityPropertyId')")
+    expect(policy).not.toContain(
       "coalesce((org_units.metadata->>'hospitalityPropertyId')::text, '') = ''",
     )
   })

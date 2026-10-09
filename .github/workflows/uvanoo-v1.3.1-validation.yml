@@ -1,7 +1,7 @@
 name: Uvanoo Batch 01 candidate validation only
 
-# PROPOSED branch-local replacement of the already registered validation workflow.
-# Apply only after Antonio authorises this exact patch. No deployment approval.
+# Branch-local, manually dispatched validation of an immutable product candidate.
+# GitHub-hosted disposable services only; no deployment or environment secrets.
 on:
   workflow_dispatch:
     inputs:
@@ -38,13 +38,13 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: beaconhs_test
-        ports: ['5432:5432']
+        ports: ['127.0.0.1:5432:5432']
         options: >-
           --health-cmd="pg_isready -U postgres -d beaconhs_test"
           --health-interval=5s --health-timeout=5s --health-retries=10
       redis:
         image: redis:7-alpine@sha256:6ab0b6e7381779332f97b8ca76193e45b0756f38d4c0dcda72dbb3c32061ab99
-        ports: ['6379:6379']
+        ports: ['127.0.0.1:6379:6379']
         options: >-
           --health-cmd="redis-cli ping"
           --health-interval=5s --health-timeout=5s --health-retries=10
@@ -136,6 +136,17 @@ jobs:
       - name: Frozen dependency install
         id: install
         run: pnpm install --frozen-lockfile 2>&1 | tee "$RUNNER_TEMP/batch01-evidence/install.log"
+      - name: Repository-pinned disposable PDF test browser
+        id: test_browser
+        run: |
+          set -euo pipefail
+          node node_modules/.pnpm/@puppeteer+browsers@3.0.6/node_modules/@puppeteer/browsers/lib/main-cli.js \
+            install chrome-headless-shell@140.0.7339.207 --path "$RUNNER_TEMP/batch01-browser" \
+            2>&1 | tee "$RUNNER_TEMP/batch01-evidence/test-browser.log"
+          browser="$RUNNER_TEMP/batch01-browser/chrome-headless-shell/linux-140.0.7339.207/chrome-headless-shell-linux64/chrome-headless-shell"
+          test -x "$browser"
+          "$browser" --version | tee -a "$RUNNER_TEMP/batch01-evidence/test-browser.log"
+          printf 'PUPPETEER_EXECUTABLE_PATH=%s\n' "$browser" >> "$GITHUB_ENV"
       - name: Formatting
         id: format
         run: pnpm format:check 2>&1 | tee "$RUNNER_TEMP/batch01-evidence/format.log"
@@ -219,6 +230,23 @@ jobs:
       - name: Repository workflow immutability regression
         id: workflow_contract
         run: bash scripts/ci/workflow-repository-immutability.test.sh 2>&1 | tee "$RUNNER_TEMP/batch01-evidence/workflow-contract.log"
+
+      - name: Related property RLS regressions with rollback-only fixtures
+        id: related_rls
+        env:
+          POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
+        run: |
+          set -euo pipefail
+          for fixture in hospitality-handover-rls hospitality-metering-rls maintenance-evidence-rls incident-property-rls inspection-compliance-property-rls; do
+            docker exec -i "$POSTGRES_CONTAINER" psql -U postgres -d beaconhs_test -X -v ON_ERROR_STOP=1 \
+              < "packages/db/src/$fixture.integration.sql" 2>&1 | tee "$RUNNER_TEMP/batch01-evidence/$fixture.log"
+          done
+      - name: People provenance, privileges and multi-session serialization
+        id: people_provenance
+        env:
+          UVANOO_PEOPLE_PROVENANCE_INTEGRATION: '1'
+          PEOPLE_PROVENANCE_TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/beaconhs_test
+        run: pnpm --filter @beaconhs/db test:people-provenance 2>&1 | tee "$RUNNER_TEMP/batch01-evidence/people-provenance.log"
 
       - name: Full production build including web and worker bundles
         id: build

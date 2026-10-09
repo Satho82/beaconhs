@@ -153,7 +153,7 @@ export function SidebarNav({
         <section key={group.label} className="mb-6 space-y-1">
           {!collapsed && (
             <h2 className="px-3 pb-2 text-[10px] font-semibold tracking-widest text-slate-400 uppercase">
-              {group.label}
+              <GeneratedValue value={group.label} />
             </h2>
           )}
           {group.items.map((item) => (

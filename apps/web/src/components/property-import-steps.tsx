@@ -1,10 +1,17 @@
+import { useTranslations } from 'next-intl'
+const STAGE_KEYS = {
+  Upload: 'm_136064c1a8aa9b',
+  Preview: 'm_11d37007232de5',
+  Review: 'm_0e315ebf127b18',
+  Import: 'm_0df79ee8347c6b',
+  Result: 'm_100e41041dbe51',
+} as const
 const STAGES = ['Upload', 'Preview', 'Review', 'Import', 'Result'] as const
 export function PropertyImportSteps({ current }: { current: (typeof STAGES)[number] }) {
+  const tBatch = useTranslations('Generated')
+
   return (
-    <ol
-      aria-label="Property Structure import progress"
-      className="grid grid-cols-2 gap-2 sm:grid-cols-5"
-    >
+    <ol aria-label={tBatch('m_1fe40c02004935')} className="grid grid-cols-2 gap-2 sm:grid-cols-5">
       {STAGES.map((stage, index) => (
         <li
           key={stage}
@@ -18,7 +25,7 @@ export function PropertyImportSteps({ current }: { current: (typeof STAGES)[numb
           <span aria-hidden="true" className="mr-2">
             {index + 1}.
           </span>
-          {stage}
+          {tBatch(STAGE_KEYS[stage])}
         </li>
       ))}
     </ol>

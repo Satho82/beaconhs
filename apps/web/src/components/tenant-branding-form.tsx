@@ -1,4 +1,5 @@
 'use client'
+import { PRODUCT_NAME } from '@/lib/brand'
 import { useGeneratedValueTranslations } from '@/i18n/generated'
 
 import { useEffect, useRef, useState } from 'react'
@@ -295,7 +296,7 @@ export function TenantBrandingForm({
                   className="h-9 max-w-32 object-contain"
                 />
               ) : (
-                <span className="font-semibold">Uvanoo</span>
+                <span className="font-semibold">{PRODUCT_NAME}</span>
               )}
             </div>
             <div className="space-y-4 p-5">

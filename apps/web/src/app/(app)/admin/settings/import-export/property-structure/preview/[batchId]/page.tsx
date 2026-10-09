@@ -31,9 +31,9 @@ export default async function PropertyStructurePreviewPage({
   params: Promise<{ batchId: string }>
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
-  const ctx = await requireRequestContext()
   const { batchId } = await params
   if (!isUuid(batchId)) notFound()
+  const ctx = await requireRequestContext()
   const sp = await searchParams
   const filter = filterFrom(pickString(sp.filter))
   const list = parseListParams(sp, { sort: 'row', dir: 'asc', perPage: 25, allowedSorts: ['row'] })
@@ -64,6 +64,7 @@ export default async function PropertyStructurePreviewPage({
   )
   const page = Math.min(list.page, Math.max(1, Math.ceil(filteredRows.length / list.perPage)))
   const rows = filteredRows.slice((page - 1) * list.perPage, page * list.perPage)
+  const tBatch = await getTranslations('Generated')
   const t = await getTranslations('TenantSettings')
   const filterLabel: Record<PreviewFilter, string> = {
     all: t('previewAllRows'),
@@ -140,12 +141,12 @@ export default async function PropertyStructurePreviewPage({
               </Button>
             ))}
           </nav>
-          <SearchInput placeholder="Search rows, names, references or issues" />
+          <SearchInput placeholder={tBatch('m_19dbb91f9413e1')} />
           <FilterChips
             basePath={basePath}
             currentParams={sp}
             paramKey="recordType"
-            label="Record type"
+            label={tBatch('m_00fe940fdc8bf4')}
             options={['Property', 'Building', 'Floor', 'Room'].map((value) => ({
               value,
               label: value,

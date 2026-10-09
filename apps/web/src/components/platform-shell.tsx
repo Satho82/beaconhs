@@ -29,6 +29,8 @@ export function PlatformShell({
   deploymentEnvironment?: string
   children: React.ReactNode
 }) {
+  const tBatch = useTranslations('Generated')
+
   const router = useRouter()
   const [pending, startSignOut] = useTransition()
   const shellT = useTranslations('Shell')
@@ -68,12 +70,12 @@ export function PlatformShell({
               <input
                 name="q"
                 type="search"
-                aria-label="Search tenants"
-                placeholder="Search tenants…"
+                aria-label={tBatch('m_0c689200391562')}
+                placeholder={tBatch('m_14a8d76ad4905b')}
                 className="min-w-0 flex-1 bg-transparent text-sm outline-none"
               />
               <button type="submit" className="text-sm font-medium text-blue-700">
-                Search
+                {tBatch('m_1417e84947b481')}
               </button>
             </form>
             <Link
@@ -81,13 +83,13 @@ export function PlatformShell({
               className="ml-auto flex items-center gap-2 text-sm text-blue-700 md:ml-0"
             >
               <ArrowLeft size={16} />
-              <span className="hidden sm:inline">Back to Application</span>
-              <span className="sr-only sm:hidden">Back to Application</span>
+              <span className="hidden sm:inline">{tBatch('m_13f8c9c1ebe799')}</span>
+              <span className="sr-only sm:hidden">{tBatch('m_13f8c9c1ebe799')}</span>
             </Link>
             <details className="relative shrink-0">
               <summary
                 className="flex cursor-pointer list-none items-center gap-2 rounded-full p-1 focus-visible:outline-2 focus-visible:outline-blue-600"
-                aria-label="Account menu"
+                aria-label={tBatch('m_05031e4f8d641e')}
               >
                 <span className="grid h-9 w-9 place-items-center rounded-full bg-blue-100 text-sm font-semibold text-blue-800">
                   {(operator.name || operator.email).slice(0, 1).toUpperCase()}

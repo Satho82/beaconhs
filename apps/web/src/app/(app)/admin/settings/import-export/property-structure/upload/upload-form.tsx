@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useRef, useState, useTransition } from 'react'
@@ -18,6 +20,8 @@ type Copy = {
 }
 
 export function PropertyStructureUploadForm({ copy }: { copy: Copy }) {
+  const tBatch = useTranslations('Generated')
+
   const inputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
   const [file, setFile] = useState<File | null>(null)
@@ -96,7 +100,8 @@ export function PropertyStructureUploadForm({ copy }: { copy: Copy }) {
         </button>
         {file ? (
           <p className="text-sm text-slate-700">
-            {copy.selectedFile}: {file.name} · {file.size.toLocaleString()} bytes
+            {copy.selectedFile}: {file.name} · {file.size.toLocaleString()}{' '}
+            {tBatch('m_0106e43bb52715')}
             <Button
               type="button"
               variant="outline"
@@ -108,7 +113,7 @@ export function PropertyStructureUploadForm({ copy }: { copy: Copy }) {
                 if (inputRef.current) inputRef.current.value = ''
               }}
             >
-              Remove file
+              {tBatch('m_02038865a602d6')}
             </Button>
           </p>
         ) : null}

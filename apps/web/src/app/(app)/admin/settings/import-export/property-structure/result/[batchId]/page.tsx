@@ -15,9 +15,9 @@ export default async function PropertyStructureResultPage({
 }: {
   params: Promise<{ batchId: string }>
 }) {
-  const ctx = await requireRequestContext()
   const { batchId } = await params
   if (!isUuid(batchId)) notFound()
+  const ctx = await requireRequestContext()
   const result = await getPropertyStructureResult(batchId)
   if (!result) notFound()
   const t = await getTranslations('TenantSettings')

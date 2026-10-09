@@ -8,6 +8,8 @@ import { loadEnabledModuleKeys } from '@/lib/module-entitlements/server'
 import { SettingsNavigation } from '../settings-form'
 
 export default async function ImportExportPage() {
+  const tBatch = await getTranslations('Generated')
+
   const ctx = await requireRequestContext()
   assertCan(ctx, 'admin.settings.manage')
   const t = await getTranslations('TenantSettings')
@@ -54,10 +56,7 @@ export default async function ImportExportPage() {
               </Button>
             </>
           ) : (
-            <p className="text-sm text-slate-600">
-              Property Structure import/export requires property management access and an enabled
-              Properties module.
-            </p>
+            <p className="text-sm text-slate-600">{tBatch('m_1148b89a209fd5')}</p>
           )}
         </CardContent>
       </Card>

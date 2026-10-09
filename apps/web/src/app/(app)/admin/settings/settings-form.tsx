@@ -74,13 +74,13 @@ export function SettingsNavigation({
             href={entry.href}
             aria-current={active ? 'page' : undefined}
             className={cn(
-              'flex shrink-0 items-center gap-2 border-b-2 px-5 py-3 text-sm hover:text-teal-700',
+              'flex shrink-0 items-center gap-3 border-b-2 px-5 py-4 text-sm hover:text-blue-600',
               active
-                ? 'border-teal-600 font-semibold text-teal-700'
-                : 'border-transparent font-medium text-slate-700',
+                ? 'border-blue-600 font-semibold text-blue-600'
+                : 'border-transparent font-medium text-[#546f9c]',
             )}
           >
-            <Icon size={18} />
+            <Icon size={22} />
             {t(entry.label)}
           </a>
         )
@@ -145,7 +145,7 @@ export function SettingsForm({
         setDirty(true)
         setMessage('')
       }}
-      className="space-y-6"
+      className="uvanoo-settings-form space-y-5"
     >
       <input type="hidden" name="settingsSection" value={activeSection} />
       {message && (
@@ -158,7 +158,7 @@ export function SettingsForm({
         activeSection={activeSection}
         canManageIntegrations={canManageIntegrations}
       />
-      <div className="xl:grid xl:grid-cols-[minmax(0,1fr)_25rem] xl:gap-5">
+      <div className="xl:grid xl:grid-cols-[minmax(0,1fr)_minmax(18rem,0.46fr)] xl:gap-5">
         <fieldset disabled={pending} className="min-w-0 space-y-4">
           {children}
         </fieldset>

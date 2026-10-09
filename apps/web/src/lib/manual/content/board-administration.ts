@@ -11,7 +11,7 @@ export const BOARD_ADMINISTRATION_ARTICLES: ManualArticle[] = [
     body: `Open [Tenant Settings](/admin/settings) in the expandable application menu. The selected tenant is named on the page; changes apply only to that tenant.
 
 ## General
-Set tenant identity, locale, timezone, currency, date and number formats, languages and regulatory terminology. Edit a value to enable **Save** and **Discard**. Discard restores the saved form. If saving fails, check the displayed message and keep your edits until you can save successfully.
+Set tenant name, locale, timezone, currency, date and number formats and languages. The tenant slug is a permanent identifier and is read-only. Expand **Regulatory terminology** for the additional terminology fields. Edit a value to enable **Save** and **Discard**. Discard restores the saved form. If saving fails, check the displayed message and keep your edits until you can save successfully.
 
 ## Branding
 Open [Branding](/admin/settings/branding) for the tenant logo, primary colour and PDF letterhead. Logo uploads accept PNG, JPEG or WebP up to 2 MB; letterheads accept PDF up to 5 MB. The tenant logo and primary colour apply to the tenant application shell. Platform defaults remain in place when an override is removed. Use Desktop or Mobile in Live Preview to inspect changes before saving. **Copy colour** copies the current valid HEX value. **Reset to Platform Default** in the colour section clears only the colour override. **Reset to Default** at the bottom removes both the tenant logo and colour overrides; it leaves the PDF letterhead unchanged. Choosing a valid replacement logo after a reset cancels logo removal. Save to apply these changes, or Discard to restore the saved identity.
@@ -35,7 +35,9 @@ The page keeps the selected tenant visible and shows **Retry**. Settings cannot 
 Platform operators open **Tenants**, search by name, slug or region, and filter by Active, Suspended or Archived. The result count and pagination follow the filters. **Open** is available in every lifecycle state; entering a tenant workspace is available only for active tenants. On a phone, each card shows status, property count and effective module count.
 
 ## Master branding and modules
-Open **Global Settings → General Settings** to edit the platform name and default primary colour. Other branding and analytics settings are preserved. Regional defaults remain tenant settings. The Template seeding utility is a maintenance tool, not a Template Library.
+Open **Global Settings → General Settings** to save default locale, time zone, date format, number format and currency. Newly created tenants inherit these defaults; existing tenants and their records are not rewritten. Platform name and colour remain under **Branding & White Label**. The five settings tabs open the supported General, Branding, Notifications (email configuration), Integrations (AI provider) and Advanced (database maintenance) areas. The Template seeding utility is a maintenance tool, not a Template Library.
+
+Open **Modules → All Modules** to search the real entitlement catalogue. **Choose tenant to manage entitlements** opens tenant selection; use that tenant’s **Modules** page to change access. This does not edit navigation preferences.
 
 In **Platform Branding**, upload the master logo or favicon and edit the supported platform identity. **Save branding** saves changes; **Discard** restores saved values. A failed save keeps edits available and displays a safe message. Tenant Branding remains separate.
 

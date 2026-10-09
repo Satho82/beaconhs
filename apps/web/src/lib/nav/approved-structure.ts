@@ -36,6 +36,24 @@ type ApprovedDestination = {
 
 const APPROVED_DESTINATIONS: readonly ApprovedDestination[] = [
   {
+    id: 'A001',
+    group: 'Dashboard',
+    label: 'Overview',
+    href: '/dashboard',
+    source: '/dashboard',
+    permission: null,
+    entitlement: null,
+  },
+  {
+    id: 'A136',
+    group: 'Reports',
+    label: 'Reports overview',
+    href: '/reports',
+    source: '/reports',
+    permission: null,
+    entitlement: null,
+  },
+  {
     id: 'A004',
     group: 'Dashboard',
     label: 'Compliance Status',
@@ -678,6 +696,39 @@ const PRESENTATION: Record<string, { iconKey: string; colour: SidebarNavItem['co
   },
 }
 
+/** Ownership of already-authorized destinations which predate the approved hierarchy.
+ * Custom workspace links live under Dashboard; pinned form ownership comes from the
+ * resolver's trusted template metadata. Labels and targets are preserved verbatim.
+ */
+function destinationParent(item: SidebarNavItem): (typeof APPROVED_APPLICATION_GROUPS)[number] {
+  if (item.approvedParent) return item.approvedParent
+  const path = item.href.split(/[?#]/, 1)[0]!
+  const owners: readonly [string, (typeof APPROVED_APPLICATION_GROUPS)[number]][] = [
+    ['/hospitality/properties', 'Tenant Settings'],
+    ['/hospitality/maintenance', 'Maintenance'],
+    ['/hospitality/risk', 'Risk'],
+    ['/hospitality/handover', 'Handover'],
+    ['/hospitality/metering', 'Metering'],
+    ['/apps/templates', 'Diary & Tasks'],
+    ['/apps', 'Tenant Settings'],
+    ['/admin', 'Tenant Settings'],
+    ['/my', 'Diary & Tasks'],
+    ['/journals', 'Diary & Tasks'],
+    ['/hazard-assessments', 'Risk'],
+    ['/inspections', 'Inspections'],
+    ['/incidents', 'Incidents'],
+    ['/corrective-actions', 'Action Plans'],
+    ['/training', 'Training'],
+    ['/documents', 'Compliance'],
+    ['/people', 'People'],
+    ['/equipment', 'Assets & PPM'],
+    ['/compliance', 'Compliance'],
+    ['/reports', 'Reports'],
+    ['/insights', 'Reports'],
+  ]
+  return owners.find(([root]) => path === root || path.startsWith(`${root}/`))?.[1] ?? 'Dashboard'
+}
+
 /** Input retains the existing resolver's saved preferences, RBAC and entitlements.
  * Every additional child is independently gated. This function never writes preferences.
  */
@@ -688,8 +739,7 @@ export function approvedNavigation(
   activePropertyId?: string | null,
 ): SidebarNavGroup[] {
   const visible = new Map(groups.flatMap((group) => group.items).map((item) => [item.href, item]))
-  const consumed = new Set<string>()
-  const items: SidebarNavItem[] = []
+  const childrenByGroup = new Map<string, SidebarNavItem[]>()
   for (const group of APPROVED_APPLICATION_GROUPS) {
     const children: SidebarNavItem[] = [...APPROVED_DESTINATIONS]
       .sort((a, b) => a.id.localeCompare(b.id))
@@ -702,7 +752,6 @@ export function approvedNavigation(
           (!entry.entitlement || entitlements.has(entry.entitlement)),
       )
       .map((entry) => {
-        consumed.add(entry.source)
         return {
           href: entry.href,
           label: entry.label,
@@ -731,25 +780,33 @@ export function approvedNavigation(
           exact: false,
         })
     }
-    if (!children.length) continue
-    items.push({
-      href: children[0]!.href,
-      label: group,
-      ...PRESENTATION[group]!,
-      groupOnly: true,
-      children,
-    })
+    childrenByGroup.set(group, children)
   }
-  // Existing hubs/custom links/pinned forms remain reachable with their truthful labels.
-  const remaining = groups
-    .map((group) => ({
-      ...group,
-      items: group.items.filter(
-        (item) =>
-          !consumed.has(item.href) ||
-          !items.some((parent) => parent.children?.some((child) => child.href === item.href)),
-      ),
-    }))
-    .filter((group) => group.items.length)
-  return [...(items.length ? [{ label: 'Application', items }] : []), ...remaining]
+  // Normalize the *same filtered input* into one tree. Never append the old
+  // category groups: that produced a second navigation below Tenant Settings.
+  // Keep existing hubs, saved custom links and authorized pinned forms without
+  // manufacturing routes or re-running a less restrictive permission fallback.
+  const represented = new Set(
+    [...childrenByGroup.values()].flatMap((children) => children.map((child) => child.href)),
+  )
+  for (const item of visible.values()) {
+    if (represented.has(item.href)) continue
+    childrenByGroup.get(destinationParent(item))!.push({ ...item })
+    represented.add(item.href)
+  }
+  const items = APPROVED_APPLICATION_GROUPS.flatMap((group): SidebarNavItem[] => {
+    const children = childrenByGroup.get(group)!
+    if (!children.length) return []
+    return [
+      {
+        moduleKey: group,
+        href: children[0]!.href,
+        label: group,
+        ...PRESENTATION[group]!,
+        groupOnly: true,
+        children,
+      },
+    ]
+  })
+  return items.length ? [{ label: 'Application', items }] : []
 }

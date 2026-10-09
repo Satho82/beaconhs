@@ -349,3 +349,93 @@
 .dark .ff-surface.field-mode label {
   color: rgb(241 245 249);
 }
+
+/* G04 is the approved application navigation; platform administration retains G02 navy. */
+[data-sidebar-appearance='application'] {
+  background: linear-gradient(180deg, #f4f9fc, #e7f2f7);
+  border-color: #dce8f0;
+  color: #103153;
+}
+[data-sidebar-appearance='application'] > div {
+  border-color: #dce8f0;
+}
+[data-sidebar-appearance='application'] button {
+  color: #103153;
+}
+.uvanoo-navigation .uvanoo-nav-entry {
+  min-height: 36px;
+  border-radius: 4px;
+  padding: 8px 10px;
+  font-size: 12px;
+}
+.uvanoo-navigation[data-navigation-appearance='application'] .uvanoo-nav-entry {
+  color: #103153;
+  box-shadow: none;
+}
+.uvanoo-navigation[data-navigation-appearance='application'] .uvanoo-nav-entry svg {
+  color: currentColor;
+}
+.uvanoo-navigation[data-navigation-appearance='application'] .uvanoo-nav-entry:hover {
+  background: #dcecf4;
+}
+.uvanoo-navigation[data-navigation-appearance='application'] .uvanoo-nav-entry[data-nav-active] {
+  background: #ff7165;
+  color: white;
+}
+.uvanoo-navigation[data-navigation-appearance='application'] .uvanoo-nav-children {
+  border-color: #c7d7e2;
+}
+.uvanoo-navigation [data-nav-nested] .uvanoo-nav-entry {
+  min-height: 32px;
+  font-size: 11px;
+  font-weight: 400;
+}
+.uvanoo-navigation[data-navigation-appearance='application']
+  [data-nav-nested]
+  .uvanoo-nav-entry[data-nav-active] {
+  background: #dcecf4;
+  color: #092d50;
+  font-weight: 600;
+  box-shadow: inset 2px 0 #ff7165;
+}
+[data-sidebar-appearance='platform'] {
+  background: #071f34;
+}
+.uvanoo-settings h1,
+.uvanoo-settings h2,
+.uvanoo-settings h3 {
+  color: #101b55;
+}
+.uvanoo-settings-form section,
+.uvanoo-settings-form [data-slot='card'] {
+  border-color: #dceafb;
+  border-radius: 7px;
+}
+.uvanoo-settings-form input:not([type='checkbox']),
+.uvanoo-settings-form select {
+  min-height: 40px;
+  border-color: #ced8ea;
+  color: #101b55;
+}
+.uvanoo-settings-form label > span {
+  color: #101b55;
+  font-weight: 600;
+  font-size: 13px;
+}
+.dark .uvanoo-settings h1,
+.dark .uvanoo-settings h2,
+.dark .uvanoo-settings h3,
+.dark .uvanoo-settings-form label > span,
+.dark .uvanoo-settings-form input:not([type='checkbox']),
+.dark .uvanoo-settings-form select {
+  color: #e2e8f0;
+}
+.uvanoo-navigation[data-navigation-appearance='platform'] .uvanoo-nav-entry svg {
+  color: currentColor;
+}
+@media (pointer: coarse) {
+  .uvanoo-navigation .uvanoo-nav-entry,
+  .uvanoo-navigation [data-nav-nested] .uvanoo-nav-entry {
+    min-height: 44px;
+  }
+}

@@ -1,10 +1,11 @@
-import { getGeneratedTranslations, getGeneratedValueTranslations } from '@/i18n/generated.server'
+import { getGeneratedValueTranslations } from '@/i18n/generated.server'
 import { eq } from 'drizzle-orm'
 import { notFound } from 'next/navigation'
 import { db, withSuperAdmin } from '@beaconhs/db'
 import { tenants } from '@beaconhs/db/schema'
 import { assertCan, can } from '@beaconhs/tenant'
 import { PageHeader } from '@beaconhs/ui'
+import Link from 'next/link'
 import { requireRequestContext } from '@/lib/auth'
 import { PageContainer } from '@/components/page-layout'
 import { TenantBrandingForm } from '@/components/tenant-branding-form'
@@ -15,8 +16,9 @@ import { getPlatformBranding } from '@/lib/platform-branding-config'
 import { resolveTenantPrimaryAction } from '@/lib/theme-governance'
 export const dynamic = 'force-dynamic'
 export default async function BrandingSettingsPage() {
+  const tVisual = await getGeneratedValueTranslations()
+
   const tBoard = await getGeneratedValueTranslations()
-  const tBoardMessage = await getGeneratedTranslations()
 
   const ctx = await requireRequestContext()
   assertCan(ctx, 'admin.settings.manage')
@@ -30,19 +32,23 @@ export default async function BrandingSettingsPage() {
   if (!tenant) notFound()
   const platformBranding = await getPlatformBranding()
   return (
-    <PageContainer>
+    <PageContainer className="uvanoo-settings">
       <div className="space-y-5">
+        <nav aria-label={tVisual('Breadcrumb')} className="text-sm text-blue-600">
+          <Link href="/admin/settings">{tVisual('Tenant Settings')}</Link> {tVisual('› Branding')}
+        </nav>
         <PageHeader
-          title={tBoard('Tenant Settings')}
-          description={tBoardMessage('m_0a19f0c1debc78', { value0: tenant.name })}
+          title={tBoard('Branding')}
+          description={tVisual(
+            'Customise your tenant’s visual identity across the Uvanoo platform.',
+          )}
         />
         <SettingsNavigation
           canManageIntegrations={can(ctx, 'admin.integrations.manage')}
           navigationLabel="Tenant Settings"
           activeSection="branding"
         />
-        <section className="rounded-xl border bg-white p-5 dark:bg-slate-900">
-          <h2 className="mb-5 text-lg font-semibold">{tBoard('Tenant Branding')}</h2>
+        <section>
           <TenantBrandingForm
             key={JSON.stringify(tenant.branding)}
             tenantId={ctx.tenantId}

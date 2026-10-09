@@ -39,6 +39,7 @@ import {
   Radiation,
   Rss,
   ScrollText,
+  Search,
   Settings,
   ShieldCheck,
   Sparkles,
@@ -52,6 +53,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@beaconhs/ui'
 import { findActiveNavHref } from './sidebar-nav-active'
+import { searchNavigation } from './navigation-search'
 
 // Map string keys → icon components. RSCs can't serialise function references,
 // so the parent server component passes us a key and we resolve client-side.
@@ -99,6 +101,9 @@ const ICONS: Record<string, LucideIcon> = {
 }
 
 export type SidebarNavItem = {
+  moduleKey?: string
+  /** Resolved ownership for pinned forms; never an authorization grant. */
+  approvedParent?: 'Training' | 'Diary & Tasks'
   href: string
   label: string
   groupOnly?: boolean
@@ -134,30 +139,77 @@ export type SidebarNavGroup = {
 export function SidebarNav({
   groups,
   collapsed = false,
+  appearance = 'application',
 }: {
   groups: SidebarNavGroup[]
   collapsed?: boolean
+  appearance?: 'application' | 'platform'
 }) {
   const tBoard = useGeneratedValueTranslations()
+  const [query, setQuery] = useState('')
+  const shownGroups = searchNavigation(groups, collapsed ? '' : query)
 
   const path = usePathname() ?? ''
   const search = useSearchParams()
   const pathname = search?.size ? `${path}?${search}` : path
   const activeHref = findActiveNavHref(pathname, groups)
+  const activeParent = groups
+    .flatMap((group) => group.items)
+    .filter(
+      (item) => item.children && findActiveNavHref(activeHref, [{ items: item.children }]) !== null,
+    )
+    .at(-1)
   return (
     <nav
-      aria-label={tBoard('Application navigation')}
-      className="app-scroll flex-1 overflow-y-auto px-3 py-5"
+      aria-label={tBoard(
+        appearance === 'platform' ? 'Platform navigation' : 'Application navigation',
+      )}
+      data-navigation-appearance={appearance}
+      className="uvanoo-navigation app-scroll flex-1 overflow-y-auto px-2 py-3"
     >
-      {groups.map((group) => (
-        <section key={group.label} className="mb-6 space-y-1">
-          {!collapsed && (
-            <h2 className="px-3 pb-2 text-[10px] font-semibold tracking-widest text-slate-400 uppercase">
+      {!collapsed && (
+        <label className="relative mb-3 block">
+          <Search
+            size={15}
+            aria-hidden
+            className="pointer-events-none absolute top-3 left-3 opacity-70"
+          />
+          <input
+            type="search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            aria-label={tBoard('Search menu')}
+            placeholder={tBoard('Search menu…')}
+            className="h-9 w-full rounded-md border border-slate-300/50 bg-white/90 pr-2 pl-9 text-xs text-[#103153] outline-offset-2 focus-visible:outline-blue-600"
+          />
+        </label>
+      )}
+      {shownGroups.length === 0 && (
+        <p role="status" className="p-3 text-sm">
+          {tBoard('No matching destinations.')}
+        </p>
+      )}
+      {shownGroups.map((group) => (
+        <section key={group.label} className="mb-3 space-y-0.5">
+          {!collapsed && group.label !== 'Application' && appearance !== 'platform' && (
+            <h2 className="px-3 pb-2 text-[10px] font-semibold tracking-widest uppercase opacity-60">
               <GeneratedValue value={group.label} />
             </h2>
           )}
           {group.items.map((item) => (
-            <NavEntry key={item.href} item={item} activeHref={activeHref} collapsed={collapsed} />
+            <NavEntry
+              key={`${item.label}:${item.href}`}
+              item={item}
+              activeHref={
+                item.groupOnly &&
+                activeParent &&
+                (item.label !== activeParent.label || item.href !== activeParent.href)
+                  ? null
+                  : activeHref
+              }
+              collapsed={collapsed}
+              searching={Boolean(query.trim())}
+            />
           ))}
         </section>
       ))}
@@ -169,10 +221,14 @@ function NavEntry({
   item,
   activeHref,
   collapsed,
+  searching = false,
+  nested = false,
 }: {
   item: SidebarNavItem
   activeHref: string | null
   collapsed: boolean
+  searching?: boolean
+  nested?: boolean
 }) {
   const tBoardMessage = useGeneratedTranslations()
 
@@ -182,7 +238,7 @@ function NavEntry({
     ? findActiveNavHref(activeHref, [{ items: item.children }]) !== null
     : false
   const [disclosure, setDisclosure] = useState<{ route: string | null; open: boolean } | null>(null)
-  const open = disclosure?.route === activeHref ? disclosure.open : childActive
+  const open = searching || (disclosure?.route === activeHref ? disclosure.open : childActive)
   const setExpanded = (next: boolean) => setDisclosure({ route: activeHref, open: next })
   const active = item.href === activeHref
   const Icon = ICONS[item.iconKey] ?? Gauge
@@ -194,15 +250,17 @@ function NavEntry({
     purple: 'text-purple-300',
   }[item.colour ?? 'blue']
   return (
-    <div>
+    <div data-nav-nested={nested || undefined}>
       <div className="flex items-center gap-1">
         {item.groupOnly && !collapsed ? (
           <button
             type="button"
             aria-expanded={open}
             aria-controls={id}
+            data-nav-active={childActive || undefined}
             onClick={() => setExpanded(!open)}
             className={cn(
+              'uvanoo-nav-entry',
               'flex min-h-11 w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm text-slate-200 hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-blue-300',
               childActive && 'bg-blue-600/30 font-semibold text-white',
             )}
@@ -217,9 +275,11 @@ function NavEntry({
           <Link
             href={item.href as never}
             aria-current={active ? 'page' : undefined}
+            data-nav-active={active || childActive || undefined}
             title={tGeneratedValue(collapsed ? item.label : undefined)}
             data-walkthrough={`nav:${item.href}`}
             className={cn(
+              'uvanoo-nav-entry',
               'flex min-w-0 flex-1 items-center gap-3 rounded-lg px-3 py-2.5 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-300',
               collapsed && 'justify-center px-2',
               active || childActive
@@ -227,7 +287,7 @@ function NavEntry({
                 : 'text-slate-300 hover:bg-white/10 hover:text-white',
             )}
           >
-            <Icon size={18} className={cn('shrink-0', iconColour)} />
+            {!nested && <Icon size={18} className={cn('shrink-0', iconColour)} />}
             {!collapsed && (
               <span className="truncate">
                 <GeneratedValue value={item.label} />
@@ -250,9 +310,20 @@ function NavEntry({
       </div>
       {Boolean(item.children?.length) &&
         (!collapsed ? (
-          <div id={id} hidden={!open} className="ml-5 border-l border-white/15 pl-2">
+          <div
+            id={id}
+            hidden={!open}
+            className="uvanoo-nav-children ml-5 border-l border-white/15 pl-2"
+          >
             {item.children?.map((child) => (
-              <NavEntry key={child.href} item={child} activeHref={activeHref} collapsed={false} />
+              <NavEntry
+                key={child.href}
+                item={child}
+                activeHref={activeHref}
+                collapsed={false}
+                searching={searching}
+                nested
+              />
             ))}
           </div>
         ) : (

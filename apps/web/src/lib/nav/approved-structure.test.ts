@@ -1,4 +1,4 @@
-import { buildDefaultNavConfig } from './registry'
+import { buildDefaultNavConfig, NAV_MODULES } from './registry'
 import { describe, expect, it } from 'vitest'
 import { approvedNavigation, APPROVED_APPLICATION_GROUPS } from './approved-structure'
 import type { SidebarNavGroup } from '@/components/sidebar-nav'
@@ -71,8 +71,86 @@ describe('approved navigation boundaries', () => {
       { label: 'My group', items: [item('/custom'), item('/apps/templates/abc/records')] },
     ]
     const before = structuredClone(groups)
-    expect(approvedNavigation(groups, () => false, new Set())).toEqual(before)
+    const result = approvedNavigation(groups, () => false, new Set())
+    expect(result.map((group) => group.label)).toEqual(['Application'])
+    expect(
+      result[0]?.items.find((parent) => parent.label === 'Dashboard')?.children,
+    ).toContainEqual(item('/custom'))
+    expect(
+      result[0]?.items.find((parent) => parent.label === 'Diary & Tasks')?.children,
+    ).toContainEqual(item('/apps/templates/abc/records'))
     expect(groups).toEqual(before)
+  })
+  it('normalizes every visible registry destination into one ordered module tree', () => {
+    const legacy = [
+      'Overview',
+      'Frontline',
+      'Knowledge',
+      'Assets & people',
+      'Assurance',
+      'Administration',
+    ]
+    const groups = legacy.map((label) => ({
+      label,
+      items: NAV_MODULES.filter((module) => module.group === label && !module.boardHidden).map(
+        (module) => ({
+          href: module.href,
+          label: module.label,
+          iconKey: module.iconKey,
+        }),
+      ),
+    }))
+    const before = structuredClone(groups)
+    const result = approvedNavigation(
+      groups,
+      () => true,
+      new Set<ModuleKey>([
+        'hospitality.properties',
+        'hospitality.maintenance',
+        'hospitality.compliance',
+      ]),
+    )
+    expect(result.map((group) => group.label)).toEqual(['Application'])
+    const parents = result[0]!.items
+    expect(parents.map((parent) => parent.label)).toEqual(
+      APPROVED_APPLICATION_GROUPS.filter((label) =>
+        parents.some((parent) => parent.label === label),
+      ),
+    )
+    expect(parents.every((parent) => parent.groupOnly && parent.children?.length)).toBe(true)
+    const destinations = parents.flatMap((parent) => parent.children!.map((child) => child.href))
+    for (const original of groups.flatMap((group) => group.items))
+      expect(destinations).toContain(original.href)
+    expect(parents.find((parent) => parent.label === 'Risk')?.children).toContainEqual(
+      expect.objectContaining({ href: '/hazard-assessments' }),
+    )
+    expect(parents.find((parent) => parent.label === 'Reports')?.children).toContainEqual(
+      expect.objectContaining({ href: '/insights' }),
+    )
+    expect(groups).toEqual(before)
+  })
+  it('preserves only supplied destinations and resolves authorized pinned forms without a second section', () => {
+    const groups = [
+      {
+        label: 'Frontline',
+        items: [
+          {
+            ...item('/apps/templates/toolbox/records'),
+            label: 'Toolbox talks',
+            approvedParent: 'Training' as const,
+          },
+          item('/journals'),
+        ],
+      },
+    ]
+    const result = approvedNavigation(groups, () => false, new Set())
+    expect(result).toHaveLength(1)
+    expect(result[0]!.items.map((parent) => parent.label)).toEqual(['Diary & Tasks', 'Training'])
+    expect(result[0]!.items.find((parent) => parent.label === 'Training')?.children).toEqual([
+      groups[0]!.items[0],
+    ])
+    expect(flatten(result).some((entry) => entry.href === '/admin/settings')).toBe(false)
+    expect(flatten(result).some((entry) => entry.href === '/hospitality/maintenance')).toBe(false)
   })
   it('matches query tabs without confusing their active states', () => {
     const groups = [

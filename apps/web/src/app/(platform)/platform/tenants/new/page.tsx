@@ -15,6 +15,7 @@ import { translateSystemCopy } from '@beaconhs/i18n/messages'
 import { requirePlatformOperator } from '@/lib/auth'
 import { MODULE_CATALOGUE } from '@/lib/module-entitlements/catalogue'
 import { PageContainer } from '@/components/page-layout'
+import { getPlatformRegionalDefaults } from '@/lib/platform-regional-defaults'
 
 export async function generateMetadata() {
   const tGenerated = await getGeneratedTranslations()
@@ -55,6 +56,7 @@ async function createTenant(formData: FormData): Promise<void> {
     ),
   })
 
+  const defaults = await getPlatformRegionalDefaults()
   const createdTenant = await withSuperAdmin(db, async (tx) => {
     const [created] = await tx
       .insert(tenants)
@@ -65,6 +67,11 @@ async function createTenant(formData: FormData): Promise<void> {
         region,
         defaultLanguage: languagePolicy.defaultLocale,
         enabledLanguages: languagePolicy.enabledLocales,
+        operationalLocale: defaults.locale,
+        operationalTimezone: defaults.timezone,
+        dateFormat: defaults.dateFormat,
+        numberFormat: defaults.numberFormat,
+        defaultCurrencyCode: defaults.currencyCode,
       })
       .returning({ id: tenants.id })
     if (created) {

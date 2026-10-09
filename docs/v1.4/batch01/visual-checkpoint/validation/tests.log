@@ -1,0 +1,1194 @@
+
+> beaconhs@0.1.0 test /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final
+> turbo run test --concurrency=1 --force
+
+
+   • Packages in scope: @beaconhs/ai, @beaconhs/analytics, @beaconhs/audit, @beaconhs/auth, @beaconhs/compliance, @beaconhs/crypto, @beaconhs/db, @beaconhs/design-studio, @beaconhs/email-render, @beaconhs/emails, @beaconhs/events, @beaconhs/forms-core, @beaconhs/forms-pdf, @beaconhs/i18n, @beaconhs/integrations, @beaconhs/jobs, @beaconhs/office, @beaconhs/reports, @beaconhs/sms, @beaconhs/storage, @beaconhs/sync, @beaconhs/tenant, @beaconhs/ui, @beaconhs/web, @beaconhs/worker
+   • Running test in 25 packages
+   • Remote caching disabled, using shared worktree cache
+
+@beaconhs/design-studio:test: cache bypass, force executing 4858459a340255a0
+@beaconhs/design-studio:test: 
+@beaconhs/design-studio:test: > @beaconhs/design-studio@0.1.0 test /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/design-studio
+@beaconhs/design-studio:test: > vitest run
+@beaconhs/design-studio:test: 
+@beaconhs/design-studio:test: 
+@beaconhs/design-studio:test:  RUN  v4.1.10 /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/design-studio
+@beaconhs/design-studio:test: 
+@beaconhs/design-studio:test:  ✓ src/print.test.ts (5 tests) 9ms
+@beaconhs/design-studio:test:  ✓ src/schema.test.ts (1 test) 9ms
+@beaconhs/design-studio:test: 
+@beaconhs/design-studio:test:  Test Files  2 passed (2)
+@beaconhs/design-studio:test:       Tests  6 passed (6)
+@beaconhs/design-studio:test:    Start at  15:09:27
+@beaconhs/design-studio:test:    Duration  587ms (transform 204ms, setup 0ms, import 293ms, tests 18ms, environment 1ms)
+@beaconhs/design-studio:test: 
+@beaconhs/storage:test: cache bypass, force executing 638996ba4f757c7d
+@beaconhs/storage:test: 
+@beaconhs/storage:test: > @beaconhs/storage@0.1.0 test /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/storage
+@beaconhs/storage:test: > vitest run
+@beaconhs/storage:test: 
+@beaconhs/storage:test: 
+@beaconhs/storage:test:  RUN  v4.1.10 /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/storage
+@beaconhs/storage:test: 
+@beaconhs/storage:test:  ✓ src/lifecycle.test.ts (2 tests) 13ms
+@beaconhs/storage:test:  ✓ src/multipart.test.ts (3 tests) 14ms
+@beaconhs/storage:test:  ✓ src/object-keys.test.ts (2 tests) 9ms
+@beaconhs/storage:test:  ✓ src/storage-url.test.ts (5 tests) 13ms
+@beaconhs/storage:test: 
+@beaconhs/storage:test:  Test Files  4 passed (4)
+@beaconhs/storage:test:       Tests  12 passed (12)
+@beaconhs/storage:test:    Start at  15:09:30
+@beaconhs/storage:test:    Duration  1.19s (transform 540ms, setup 0ms, import 1.51s, tests 49ms, environment 1ms)
+@beaconhs/storage:test: 
+@beaconhs/email-render:test: cache bypass, force executing 4b1af77980d90f69
+@beaconhs/email-render:test: 
+@beaconhs/email-render:test: > @beaconhs/email-render@0.1.0 test /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/email-render
+@beaconhs/email-render:test: > vitest run
+@beaconhs/email-render:test: 
+@beaconhs/email-render:test: 
+@beaconhs/email-render:test:  RUN  v4.1.10 /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/email-render
+@beaconhs/email-render:test: 
+@beaconhs/email-render:test:  ✓ src/delivery-input.test.ts (13 tests) 52ms
+@beaconhs/email-render:test:  ✓ src/index.test.ts (35 tests) 113ms
+@beaconhs/email-render:test: 
+@beaconhs/email-render:test:  Test Files  2 passed (2)
+@beaconhs/email-render:test:       Tests  48 passed (48)
+@beaconhs/email-render:test:    Start at  15:09:33
+@beaconhs/email-render:test:    Duration  2.93s (transform 413ms, setup 0ms, import 2.59s, tests 165ms, environment 0ms)
+@beaconhs/email-render:test: 
+@beaconhs/office:test: cache bypass, force executing 320fb6818cdd51f3
+@beaconhs/office:test: 
+@beaconhs/office:test: > @beaconhs/office@0.1.0 test /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/office
+@beaconhs/office:test: > vitest run
+@beaconhs/office:test: 
+@beaconhs/office:test: 
+@beaconhs/office:test:  RUN  v4.1.10 /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/office
+@beaconhs/office:test: 
+@beaconhs/office:test:  ✓ src/fodt.test.ts (12 tests) 33ms
+@beaconhs/office:test:  ✓ src/limits.test.ts (2 tests) 11ms
+@beaconhs/office:test: 
+@beaconhs/office:test:  Test Files  2 passed (2)
+@beaconhs/office:test:       Tests  14 passed (14)
+@beaconhs/office:test:    Start at  15:09:38
+@beaconhs/office:test:    Duration  954ms (transform 205ms, setup 0ms, import 303ms, tests 44ms, environment 0ms)
+@beaconhs/office:test: 
+@beaconhs/crypto:test: cache bypass, force executing 1ff781835c243bd0
+@beaconhs/crypto:test: 
+@beaconhs/crypto:test: > @beaconhs/crypto@0.1.0 test /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/crypto
+@beaconhs/crypto:test: > vitest run
+@beaconhs/crypto:test: 
+@beaconhs/crypto:test: 
+@beaconhs/crypto:test:  RUN  v4.1.10 /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/crypto
+@beaconhs/crypto:test: 
+@beaconhs/crypto:test:  ✓ src/index.test.ts (5 tests) 17ms
+@beaconhs/crypto:test:  ✓ src/production-config.test.ts (1 test) 35ms
+@beaconhs/crypto:test: 
+@beaconhs/crypto:test:  Test Files  2 passed (2)
+@beaconhs/crypto:test:       Tests  6 passed (6)
+@beaconhs/crypto:test:    Start at  15:09:42
+@beaconhs/crypto:test:    Duration  954ms (transform 138ms, setup 0ms, import 221ms, tests 52ms, environment 2ms)
+@beaconhs/crypto:test: 
+@beaconhs/i18n:test: cache bypass, force executing b40aee9840b388b4
+@beaconhs/i18n:test: 
+@beaconhs/i18n:test: > @beaconhs/i18n@0.1.0 test /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/i18n
+@beaconhs/i18n:test: > vitest run
+@beaconhs/i18n:test: 
+@beaconhs/i18n:test: 
+@beaconhs/i18n:test:  RUN  v4.1.10 /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/i18n
+@beaconhs/i18n:test: 
+@beaconhs/i18n:test:  ✓ src/index.test.ts (7 tests) 12ms
+@beaconhs/i18n:test:  ✓ src/messages.test.ts (5 tests) 898ms
+@beaconhs/i18n:test:      ✓ preserves generated-message placeholders in every locale  758ms
+@beaconhs/i18n:test: 
+@beaconhs/i18n:test:  Test Files  2 passed (2)
+@beaconhs/i18n:test:       Tests  12 passed (12)
+@beaconhs/i18n:test:    Start at  15:09:46
+@beaconhs/i18n:test:    Duration  5.50s (transform 2.44s, setup 0ms, import 4.12s, tests 910ms, environment 2ms)
+@beaconhs/i18n:test: 
+@beaconhs/ui:test: cache bypass, force executing e34c3aec42c1d904
+@beaconhs/ui:test: 
+@beaconhs/ui:test: > @beaconhs/ui@0.1.0 test /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/ui
+@beaconhs/ui:test: > vitest run
+@beaconhs/ui:test: 
+@beaconhs/ui:test: 
+@beaconhs/ui:test:  RUN  v4.1.10 /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/ui
+@beaconhs/ui:test: 
+@beaconhs/ui:test:  ✓ src/select.test.ts (2 tests) 11ms
+@beaconhs/ui:test:  ✓ src/file-uploader.test.ts (2 tests) 8ms
+@beaconhs/ui:test: 
+@beaconhs/ui:test:  Test Files  2 passed (2)
+@beaconhs/ui:test:       Tests  4 passed (4)
+@beaconhs/ui:test:    Start at  15:09:53
+@beaconhs/ui:test:    Duration  807ms (transform 174ms, setup 0ms, import 277ms, tests 19ms, environment 1ms)
+@beaconhs/ui:test: 
+@beaconhs/forms-core:test: cache bypass, force executing 6a1af40eca17eef4
+@beaconhs/forms-core:test: 
+@beaconhs/forms-core:test: > @beaconhs/forms-core@0.1.0 test /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/forms-core
+@beaconhs/forms-core:test: > vitest run
+@beaconhs/forms-core:test: 
+@beaconhs/forms-core:test: 
+@beaconhs/forms-core:test:  RUN  v4.1.10 /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/forms-core
+@beaconhs/forms-core:test: 
+@beaconhs/forms-core:test:  ✓ src/field-types.test.ts (4 tests) 18ms
+@beaconhs/forms-core:test:  ✓ src/custom-fields.test.ts (18 tests) 35ms
+@beaconhs/forms-core:test:  ✓ src/evaluator.test.ts (36 tests) 39ms
+@beaconhs/forms-core:test:  ✓ src/_smoke.test.ts (3 tests) 91ms
+@beaconhs/forms-core:test:  ✓ src/automation.test.ts (11 tests) 274ms
+@beaconhs/forms-core:test:  ✓ src/schema.test.ts (49 tests) 586ms
+@beaconhs/forms-core:test:  ✓ src/scoring.test.ts (2 tests) 45ms
+@beaconhs/forms-core:test:  ✓ src/entity-attrs.test.ts (2 tests) 72ms
+@beaconhs/forms-core:test:  ✓ src/automation-warnings.test.ts (7 tests) 53ms
+@beaconhs/forms-core:test:  ✓ src/sanitize.test.ts (12 tests) 292ms
+@beaconhs/forms-core:test:  ✓ src/pdf-template-html.test.ts (3 tests) 19ms
+@beaconhs/forms-core:test:  ✓ src/text.test.ts (3 tests) 49ms
+@beaconhs/forms-core:test:  ✓ src/validator.test.ts (73 tests) 115ms
+@beaconhs/forms-core:test:  ✓ src/response-normalize.test.ts (23 tests) 130ms
+@beaconhs/forms-core:test: 
+@beaconhs/forms-core:test:  Test Files  14 passed (14)
+@beaconhs/forms-core:test:       Tests  246 passed (246)
+@beaconhs/forms-core:test:    Start at  15:09:56
+@beaconhs/forms-core:test:    Duration  7.42s (transform 7.55s, setup 0ms, import 36.69s, tests 1.82s, environment 28ms)
+@beaconhs/forms-core:test: 
+@beaconhs/db:test: cache bypass, force executing 38aab0772e9104ea
+@beaconhs/db:test: 
+@beaconhs/db:test: > @beaconhs/db@0.1.0 test /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/db
+@beaconhs/db:test: > vitest run
+@beaconhs/db:test: 
+@beaconhs/db:test: 
+@beaconhs/db:test:  RUN  v4.1.10 /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/db
+@beaconhs/db:test: 
+@beaconhs/db:test:  ✓ src/migration-state.test.ts (8 tests) 18ms
+@beaconhs/db:test:  ✓ src/cycas-demo-seed-plan.test.ts (9 tests) 845ms
+@beaconhs/db:test:  ✓ src/production-cutover-integrity.test.ts (14 tests) 1976ms
+@beaconhs/db:test:      ✓ keeps a linear post-baseline migration and snapshot chain  1858ms
+@beaconhs/db:test:  ✓ src/identity-integrity.test.ts (15 tests) 43ms
+@beaconhs/db:test:  ✓ src/hazid-relational-integrity.test.ts (4 tests) 197ms
+@beaconhs/db:test:  ✓ src/incident-relational-integrity.test.ts (5 tests) 470ms
+@beaconhs/db:test:      ✓ models every cascade/no-action relationship and supporting key  313ms
+@beaconhs/db:test:  ✓ src/attachment-integrity.test.ts (3 tests) 419ms
+@beaconhs/db:test:  ✓ src/equipment-relational-integrity.test.ts (5 tests) 589ms
+@beaconhs/db:test:      ✓ models every cascade/no-action edge with a tenant-aware schema key and index  423ms
+@beaconhs/db:test:  ✓ src/training-relational-integrity.test.ts (6 tests) 635ms
+@beaconhs/db:test:      ✓ models every relationship with a tenant-aware schema key and child index  420ms
+@beaconhs/db:test:  ✓ src/inspection-relational-integrity.test.ts (8 tests) 644ms
+@beaconhs/db:test:      ✓ models every relationship with a tenant-aware schema key and child index  332ms
+@beaconhs/db:test:  ✓ src/people-org-relational-integrity.test.ts (8 tests) 697ms
+@beaconhs/db:test:      ✓ models every relationship with a tenant-aware schema key and child index  342ms
+@beaconhs/db:test:  ✓ src/ppe-relational-integrity.test.ts (11 tests) 722ms
+@beaconhs/db:test:  ✓ src/client-lazy.test.ts (4 tests) 10516ms
+@beaconhs/db:test:      ✓ imports without creating runtime or super-admin clients  9659ms
+@beaconhs/db:test:      ✓ imports safely but fails closed on first unconfigured production use  304ms
+@beaconhs/db:test:  ✓ src/document-acknowledgment-integrity.test.ts (4 tests) 260ms
+@beaconhs/db:test:  ✓ src/tenant-relational-integrity.test.ts (6 tests) 1677ms
+@beaconhs/db:test:      ✓ keeps security-critical ownership and workflow principals tenant-bound  503ms
+@beaconhs/db:test:      ✓ backs every composite tenant FK with an exact parent unique key  470ms
+@beaconhs/db:test:  ✓ src/migration-rls-preflight.test.ts (19 tests) 188ms
+@beaconhs/db:test:  ✓ src/demo-hotel-seed-plan.test.ts (4 tests) 236ms
+@beaconhs/db:test:  ✓ src/report-parity-cutover.test.ts (3 tests) 92ms
+@beaconhs/db:test:  ✓ src/forward-migration-guard.test.ts (7 tests) 138ms
+@beaconhs/db:test:  ✓ src/risk-matrix.test.ts (14 tests) 43ms
+@beaconhs/db:test:  ✓ src/template-source-cutover.test.ts (4 tests) 74ms
+@beaconhs/db:test:  ✓ src/person-title-query.test.ts (2 tests) 44ms
+@beaconhs/db:test:  ✓ src/form-response-parent-lock.test.ts (7 tests) 143ms
+@beaconhs/db:test:  ✓ src/incident-injury-taxonomy-integrity.test.ts (2 tests) 36ms
+@beaconhs/db:test:  ✓ src/document-relational-integrity.test.ts (4 tests) 503ms
+@beaconhs/db:test:      ✓ models every cascade/no-action relationship and exact parent key  358ms
+@beaconhs/db:test:  ✓ src/corrective-action-relational-integrity.test.ts (2 tests) 425ms
+@beaconhs/db:test:      ✓ keeps ORM relation joins tenant-qualified  382ms
+@beaconhs/db:test:  ✓ src/risk-library-install.test.ts (2 tests) 246ms
+@beaconhs/db:test:  ✓ src/rls.test.ts (3 tests) 112ms
+@beaconhs/db:test:  ✓ src/document-book-publication.test.ts (6 tests) 38ms
+@beaconhs/db:test:  ✓ src/pg-error.test.ts (9 tests) 22ms
+@beaconhs/db:test:  ✓ src/training-completion-cutover.test.ts (6 tests) 165ms
+@beaconhs/db:test:  ✓ src/module-entitlements.test.ts (5 tests) 32ms
+@beaconhs/db:test:  ✓ src/document-review-version-provenance.test.ts (2 tests) 84ms
+@beaconhs/db:test:  ✓ src/hazid-builder-integrity.test.ts (4 tests) 161ms
+@beaconhs/db:test:  ✓ src/durable-publication-integrity.test.ts (4 tests) 99ms
+@beaconhs/db:test:  ✓ src/reporting-property-scope.test.ts (6 tests) 75ms
+@beaconhs/db:test:  ✓ src/client.test.ts (2 tests) 42ms
+@beaconhs/db:test:  ✓ src/catalog-name.test.ts (2 tests) 183ms
+@beaconhs/db:test:  ✓ src/incident-property-access.test.ts (4 tests) 241ms
+@beaconhs/db:test:  ✓ src/action-property-policy.test.ts (4 tests) 286ms
+@beaconhs/db:test:  ✓ src/risk-migration.test.ts (4 tests) 120ms
+@beaconhs/db:test:  ✓ src/storage-object-deletion-outbox.test.ts (2 tests) 33ms
+@beaconhs/db:test:  ✓ src/inspection-choice-integrity.test.ts (2 tests) 56ms
+@beaconhs/db:test:  ✓ src/reporting-view-cutover.test.ts (6 tests) 159ms
+@beaconhs/db:test:  ✓ src/document-version-integrity.test.ts (3 tests) 64ms
+@beaconhs/db:test:  ✓ src/storage-object-deletion-integrity.test.ts (5 tests) 133ms
+@beaconhs/db:test:  ✓ src/hospitality-handover.test.ts (5 tests) 88ms
+@beaconhs/db:test:  ✓ src/training-record-value-guards.test.ts (3 tests) 231ms
+@beaconhs/db:test:  ✓ src/hospitality-metering.test.ts (4 tests) 216ms
+@beaconhs/db:test:  ✓ src/maintenance-evidence.test.ts (3 tests) 79ms
+@beaconhs/db:test:  ✓ src/training-extra-fields-integrity.test.ts (2 tests) 157ms
+@beaconhs/db:test:  ✓ src/hazid-signature-invalidation-contract.test.ts (3 tests) 62ms
+@beaconhs/db:test:  ✓ src/property-scope-repair-migration.test.ts (4 tests) 106ms
+@beaconhs/db:test:  ✓ src/builder-photo-cutover.test.ts (5 tests) 69ms
+@beaconhs/db:test:  ✓ src/equipment-checkout-uniqueness.test.ts (3 tests) 74ms
+@beaconhs/db:test:  ✓ src/tenant-baseline.test.ts (3 tests) 62ms
+@beaconhs/db:test:  ✓ src/risk-lifecycle-migration.test.ts (5 tests) 111ms
+@beaconhs/db:test:  ✓ src/inspection-location-cutover.test.ts (3 tests) 25ms
+@beaconhs/db:test:  ✓ src/document-key-integrity.test.ts (2 tests) 123ms
+@beaconhs/db:test:  ✓ src/report-portrait-cutover.test.ts (1 test) 21ms
+@beaconhs/db:test:  ✓ src/document-category-index.test.ts (3 tests) 17ms
+@beaconhs/db:test:  ✓ src/custom-field-integrity.test.ts (2 tests) 19ms
+@beaconhs/db:test:  ✓ src/person-title-cutover-contract.test.ts (2 tests) 14ms
+@beaconhs/db:test: 
+@beaconhs/db:test:  Test Files  63 passed (63)
+@beaconhs/db:test:       Tests  312 passed (312)
+@beaconhs/db:test:    Start at  15:10:06
+@beaconhs/db:test:    Duration  49.08s (transform 32.39s, setup 0ms, import 337.19s, tests 25.45s, environment 95ms)
+@beaconhs/db:test: 
+@beaconhs/sync:test: cache bypass, force executing ee34e163d683e1d4
+@beaconhs/sync:test: 
+@beaconhs/sync:test: > @beaconhs/sync@0.1.0 test /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/sync
+@beaconhs/sync:test: > node --import tsx --test src/*.test.ts
+@beaconhs/sync:test: 
+@beaconhs/sync:test: ✔ public IP policy rejects local, private, special, mapped, and documentation ranges (23.988428ms)
+@beaconhs/sync:test: ✔ hostname normalization rejects URL-shaped and malformed database hosts (3.227257ms)
+@beaconhs/sync:test: ✔ DNS policy rejects a hostname if any answer is non-public (17.431946ms)
+@beaconhs/sync:test: ✔ every DNS resolution is revalidated so a rebinding answer fails closed (1.372241ms)
+@beaconhs/sync:test: ✔ outbound configuration and redirect policy reject unsafe request metadata (63.76702ms)
+@beaconhs/sync:test: ✔ secure fetch rejects unsafe schemes, credentials, normalized private literals, and hop headers (8.690872ms)
+@beaconhs/sync:test: ✔ an abort signal interrupts an in-flight DNS resolution (2.38128ms)
+@beaconhs/sync:test: ✔ database connections reject private hosts and unencrypted credentials before loading a driver (1.790414ms)
+@beaconhs/sync:test: ✔ snapshot archive policy fails closed for processing failures and empty entities (1.518058ms)
+@beaconhs/sync:test: ▶ people sync convergence policy
+@beaconhs/sync:test:   ✔ does not treat an unchanged source hash as proof the target is unchanged (2.987632ms)
+@beaconhs/sync:test:   ✔ protects differing manual rows during first natural-key adoption (1.281417ms)
+@beaconhs/sync:test:   ✔ repairs provenance without conflicting when the visible manual title matches (0.759356ms)
+@beaconhs/sync:test:   ✔ conflicts only when manual-wins target edits overlap a changed source (0.553968ms)
+@beaconhs/sync:test: ✔ people sync convergence policy (12.216523ms)
+@beaconhs/sync:test: ▶ people sync canonical title cutover
+@beaconhs/sync:test:   ✔ reads the primary title relationship instead of the retired people column (7.365469ms)
+@beaconhs/sync:test:   ✔ tracks source ownership without deleting co-owned manual titles (1.178555ms)
+@beaconhs/sync:test:   ✔ checks target convergence instead of trusting rowHash alone (0.662656ms)
+@beaconhs/sync:test:   ✔ uses the last persisted sync result as the manual-wins drift baseline (0.52124ms)
+@beaconhs/sync:test:   ✔ does not overwrite a differing manual person during natural-key adoption (0.576419ms)
+@beaconhs/sync:test:   ✔ serializes title ownership changes through the parent person (0.523785ms)
+@beaconhs/sync:test:   ✔ normalizes source display text before resolving the unique catalogue key (0.465249ms)
+@beaconhs/sync:test: ✔ people sync canonical title cutover (18.065576ms)
+@beaconhs/sync:test: ℹ tests 20
+@beaconhs/sync:test: ℹ suites 2
+@beaconhs/sync:test: ℹ pass 20
+@beaconhs/sync:test: ℹ fail 0
+@beaconhs/sync:test: ℹ cancelled 0
+@beaconhs/sync:test: ℹ skipped 0
+@beaconhs/sync:test: ℹ todo 0
+@beaconhs/sync:test: ℹ duration_ms 860.002007
+@beaconhs/compliance:test: cache bypass, force executing ad3a292989d1f6a0
+@beaconhs/compliance:test: 
+@beaconhs/compliance:test: > @beaconhs/compliance@0.1.0 test /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/compliance
+@beaconhs/compliance:test: > vitest run
+@beaconhs/compliance:test: 
+@beaconhs/compliance:test: 
+@beaconhs/compliance:test:  RUN  v4.1.10 /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/compliance
+@beaconhs/compliance:test: 
+@beaconhs/compliance:test:  ✓ src/property-audience-contract.test.ts (1 test) 12ms
+@beaconhs/compliance:test:  ✓ src/hazard-assessment-evaluation.test.ts (1 test) 42ms
+@beaconhs/compliance:test:  ✓ src/training-evaluation.test.ts (6 tests) 567ms
+@beaconhs/compliance:test:  ✓ src/job-title-evaluation.test.ts (1 test) 165ms
+@beaconhs/compliance:test:  ✓ src/schedule.test.ts (9 tests) 4119ms
+@beaconhs/compliance:test:      ✓ keeps the previous weekly period active until the next scheduled fire  1273ms
+@beaconhs/compliance:test:      ✓ starts a newly-created mid-period obligation at the next fire  697ms
+@beaconhs/compliance:test:      ✓ allows a daily next-day due offset but rejects overlapping cycles  958ms
+@beaconhs/compliance:test:      ✓ uses exact weekday fires and due offsets without a weekly fallback  400ms
+@beaconhs/compliance:test:      ✓ rejects an offset that overlaps the shortest upcoming cron interval  388ms
+@beaconhs/compliance:test:  ✓ src/target-lock.test.ts (2 tests) 24ms
+@beaconhs/compliance:test:  ✓ src/target-retirement.test.ts (10 tests) 37ms
+@beaconhs/compliance:test:  ✓ src/audience-targets.test.ts (3 tests) 86ms
+@beaconhs/compliance:test:  ✓ src/record-evaluation.test.ts (2 tests) 122ms
+@beaconhs/compliance:test:  ✓ src/evidence.test.ts (8 tests) 90ms
+@beaconhs/compliance:test:  ✓ src/entitlement.test.ts (4 tests) 21ms
+@beaconhs/compliance:test:  ✓ src/materialize.test.ts (10 tests) 64ms
+@beaconhs/compliance:test: 
+@beaconhs/compliance:test:  Test Files  12 passed (12)
+@beaconhs/compliance:test:       Tests  57 passed (57)
+@beaconhs/compliance:test:    Start at  15:11:01
+@beaconhs/compliance:test:    Duration  17.72s (transform 26.16s, setup 0ms, import 86.42s, tests 5.35s, environment 251ms)
+@beaconhs/compliance:test: 
+@beaconhs/reports:test: cache bypass, force executing aa86289e28f382a8
+@beaconhs/reports:test: 
+@beaconhs/reports:test: > @beaconhs/reports@0.1.0 test /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/reports
+@beaconhs/reports:test: > vitest run
+@beaconhs/reports:test: 
+@beaconhs/reports:test: 
+@beaconhs/reports:test:  RUN  v4.1.10 /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/reports
+@beaconhs/reports:test: 
+@beaconhs/reports:test:  ✓ src/client-boundary.test.ts (1 test) 16ms
+@beaconhs/reports:test:  ✓ src/export-mode.test.ts (2 tests) 16ms
+@beaconhs/reports:test:  ✓ src/wallet-cards.test.ts (2 tests) 17ms
+@beaconhs/reports:test:  ✓ src/source-catalog.test.ts (5 tests) 27ms
+@beaconhs/reports:test:  ✓ src/seed-parity.test.ts (5 tests) 50ms
+@beaconhs/reports:test: 
+@beaconhs/reports:test:  Test Files  5 passed (5)
+@beaconhs/reports:test:       Tests  15 passed (15)
+@beaconhs/reports:test:    Start at  15:11:22
+@beaconhs/reports:test:    Duration  5.45s (transform 2.77s, setup 0ms, import 5.55s, tests 126ms, environment 5ms)
+@beaconhs/reports:test: 
+@beaconhs/analytics:test: cache bypass, force executing 0d53e19368df2797
+@beaconhs/analytics:test: 
+@beaconhs/analytics:test: > @beaconhs/analytics@0.1.0 test /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/analytics
+@beaconhs/analytics:test: > vitest run
+@beaconhs/analytics:test: 
+@beaconhs/analytics:test: 
+@beaconhs/analytics:test:  RUN  v4.1.10 /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/analytics
+@beaconhs/analytics:test: 
+@beaconhs/analytics:test:  ✓ src/server/discover.test.ts (4 tests) 262ms
+@beaconhs/analytics:test:  ✓ src/server/discover.entitlements.test.ts (2 tests) 241ms
+@beaconhs/analytics:test:  ✓ src/server/compile.test.ts (6 tests) 104ms
+@beaconhs/analytics:test:  ✓ src/server/execute.test.ts (2 tests) 11ms
+@beaconhs/analytics:test:  ✓ src/server/property-reporting.test.ts (2 tests) 121ms
+@beaconhs/analytics:test: 
+@beaconhs/analytics:test:  Test Files  5 passed (5)
+@beaconhs/analytics:test:       Tests  16 passed (16)
+@beaconhs/analytics:test:    Start at  15:11:30
+@beaconhs/analytics:test:    Duration  9.86s (transform 10.88s, setup 0ms, import 33.81s, tests 739ms, environment 2ms)
+@beaconhs/analytics:test: 
+@beaconhs/emails:test: cache bypass, force executing 3cd2ac4e4c335711
+@beaconhs/emails:test: 
+@beaconhs/emails:test: > @beaconhs/emails@0.1.0 test /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/emails
+@beaconhs/emails:test: > vitest run
+@beaconhs/emails:test: 
+@beaconhs/emails:test: 
+@beaconhs/emails:test:  RUN  v4.1.10 /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/emails
+@beaconhs/emails:test: 
+@beaconhs/emails:test:  ✓ src/transport.test.ts (51 tests) 92ms
+@beaconhs/emails:test: 
+@beaconhs/emails:test:  Test Files  1 passed (1)
+@beaconhs/emails:test:       Tests  51 passed (51)
+@beaconhs/emails:test:    Start at  15:11:42
+@beaconhs/emails:test:    Duration  1.03s (transform 275ms, setup 0ms, import 422ms, tests 92ms, environment 0ms)
+@beaconhs/emails:test: 
+@beaconhs/sms:test: cache bypass, force executing 9fe81af906e14cd7
+@beaconhs/sms:test: 
+@beaconhs/sms:test: > @beaconhs/sms@0.1.0 test /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/sms
+@beaconhs/sms:test: > vitest run
+@beaconhs/sms:test: 
+@beaconhs/sms:test: 
+@beaconhs/sms:test:  RUN  v4.1.10 /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/sms
+@beaconhs/sms:test: 
+@beaconhs/sms:test:  ✓ src/transport.test.ts (21 tests) 94ms
+@beaconhs/sms:test: 
+@beaconhs/sms:test:  Test Files  1 passed (1)
+@beaconhs/sms:test:       Tests  21 passed (21)
+@beaconhs/sms:test:    Start at  15:11:45
+@beaconhs/sms:test:    Duration  810ms (transform 161ms, setup 0ms, import 245ms, tests 94ms, environment 0ms)
+@beaconhs/sms:test: 
+@beaconhs/forms-pdf:test: cache bypass, force executing 7f6e64621d20b8ef
+@beaconhs/forms-pdf:test: 
+@beaconhs/forms-pdf:test: > @beaconhs/forms-pdf@0.1.0 test /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/forms-pdf
+@beaconhs/forms-pdf:test: > vitest run --no-file-parallelism
+@beaconhs/forms-pdf:test: 
+@beaconhs/forms-pdf:test: 
+@beaconhs/forms-pdf:test:  RUN  v4.1.10 /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/forms-pdf
+@beaconhs/forms-pdf:test: 
+@beaconhs/forms-pdf:test:  ✓ src/report-document.test.ts (1 test) 1586ms
+@beaconhs/forms-pdf:test:      ✓ prints the canonical seeded layout on portrait Letter paper  1583ms
+@beaconhs/forms-pdf:test:  ✓ src/design-png.test.ts (1 test) 1196ms
+@beaconhs/forms-pdf:test:      ✓ renders both CR80 faces at printer resolution  1194ms
+@beaconhs/forms-pdf:test:  ✓ src/wallet-card-size.test.ts (1 test) 918ms
+@beaconhs/forms-pdf:test:      ✓ locks a batch of fronts to the CR80 MediaBox  915ms
+@beaconhs/forms-pdf:test:  ✓ src/util.test.ts (14 tests) 665ms
+@beaconhs/forms-pdf:test:      ✓ downsamples large raster images without changing the stored original  652ms
+@beaconhs/forms-pdf:test:  ✓ src/templates/credential-theme.test.ts (1 test) 7ms
+@beaconhs/forms-pdf:test: 
+@beaconhs/forms-pdf:test:  Test Files  5 passed (5)
+@beaconhs/forms-pdf:test:       Tests  18 passed (18)
+@beaconhs/forms-pdf:test:    Start at  15:11:48
+@beaconhs/forms-pdf:test:    Duration  22.29s (transform 2.74s, setup 0ms, import 15.79s, tests 4.37s, environment 1ms)
+@beaconhs/forms-pdf:test: 
+@beaconhs/jobs:test: cache bypass, force executing 7fae6bb1ae68f57b
+@beaconhs/jobs:test: 
+@beaconhs/jobs:test: > @beaconhs/jobs@0.1.0 test /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/jobs
+@beaconhs/jobs:test: > vitest run
+@beaconhs/jobs:test: 
+@beaconhs/jobs:test: 
+@beaconhs/jobs:test:  RUN  v4.1.10 /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/jobs
+@beaconhs/jobs:test: 
+@beaconhs/jobs:test:  ✓ src/pdf-on-demand-isolation.test.ts (1 test) 7ms
+@beaconhs/jobs:test:  ✓ src/web-push.test.ts (5 tests) 103ms
+@beaconhs/jobs:test:  ✓ src/lazy-runtime.test.ts (9 tests) 373ms
+@beaconhs/jobs:test:  ✓ src/queue-validation.test.ts (4 tests) 27ms
+@beaconhs/jobs:test: 
+@beaconhs/jobs:test:  Test Files  4 passed (4)
+@beaconhs/jobs:test:       Tests  19 passed (19)
+@beaconhs/jobs:test:    Start at  15:12:12
+@beaconhs/jobs:test:    Duration  1.21s (transform 633ms, setup 0ms, import 1.33s, tests 510ms, environment 1ms)
+@beaconhs/jobs:test: 
+@beaconhs/ai:test: cache bypass, force executing 9d5d5756693164a6
+@beaconhs/ai:test: 
+@beaconhs/ai:test: > @beaconhs/ai@0.1.0 test /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/ai
+@beaconhs/ai:test: > node --import tsx --test src/*.test.ts
+@beaconhs/ai:test: 
+@beaconhs/ai:test: ✔ AI provider validation accepts catalogue entries only, never inherited object keys (1.869185ms)
+@beaconhs/ai:test: ✔ AI base URL validation accepts only canonical public HTTPS overrides (32.869356ms)
+@beaconhs/ai:test: ✔ AI provider transport rejects unsafe endpoints before opening a socket (4.442927ms)
+@beaconhs/ai:test: ✔ extractJsonObject reads fenced and raw objects (3.285434ms)
+@beaconhs/ai:test: ✔ coerceJournalAnalysis maps the OpenRouter/Kimi field names onto the stored schema (6.206865ms)
+@beaconhs/ai:test: ▶ AI vision request bounds
+@beaconhs/ai:test:   ✔ accepts bounded storage bytes (1.621907ms)
+@beaconhs/ai:test:   ✔ rejects empty, excessive-count, and individually oversized images (1.352379ms)
+@beaconhs/ai:test:   ✔ rejects aggregate base64-expansion risk and oversized prompts (0.949875ms)
+@beaconhs/ai:test: ✔ AI vision request bounds (6.877477ms)
+@beaconhs/ai:test: ℹ tests 8
+@beaconhs/ai:test: ℹ suites 1
+@beaconhs/ai:test: ℹ pass 8
+@beaconhs/ai:test: ℹ fail 0
+@beaconhs/ai:test: ℹ cancelled 0
+@beaconhs/ai:test: ℹ skipped 0
+@beaconhs/ai:test: ℹ todo 0
+@beaconhs/ai:test: ℹ duration_ms 1180.547529
+@beaconhs/events:test: cache bypass, force executing 67bb20304b2cf6f5
+@beaconhs/events:test: 
+@beaconhs/events:test: > @beaconhs/events@0.1.0 test /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/events
+@beaconhs/events:test: > vitest run
+@beaconhs/events:test: 
+@beaconhs/events:test: 
+@beaconhs/events:test:  RUN  v4.1.10 /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/events
+@beaconhs/events:test: 
+@beaconhs/events:test:  ✓ src/native-flow-email-cutover.test.ts (4 tests) 9ms
+@beaconhs/events:test:  ✓ src/email-html.test.ts (2 tests) 8ms
+@beaconhs/events:test:  ✓ src/compliance-transitions.test.ts (4 tests) 14ms
+@beaconhs/events:test: 
+@beaconhs/events:test:  Test Files  3 passed (3)
+@beaconhs/events:test:       Tests  10 passed (10)
+@beaconhs/events:test:    Start at  15:12:17
+@beaconhs/events:test:    Duration  4.65s (transform 1.29s, setup 0ms, import 6.62s, tests 31ms, environment 1ms)
+@beaconhs/events:test: 
+@beaconhs/integrations:test: cache bypass, force executing c49ce2d125969fb8
+@beaconhs/integrations:test: 
+@beaconhs/integrations:test: > @beaconhs/integrations@0.1.0 test /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/integrations
+@beaconhs/integrations:test: > node --import tsx --test src/*.test.ts
+@beaconhs/integrations:test: 
+@beaconhs/integrations:test: ✔ PMS room states normalize behind a vendor-neutral boundary (3.7702ms)
+@beaconhs/integrations:test: ✔ PMS room identity is stable and rejects unsafe identifiers (1.933037ms)
+@beaconhs/integrations:test: ✔ email destination sanitizes authored markup and cannot promote record values to HTML (80.60952ms)
+@beaconhs/integrations:test: ✔ HTTP destination connectivity checks reject non-HTTPS and private targets without egress (11.264884ms)
+@beaconhs/integrations:test: ✔ HTTP destination resumes a known partial attempt without replaying successful items (6.938517ms)
+@beaconhs/integrations:test: ✔ partial ledger refs remain retryable and only completed refs satisfy send-once (1.331569ms)
+@beaconhs/integrations:test: ✔ SQL destination requires an identity column before it can connect or insert (2.496008ms)
+@beaconhs/integrations:test: ℹ tests 7
+@beaconhs/integrations:test: ℹ suites 0
+@beaconhs/integrations:test: ℹ pass 7
+@beaconhs/integrations:test: ℹ fail 0
+@beaconhs/integrations:test: ℹ cancelled 0
+@beaconhs/integrations:test: ℹ skipped 0
+@beaconhs/integrations:test: ℹ todo 0
+@beaconhs/integrations:test: ℹ duration_ms 8244.901538
+@beaconhs/auth:test: cache bypass, force executing e4a8ca2c6beb201d
+@beaconhs/auth:test: 
+@beaconhs/auth:test: > @beaconhs/auth@0.1.0 test /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/auth
+@beaconhs/auth:test: > vitest run
+@beaconhs/auth:test: 
+@beaconhs/auth:test: 
+@beaconhs/auth:test:  RUN  v4.1.10 /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/auth
+@beaconhs/auth:test: 
+@beaconhs/auth:test:  ↓ src/cycas-board.integration.test.ts (1 test | 1 skipped)
+@beaconhs/auth:test:  ✓ src/public-origin.test.ts (6 tests) 12ms
+@beaconhs/auth:test:  ✓ src/auth-email-branding.test.ts (4 tests) 12ms
+@beaconhs/auth:test: stdout | src/lazy-runtime.test.ts > lazy auth runtime > uses the explicit loopback-only SMTP transport for local magic links
+@beaconhs/auth:test: [auth] magic-link accepted by the local SMTP server for operator@example.com
+@beaconhs/auth:test: 
+@beaconhs/auth:test:  ✓ src/lazy-runtime.test.ts (15 tests) 183ms
+@beaconhs/auth:test: 
+@beaconhs/auth:test:  Test Files  3 passed | 1 skipped (4)
+@beaconhs/auth:test:       Tests  25 passed | 1 skipped (26)
+@beaconhs/auth:test:    Start at  15:12:33
+@beaconhs/auth:test:    Duration  827ms (transform 883ms, setup 0ms, import 1.02s, tests 207ms, environment 1ms)
+@beaconhs/auth:test: 
+@beaconhs/worker:test: cache bypass, force executing d0d4639f0959a770
+@beaconhs/worker:test: 
+@beaconhs/worker:test: > @beaconhs/worker@0.1.0 test /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/apps/worker
+@beaconhs/worker:test: > vitest run
+@beaconhs/worker:test: 
+@beaconhs/worker:test: 
+@beaconhs/worker:test:  RUN  v4.1.10 /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/apps/worker
+@beaconhs/worker:test: 
+@beaconhs/worker:test:  ✓ src/storage-init.test.ts (2 tests) 268ms
+@beaconhs/worker:test:  ✓ src/lib/cron.test.ts (4 tests) 480ms
+@beaconhs/worker:test:  ✓ src/lib/storage-object-deletion-outbox.test.ts (3 tests) 89ms
+@beaconhs/worker:test:  ✓ src/lib/equipment-maintenance-dispatch-policy.test.ts (2 tests) 82ms
+@beaconhs/worker:test:  ✓ src/workers/email.test.ts (6 tests) 329ms
+@beaconhs/worker:test:      ✓ records a platform-suppressed send without contacting a provider  306ms
+@beaconhs/worker:test:  ✓ src/workers/notify.test.ts (2 tests) 386ms
+@beaconhs/worker:test:      ✓ drops a queued automatic notification before creating or delivering any channel  381ms
+@beaconhs/worker:test:  ✓ src/lib/operational-task-schedule.test.ts (12 tests) 493ms
+@beaconhs/worker:test:      ✓ keeps the configured local time across spring DST and calculates due time from the instant  302ms
+@beaconhs/worker:test:  ✓ src/lib/form-compliance-schedule.test.ts (3 tests) 730ms
+@beaconhs/worker:test:      ✓ does not run between schedule boundaries  317ms
+@beaconhs/worker:test:  ✓ src/lib/report-cadence.test.ts (6 tests) 780ms
+@beaconhs/worker:test:      ✓ skips months that do not contain the requested day  375ms
+@beaconhs/worker:test:  ✓ src/workers/push.test.ts (6 tests) 1728ms
+@beaconhs/worker:test:      ✓ suppresses a marked Compliance push linking to /training/learn/course-1 after revocation  1719ms
+@beaconhs/worker:test:  ✓ src/lib/domain-event-outbox-policy.test.ts (3 tests) 17ms
+@beaconhs/worker:test:  ✓ src/lib/pdf-artifact-policy.test.ts (3 tests) 13ms
+@beaconhs/worker:test:  ✓ src/lib/email-attachment-policy.test.ts (5 tests) 12ms
+@beaconhs/worker:test:  ✓ src/lib/external-artifact-commit.test.ts (4 tests) 53ms
+@beaconhs/worker:test:  ✓ src/lib/resolve-email-transport.test.ts (4 tests) 18ms
+@beaconhs/worker:test:  ✓ src/lib/journal-analysis-cutover.test.ts (1 test) 10ms
+@beaconhs/worker:test:  ✓ src/lib/durable-publication-policy.test.ts (3 tests) 37ms
+@beaconhs/worker:test:  ✓ src/lib/resolve-sms-transport.test.ts (1 test) 13ms
+@beaconhs/worker:test:  ✓ src/lib/report-source-access-contract.test.ts (4 tests) 55ms
+@beaconhs/worker:test:  ✓ src/lib/pdf-email-failure-contract.test.ts (1 test) 6ms
+@beaconhs/worker:test:  ✓ src/lib/sync-compliance-contract.test.ts (1 test) 8ms
+@beaconhs/worker:test:  ✓ src/lib/report-wallet-export-contract.test.ts (1 test) 9ms
+@beaconhs/worker:test:  ✓ src/lib/domain-event-contract.test.ts (2 tests) 18ms
+@beaconhs/worker:test:  ✓ src/lib/attachment-upload-reconciler.test.ts (6 tests) 18ms
+@beaconhs/worker:test:  ✓ src/lib/operational-task-lifecycle.test.ts (2 tests) 7ms
+@beaconhs/worker:test:  ✓ src/lib/domain-event-web-command.test.ts (2 tests) 42ms
+@beaconhs/worker:test:  ✓ src/lib/compliance-dispatch-lifecycle.test.ts (7 tests) 28ms
+@beaconhs/worker:test: 
+@beaconhs/worker:test:  Test Files  27 passed (27)
+@beaconhs/worker:test:       Tests  96 passed (96)
+@beaconhs/worker:test:    Start at  15:12:36
+@beaconhs/worker:test:    Duration  14.59s (transform 19.22s, setup 0ms, import 59.17s, tests 5.73s, environment 60ms)
+@beaconhs/worker:test: 
+@beaconhs/web:test: cache bypass, force executing 28efd3ebf9c9d0a0
+@beaconhs/web:test: 
+@beaconhs/web:test: > @beaconhs/web@0.1.0 test /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/apps/web
+@beaconhs/web:test: > vitest run --passWithNoTests
+@beaconhs/web:test: 
+@beaconhs/web:test: 
+@beaconhs/web:test:  RUN  v4.1.10 /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/apps/web
+@beaconhs/web:test: 
+@beaconhs/web:test:  ✓ src/app/api/health/ready/route.test.ts (2 tests) 2839ms
+@beaconhs/web:test:      ✓ requires auth, runtime DB, super-admin DB, and Redis  2829ms
+@beaconhs/web:test:  ✓ src/lib/security-headers.test.ts (6 tests) 3508ms
+@beaconhs/web:test:      ✓ does not leave custom inline app scripts without a request nonce  2064ms
+@beaconhs/web:test:      ✓ does not load mutable latest-tag browser dependencies  1429ms
+@beaconhs/web:test:  ✓ src/lib/dynamic-uuid-route-guards.test.ts (3 tests) 3793ms
+@beaconhs/web:test:      ✓ does not impose UUID syntax on token-, slug-, key-, enum-, or text-id parameters  668ms
+@beaconhs/web:test:      ✓ uses the canonical UUID helper instead of route-local regex implementations  2438ms
+@beaconhs/web:test:      ✓ guards every UUID-backed dynamic parameter before route-level data access  674ms
+@beaconhs/web:test:  ✓ src/lib/image-upload-optimization.test.ts (3 tests) 4687ms
+@beaconhs/web:test:      ✓ resizes and recompresses an oversized camera photo  1840ms
+@beaconhs/web:test:      ✓ converts a large transparent image to webp  2805ms
+@beaconhs/web:test:  ❯ src/lib/forms/form-response-parent-lock-contract.test.ts (9 tests | 1 failed) 8036ms
+@beaconhs/web:test:      × keeps an exhaustive inventory of every web and worker response writer 7938ms
+@beaconhs/web:test:      ✓ keeps every non-submission response create evidence-ineligible 60ms
+@beaconhs/web:test:      ✓ guards every runtime form-response update writer outside the owning HazID action 8ms
+@beaconhs/web:test:      ✓ guards response-owned workflow and monitoring child rows before mutation 12ms
+@beaconhs/web:test:      ✓ never takes a response row lock before the shared parent-first guard 4ms
+@beaconhs/web:test:      ✓ keyset-pages overdue sessions so skipped locked parents cannot starve later rows 1ms
+@beaconhs/web:test:      ✓ replaces durable response PDFs without overwriting the committed object first 1ms
+@beaconhs/web:test:      ✓ materializes every form-evidence lifecycle transition in its write transaction 2ms
+@beaconhs/web:test:      ✓ does not rematerialize compliance for draft payload or monitor-only writes 4ms
+@beaconhs/web:test:  ❯ src/lib/native-dependencies.test.ts (2 tests | 1 failed) 8591ms
+@beaconhs/web:test:      × loads the canvas backend and emits a real PNG 6132ms
+@beaconhs/web:test:      ✓ renders a PDF page through unpdf with the native canvas backend  2450ms
+@beaconhs/web:test: stderr | src/app/(platform)/platform/branding/_form.test.tsx > preserves edits on failure, hides private errors, and restores saved values on Discard
+@beaconhs/web:test: The current testing environment is not configured to support act(...)
+@beaconhs/web:test: 
+@beaconhs/web:test: stderr | src/app/(platform)/platform/branding/_form.test.tsx > preserves edits on failure, hides private errors, and restores saved values on Discard
+@beaconhs/web:test: The current testing environment is not configured to support act(...)
+@beaconhs/web:test: 
+@beaconhs/web:test: stderr | src/app/(platform)/platform/branding/_form.test.tsx > preserves edits on failure, hides private errors, and restores saved values on Discard
+@beaconhs/web:test: The current testing environment is not configured to support act(...)
+@beaconhs/web:test: The current testing environment is not configured to support act(...)
+@beaconhs/web:test: 
+@beaconhs/web:test: stderr | src/app/(platform)/platform/branding/_form.test.tsx > preserves edits on failure, hides private errors, and restores saved values on Discard
+@beaconhs/web:test: The current testing environment is not configured to support act(...)
+@beaconhs/web:test: The current testing environment is not configured to support act(...)
+@beaconhs/web:test: 
+@beaconhs/web:test: stderr | src/app/(platform)/platform/branding/_form.test.tsx > preserves edits on failure, hides private errors, and restores saved values on Discard
+@beaconhs/web:test: The current testing environment is not configured to support act(...)
+@beaconhs/web:test: 
+@beaconhs/web:test: stderr | src/app/(platform)/platform/branding/_form.test.tsx > preserves the clicked asset reset button in the existing action payload
+@beaconhs/web:test: The current testing environment is not configured to support act(...)
+@beaconhs/web:test: 
+@beaconhs/web:test: stderr | src/app/(platform)/platform/branding/_form.test.tsx > preserves the clicked asset reset button in the existing action payload
+@beaconhs/web:test: The current testing environment is not configured to support act(...)
+@beaconhs/web:test: The current testing environment is not configured to support act(...)
+@beaconhs/web:test: 
+@beaconhs/web:test: stderr | src/app/(platform)/platform/branding/_form.test.tsx > preserves the clicked asset reset button in the existing action payload
+@beaconhs/web:test: The current testing environment is not configured to support act(...)
+@beaconhs/web:test: 
+@beaconhs/web:test:  ✓ src/app/(platform)/platform/branding/_form.test.tsx (2 tests) 1157ms
+@beaconhs/web:test:    ✓ preserves edits on failure, hides private errors, and restores saved values on Discard  909ms
+@beaconhs/web:test:  ✓ src/lib/hospitality/properties-controls.test.tsx (5 tests) 1605ms
+@beaconhs/web:test:      ✓ preserves a deep-linked page on mount and resets to page one when search is cleared  986ms
+@beaconhs/web:test:      ✓ disables the correct boundary on page 1 while preserving search  552ms
+@beaconhs/web:test: stderr | src/app/(app)/admin/settings/settings-form.test.tsx > settings form state > retains edits on failure, reports the failure and supports Discard
+@beaconhs/web:test: The current testing environment is not configured to support act(...)
+@beaconhs/web:test: 
+@beaconhs/web:test: stderr | src/app/(app)/admin/settings/settings-form.test.tsx > settings form state > retains edits on failure, reports the failure and supports Discard
+@beaconhs/web:test: The current testing environment is not configured to support act(...)
+@beaconhs/web:test: 
+@beaconhs/web:test:  ❯ scripts/dev-first-identity.test.ts (19 tests | 1 failed) 5409ms
+@beaconhs/web:test:      ✓ rejects environment production 12ms
+@beaconhs/web:test:      ✓ rejects environment staging 1ms
+@beaconhs/web:test:      ✓ rejects environment  1ms
+@beaconhs/web:test:      ✓ rejects environment undefined 1ms
+@beaconhs/web:test:      ✓ rejects conflicting runtime production 3ms
+@beaconhs/web:test:      ✓ rejects conflicting runtime staging 2ms
+@beaconhs/web:test:      ✓ rejects wrong confirmation  2ms
+@beaconhs/web:test:      ✓ rejects wrong confirmation yes 1ms
+@beaconhs/web:test:      ✓ rejects wrong confirmation undefined 1ms
+@beaconhs/web:test:      ✓ rejects wrong database postgresql://beaconhs_super:test@staging/beaconhs 2ms
+@beaconhs/web:test:      ✓ rejects wrong database postgresql://beaconhs_super:test@production/beaconhs 1ms
+@beaconhs/web:test:      ✓ rejects wrong database postgresql://beaconhs_super:test@uvanoo-dev-postgres/wrong 1ms
+@beaconhs/web:test:      ✓ rejects wrong database postgresql://postgres:test@uvanoo-dev-postgres/beaconhs 0ms
+@beaconhs/web:test:      ✓ rejects wrong database postgresql://beaconhs_super:test@uvanoo-dev-postgres/beaconhs?host=production 1ms
+@beaconhs/web:test:      ✓ rejects missing or mismatched Docker evidence and non-DEV email 2ms
+@beaconhs/web:test:      ✓ accepts only an empty verified DEV target 5ms
+@beaconhs/web:test:      ✓ uses the supported server API, disables auto-session creation, audits and refuses a second run 128ms
+@beaconhs/web:test:      ✓ rejects a connected-server mismatch before account creation 1ms
+@beaconhs/web:test:      × keeps public signup disabled with no public bootstrap route or credential fabrication 5238ms
+@beaconhs/web:test: stderr | src/app/(app)/admin/settings/settings-form.test.tsx > settings form state > retains edits on failure, reports the failure and supports Discard
+@beaconhs/web:test: The current testing environment is not configured to support act(...)
+@beaconhs/web:test: The current testing environment is not configured to support act(...)
+@beaconhs/web:test: 
+@beaconhs/web:test: stderr | src/app/(app)/admin/settings/settings-form.test.tsx > settings form state > retains edits on failure, reports the failure and supports Discard
+@beaconhs/web:test: The current testing environment is not configured to support act(...)
+@beaconhs/web:test: The current testing environment is not configured to support act(...)
+@beaconhs/web:test: 
+@beaconhs/web:test: stderr | src/app/(app)/admin/settings/settings-form.test.tsx > settings form state > retains edits on failure, reports the failure and supports Discard
+@beaconhs/web:test: The current testing environment is not configured to support act(...)
+@beaconhs/web:test: 
+@beaconhs/web:test: stderr | src/app/(app)/admin/settings/settings-form.test.tsx > settings form state > guards navigation while dirty and clears dirty state only after successful save
+@beaconhs/web:test: The current testing environment is not configured to support act(...)
+@beaconhs/web:test: 
+@beaconhs/web:test: stderr | src/app/(app)/admin/settings/settings-form.test.tsx > settings form state > guards navigation while dirty and clears dirty state only after successful save
+@beaconhs/web:test: The current testing environment is not configured to support act(...)
+@beaconhs/web:test: 
+@beaconhs/web:test: stderr | src/app/(app)/admin/settings/settings-form.test.tsx > settings form state > guards navigation while dirty and clears dirty state only after successful save
+@beaconhs/web:test: The current testing environment is not configured to support act(...)
+@beaconhs/web:test: The current testing environment is not configured to support act(...)
+@beaconhs/web:test: 
+@beaconhs/web:test: stderr | src/app/(app)/admin/settings/settings-form.test.tsx > settings form state > guards navigation while dirty and clears dirty state only after successful save
+@beaconhs/web:test: The current testing environment is not configured to support act(...)
+@beaconhs/web:test: 
+@beaconhs/web:test:  ✓ src/app/(app)/admin/settings/settings-form.test.tsx (2 tests) 2738ms
+@beaconhs/web:test:      ✓ retains edits on failure, reports the failure and supports Discard  2253ms
+@beaconhs/web:test:      ✓ guards navigation while dirty and clears dirty state only after successful save  461ms
+@beaconhs/web:test:  ✓ src/lib/request-body.test.ts (5 tests) 1002ms
+@beaconhs/web:test:      ✓ accepts a body exactly at the byte boundary  886ms
+@beaconhs/web:test:  ✓ src/app/(app)/hospitality/maintenance/report/quick-maintenance-form.test.tsx (2 tests) 3405ms
+@beaconhs/web:test:      ✓ shows the single authorised hotel and preserves the submitted location/source  2287ms
+@beaconhs/web:test:      ✓ requires a property and only offers its rooms after selection  1106ms
+@beaconhs/web:test: stderr | src/components/tenant-branding-form.test.tsx > copies the effective colour without saving and reports clipboard failure honestly
+@beaconhs/web:test: An update to TenantBrandingForm inside a test was not wrapped in act(...).
+@beaconhs/web:test: 
+@beaconhs/web:test: When testing, code that causes React state updates should be wrapped into act(...):
+@beaconhs/web:test: 
+@beaconhs/web:test: act(() => {
+@beaconhs/web:test:   /* fire events that update state */
+@beaconhs/web:test: });
+@beaconhs/web:test: /* assert on the output */
+@beaconhs/web:test: 
+@beaconhs/web:test: This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+@beaconhs/web:test: 
+@beaconhs/web:test: stderr | src/components/tenant-branding-form.test.tsx > copies the effective colour without saving and reports clipboard failure honestly
+@beaconhs/web:test: An update to TenantBrandingForm inside a test was not wrapped in act(...).
+@beaconhs/web:test: 
+@beaconhs/web:test: When testing, code that causes React state updates should be wrapped into act(...):
+@beaconhs/web:test: 
+@beaconhs/web:test: act(() => {
+@beaconhs/web:test:   /* fire events that update state */
+@beaconhs/web:test: });
+@beaconhs/web:test: /* assert on the output */
+@beaconhs/web:test: 
+@beaconhs/web:test: This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+@beaconhs/web:test: 
+@beaconhs/web:test: stderr | src/components/tenant-branding-form.test.tsx > copies the effective colour without saving and reports clipboard failure honestly
+@beaconhs/web:test: An update to TenantBrandingForm inside a test was not wrapped in act(...).
+@beaconhs/web:test: 
+@beaconhs/web:test: When testing, code that causes React state updates should be wrapped into act(...):
+@beaconhs/web:test: 
+@beaconhs/web:test: act(() => {
+@beaconhs/web:test:   /* fire events that update state */
+@beaconhs/web:test: });
+@beaconhs/web:test: /* assert on the output */
+@beaconhs/web:test: 
+@beaconhs/web:test: This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+@beaconhs/web:test: 
+@beaconhs/web:test:  ❯ src/components/tenant-branding-form.test.tsx (5 tests | 1 failed) 11855ms
+@beaconhs/web:test:    × switches preview modes and restores saved identity on Discard 5782ms
+@beaconhs/web:test:    ✓ keeps unsupported branding fields out of the persistence form  703ms
+@beaconhs/web:test:    ✓ replaces a reset logo with a valid upload up to the existing server size limit  2195ms
+@beaconhs/web:test:    ✓ resets only the primary colour and restores it on Discard  1509ms
+@beaconhs/web:test:    ✓ copies the effective colour without saving and reports clipboard failure honestly  1661ms
+@beaconhs/web:test: stderr | src/components/sidebar-nav.test.tsx > expandable sidebar > renders one unified navigation with legacy destinations nested only under modules
+@beaconhs/web:test: The current testing environment is not configured to support act(...)
+@beaconhs/web:test: 
+@beaconhs/web:test: stderr | src/components/sidebar-nav.test.tsx > expandable sidebar > renders one unified navigation with legacy destinations nested only under modules
+@beaconhs/web:test: The current testing environment is not configured to support act(...)
+@beaconhs/web:test: 
+@beaconhs/web:test: stderr | src/components/sidebar-nav.test.tsx > expandable sidebar > renders one unified navigation with legacy destinations nested only under modules
+@beaconhs/web:test: The current testing environment is not configured to support act(...)
+@beaconhs/web:test: 
+@beaconhs/web:test: stderr | src/components/sidebar-nav.test.tsx > expandable sidebar > exposes a real accessible disclosure without removing the parent destination
+@beaconhs/web:test: The current testing environment is not configured to support act(...)
+@beaconhs/web:test: 
+@beaconhs/web:test: stderr | src/components/sidebar-nav.test.tsx > expandable sidebar > exposes a real accessible disclosure without removing the parent destination
+@beaconhs/web:test: The current testing environment is not configured to support act(...)
+@beaconhs/web:test: 
+@beaconhs/web:test: stderr | src/components/sidebar-nav.test.tsx > expandable sidebar > exposes a real accessible disclosure without removing the parent destination
+@beaconhs/web:test: The current testing environment is not configured to support act(...)
+@beaconhs/web:test: 
+@beaconhs/web:test: stderr | src/components/sidebar-nav.test.tsx > expandable sidebar > exposes a real accessible disclosure without removing the parent destination
+@beaconhs/web:test: The current testing environment is not configured to support act(...)
+@beaconhs/web:test: 
+@beaconhs/web:test: stderr | src/components/sidebar-nav.test.tsx > expandable sidebar > keeps nested links accessible in collapsed desktop mode
+@beaconhs/web:test: The current testing environment is not configured to support act(...)
+@beaconhs/web:test: 
+@beaconhs/web:test: stderr | src/components/sidebar-nav.test.tsx > expandable sidebar > keeps nested links accessible in collapsed desktop mode
+@beaconhs/web:test: The current testing environment is not configured to support act(...)
+@beaconhs/web:test: 
+@beaconhs/web:test:  ✓ src/components/sidebar-nav.test.tsx (3 tests) 1520ms
+@beaconhs/web:test:      ✓ renders one unified navigation with legacy destinations nested only under modules  1255ms
+@beaconhs/web:test:  ✓ src/app/(platform)/platform/settings/_actions.test.ts (14 tests) 899ms
+@beaconhs/web:test:    ✓ preserves unrelated branding contracts and audits the supported update  377ms
+@beaconhs/web:test:    ✓ persists regional defaults and their audit within the same transaction  339ms
+@beaconhs/web:test:  ✓ src/app/api/v1/docs/route.test.ts (1 test) 529ms
+@beaconhs/web:test:      ✓ loads an exact, integrity-pinned Scalar artifact with the request nonce  523ms
+@beaconhs/web:test:  ✓ src/components/select-reset.test.tsx (1 test) 1184ms
+@beaconhs/web:test:    ✓ Discard restores the visible custom select as well as the submitted native value  1173ms
+@beaconhs/web:test:  ✓ src/app/(app)/insights/cards/[id]/export/_document.test.ts (3 tests) 502ms
+@beaconhs/web:test:      ✓ splits a wide pivot and blanks legacy missing sentinels  326ms
+@beaconhs/web:test:  ✓ src/app/(app)/admin/api-keys/_mutation-input.test.ts (4 tests) 608ms
+@beaconhs/web:test:      ✓ normalizes bounded names and validates key ids  579ms
+@beaconhs/web:test:  ✓ src/app/(app)/apps/responses/[id]/_detail-list-state.test.ts (3 tests) 189ms
+@beaconhs/web:test:  ✓ src/lib/hazid-app-condition.test.ts (3 tests) 214ms
+@beaconhs/web:test:  ✓ src/lib/hospitality/properties-actions.test.ts (7 tests) 1012ms
+@beaconhs/web:test:      ✓ uses the request context and redirects to the created property  906ms
+@beaconhs/web:test:  ✓ src/lib/hospitality/properties.test.ts (77 tests) 1757ms
+@beaconhs/web:test:      ✓ creates a validated property for the authenticated tenant and audits it  408ms
+@beaconhs/web:test:  ✓ src/lib/compliance-entitlements.test.tsx (11 tests) 5490ms
+@beaconhs/web:test:    ✓ denies every remaining direct Compliance page before data loading  335ms
+@beaconhs/web:test:    ✓ denies every remaining direct Compliance page before data loading  1136ms
+@beaconhs/web:test:    ✓ denies every remaining direct Compliance page before data loading  675ms
+@beaconhs/web:test:    ✓ denies every remaining direct Compliance page before data loading  415ms
+@beaconhs/web:test:    ✓ denies every remaining direct Compliance page before data loading  1636ms
+@beaconhs/web:test:    ✓ denies every remaining direct Compliance page before data loading  736ms
+@beaconhs/web:test:  ❯ src/lib/training-access.test.ts (11 tests | 2 failed) 11186ms
+@beaconhs/web:test:      ✓ routes permissions [] to /training/courses and hides inaccessible tabs 231ms
+@beaconhs/web:test:      ✓ routes permissions ["training.read.self"] to /training/records and hides inaccessible tabs 3ms
+@beaconhs/web:test:      ✓ routes permissions ["training.read.all"] to /training/records and hides inaccessible tabs 4ms
+@beaconhs/web:test:      ✓ routes permissions ["training.course.manage"] to /training/courses and hides inaccessible tabs 3ms
+@beaconhs/web:test:      ✓ routes permissions ["training.record.create"] to /training/courses and hides inaccessible tabs 2ms
+@beaconhs/web:test:      ✓ routes permissions ["training.class.manage"] to /training/courses and hides inaccessible tabs 2ms
+@beaconhs/web:test:      ✓ routes permissions ["training.*"] to /training/records and hides inaccessible tabs 2ms
+@beaconhs/web:test:      ✓ allows Super Admin without assigning role permissions 5ms
+@beaconhs/web:test:      × redirects records before querying tenant records 5021ms
+@beaconhs/web:test:      ✓ redirects skills before querying tenant records  904ms
+@beaconhs/web:test:      × redirects assessments before querying tenant records 5002ms
+@beaconhs/web:test:  ✓ src/lib/operations-report-page.test.tsx (4 tests) 672ms
+@beaconhs/web:test:      ✓ recovers invalid page Infinity to the first real record  592ms
+@beaconhs/web:test:  ✓ src/app/(app)/apps/_lib/ai-generate.test.ts (3 tests) 470ms
+@beaconhs/web:test:      ✓ extracts and validates a fenced app response  321ms
+@beaconhs/web:test:  ✓ src/lib/download-audit-prefetch-contract.test.ts (46 tests) 276ms
+@beaconhs/web:test:  ✓ src/lib/training-external-url.test.ts (16 tests) 381ms
+@beaconhs/web:test:  ✓ src/lib/tenant-operational-defaults.test.ts (10 tests) 528ms
+@beaconhs/web:test:      ✓ accepts independent locale, timezone, format, and ISO currency values  374ms
+@beaconhs/web:test:  ✓ src/lib/template-builder-compile.test.ts (2 tests) 340ms
+@beaconhs/web:test:  ✓ src/lib/hospitality/floor-rooms-page.test.tsx (24 tests) 579ms
+@beaconhs/web:test:  ✓ src/lib/picker-options.test.ts (3 tests) 117ms
+@beaconhs/web:test:  ✓ scripts/i18n-source-audit.test.ts (2 tests) 698ms
+@beaconhs/web:test:      ✓ contain no duplicate generated-message keys  565ms
+@beaconhs/web:test:  ✓ src/lib/persisted-text-policy.test.ts (7 tests) 350ms
+@beaconhs/web:test:  ✓ src/lib/journal-ai-policy.test.ts (2 tests) 410ms
+@beaconhs/web:test:      ✓ rejects blank, malformed, and silently lossy requests  326ms
+@beaconhs/web:test:  ❯ src/lib/pdf-template-designer-roundtrip.test.ts (45 tests | 1 failed) 45069ms
+@beaconhs/web:test:        × keeps every handlebars block out of table-internal text position 7473ms
+@beaconhs/web:test:        ✓ round-trips every merge token and repeat marker unchanged  3856ms
+@beaconhs/web:test:        ✓ still compiles to the same blocks after a designer round-trip  2196ms
+@beaconhs/web:test:        ✓ keeps every handlebars block out of table-internal text position  1756ms
+@beaconhs/web:test:        ✓ round-trips every merge token and repeat marker unchanged  1619ms
+@beaconhs/web:test:        ✓ still compiles to the same blocks after a designer round-trip  2080ms
+@beaconhs/web:test:        ✓ keeps every handlebars block out of table-internal text position  1108ms
+@beaconhs/web:test:        ✓ round-trips every merge token and repeat marker unchanged  856ms
+@beaconhs/web:test:        ✓ still compiles to the same blocks after a designer round-trip  1189ms
+@beaconhs/web:test:        ✓ keeps every handlebars block out of table-internal text position  1043ms
+@beaconhs/web:test:        ✓ round-trips every merge token and repeat marker unchanged  1226ms
+@beaconhs/web:test:        ✓ still compiles to the same blocks after a designer round-trip  1187ms
+@beaconhs/web:test:        ✓ keeps every handlebars block out of table-internal text position  771ms
+@beaconhs/web:test:        ✓ round-trips every merge token and repeat marker unchanged  657ms
+@beaconhs/web:test:        ✓ still compiles to the same blocks after a designer round-trip  543ms
+@beaconhs/web:test:        ✓ keeps every handlebars block out of table-internal text position 258ms
+@beaconhs/web:test:        ✓ round-trips every merge token and repeat marker unchanged  610ms
+@beaconhs/web:test:        ✓ still compiles to the same blocks after a designer round-trip  433ms
+@beaconhs/web:test:        ✓ keeps every handlebars block out of table-internal text position  828ms
+@beaconhs/web:test:        ✓ round-trips every merge token and repeat marker unchanged  765ms
+@beaconhs/web:test:        ✓ still compiles to the same blocks after a designer round-trip  878ms
+@beaconhs/web:test:        ✓ keeps every handlebars block out of table-internal text position  444ms
+@beaconhs/web:test:        ✓ round-trips every merge token and repeat marker unchanged  734ms
+@beaconhs/web:test:        ✓ still compiles to the same blocks after a designer round-trip  551ms
+@beaconhs/web:test:        ✓ keeps every handlebars block out of table-internal text position  439ms
+@beaconhs/web:test:        ✓ round-trips every merge token and repeat marker unchanged  351ms
+@beaconhs/web:test:        ✓ still compiles to the same blocks after a designer round-trip  484ms
+@beaconhs/web:test:        ✓ keeps every handlebars block out of table-internal text position  721ms
+@beaconhs/web:test:        ✓ round-trips every merge token and repeat marker unchanged  631ms
+@beaconhs/web:test:        ✓ still compiles to the same blocks after a designer round-trip  621ms
+@beaconhs/web:test:        ✓ keeps every handlebars block out of table-internal text position  750ms
+@beaconhs/web:test:        ✓ round-trips every merge token and repeat marker unchanged  867ms
+@beaconhs/web:test:        ✓ still compiles to the same blocks after a designer round-trip  785ms
+@beaconhs/web:test:        ✓ keeps every handlebars block out of table-internal text position  641ms
+@beaconhs/web:test:        ✓ round-trips every merge token and repeat marker unchanged  426ms
+@beaconhs/web:test:        ✓ still compiles to the same blocks after a designer round-trip  424ms
+@beaconhs/web:test:        ✓ keeps every handlebars block out of table-internal text position  513ms
+@beaconhs/web:test:        ✓ round-trips every merge token and repeat marker unchanged  412ms
+@beaconhs/web:test:        ✓ still compiles to the same blocks after a designer round-trip  506ms
+@beaconhs/web:test:        ✓ keeps every handlebars block out of table-internal text position  624ms
+@beaconhs/web:test:        ✓ round-trips every merge token and repeat marker unchanged  728ms
+@beaconhs/web:test:        ✓ still compiles to the same blocks after a designer round-trip  439ms
+@beaconhs/web:test:        ✓ keeps every handlebars block out of table-internal text position  528ms
+@beaconhs/web:test:        ✓ round-trips every merge token and repeat marker unchanged  572ms
+@beaconhs/web:test:        ✓ still compiles to the same blocks after a designer round-trip  395ms
+@beaconhs/web:test:  ✓ src/lib/csv.test.ts (2 tests) 348ms
+@beaconhs/web:test:      ✓ uses one sentinel row to distinguish a complete export from truncation  333ms
+@beaconhs/web:test:  ✓ src/lib/attachment-evidence-access.test.ts (8 tests) 117ms
+@beaconhs/web:test:  ✓ src/app/(platform)/platform/tenants/page.test.tsx (2 tests) 388ms
+@beaconhs/web:test:    ✓ opens every lifecycle state while keeping tenant switching restricted to active tenants  351ms
+@beaconhs/web:test:  ✓ src/lib/forms/form-response-evidence.test.ts (5 tests) 32ms
+@beaconhs/web:test:  ✓ src/lib/wopi.test.ts (4 tests) 111ms
+@beaconhs/web:test:  ✓ src/lib/training-assessment-list-contract.test.ts (2 tests) 142ms
+@beaconhs/web:test:  ✓ src/lib/nav/registry.test.ts (7 tests) 202ms
+@beaconhs/web:test:  ✓ src/lib/insights-expression-fields.test.ts (2 tests) 96ms
+@beaconhs/web:test:  ✓ src/lib/imports/engine.test.ts (4 tests) 179ms
+@beaconhs/web:test:  ✓ src/lib/imports/property-structure.test.ts (3 tests) 219ms
+@beaconhs/web:test:  ✓ src/lib/custom-fields/analytics-dependency-policy.test.ts (9 tests) 168ms
+@beaconhs/web:test:  ✓ src/lib/assistant/share-target-policy.test.ts (7 tests) 101ms
+@beaconhs/web:test:  ✓ src/app/(app)/admin/notifications/page.test.tsx (12 tests) 287ms
+@beaconhs/web:test:  ✓ src/lib/training-class-policy.test.ts (6 tests) 633ms
+@beaconhs/web:test:      ✓ parses bounded fields and viewer-local timestamps  355ms
+@beaconhs/web:test:  ✓ src/app/(app)/admin/settings/branding/_actions.test.ts (7 tests) 458ms
+@beaconhs/web:test:      ✓ rejects missing permission before storage or privileged reads  381ms
+@beaconhs/web:test:  ✓ src/lib/training-assessment-compliance-cutover-contract.test.ts (3 tests) 42ms
+@beaconhs/web:test:  ✓ src/lib/corrective-action-email.test.ts (1 test) 609ms
+@beaconhs/web:test:      ✓ renders safe rich text instead of showing its markup as code  603ms
+@beaconhs/web:test:  ✓ src/app/(app)/training/records/wallet-cards/route.test.ts (2 tests) 199ms
+@beaconhs/web:test:  ✓ src/app/(app)/insights/_widgets.test.ts (26 tests) 397ms
+@beaconhs/web:test:  ✓ src/lib/platform-branding-config.test.ts (2 tests) 185ms
+@beaconhs/web:test:  ✓ src/lib/datetime.test.ts (5 tests) 248ms
+@beaconhs/web:test:  ✓ src/app/(app)/admin/settings/advanced/_actions.test.ts (4 tests) 263ms
+@beaconhs/web:test:  ✓ src/app/(app)/tenant-branding/logo/route.test.ts (5 tests) 348ms
+@beaconhs/web:test:    ✓ uses the authenticated tenant, private caching and nosniff  324ms
+@beaconhs/web:test:  ✓ src/app/(app)/training/_lib/grading.test.ts (7 tests) 53ms
+@beaconhs/web:test: stderr | src/components/admin-load-failure.test.tsx > announces a safe error and retries the current route without changing tenant context
+@beaconhs/web:test: The current testing environment is not configured to support act(...)
+@beaconhs/web:test: 
+@beaconhs/web:test: stderr | src/components/admin-load-failure.test.tsx > announces a safe error and retries the current route without changing tenant context
+@beaconhs/web:test: The current testing environment is not configured to support act(...)
+@beaconhs/web:test: The current testing environment is not configured to support act(...)
+@beaconhs/web:test: 
+@beaconhs/web:test: stderr | src/components/admin-load-failure.test.tsx > announces a safe error and retries the current route without changing tenant context
+@beaconhs/web:test: The current testing environment is not configured to support act(...)
+@beaconhs/web:test: 
+@beaconhs/web:test:  ✓ src/components/admin-load-failure.test.tsx (1 test) 588ms
+@beaconhs/web:test:    ✓ announces a safe error and retries the current route without changing tenant context  582ms
+@beaconhs/web:test:  ✓ src/lib/operations-people-page.test.tsx (4 tests) 87ms
+@beaconhs/web:test:  ✓ src/app/(app)/compliance/obligations/_semantic-config.test.ts (5 tests) 251ms
+@beaconhs/web:test:  ✓ src/lib/api/security.test.ts (3 tests) 198ms
+@beaconhs/web:test:  ✓ src/lib/bulk-actions.test.ts (9 tests) 136ms
+@beaconhs/web:test:  ✓ src/lib/imports/property-structure-storage-path.test.ts (2 tests) 388ms
+@beaconhs/web:test:      ✓ reads a finalized tenant CSV from private storage and persists a validated preview batch  379ms
+@beaconhs/web:test:  ✓ src/lib/report-built-in-editor-contract.test.ts (7 tests) 110ms
+@beaconhs/web:test:  ✓ src/components/brand-logo-provider-contract.test.ts (2 tests) 37ms
+@beaconhs/web:test:  ✓ src/lib/module-entitlements/server.test.ts (2 tests) 22ms
+@beaconhs/web:test:  ✓ src/lib/vehicle-log-import-policy.test.ts (7 tests) 465ms
+@beaconhs/web:test:  ✓ src/lib/list-params.test.ts (10 tests) 121ms
+@beaconhs/web:test:  ✓ src/lib/email-inline.test.ts (3 tests) 233ms
+@beaconhs/web:test:  ✓ src/app/(app)/compliance/_person-list.test.ts (2 tests) 198ms
+@beaconhs/web:test:  ✓ src/app/(platform)/platform/branding/_actions.test.ts (4 tests) 320ms
+@beaconhs/web:test:  ✓ src/lib/audit.test.ts (4 tests) 132ms
+@beaconhs/web:test:  ✓ src/lib/collabora.test.ts (18 tests) 542ms
+@beaconhs/web:test:  ✓ src/lib/action-attachment-access.test.ts (8 tests) 157ms
+@beaconhs/web:test:  ✓ src/lib/hospitality/guest-maintenance.test.ts (12 tests) 223ms
+@beaconhs/web:test:  ✓ src/lib/picker-scaling-contract.test.ts (8 tests) 70ms
+@beaconhs/web:test:  ✓ src/components/builder/checklist-order.test.ts (3 tests) 46ms
+@beaconhs/web:test:  ✓ src/lib/flows/webhook-policy.test.ts (7 tests) 297ms
+@beaconhs/web:test:  ✓ src/lib/access-delegation.test.ts (19 tests) 87ms
+@beaconhs/web:test:  ✓ src/lib/provider-config-persistence.test.ts (4 tests) 74ms
+@beaconhs/web:test:  ✓ src/app/(app)/equipment/vehicle-log/_equipment-policy.test.ts (4 tests) 54ms
+@beaconhs/web:test:  ✓ src/lib/analytics-access-policy.test.ts (7 tests) 760ms
+@beaconhs/web:test:      ✓ keeps raw and arbitrary scoped Builder keys out of the engine default map  637ms
+@beaconhs/web:test:  ✓ src/components/app-shell.test.tsx (3 tests) 252ms
+@beaconhs/web:test:  ✓ src/lib/credential-design-write.test.ts (10 tests) 762ms
+@beaconhs/web:test:  ✓ src/lib/sms-config.test.ts (7 tests) 291ms
+@beaconhs/web:test:  ✓ src/lib/training-certificate-issuance.test.ts (4 tests) 213ms
+@beaconhs/web:test:  ✓ src/lib/hospitality/maintenance-board-page.test.tsx (3 tests) 485ms
+@beaconhs/web:test:      ✓ shows real assignee, resolution and record history to read-only users  464ms
+@beaconhs/web:test:  ✓ src/app/(app)/training/skills/_mutation-input.test.ts (3 tests) 189ms
+@beaconhs/web:test:  ✓ src/lib/imports/people.test.ts (6 tests) 42ms
+@beaconhs/web:test:  ✓ src/app/api/attachments/[id]/route.test.ts (9 tests) 145ms
+@beaconhs/web:test:  ✓ src/lib/ai-conversation-pagination.test.ts (9 tests) 47ms
+@beaconhs/web:test:  ✓ src/app/(app)/tools/safe-distance/_mutation-policy.test.ts (8 tests) 142ms
+@beaconhs/web:test:  ✓ src/lib/ppe-inspection-due.test.ts (5 tests) 158ms
+@beaconhs/web:test:  ✓ src/app/api/picker-options/route.test.ts (68 tests) 416ms
+@beaconhs/web:test:  ✓ src/lib/nav/approved-structure.test.ts (10 tests) 300ms
+@beaconhs/web:test:  ✓ src/lib/document-text-diff.test.ts (3 tests) 156ms
+@beaconhs/web:test:  ✓ src/lib/action-property-context.test.ts (7 tests) 119ms
+@beaconhs/web:test:  ✓ src/lib/flows/module-pdf-templates.test.ts (46 tests) 200ms
+@beaconhs/web:test:  ✓ src/lib/document-version-visibility-contract.test.ts (12 tests) 24ms
+@beaconhs/web:test:  ✓ src/lib/storage-keys.test.ts (2 tests) 40ms
+@beaconhs/web:test:  ✓ scripts/dev-minimal-tenant.test.ts (4 tests) 142ms
+@beaconhs/web:test:  ✓ src/lib/mutation-input.test.ts (7 tests) 125ms
+@beaconhs/web:test:  ✓ src/lib/hazard-assessment-locking-contract.test.ts (9 tests) 150ms
+@beaconhs/web:test:  ✓ src/lib/hospitality/properties-pages.test.tsx (12 tests) 254ms
+@beaconhs/web:test:  ✓ src/app/(app)/equipment/station/settings/_policy.test.ts (3 tests) 100ms
+@beaconhs/web:test:  ✓ src/lib/forms/response-entity-references.test.ts (1 test) 10ms
+@beaconhs/web:test:  ✓ src/app/(app)/tools/safe-distance/_lib.test.ts (14 tests) 81ms
+@beaconhs/web:test:  ✓ src/app/(app)/admin/settings/branding/assets/[kind]/route.test.ts (9 tests) 167ms
+@beaconhs/web:test:  ✓ src/lib/equipment/mutation-input.test.ts (5 tests) 106ms
+@beaconhs/web:test:  ✓ src/lib/assistant/tools-write.test.ts (4 tests) 31ms
+@beaconhs/web:test:  ✓ src/lib/risk-assessments.test.ts (9 tests) 29ms
+@beaconhs/web:test:  ✓ src/lib/pdf-page-content.test.ts (3 tests) 336ms
+@beaconhs/web:test:  ✓ src/lib/inspection-choice-cutover-contract.test.ts (4 tests) 108ms
+@beaconhs/web:test:  ✓ src/app/(app)/training/courses/[id]/_lib/autosave-queue.test.ts (7 tests) 163ms
+@beaconhs/web:test:  ✓ src/app/(app)/training/records/_mutation-input.test.ts (6 tests) 147ms
+@beaconhs/web:test:  ✓ src/lib/photo-document-url.test.ts (2 tests) 18ms
+@beaconhs/web:test:  ✓ src/app/(app)/equipment/vehicle-log/_entry-input.test.ts (3 tests) 52ms
+@beaconhs/web:test: stderr | src/lib/email-settings-actions.test.ts > testEmailConnection > fails closed and audits when the Redis limiter is unavailable
+@beaconhs/web:test: [email-settings] test-send rate limiter unavailable { errorName: 'Error' }
+@beaconhs/web:test: 
+@beaconhs/web:test: stderr | src/lib/email-settings-actions.test.ts > testEmailConnection > returns a generic provider failure and audits no provider error details
+@beaconhs/web:test: [email-settings] provider rejected a test send { provider: 'sendgrid', errorName: 'Error' }
+@beaconhs/web:test: 
+@beaconhs/web:test:  ✓ src/lib/email-settings-actions.test.ts (13 tests) 308ms
+@beaconhs/web:test: stderr | src/lib/sms-settings-actions.test.ts > testSmsConnection > fails closed when the rate limiter is unavailable
+@beaconhs/web:test: [sms-settings] test-send rate limiter unavailable { errorName: 'Error' }
+@beaconhs/web:test: 
+@beaconhs/web:test: stderr | src/lib/sms-settings-actions.test.ts > testSmsConnection > returns a generic failure without exposing provider errors
+@beaconhs/web:test: [sms-settings] provider rejected a test send { provider: 'twilio', errorName: 'Error' }
+@beaconhs/web:test: 
+@beaconhs/web:test:  ✓ src/lib/sms-settings-actions.test.ts (10 tests) 311ms
+@beaconhs/web:test:  ✓ src/lib/compliance-target-retirement-contract.test.ts (7 tests) 71ms
+@beaconhs/web:test:  ✓ src/lib/document-book-snapshot-contract.test.ts (7 tests) 33ms
+@beaconhs/web:test:  ✓ src/lib/hospitality/building-floors-page.test.tsx (7 tests) 152ms
+@beaconhs/web:test:  ✓ scripts/private-attachment-url-cutover.test.ts (19 tests) 166ms
+@beaconhs/web:test:  ✓ src/app/(app)/admin/settings/settings-ui-contract.test.ts (5 tests) 23ms
+@beaconhs/web:test:  ✓ src/lib/email-config.test.ts (10 tests) 188ms
+@beaconhs/web:test:  ✓ src/lib/incident-injury-input.test.ts (3 tests) 32ms
+@beaconhs/web:test:  ✓ src/app/(app)/compliance/obligations/_input.test.ts (4 tests) 64ms
+@beaconhs/web:test:  ✓ src/components/record-header-actions-contract.test.ts (5 tests) 103ms
+@beaconhs/web:test:  ✓ src/lib/flows/flow-policy.test.ts (5 tests) 151ms
+@beaconhs/web:test:  ✓ src/lib/signature-storage.test.ts (2 tests) 79ms
+@beaconhs/web:test:  ✓ src/lib/property-evidence-integration.test.ts (11 tests) 41ms
+@beaconhs/web:test:  ✓ src/app/(app)/dashboard/_widget-access.test.ts (4 tests) 108ms
+@beaconhs/web:test:  ✓ src/lib/inspection-record-atomicity-contract.test.ts (13 tests) 190ms
+@beaconhs/web:test:  ✓ src/app/(app)/compliance/_resolve-link.test.ts (7 tests) 27ms
+@beaconhs/web:test:  ✓ src/lib/platform-tenant-administration-contract.test.ts (3 tests) 30ms
+@beaconhs/web:test:  ✓ src/lib/configuration-governance-contract.test.ts (6 tests) 10ms
+@beaconhs/web:test:  ✓ src/lib/hospitality/property-context.test.ts (9 tests) 246ms
+@beaconhs/web:test:  ✓ src/components/navigation-search.test.ts (4 tests) 79ms
+@beaconhs/web:test:  ✓ src/lib/role-assignment-upsert.test.ts (8 tests) 184ms
+@beaconhs/web:test:  ✓ src/app/platform-branding/_asset-response.test.ts (2 tests) 199ms
+@beaconhs/web:test:  ✓ src/lib/router-prefetch.test.ts (4 tests) 104ms
+@beaconhs/web:test:  ✓ src/lib/imports/property-structure-page-guards.test.ts (18 tests) 39ms
+@beaconhs/web:test:  ✓ src/lib/platform-control-centre-contract.test.ts (19 tests) 51ms
+@beaconhs/web:test:  ✓ src/app/(app)/apps/_lib/access-policy.test.ts (8 tests) 150ms
+@beaconhs/web:test:  ✓ src/lib/ppe-inspection-evidence-cutover-contract.test.ts (5 tests) 51ms
+@beaconhs/web:test:  ✓ src/app/(app)/apps/_lib/data-source-query-policy.test.ts (7 tests) 183ms
+@beaconhs/web:test:  ✓ src/app/(app)/people/_primary-title-directory-contract.test.ts (2 tests) 94ms
+@beaconhs/web:test:  ✓ src/lib/training-mutation-validation.test.ts (6 tests) 194ms
+@beaconhs/web:test:  ✓ src/app/(app)/compliance/_signals.test.ts (3 tests) 120ms
+@beaconhs/web:test:  ✓ src/lib/theme-governance.test.ts (2 tests) 10ms
+@beaconhs/web:test:  ✓ src/app/(app)/journals/_tag-policy.test.ts (3 tests) 10ms
+@beaconhs/web:test:  ✓ src/app/(app)/journals/_tree-pages.test.ts (4 tests) 21ms
+@beaconhs/web:test:  ✓ src/lib/nav/resolve.entitlements.test.ts (4 tests) 13ms
+@beaconhs/web:test:  ✓ src/app/(app)/journals/_query-input.test.ts (2 tests) 65ms
+@beaconhs/web:test:  ✓ src/lib/identity-catalog-lifecycle-contract.test.ts (2 tests) 22ms
+@beaconhs/web:test:  ✓ src/lib/module-pdf-targets.test.ts (6 tests) 207ms
+@beaconhs/web:test:  ✓ src/app/(app)/apps/_lib/template-key.server.test.ts (2 tests) 68ms
+@beaconhs/web:test:  ✓ src/lib/tenant-brand-assets.test.ts (3 tests) 11ms
+@beaconhs/web:test:  ✓ src/lib/platform-tenant-counts.test.ts (1 test) 68ms
+@beaconhs/web:test:  ✓ src/lib/compliance-evidence-lifecycle-contract.test.ts (6 tests) 80ms
+@beaconhs/web:test:  ✓ src/lib/custom-field-lifecycle-contract.test.ts (6 tests) 79ms
+@beaconhs/web:test:  ✓ src/lib/hospitality/metering-idempotency.test.ts (2 tests) 8ms
+@beaconhs/web:test:  ✓ src/lib/invites.test.ts (7 tests) 215ms
+@beaconhs/web:test:  ✓ src/lib/inspection-response-config.test.ts (6 tests) 88ms
+@beaconhs/web:test:  ✓ src/lib/platform-brand-assets.test.ts (8 tests) 11ms
+@beaconhs/web:test:  ✓ src/lib/remote-search-policy.test.ts (4 tests) 13ms
+@beaconhs/web:test:  ✓ src/lib/equipment-ppe-compliance-evidence-lifecycle-contract.test.ts (5 tests) 143ms
+@beaconhs/web:test:  ✓ src/lib/document-authoring-policy.test.ts (9 tests) 61ms
+@beaconhs/web:test:  ✓ src/lib/photo-edits.test.ts (3 tests) 17ms
+@beaconhs/web:test:  ✓ src/lib/flows/form-flow-validation.test.ts (2 tests) 12ms
+@beaconhs/web:test:  ✓ src/lib/hospitality/signoff.test.ts (1 test) 14ms
+@beaconhs/web:test:  ✓ src/lib/equipment-inspection-atomicity-contract.test.ts (9 tests) 148ms
+@beaconhs/web:test:  ✓ src/lib/compliance-obligation-lifecycle-contract.test.ts (5 tests) 11ms
+@beaconhs/web:test:  ✓ src/lib/module-entitlements/policy.test.ts (8 tests) 89ms
+@beaconhs/web:test:  ✓ src/lib/upload-policy.test.ts (3 tests) 12ms
+@beaconhs/web:test:  ✓ src/lib/training-compliance-evidence-lifecycle-contract.test.ts (7 tests) 61ms
+@beaconhs/web:test:  ✓ src/app/(app)/documents/categories/_category-parent-policy.test.ts (4 tests) 101ms
+@beaconhs/web:test:  ✓ src/components/inspection/criterion-save-queue.test.ts (2 tests) 99ms
+@beaconhs/web:test:  ✓ src/app/(app)/training/_lib/extra-field-production-contract.test.ts (3 tests) 79ms
+@beaconhs/web:test:  ✓ src/app/(app)/apps/_lib/score-router.test.ts (4 tests) 151ms
+@beaconhs/web:test:  ✓ src/lib/risk-lifecycle.test.ts (14 tests) 72ms
+@beaconhs/web:test:  ✓ src/app/(app)/training/_lib/assessment-question-input.test.ts (4 tests) 109ms
+@beaconhs/web:test:  ✓ src/lib/inspection-compliance-attachment-access.test.ts (7 tests) 16ms
+@beaconhs/web:test:  ✓ src/app/(app)/training/_lib/extra-field-policy.test.ts (4 tests) 143ms
+@beaconhs/web:test:  ✓ src/lib/incidents/attachment-access.test.ts (6 tests) 130ms
+@beaconhs/web:test:  ✓ src/lib/equipment-bulk-qr.test.ts (2 tests) 99ms
+@beaconhs/web:test:  ✓ src/lib/role-assignment-actions-contract.test.ts (2 tests) 20ms
+@beaconhs/web:test:  ✓ src/lib/document-version-policy.test.ts (3 tests) 37ms
+@beaconhs/web:test:  ✓ src/lib/document-review-version-cutover-contract.test.ts (3 tests) 15ms
+@beaconhs/web:test:  ✓ src/lib/google-analytics-contract.test.ts (1 test) 7ms
+@beaconhs/web:test:  ✓ src/lib/v14-currency-defaults-contract.test.ts (2 tests) 42ms
+@beaconhs/web:test:  ✓ src/lib/document-reader-cutover-contract.test.ts (2 tests) 25ms
+@beaconhs/web:test:  ✓ src/lib/assistant-stream-cutover-contract.test.ts (1 test) 32ms
+@beaconhs/web:test:  ✓ src/lib/inspection-record-lifecycle.test.ts (5 tests) 196ms
+@beaconhs/web:test:  ✓ src/lib/job-title-lifecycle-contract.test.ts (9 tests) 102ms
+@beaconhs/web:test:  ✓ src/lib/lift-plan-persistence-contract.test.ts (6 tests) 117ms
+@beaconhs/web:test:  ✓ src/app/(app)/documents/categories/_category-mutation-policy.test.ts (3 tests) 10ms
+@beaconhs/web:test:  ✓ src/lib/direct-printing-contract.test.ts (3 tests) 12ms
+@beaconhs/web:test:  ✓ src/lib/hospitality/maintenance-evidence-contract.test.ts (4 tests) 51ms
+@beaconhs/web:test:  ✓ src/lib/equipment-station-picker.test.ts (4 tests) 238ms
+@beaconhs/web:test:  ✓ src/lib/module-entitlements/platform.test.ts (1 test) 210ms
+@beaconhs/web:test:  ✓ src/lib/forms/form-compliance-cutover-contract.test.ts (3 tests) 99ms
+@beaconhs/web:test:  ✓ src/app/(app)/training/_lib/assessment-attempt-policy.test.ts (3 tests) 10ms
+@beaconhs/web:test:  ✓ src/app/(app)/admin/api-keys/_reveal-cookie.test.ts (2 tests) 121ms
+@beaconhs/web:test:  ✓ src/lib/report-wallet-export-cutover.test.ts (1 test) 99ms
+@beaconhs/web:test:  ✓ src/lib/document-key-policy.test.ts (2 tests) 32ms
+@beaconhs/web:test:  ✓ src/lib/v131-hotfix-contract.test.ts (3 tests) 21ms
+@beaconhs/web:test:  ✓ src/lib/training-pptx-policy.test.ts (5 tests) 84ms
+@beaconhs/web:test:  ✓ src/lib/hazid-read-others-contract.test.ts (5 tests) 26ms
+@beaconhs/web:test:  ✓ src/lib/credential-output-actions.test.ts (1 test) 150ms
+@beaconhs/web:test:  ✓ src/lib/template-builder-html.test.ts (4 tests) 151ms
+@beaconhs/web:test:  ✓ src/app/(app)/apps/_lib/draft-save-order.test.ts (6 tests) 13ms
+@beaconhs/web:test:  ✓ src/app/(app)/hazard-assessments/risk-matrix/_policy.test.ts (3 tests) 34ms
+@beaconhs/web:test:  ✓ src/app/(app)/apps/responses/[id]/_spawn-prefill.test.ts (3 tests) 128ms
+@beaconhs/web:test:  ✓ src/lib/corrective-action-compliance-evidence-lifecycle-contract.test.ts (3 tests) 51ms
+@beaconhs/web:test:  ✓ src/lib/attachment-url.test.ts (1 test) 58ms
+@beaconhs/web:test:  ✓ src/lib/hospitality/property-access.test.ts (3 tests) 14ms
+@beaconhs/web:test:  ✓ src/lib/cardpresso.test.ts (1 test) 13ms
+@beaconhs/web:test:  ✓ src/lib/corrective-action-property-authoring-contract.test.ts (2 tests) 9ms
+@beaconhs/web:test:  ✓ src/lib/deployment-version-skew-contract.test.ts (4 tests) 91ms
+@beaconhs/web:test:  ✓ src/lib/hospitality/handover-contract.test.ts (4 tests) 65ms
+@beaconhs/web:test:  ✓ src/lib/admin-template-input.test.ts (5 tests) 21ms
+@beaconhs/web:test:  ✓ src/lib/flows/form-subject-values.test.ts (3 tests) 76ms
+@beaconhs/web:test:  ✓ src/lib/row-selection.test.ts (3 tests) 111ms
+@beaconhs/web:test:  ✓ src/components/sidebar-nav-active.test.ts (3 tests) 124ms
+@beaconhs/web:test:  ✓ src/lib/hospitality/metering.test.ts (5 tests) 317ms
+@beaconhs/web:test:      ✓ never silently creates negative consumption  303ms
+@beaconhs/web:test:  ✓ src/components/photo-gallery-contract.test.ts (3 tests) 264ms
+@beaconhs/web:test:  ✓ src/lib/incidents/lifecycle.test.ts (2 tests) 9ms
+@beaconhs/web:test:  ✓ src/lib/report-property-security-contract.test.ts (2 tests) 8ms
+@beaconhs/web:test:  ✓ src/i18n/i18n-coverage.test.ts (7 tests) 6817ms
+@beaconhs/web:test:      ✓ contains no untranslated JSX or user-facing attributes  1127ms
+@beaconhs/web:test:      ✓ contains every generated key referenced by application source  2981ms
+@beaconhs/web:test:      ✓ uses request-aware metadata instead of static English metadata  2194ms
+@beaconhs/web:test:      ✓ catalogs every framework-agnostic UI primitive string  378ms
+@beaconhs/web:test:  ✓ src/app/(platform)/platform/tenants/[tenantId]/branding/_actions.test.ts (3 tests) 11ms
+@beaconhs/web:test:  ✓ src/lib/upload-verification.test.ts (2 tests) 55ms
+@beaconhs/web:test:  ✓ src/lib/journal-analysis-cutover-contract.test.ts (1 test) 10ms
+@beaconhs/web:test:  ✓ src/lib/credential-design-delete-cutover.test.ts (1 test) 26ms
+@beaconhs/web:test:  ✓ src/lib/forms-governance-contract.test.ts (4 tests) 54ms
+@beaconhs/web:test:  ✓ src/lib/incident-investigation.test.ts (2 tests) 12ms
+@beaconhs/web:test:  ✓ src/lib/equipment-station.test.ts (2 tests) 11ms
+@beaconhs/web:test:  ✓ src/lib/document-publish-save-contract.test.ts (3 tests) 12ms
+@beaconhs/web:test:  ✓ src/lib/hospitality/diary.test.ts (2 tests) 8ms
+@beaconhs/web:test:  ✓ src/app/(app)/admin/api-keys/_route-guard.test.ts (1 test) 26ms
+@beaconhs/web:test:  ✓ src/lib/assistant/limits.test.ts (1 test) 7ms
+@beaconhs/web:test:  ✓ src/lib/hospitality/handover-property-context.test.ts (2 tests) 175ms
+@beaconhs/web:test:  ✓ src/app/(app)/training/learn/_lib/compliance-requirement.test.ts (5 tests) 12ms
+@beaconhs/web:test:  ✓ src/app/(app)/admin/settings/_actions.audit-contract.test.ts (1 test) 8ms
+@beaconhs/web:test:  ✓ src/lib/hospitality/maintenance-navigation-contract.test.ts (4 tests) 10ms
+@beaconhs/web:test:  ✓ src/lib/risk-reporting.test.ts (5 tests) 19ms
+@beaconhs/web:test:  ✓ src/components/file-upload-contract.test.ts (1 test) 7ms
+@beaconhs/web:test:  ✓ src/app/(app)/apps/templates/[id]/fill/photo-field-state.test.ts (1 test) 7ms
+@beaconhs/web:test:  ✓ src/app/(app)/layout.theme-contract.test.ts (1 test) 7ms
+@beaconhs/web:test:  ✓ src/lib/equipment-custody.test.ts (2 tests) 8ms
+@beaconhs/web:test:  ✓ src/app/(app)/journals/_mutation-policy.test.ts (4 tests) 10ms
+@beaconhs/web:test:  ✓ src/lib/regulatory-terminology.test.ts (2 tests) 9ms
+@beaconhs/web:test:  ✓ src/lib/hospitality/maintenance-lifecycle.test.ts (3 tests) 10ms
+@beaconhs/web:test:  ↓ src/lib/property-delegation.integration.test.ts (1 test | 1 skipped)
+@beaconhs/web:test: 
+@beaconhs/web:test: ⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+@beaconhs/web:test: 
+@beaconhs/web:test:  FAIL  scripts/dev-first-identity.test.ts > guarded DEV first identity > keeps public signup disabled with no public bootstrap route or credential fabrication
+@beaconhs/web:test: Error: Test timed out in 5000ms.
+@beaconhs/web:test: If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+@beaconhs/web:test:  ❯ scripts/dev-first-identity.test.ts:162:3
+@beaconhs/web:test:     160|     expect(mocks.signUp).not.toHaveBeenCalled()
+@beaconhs/web:test:     161|   })
+@beaconhs/web:test:     162|   it('keeps public signup disabled with no public bootstrap route or c…
+@beaconhs/web:test:        |   ^
+@beaconhs/web:test:     163|     const runtime = readFileSync(
+@beaconhs/web:test:     164|       new URL('../../../packages/auth/src/server.ts', import.meta.url),
+@beaconhs/web:test: 
+@beaconhs/web:test: ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯
+@beaconhs/web:test: 
+@beaconhs/web:test:  FAIL  src/components/tenant-branding-form.test.tsx > switches preview modes and restores saved identity on Discard
+@beaconhs/web:test: Error: Test timed out in 5000ms.
+@beaconhs/web:test: If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+@beaconhs/web:test:  ❯ src/components/tenant-branding-form.test.tsx:47:1
+@beaconhs/web:test:      45| const button = (label: string) =>
+@beaconhs/web:test:      46|   [...host.querySelectorAll('button')].find((item) => item.textContent…
+@beaconhs/web:test:      47| it('switches preview modes and restores saved identity on Discard', as…
+@beaconhs/web:test:        | ^
+@beaconhs/web:test:      48|   await render()
+@beaconhs/web:test:      49|   expect(button('Desktop').getAttribute('aria-pressed')).toBe('true')
+@beaconhs/web:test: 
+@beaconhs/web:test: ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯
+@beaconhs/web:test: 
+@beaconhs/web:test:  FAIL  src/lib/native-dependencies.test.ts > native production dependencies > loads the canvas backend and emits a real PNG
+@beaconhs/web:test: Error: Test timed out in 5000ms.
+@beaconhs/web:test: If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+@beaconhs/web:test:  ❯ src/lib/native-dependencies.test.ts:28:3
+@beaconhs/web:test:      26|
+@beaconhs/web:test:      27| describe('native production dependencies', () => {
+@beaconhs/web:test:      28|   it('loads the canvas backend and emits a real PNG', async () => {
+@beaconhs/web:test:        |   ^
+@beaconhs/web:test:      29|     const { createCanvas } = await import('@napi-rs/canvas')
+@beaconhs/web:test:      30|     const canvas = createCanvas(2, 2)
+@beaconhs/web:test: 
+@beaconhs/web:test: ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯
+@beaconhs/web:test: 
+@beaconhs/web:test:  FAIL  src/lib/pdf-template-designer-roundtrip.test.ts > PDF templates survive the visual designer > hazid-assessment-pdf > keeps every handlebars block out of table-internal text position
+@beaconhs/web:test: Error: Test timed out in 5000ms.
+@beaconhs/web:test: If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+@beaconhs/web:test:  ❯ src/lib/pdf-template-designer-roundtrip.test.ts:61:7
+@beaconhs/web:test:      59|   for (const seed of MODULE_PDF_TEMPLATE_SEEDS) {
+@beaconhs/web:test:      60|     describe(seed.key, () => {
+@beaconhs/web:test:      61|       it('keeps every handlebars block out of table-internal text posi…
+@beaconhs/web:test:        |       ^
+@beaconhs/web:test:      62|         // A block token parked directly inside <table>/<tbody>/<tr> g…
+@beaconhs/web:test:      63|         // the HTML parser, so the designer would corrupt the template…
+@beaconhs/web:test: 
+@beaconhs/web:test: ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯
+@beaconhs/web:test: 
+@beaconhs/web:test:  FAIL  src/lib/training-access.test.ts > restricted Training list deep links > redirects records before querying tenant records
+@beaconhs/web:test:  FAIL  src/lib/training-access.test.ts > restricted Training list deep links > redirects assessments before querying tenant records
+@beaconhs/web:test: Error: Test timed out in 5000ms.
+@beaconhs/web:test: If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+@beaconhs/web:test:  ❯ src/lib/training-access.test.ts:79:57
+@beaconhs/web:test:      77|
+@beaconhs/web:test:      78| describe('restricted Training list deep links', () => {
+@beaconhs/web:test:      79|   it.each(['records', 'skills', 'assessments'] as const)(
+@beaconhs/web:test:        |                                                         ^
+@beaconhs/web:test:      80|     'redirects %s before querying tenant records',
+@beaconhs/web:test:      81|     async (list) => {
+@beaconhs/web:test: 
+@beaconhs/web:test: ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/7]⎯
+@beaconhs/web:test: 
+@beaconhs/web:test:  FAIL  src/lib/forms/form-response-parent-lock-contract.test.ts > generic form-response parent-lock contract > keeps an exhaustive inventory of every web and worker response writer
+@beaconhs/web:test: Error: Test timed out in 5000ms.
+@beaconhs/web:test: If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+@beaconhs/web:test:  ❯ src/lib/forms/form-response-parent-lock-contract.test.ts:56:3
+@beaconhs/web:test:      54|
+@beaconhs/web:test:      55| describe('generic form-response parent-lock contract', () => {
+@beaconhs/web:test:      56|   it('keeps an exhaustive inventory of every web and worker response w…
+@beaconhs/web:test:        |   ^
+@beaconhs/web:test:      57|     expect(runtimeResponseWriters(new URL('../../', import.meta.url)))…
+@beaconhs/web:test:      58|       'app/(app)/apps/_lib/form-flow-adapter.ts',
+@beaconhs/web:test: 
+@beaconhs/web:test: ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/7]⎯
+@beaconhs/web:test: 
+@beaconhs/web:test: 
+@beaconhs/web:test:  Test Files  6 failed | 251 passed | 1 skipped (258)
+@beaconhs/web:test:       Tests  7 failed | 1567 passed | 1 skipped (1575)
+@beaconhs/web:test:    Start at  15:12:53
+@beaconhs/web:test:    Duration  183.69s (transform 107.48s, setup 0ms, import 1274.91s, tests 168.00s, environment 103.06s)
+@beaconhs/web:test: 
+@beaconhs/web:test:  ELIFECYCLE  Test failed. See above for more details.
+@beaconhs/web#test:  ERROR  command (/Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/apps/web) /usr/local/bin/pnpm run test exited (1)
+
+ Tasks:    22 successful, 23 total
+Cached:    0 cached, 23 total
+  Time:    6m32.428s 
+Failed:    @beaconhs/web#test
+
+ ERROR  run failed: command  exited (1)
+ ELIFECYCLE  Test failed. See above for more details.

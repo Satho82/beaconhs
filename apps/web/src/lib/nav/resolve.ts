@@ -210,6 +210,7 @@ function resolveItem(
       // (records), not the designer. Rows open the entry; editors get a
       // "Configure" link from there into the builder.
       href: `/apps/templates/${item.templateId}/records`,
+      approvedParent: meta.key === TOOLBOX_TEMPLATE_KEY ? 'Training' : 'Diary & Tasks',
       label: item.label ?? meta.name,
       iconKey: item.iconKey ?? meta.iconKey ?? PINNED_FORM_DEFAULT_ICON,
     }

@@ -1,8 +1,10 @@
 'use client'
 
+import { useGeneratedValueTranslations } from '@/i18n/generated'
+
 import { GeneratedValue } from '@/i18n/generated'
 import { LogOut, ShieldCheck, Search, ArrowLeft } from 'lucide-react'
-import { useTransition } from 'react'
+import { useTransition, type CSSProperties } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
@@ -29,6 +31,8 @@ export function PlatformShell({
   deploymentEnvironment?: string
   children: React.ReactNode
 }) {
+  const tVisual = useGeneratedValueTranslations()
+
   const tBatch = useTranslations('Generated')
 
   const router = useRouter()
@@ -37,7 +41,10 @@ export function PlatformShell({
   const groups = PLATFORM_NAV_GROUPS
 
   return (
-    <div className="flex [height:100dvh] h-screen overflow-hidden">
+    <div
+      className="flex [height:100dvh] h-screen overflow-hidden"
+      style={{ '--tenant-primary-action': branding.primaryColor || '#0066FF' } as CSSProperties}
+    >
       <AppSidebar
         groups={groups}
         defaultCollapsed={defaultCollapsed}
@@ -53,10 +60,10 @@ export function PlatformShell({
               <ShieldCheck className="shrink-0 text-teal-700 dark:text-teal-300" size={18} />
               <div className="min-w-0">
                 <div className="truncate text-sm font-semibold">
-                  <GeneratedValue value={'Platform administration'} />
+                  <GeneratedValue value={'Platform Admin'} />
                 </div>
                 <div className="truncate text-xs text-slate-500 dark:text-slate-400">
-                  <GeneratedValue value={operator.email} />
+                  <GeneratedValue value={'Platform workspace'} />
                 </div>
               </div>
             </div>
@@ -94,7 +101,12 @@ export function PlatformShell({
                 <span className="grid h-9 w-9 place-items-center rounded-full bg-blue-100 text-sm font-semibold text-blue-800">
                   {(operator.name || operator.email).slice(0, 1).toUpperCase()}
                 </span>
-                <span className="hidden max-w-32 truncate text-sm xl:inline">{operator.name}</span>
+                <span className="hidden max-w-44 text-sm xl:block">
+                  <span className="block truncate font-semibold">{operator.name}</span>
+                  <span className="block text-xs text-blue-700">
+                    {tVisual('Platform Super Admin')}
+                  </span>
+                </span>
               </summary>
               <div className="absolute right-0 z-30 mt-2 w-64 rounded-xl border bg-white p-3 shadow-lg dark:bg-slate-900">
                 <p className="truncate text-sm font-semibold">{operator.name}</p>

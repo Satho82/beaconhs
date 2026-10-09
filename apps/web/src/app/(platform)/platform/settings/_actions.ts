@@ -3,6 +3,37 @@ import { revalidatePath } from 'next/cache'
 import { requirePlatformOperator } from '@/lib/auth'
 import { getPlatformBranding, savePlatformBranding } from '@/lib/platform-branding-config'
 import { recordPlatformAudit } from '@/lib/platform-audit'
+import { db, withSuperAdmin } from '@beaconhs/db'
+import { platformSettings, platformAuditLog, PLATFORM_SETTINGS_ID } from '@beaconhs/db/schema'
+import { parseTenantOperationalDefaults } from '@/lib/tenant-operational-defaults'
+
+export async function savePlatformRegionalDefaults(data: FormData) {
+  const operator = await requirePlatformOperator()
+  const defaults = parseTenantOperationalDefaults({
+    locale: data.get('locale'),
+    timezone: data.get('timezone'),
+    dateFormat: data.get('dateFormat'),
+    numberFormat: data.get('numberFormat'),
+    currencyCode: data.get('currencyCode'),
+  })
+  await withSuperAdmin(db, async (tx) => {
+    await tx
+      .insert(platformSettings)
+      .values({ id: PLATFORM_SETTINGS_ID, regionalDefaults: defaults })
+      .onConflictDoUpdate({
+        target: platformSettings.id,
+        set: { regionalDefaults: defaults, updatedAt: new Date() },
+      })
+    await tx.insert(platformAuditLog).values({
+      actorUserId: operator.userId,
+      entityType: 'platform-regional-defaults',
+      action: 'update',
+      summary: 'Updated regional defaults for newly created tenants',
+      after: defaults,
+    })
+  })
+  revalidatePath('/platform/settings')
+}
 
 export async function savePlatformIdentity(data: FormData) {
   const operator = await requirePlatformOperator()

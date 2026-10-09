@@ -7,6 +7,7 @@ import { GeneratedValue, useGeneratedValueTranslations } from '@/i18n/generated'
 // width flash). Hosts the brand, the nav, the theme switcher, and the version tag.
 
 import { useCallback, useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { Badge, cn } from '@beaconhs/ui'
@@ -49,6 +50,7 @@ export function AppSidebar({
   const [collapsed, setCollapsed] = useState(defaultCollapsed)
   const t = useTranslations('Shell')
   const navGroups = useNavGroups(groups)
+  const platform = (usePathname() ?? '').startsWith('/platform')
   const { immutableVersion, releaseLabel, environmentLabel } = deploymentLabels(
     deploymentVersion,
     deploymentEnvironment,
@@ -68,6 +70,7 @@ export function AppSidebar({
 
   return (
     <aside
+      data-sidebar-appearance={platform ? 'platform' : 'application'}
       className={cn(
         'hidden shrink-0 flex-col border-r border-slate-800 bg-[rgb(var(--color-sidebar))] text-slate-100 motion-safe:transition-[width] motion-safe:duration-200 lg:flex',
         'dark:border-slate-800',
@@ -106,7 +109,11 @@ export function AppSidebar({
         </button>
       </div>
 
-      <SidebarNav groups={navGroups} collapsed={collapsed} />
+      <SidebarNav
+        groups={navGroups}
+        collapsed={collapsed}
+        appearance={platform ? 'platform' : 'application'}
+      />
 
       <div className="border-t border-white/10 p-3 dark:border-slate-800">
         <GeneratedValue

@@ -63,6 +63,20 @@ export const PLATFORM_NAV_GROUPS: SidebarNavGroup[] = [
         ],
       },
       {
+        href: '/platform/modules',
+        label: 'Modules',
+        iconKey: 'layers',
+        groupOnly: true,
+        children: [
+          {
+            href: '/platform/modules',
+            label: 'All Modules',
+            iconKey: 'layers',
+            exact: true,
+          },
+        ],
+      },
+      {
         href: '/platform/settings',
         label: 'Global Settings',
         iconKey: 'settings',

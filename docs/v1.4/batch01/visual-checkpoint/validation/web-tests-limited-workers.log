@@ -1,0 +1,9 @@
+
+ RUN  v4.1.10 /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/apps/web
+
+
+ Test Files  257 passed | 1 skipped (258)
+      Tests  1574 passed | 1 skipped (1575)
+   Start at  15:16:30
+   Duration  186.75s (transform 10.76s, setup 0ms, import 241.99s, tests 18.00s, environment 11.81s)
+

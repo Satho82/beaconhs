@@ -1,0 +1,31 @@
+
+> beaconhs@0.1.0 build /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final
+> turbo run build --concurrency=1 --force
+
+
+   • Packages in scope: @beaconhs/ai, @beaconhs/analytics, @beaconhs/audit, @beaconhs/auth, @beaconhs/compliance, @beaconhs/crypto, @beaconhs/db, @beaconhs/design-studio, @beaconhs/email-render, @beaconhs/emails, @beaconhs/events, @beaconhs/forms-core, @beaconhs/forms-pdf, @beaconhs/i18n, @beaconhs/integrations, @beaconhs/jobs, @beaconhs/office, @beaconhs/reports, @beaconhs/sms, @beaconhs/storage, @beaconhs/sync, @beaconhs/tenant, @beaconhs/ui, @beaconhs/web, @beaconhs/worker
+   • Running build in 25 packages
+   • Remote caching disabled, using shared worktree cache
+
+@beaconhs/web:build: cache bypass, force executing 916a4ed65902ea5f
+@beaconhs/web:build: 
+@beaconhs/web:build: > @beaconhs/web@0.1.0 build /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/apps/web
+@beaconhs/web:build: > next build --webpack
+@beaconhs/web:build: 
+@beaconhs/web:build: ▲ Next.js 16.3.3 (webpack)
+@beaconhs/web:build: ✓ Running next.config.ts took 2.6s
+@beaconhs/web:build: ⚠ No build cache found. Please configure build caching for faster rebuilds. Read more: https://nextjs.org/docs/messages/no-cache
+@beaconhs/web:build: - Experiments (use with caution):
+@beaconhs/web:build:   · clientTraceMetadata
+@beaconhs/web:build:   ✓ webpackBuildWorker
+@beaconhs/web:build:   ✓ webpackMemoryOptimizations
+@beaconhs/web:build: 
+@beaconhs/web:build:   Creating an optimized production build ...
+Shutting down Turborepo tasks...
+@beaconhs/web:build:  ELIFECYCLE  Command failed with exit code 130.
+@beaconhs/worker:build: cache bypass, force executing 9daaec95726252d1
+
+ Tasks:    0 successful, 2 total
+Cached:    0 cached, 2 total
+  Time:    50.975s 
+

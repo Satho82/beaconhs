@@ -1,18 +1,12 @@
 import { getGeneratedTranslations, getGeneratedValueTranslations } from '@/i18n/generated.server'
 import Link from 'next/link'
-import { asc, count, desc, eq, isNull } from 'drizzle-orm'
+import { asc, count, desc, eq } from 'drizzle-orm'
 import { db, withSuperAdmin } from '@beaconhs/db'
-import {
-  tenants,
-  users,
-  hospitalityProperties,
-  formTemplates,
-  platformAuditLog,
-} from '@beaconhs/db/schema'
-import { Button, Badge, EmptyState, PageHeader } from '@beaconhs/ui'
+import { tenants, platformAuditLog } from '@beaconhs/db/schema'
+import { Badge, EmptyState } from '@beaconhs/ui'
+import { PlatformOverview } from '@/components/platform-overview'
 import { PageContainer } from '@/components/page-layout'
 import { requirePlatformOperator } from '@/lib/auth'
-import { MODULE_CATALOGUE } from '@/lib/module-entitlements/catalogue'
 import { getPlatformBranding } from '@/lib/platform-branding-config'
 
 export const dynamic = 'force-dynamic'
@@ -28,42 +22,32 @@ export default async function PlatformHubPage() {
   await requirePlatformOperator()
   const [data, branding] = await Promise.all([
     withSuperAdmin(db, async (tx) => {
-      const [tenantCount, propertyCount, userCount, templateCount, portfolio, activity, suspended] =
-        await Promise.all([
-          tx.select({ value: count() }).from(tenants),
-          tx
-            .select({ value: count() })
-            .from(hospitalityProperties)
-            .where(isNull(hospitalityProperties.deletedAt)),
-          tx.select({ value: count() }).from(users),
-          tx.select({ value: count() }).from(formTemplates).where(isNull(formTemplates.deletedAt)),
-          tx
-            .select({
-              id: tenants.id,
-              name: tenants.name,
-              status: tenants.status,
-              region: tenants.region,
-            })
-            .from(tenants)
-            .orderBy(asc(tenants.name), asc(tenants.id))
-            .limit(6),
-          tx
-            .select({
-              id: platformAuditLog.id,
-              action: platformAuditLog.action,
-              summary: platformAuditLog.summary,
-              occurredAt: platformAuditLog.occurredAt,
-            })
-            .from(platformAuditLog)
-            .orderBy(desc(platformAuditLog.occurredAt))
-            .limit(8),
-          tx.select({ value: count() }).from(tenants).where(eq(tenants.status, 'suspended')),
-        ])
+      const [tenantCount, portfolio, activity, suspended] = await Promise.all([
+        tx.select({ value: count() }).from(tenants),
+        tx
+          .select({
+            id: tenants.id,
+            name: tenants.name,
+            status: tenants.status,
+            region: tenants.region,
+          })
+          .from(tenants)
+          .orderBy(asc(tenants.name), asc(tenants.id))
+          .limit(6),
+        tx
+          .select({
+            id: platformAuditLog.id,
+            action: platformAuditLog.action,
+            summary: platformAuditLog.summary,
+            occurredAt: platformAuditLog.occurredAt,
+          })
+          .from(platformAuditLog)
+          .orderBy(desc(platformAuditLog.occurredAt))
+          .limit(8),
+        tx.select({ value: count() }).from(tenants).where(eq(tenants.status, 'suspended')),
+      ])
       return {
         tenantCount: tenantCount[0]?.value ?? 0,
-        propertyCount: propertyCount[0]?.value ?? 0,
-        userCount: userCount[0]?.value ?? 0,
-        templateCount: templateCount[0]?.value ?? 0,
         portfolio,
         activity,
         suspended: suspended[0]?.value ?? 0,
@@ -71,77 +55,10 @@ export default async function PlatformHubPage() {
     }),
     getPlatformBranding(),
   ])
-  const metrics = [
-    {
-      label: 'Tenants',
-      value: data.tenantCount,
-      href: '/platform/tenants',
-      detail: 'All lifecycle states',
-    },
-    {
-      label: 'Properties',
-      value: data.propertyCount,
-      href: '/platform/tenants',
-      detail: 'Active property records across tenants',
-    },
-    {
-      label: 'Platform Users',
-      value: data.userCount,
-      href: '/platform/users',
-      detail: 'Global identities, including disabled accounts',
-    },
-    {
-      label: 'Module types',
-      value: MODULE_CATALOGUE.length,
-      href: '/platform/tenants',
-      detail: 'Available entitlement catalogue entries',
-    },
-    {
-      label: 'Tenant form templates',
-      value: data.templateCount,
-      href: null,
-      detail: 'Non-deleted tenant form templates',
-    },
-  ]
   return (
     <PageContainer>
       <div className="space-y-6">
-        <PageHeader
-          title={tBoard('Platform administration')}
-          description={tBoard('Manage organisations and platform configuration')}
-          actions={
-            <Button asChild>
-              <Link href="/platform/tenants/new">{tBoard('Create tenant')}</Link>
-            </Button>
-          }
-        />
-        <div
-          className="grid grid-cols-2 gap-3 xl:grid-cols-5"
-          aria-label={tBoard('Platform totals')}
-        >
-          {metrics.map((metric) => {
-            const content = (
-              <>
-                <p className="text-sm text-slate-500">{tBoard(metric.label)}</p>
-                <p className="mt-2 text-3xl font-semibold tracking-tight">{metric.value}</p>
-                <p className="mt-2 text-xs text-slate-500">{tBoard(metric.detail)}</p>
-              </>
-            )
-            return metric.href ? (
-              <Link
-                key={metric.label}
-                href={metric.href as never}
-                className="rounded-xl border bg-white p-4 hover:border-teal-600 focus-visible:outline-2 focus-visible:outline-teal-600 dark:bg-slate-900"
-              >
-                {content}
-              </Link>
-            ) : (
-              <div key={metric.label} className="rounded-xl border bg-white p-4 dark:bg-slate-900">
-                {content}
-              </div>
-            )
-          })}
-        </div>
+        <PlatformOverview />
         <div className="grid gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(18rem,1fr)]">
           <section className="min-w-0 rounded-xl border bg-white p-5 dark:bg-slate-900">
             <div className="flex flex-wrap items-center justify-between gap-3">

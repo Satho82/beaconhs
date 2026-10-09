@@ -1,0 +1,197 @@
+{
+  "baseline": "c6cb678a8b603c57783fe93f43f7758978c10862",
+  "branch": "feature/uvanoo-v1.4-batch01-visual-final",
+  "uncommitted": true,
+  "generatedExcluded": ["apps/web/AGENTS.md", "apps/web/CLAUDE.md", "apps/web/next-env.d.ts"],
+  "protectedFilesUnchanged": [
+    "packages/db/src/action-property-policy.ts",
+    "packages/db/src/action-property-rls.integration.sql",
+    "packages/db/src/inspection-compliance-property-rls.integration.sql",
+    "packages/db/src/people-property-provenance.integration.sql",
+    "packages/db/src/migrate.ts",
+    "packages/db/drizzle/0057_people_property_provenance.sql"
+  ],
+  "secretPatternScan": {
+    "filesScanned": 44,
+    "findings": 0,
+    "note": "Targeted pattern scan, not a comprehensive secret audit."
+  },
+  "files": [
+    {
+      "path": "apps/web/src/app/(app)/admin/settings/_actions.ts",
+      "sha256": "328c58b77f0a48e2e43f7912cfa87290abf536c1d4aaef2815c2695e3a4f9485"
+    },
+    {
+      "path": "apps/web/src/app/(app)/admin/settings/branding/page.tsx",
+      "sha256": "ba54beb5f24834574e805902057b97fc9f62a8cd18f8dc8b7e4746ed9bcc5c78"
+    },
+    {
+      "path": "apps/web/src/app/(app)/admin/settings/page.tsx",
+      "sha256": "3334b484cbed7b4064e26bcafa1a3702dac2eca723435c8db9dd39f4394fc9cf"
+    },
+    {
+      "path": "apps/web/src/app/(app)/admin/settings/settings-form.tsx",
+      "sha256": "179512efac7a28cefa4f758f0232b9f654c6d25a4774589f236e37871599d4c3"
+    },
+    {
+      "path": "apps/web/src/app/(platform)/platform/modules/page.tsx",
+      "sha256": "ed2ffd678ea377c2be83cb83a4d52f9e41bc3bf3c4d4fe894195eb83b1280d2b"
+    },
+    {
+      "path": "apps/web/src/app/(platform)/platform/page.tsx",
+      "sha256": "5ffabafd5ec1a2babd3564cfa1a780aae9c82f33f8e7df188d8631e8cb5aeb42"
+    },
+    {
+      "path": "apps/web/src/app/(platform)/platform/settings/_actions.test.ts",
+      "sha256": "ff4f0f0aefad97726c0cd7a705d9f4d6c45bd7a2d67ba8b25280bbc54119e490"
+    },
+    {
+      "path": "apps/web/src/app/(platform)/platform/settings/_actions.ts",
+      "sha256": "623d73aff1d114aa8710712304522e3b2972f9741e0558acf6d843fb6476961f"
+    },
+    {
+      "path": "apps/web/src/app/(platform)/platform/settings/page.tsx",
+      "sha256": "b7f3e5b4cfb277f938d959528493eb918796bea22075aaceeb70a12ea48ad3c4"
+    },
+    {
+      "path": "apps/web/src/app/(platform)/platform/tenants/[tenantId]/page.tsx",
+      "sha256": "c84edb59f9da2493dc7e291124387f8f4fb14157b121b86ff1f5fb3001dd1e8a"
+    },
+    {
+      "path": "apps/web/src/app/(platform)/platform/tenants/new/page.tsx",
+      "sha256": "4590f067f01ea4153ab62be9814b8b9f0e6ba4e81c01809877a390695ff0d74b"
+    },
+    {
+      "path": "apps/web/src/app/(platform)/platform/tenants/page.tsx",
+      "sha256": "ef05195ebe92c9b82ed2a27be0d097545aaafb46a5c07744a286fb6ada744f9f"
+    },
+    {
+      "path": "apps/web/src/app/globals.css",
+      "sha256": "728d7be4038f18a6a5d08531f427598a28105d1255ec3f89c17fe8653122321d"
+    },
+    {
+      "path": "apps/web/src/components/app-shell.tsx",
+      "sha256": "d4e1d9fb39cf8485a4e6f05fcc7b2b2a8bfcf17402ca5180567898a646f18fa5"
+    },
+    {
+      "path": "apps/web/src/components/app-sidebar.tsx",
+      "sha256": "9aa33bbceb69a0843a6b7f96bf5985c0b61b9ab49dfb682d823d5dd7f583067b"
+    },
+    {
+      "path": "apps/web/src/components/mobile-nav-toggle.tsx",
+      "sha256": "c1fcbb762752eb39b670f52a97751b464205158b27b20eec6e8d0c2d3f679645"
+    },
+    {
+      "path": "apps/web/src/components/module-strip.tsx",
+      "sha256": "e338abcd6246a8f3f7216ff29c267c5f20a75edc684f9214022177b6ec17bd7b"
+    },
+    {
+      "path": "apps/web/src/components/navigation-search.test.ts",
+      "sha256": "28e47b858d32dade69aea0f4e9dd3d151fc4c9d89818e1911620454889694af7"
+    },
+    {
+      "path": "apps/web/src/components/navigation-search.ts",
+      "sha256": "e87563f4c8ca6953e0f69a6cd5c31388799d7b032012bee2db378544420ffcb5"
+    },
+    {
+      "path": "apps/web/src/components/platform-overview.tsx",
+      "sha256": "b8ddf3eb1868bd17d47aa10ea807f9dc83cc62d14b28ee9c1459cf206d03d76d"
+    },
+    {
+      "path": "apps/web/src/components/platform-settings-navigation.tsx",
+      "sha256": "d5eb21c88f8ade1bdd2832a6c493ed236db6252d876d10e5804264797b05c5c9"
+    },
+    {
+      "path": "apps/web/src/components/platform-shell.tsx",
+      "sha256": "8cdff6e413bcbae4463dbdd1500172a46d2f9e0fe260d22c5eef92131cb256ac"
+    },
+    {
+      "path": "apps/web/src/components/select-reset.test.tsx",
+      "sha256": "8b5f9c3d77a749eeacc82d703e7ecfede27fa153d4c45b44f555be5840e63b34"
+    },
+    {
+      "path": "apps/web/src/components/sidebar-nav.test.tsx",
+      "sha256": "cbdbe8126c960f8554f30f0eae935f2516ae37f79e6f040bea1897040b745645"
+    },
+    {
+      "path": "apps/web/src/components/sidebar-nav.tsx",
+      "sha256": "a2ec3fb23ecd3c80db98cc2bd29e8839905d6e788b2b7fec6b5016973870b856"
+    },
+    {
+      "path": "apps/web/src/components/tenant-branding-form.tsx",
+      "sha256": "850f918a605a76892cfd2b000c33962b5821646ba78415ba00a55a209b7b2081"
+    },
+    {
+      "path": "apps/web/src/components/use-platform-nav.ts",
+      "sha256": "af3fa7cc784d23463d6b6b4c7e659f514326095a84d7e81ed4eaa11688138804"
+    },
+    {
+      "path": "apps/web/src/lib/manual/content/board-administration.ts",
+      "sha256": "ead7f2397af58200c8faef832f84f5c3e07b2f62dfe8e99cf13110e95b709723"
+    },
+    {
+      "path": "apps/web/src/lib/manual/content/getting-started.ts",
+      "sha256": "2faa95d0dbd2ce5d8466bfce0a9a9a972a06042f8a068d25fcfeda019e8574d8"
+    },
+    {
+      "path": "apps/web/src/lib/nav/approved-structure.test.ts",
+      "sha256": "91677110e7153a418bc460a454566e363167da04caf0d9714dae1fd78bd59d48"
+    },
+    {
+      "path": "apps/web/src/lib/nav/approved-structure.ts",
+      "sha256": "0375aef081fa38b40f3c8b7ee3b68bb639f98ca08c9c5bb0bb4faa985a3d7fad"
+    },
+    {
+      "path": "apps/web/src/lib/nav/resolve.ts",
+      "sha256": "052c0804f37394c5640154f2ad5ccd68dcfaee81d0dbec8a35aa7ef18f5ccb11"
+    },
+    {
+      "path": "apps/web/src/lib/platform-regional-defaults.ts",
+      "sha256": "ff684469546022e7ba0169ecc0ae9aa71dcdeb81f3fd4cd4b48335892c26e287"
+    },
+    {
+      "path": "apps/web/src/lib/platform-tenant-counts.test.ts",
+      "sha256": "6f2405ddb62c04958d5d68024ce889fc074acd99ff4f41b2405594d6979d14fc"
+    },
+    {
+      "path": "apps/web/src/lib/platform-tenant-counts.ts",
+      "sha256": "9b08e5b8193c397548a105c5bdf883cab42a73f74f169e6196d89096e585ceb0"
+    },
+    {
+      "path": "apps/web/src/lib/walkthroughs/registry.ts",
+      "sha256": "99d8bc206c4cb1fc377b54d1131f62b97f6909c79bbb7efc713094387397a0aa"
+    },
+    {
+      "path": "packages/db/drizzle/0058_platform_regional_defaults.sql",
+      "sha256": "fb1fcab4f5cea69815c83a85d8ac4d696e8ae4486ae3d730a512b2f39fe7d4f4"
+    },
+    {
+      "path": "packages/db/drizzle/meta/_journal.json",
+      "sha256": "b0d071054cd2a33ea9bd1492d1a923e42241db6727defc99829ee486f6afad76"
+    },
+    {
+      "path": "packages/db/src/production-cutover-integrity.test.ts",
+      "sha256": "97f9fe6bb02bfe219970b214d5415ae7ff50f4a2b882561a0da6cee32378c221"
+    },
+    {
+      "path": "packages/db/src/schema/platform-settings.ts",
+      "sha256": "f279f2903dafb846cd3a527329611d6c09f2fc7e0fa1e43c5817848d6173b3b8"
+    },
+    {
+      "path": "packages/i18n/src/messages/en.json",
+      "sha256": "d5ac4bafbc2a03639d564c48edf0a65938277fea5e2580157cb3a2adea972fa1"
+    },
+    {
+      "path": "packages/i18n/src/messages/es.json",
+      "sha256": "35145b414b716e379fb8bec8f3a33b4ef9843dce407fd4cbbc7a6fe087d0e813"
+    },
+    {
+      "path": "packages/i18n/src/messages/fr.json",
+      "sha256": "eafe0c12e4663b60725aaca1541199badbdc90978d1e9b95b65fd9f171550a0a"
+    },
+    {
+      "path": "packages/ui/src/select.tsx",
+      "sha256": "59f9745bf786c34f80fefa9bf2cd1ca409194b4d675a54860f3bb084ec441053"
+    }
+  ]
+}

@@ -3,7 +3,7 @@ import { getGeneratedValueTranslations, getGeneratedTranslations } from '@/i18n/
 import { GeneratedText, GeneratedValue } from '@/i18n/generated'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { and, asc, count, desc, eq, ilike, inArray, or, sql, type SQL } from 'drizzle-orm'
+import { and, asc, count, desc, eq, ilike, inArray, or, type SQL } from 'drizzle-orm'
 import {
   Badge,
   Button,
@@ -17,14 +17,7 @@ import {
   TableRow,
 } from '@beaconhs/ui'
 import { db, withSuperAdmin } from '@beaconhs/db'
-import {
-  incidents,
-  people,
-  tenantUsers,
-  tenants,
-  hospitalityProperties,
-  tenantModuleEntitlements,
-} from '@beaconhs/db/schema'
+import { tenants, tenantModuleEntitlements } from '@beaconhs/db/schema'
 import { isEntitlementEffective } from '@/lib/module-entitlements/policy'
 import { isModuleKey } from '@/lib/module-entitlements/catalogue'
 import { requirePlatformOperator } from '@/lib/auth'
@@ -36,6 +29,7 @@ import { SearchInput } from '@/components/search-input'
 import { SortableTh } from '@/components/sortable-th'
 import { TableToolbar } from '@/components/table-toolbar'
 import { parseListParams, pickString } from '@/lib/list-params'
+import { platformTenantCounts } from '@/lib/platform-tenant-counts'
 
 export async function generateMetadata() {
   const tGenerated = await getGeneratedTranslations()
@@ -85,10 +79,7 @@ export default async function AdminTenantsPage({
         )
       : undefined
     const where = and(search, statusFilter ? eq(tenants.status, statusFilter) : undefined)
-    const memberCount = sql<number>`(select count(*) from ${tenantUsers} where ${tenantUsers.tenantId} = ${tenants.id})`
-    const peopleCount = sql<number>`(select count(*) from ${people} where ${people.tenantId} = ${tenants.id})`
-    const incidentCount = sql<number>`(select count(*) from ${incidents} where ${incidents.tenantId} = ${tenants.id})`
-    const propertyCount = sql<number>`(select count(*) from ${hospitalityProperties} where ${hospitalityProperties.tenantId} = ${tenants.id} and ${hospitalityProperties.deletedAt} is null)`
+    const { memberCount, peopleCount, incidentCount, propertyCount } = platformTenantCounts
     const dirFn = params.dir === 'asc' ? asc : desc
     const orderBy =
       params.sort === 'slug'

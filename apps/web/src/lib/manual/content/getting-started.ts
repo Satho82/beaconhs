@@ -58,15 +58,15 @@ A normal password or magic-link sign-in does not activate a pending invitation. 
 
 ## Finding your way around
 
-The navy left menu lists everything you can use. The highlighted item shows your current page. Your organisation stays in the top header; role and property controls sit directly below it on desktop, tablet and phone. Long page titles and page actions wrap on smaller screens. Items are grouped:
+The light left menu lists everything you can use. **Search menu** finds permitted destinations and expands matching groups. The coral parent and highlighted child show your current page. The coloured module strip opens the same authorised modules; scroll it horizontally on smaller screens. Platform Admin uses its separate navy navigation. Your organisation stays in the top header; role and property controls sit directly below it on desktop, tablet and phone. Long page titles and page actions wrap on smaller screens. Items are grouped:
 
-- **Overview** — the **Dashboard**, your [Workspace](/my), and the activity feed.
-- **Properties** — the existing Property → Building → Floor → Room structure.
-- **Operations** — Maintenance, Handover and Corrective Actions.
-- **Safety & Compliance** — Compliance, Inspections, Incidents, Risk and Training.
-- **Resources** — training and documents.
-- **Assets** — Assets and Metering. **People** has its own group.
-- **Reports** — inspections, compliance, and follow-up actions.
+- **Dashboard** — overview, activity feed, inbox, assistant, help and saved custom workspace links.
+- **Diary & Tasks** — your [Workspace](/my), tasks, journals and pinned operational forms. Property Diary and Manager Sign-off appear only for the selected property when entitled.
+- **Maintenance**, **Compliance**, **Risk**, **Inspections**, **Incidents**, **Action Plans**, **Training**, **People**, **Handover**, **Assets & PPM**, and **Metering** are separate expandable modules. Documents sit under Compliance; authorised Toolbox Talk pins sit under Training.
+- **Reports** — the reports hub, permitted report tools and Insights. Reports is not merged with the separately documented Reporting module.
+- **Tenant Settings** — properties, users, general settings, branding, modules, integrations, templates, import/export and permitted administration tools.
+
+There is one navigation tree, not a second set of legacy category headings. Saved links and pinned forms retain their destinations and access rules under the relevant module. Daily Hotel, Reporting and Approvals remain documented separately but are not shown as dead links when unavailable. Approvals is not Manager Sign-off.
 
 You only see the items your role allows. If a page is missing, ask your supervisor or admin.
 

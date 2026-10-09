@@ -2,6 +2,7 @@
 import { useGeneratedValueTranslations } from '@/i18n/generated'
 
 import { Menu } from 'lucide-react'
+import { usePathname } from 'next/navigation'
 import { Drawer } from '@beaconhs/ui'
 import { Logo } from './brand-logo'
 import { useMobileNav } from './mobile-nav'
@@ -21,6 +22,7 @@ export function MobileNavToggle({
 
   const { open, setOpen } = useMobileNav()
   const navGroups = useNavGroups(groups)
+  const platform = (usePathname() ?? '').startsWith('/platform')
   return (
     <>
       <button
@@ -38,7 +40,11 @@ export function MobileNavToggle({
         side="left"
         size="sm"
         title={<Logo className="h-7 w-auto" branding={platformBranding} />}
-        bodyClassName="flex min-h-0 flex-1 flex-col bg-[rgb(var(--color-sidebar))] text-slate-100"
+        bodyClassName={
+          platform
+            ? 'flex min-h-0 flex-1 flex-col bg-[#071f34] text-white'
+            : 'flex min-h-0 flex-1 flex-col bg-[#edf5f9] text-[#103153]'
+        }
       >
         <div
           className="flex min-h-0 flex-1 flex-col"
@@ -46,7 +52,7 @@ export function MobileNavToggle({
             if ((event.target as HTMLElement).closest('a')) setOpen(false)
           }}
         >
-          <SidebarNav groups={navGroups} />
+          <SidebarNav groups={navGroups} appearance={platform ? 'platform' : 'application'} />
         </div>
         <div className="border-t border-white/10 p-4">
           <ThemeToggle />

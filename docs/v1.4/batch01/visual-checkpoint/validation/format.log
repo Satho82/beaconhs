@@ -1,0 +1,6 @@
+
+> beaconhs@0.1.0 format:check /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final
+> prettier --check "**/*.{ts,tsx,md,json}"
+
+Checking formatting...
+All matched files use Prettier code style!

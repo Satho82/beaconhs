@@ -47,6 +47,9 @@ export async function saveSettings(formData: FormData) {
   })
   await withSuperAdmin(db, async (tx) => {
     const [before] = await tx.select().from(tenants).where(eq(tenants.id, ctx.tenantId)).limit(1)
+    if (!before) throw new Error('Tenant not found.')
+    if (slug && slug !== before.slug)
+      throw new Error('The tenant identifier cannot be changed here.')
     const tenantName = name || (before?.name ?? 'Tenant')
     const tenantSlug = slug || (before?.slug ?? 'tenant')
     await tx

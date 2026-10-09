@@ -26,6 +26,10 @@ export const platformSettings = pgTable('platform_settings', {
   // compliance_dispatches). Shape = DbMaintenanceSettings in db/maintenance.ts.
   database: jsonb('database').$type<Record<string, unknown>>().default({}).notNull(),
   branding: jsonb('branding').$type<Record<string, unknown>>().default({}).notNull(),
+  regionalDefaults: jsonb('regional_defaults')
+    .$type<Record<string, unknown>>()
+    .default({})
+    .notNull(),
   ...timestamps,
 })
 

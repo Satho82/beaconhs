@@ -1,0 +1,32 @@
+
+> beaconhs@0.1.0 lint /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final
+> turbo run lint --concurrency=1 --force
+
+
+   • Packages in scope: @beaconhs/ai, @beaconhs/analytics, @beaconhs/audit, @beaconhs/auth, @beaconhs/compliance, @beaconhs/crypto, @beaconhs/db, @beaconhs/design-studio, @beaconhs/email-render, @beaconhs/emails, @beaconhs/events, @beaconhs/forms-core, @beaconhs/forms-pdf, @beaconhs/i18n, @beaconhs/integrations, @beaconhs/jobs, @beaconhs/office, @beaconhs/reports, @beaconhs/sms, @beaconhs/storage, @beaconhs/sync, @beaconhs/tenant, @beaconhs/ui, @beaconhs/web, @beaconhs/worker
+   • Running lint in 25 packages
+   • Remote caching disabled, using shared worktree cache
+
+@beaconhs/web:lint: cache bypass, force executing 689e218f436f9ca6
+@beaconhs/web:lint: 
+@beaconhs/web:lint: > @beaconhs/web@0.1.0 lint /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/apps/web
+@beaconhs/web:lint: > eslint .
+@beaconhs/web:lint: 
+@beaconhs/web:lint: 
+@beaconhs/web:lint: /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/apps/web/src/app/(platform)/platform/branding/page.tsx
+@beaconhs/web:lint:   119:23  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+@beaconhs/web:lint:   138:21  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+@beaconhs/web:lint: 
+@beaconhs/web:lint: /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/apps/web/src/app/guest/maintenance/[token]/page.tsx
+@beaconhs/web:lint:   28:13  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+@beaconhs/web:lint: 
+@beaconhs/web:lint: /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/apps/web/src/components/brand-logo.tsx
+@beaconhs/web:lint:   247:7  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+@beaconhs/web:lint: 
+@beaconhs/web:lint: ✖ 4 problems (0 errors, 4 warnings)
+@beaconhs/web:lint: 
+
+ Tasks:    1 successful, 1 total
+Cached:    0 cached, 1 total
+  Time:    2m14.23s 
+

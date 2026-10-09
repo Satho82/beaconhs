@@ -1,0 +1,7 @@
+{"check":"tenant-admin platform denial","path":"/platform","status":200,"streamedDenial":true,"protectedContentAbsent":true}
+{"check":"tenant-admin platform denial","path":"/platform/modules","status":200,"streamedDenial":true,"protectedContentAbsent":true}
+{"check":"tenant-admin platform denial","path":"/platform/settings","status":200,"streamedDenial":true,"protectedContentAbsent":true}
+{"check":"tenant-admin settings access","path":"/admin/settings","status":200}
+{"check":"tenant-admin settings access","path":"/admin/settings/modules","status":200}
+{"check":"tenant-admin settings access","path":"/admin/settings/branding","status":200}
+PASS: isolated synthetic authentication and platform/tenant boundary smoke checks

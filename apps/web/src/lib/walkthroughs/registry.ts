@@ -43,7 +43,7 @@ export const WALKTHROUGHS: Walkthrough[] = [
     id: 'welcome',
     title: 'Welcome to Uvanoo',
     description:
-      'A quick lap of the app: expandable menu groups, your workspace, and where to get help.',
+      'A quick lap of the app: searchable light navigation, expandable module groups, your workspace, and help.',
     startPath: '/dashboard',
     defaultEnabled: true,
     defaultAutoStart: true,

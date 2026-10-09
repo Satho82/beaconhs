@@ -1,0 +1,39 @@
+{
+  "status": "published-checkpoint-not-full-visual-acceptance",
+  "date": "2026-10-09",
+  "branch": "feature/uvanoo-v1.4-batch01-visual-final",
+  "parentSha": "c6cb678a8b603c57783fe93f43f7758978c10862",
+  "validatedSecurityProductSha": "0a4a04ca13758b68068f9483a3c0816b741478d8",
+  "baselineGitHubRun": "37930532626",
+  "newCloudValidation": "not requested or dispatched",
+  "format": "PASS",
+  "typecheck": "PASS: all 25 package tasks",
+  "lint": "PASS: zero errors, four existing no-img-element warnings",
+  "knip": "PASS",
+  "diffCheck": "PASS",
+  "focusedNavigationTests": "PASS: 28 navigation, entitlement and registry tests",
+  "databaseUnitTests": "PASS: 312",
+  "repositoryTests": "22 successful tasks; web task initially failed seven 5000ms timeouts across six files. These failures are retained in tests.log.",
+  "completeWebRetest": "PASS: 257 files, 1574 tests; one existing skipped file/test. Explicit --maxWorkers=2, unchanged assertions and timeouts. No unresolved timeout in this retest.",
+  "productionBuild": "INCOMPLETE: stopped during compilation at user's publish-checkpoint instruction, exit 130. Not claimed as validated.",
+  "migrationInstallation": "PASS: 58 installed; rerun zero pending",
+  "securityFiles": "Migration 0057 and five protected policy/regression/runner files unchanged",
+  "secretScan": "PASS: targeted secret-pattern scan of 44 changed product files; not a comprehensive secret audit",
+  "browserChecks": [
+    "One unified sidebar: expanded desktop, mobile drawer top and bottom",
+    "Menu search, keyboard disclosure, mobile Escape and focus restoration",
+    "Desktop 1536px, tablet 768px, mobile 390px; no document horizontal overflow at tablet/mobile",
+    "Tenant General and Branding save/discard/reload; two-tenant branding isolation",
+    "Platform module search and real entitlement management",
+    "Real synthetic tenant creation inherits regional defaults without rewriting existing tenants",
+    "Authenticated tenant admins denied platform access; permitted tenant settings render"
+  ],
+  "outstanding": [
+    "Production build completion and new checkpoint cloud validation",
+    "Antonio's visual approval; exact logo asset and remaining visual differences",
+    "Unsupported/deferred backend capabilities listed in acceptance.html",
+    "Platform dashboard screenshot is an incomplete capture and requires recapture",
+    "No operational email/Redis/external integrations exercised"
+  ],
+  "safety": "No merge, deployment, live database change or infrastructure modification. Checkpoint push only."
+}

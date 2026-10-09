@@ -9,6 +9,16 @@ import { GeneratedValue, useGeneratedTranslations } from '@/i18n/generated'
 import type { TenantBrandingFormState } from '@/lib/tenant-branding-form-state'
 import { useUnsavedChanges } from '@/lib/use-unsaved-changes'
 import { useRouter } from 'next/navigation'
+import {
+  Building2,
+  ClipboardList,
+  ShieldCheck,
+  Wrench,
+  Home,
+  Users,
+  Check,
+  Info,
+} from 'lucide-react'
 
 const initial: TenantBrandingFormState = { status: 'idle' }
 
@@ -101,9 +111,26 @@ export function TenantBrandingForm({
       </p>
       <input type="hidden" name="tenantId" value={tenantId} />
       {!hasLogo && resetLogo && <input type="hidden" name="resetLogo" value="1" />}
-      <div className="grid gap-6 xl:grid-cols-2">
-        <fieldset disabled={pending} className="space-y-6">
-          <section className="space-y-2">
+      <nav
+        aria-label={tBoard('Branding sections')}
+        className="flex gap-6 overflow-x-auto border-b border-blue-100 pb-3 text-sm text-blue-600"
+      >
+        <a href="#brand-identity" className="whitespace-nowrap">
+          {tBoard('Brand Identity')}
+        </a>
+        <a href="#brand-colours">{tBoard('Colours')}</a>
+        <a href="#brand-documents">{tBoard('Documents')}</a>
+      </nav>
+      <div className="grid gap-5 xl:grid-cols-[1.15fr_1fr]">
+        <fieldset
+          disabled={pending}
+          className="space-y-6 rounded-lg border border-blue-100 bg-white p-5 dark:bg-slate-900"
+        >
+          <section id="brand-identity" className="scroll-mt-5 space-y-3">
+            <h3 className="text-lg font-semibold">{tBoard('Logo')}</h3>
+            <p className="text-sm text-slate-500">
+              {tBoard('Upload your organisation logo for the application interface.')}
+            </p>
             <Label htmlFor="logo">
               <GeneratedValue value="Tenant logo" />
             </Label>
@@ -158,7 +185,10 @@ export function TenantBrandingForm({
               </label>
             ) : null}
           </section>
-          <section className="space-y-2">
+          <section
+            id="brand-colours"
+            className="scroll-mt-5 space-y-4 border-t border-blue-100 pt-5"
+          >
             <Label htmlFor="primaryColor">
               <GeneratedValue value="Primary colour" />
             </Label>
@@ -198,6 +228,29 @@ export function TenantBrandingForm({
                 {tBoard('Copy colour')}
               </Button>
             </div>
+            <div className="space-y-2">
+              <p className="text-sm text-slate-600">{tBoard('Suggested colours')}</p>
+              <div className="flex flex-wrap gap-2">
+                {['#0066FF', '#14B8A6', '#103956', '#FF7165', '#8560B5', '#64748B'].map(
+                  (swatch) => (
+                    <button
+                      key={swatch}
+                      type="button"
+                      aria-label={`${tBoard('Use colour')} ${swatch}`}
+                      aria-pressed={colour.toUpperCase() === swatch}
+                      onClick={() => {
+                        setColour(swatch)
+                        setDirty(true)
+                      }}
+                      style={{ backgroundColor: swatch }}
+                      className="grid h-9 w-9 place-items-center rounded-md border-2 border-white text-white ring-1 ring-slate-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+                    >
+                      {colour.toUpperCase() === swatch && <Check size={18} />}
+                    </button>
+                  ),
+                )}
+              </div>
+            </div>
             {copyMessage && (
               <p role="status" className="text-xs text-slate-600">
                 {copyMessage}
@@ -224,7 +277,10 @@ export function TenantBrandingForm({
               </Button>
             </div>
           </section>
-          <section className="space-y-2">
+          <section
+            id="brand-documents"
+            className="scroll-mt-5 space-y-3 border-t border-blue-100 pt-5"
+          >
             <Label htmlFor="letterhead">
               <GeneratedValue value="PDF letterhead" />
             </Label>
@@ -260,7 +316,7 @@ export function TenantBrandingForm({
         </fieldset>
         <section
           aria-label={tBoard('Tenant identity preview')}
-          className="min-w-0 rounded-xl border bg-slate-50 p-4 dark:bg-slate-950"
+          className="min-w-0 rounded-lg border border-blue-100 bg-white p-4 dark:bg-slate-950"
         >
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <h3 className="font-semibold">{tBoard('Live Preview')}</h3>
@@ -285,7 +341,7 @@ export function TenantBrandingForm({
                 : 'overflow-hidden rounded-lg border bg-white'
             }
           >
-            <div className="flex min-h-16 items-center gap-3 bg-slate-900 p-4 text-white">
+            <div className="flex min-h-16 items-center gap-3 bg-[#eef5f9] p-4 text-[#103153]">
               {previewLogo ? (
                 <Image
                   unoptimized
@@ -299,26 +355,74 @@ export function TenantBrandingForm({
                 <span className="font-semibold">{PRODUCT_NAME}</span>
               )}
             </div>
-            <div className="space-y-4 p-5">
-              <h4 className="font-semibold text-slate-900">{tenantName}</h4>
-              <p className="text-sm text-slate-600">{tBoard('Branding preview')}</p>
-              <div
-                className="rounded-lg border border-slate-200 p-4 text-sm text-slate-700"
-                style={{ borderTop: `3px solid ${previewColour}` }}
-              >
-                {tBoard('Your tenant identity')}
+            <div className={previewMode === 'desktop' ? 'grid grid-cols-[7rem_1fr]' : ''}>
+              {previewMode === 'desktop' && (
+                <div className="space-y-4 bg-[#eef5f9] px-3 py-5 text-[11px] text-[#103153]">
+                  {[
+                    { label: 'Dashboard', icon: Home },
+                    { label: 'Properties', icon: Building2 },
+                    { label: 'People', icon: Users },
+                    { label: 'Compliance', icon: ShieldCheck },
+                    { label: 'Maintenance', icon: Wrench },
+                  ].map(({ label, icon: Icon }) => (
+                    <div key={label} className="flex items-center gap-2">
+                      <Icon size={14} />
+                      <span>{tBoard(label)}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <div className="space-y-4 p-5">
+                <div className="rounded-lg bg-gradient-to-r from-blue-50 to-teal-50 p-4">
+                  <h4 className="font-semibold text-slate-900">{tenantName}</h4>
+                  <p className="mt-1 text-xs text-slate-600">
+                    {tBoard('Branding preview — sample layout, not live operational data.')}
+                  </p>
+                </div>
+                <div className={previewMode === 'desktop' ? 'grid grid-cols-3 gap-2' : 'space-y-2'}>
+                  {[
+                    { label: 'Maintenance', icon: Wrench },
+                    { label: 'Compliance', icon: ShieldCheck },
+                    { label: 'Tasks', icon: ClipboardList },
+                  ].map(({ label, icon: Icon }) => (
+                    <div
+                      key={label}
+                      className="space-y-3 rounded border border-blue-100 p-3 text-xs"
+                    >
+                      <span>{tBoard(label)}</span>
+                      <Icon size={24} style={{ color: previewColour }} />
+                    </div>
+                  ))}
+                </div>
+                <div
+                  className="rounded-lg border border-slate-200 p-4 text-sm text-slate-700"
+                  style={{ borderTop: `3px solid ${previewColour}` }}
+                >
+                  {tBoard('Your tenant identity')}
+                </div>
+                <span
+                  className="inline-block rounded-md px-4 py-2 text-sm font-semibold"
+                  style={{ color: previewColour, border: `1px solid ${previewColour}` }}
+                >
+                  {tBoard('Primary colour')}
+                </span>
               </div>
-              <span
-                className="inline-block rounded-md px-4 py-2 text-sm font-semibold"
-                style={{ color: previewColour, border: `1px solid ${previewColour}` }}
-              >
-                {tBoard('Primary colour')}
-              </span>
             </div>
           </div>
           <p className="mt-4 text-xs text-slate-500">
             {tBoard('Preview only. Save to apply your changes.')}
           </p>
+          <div className="mt-5 rounded-md border border-blue-100 bg-blue-50 p-4 text-sm text-[#546f9c]">
+            <h4 className="mb-2 flex items-center gap-2 font-semibold text-[#101b55]">
+              <Info size={18} />
+              {tBoard('Where your branding is applied')}
+            </h4>
+            <p>
+              {tBoard(
+                'The logo and primary colour apply to your tenant application. The document upload controls your PDF letterhead. Tenant-specific login branding and secondary-colour settings are not yet supported.',
+              )}
+            </p>
+          </div>
         </section>
       </div>
       {state.status === 'error' ? (

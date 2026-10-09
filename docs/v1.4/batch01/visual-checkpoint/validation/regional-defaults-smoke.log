@@ -1,0 +1,7 @@
+          slug           | operational_locale | operational_timezone | default_currency_code | date_format | number_format 
+-------------------------+--------------------+----------------------+-----------------------+-------------+---------------
+ isolation-hospitality   | en-GB              | Europe/London        | GBP                   | DD/MM/YYYY  | standard
+ preview-hospitality     | en-GB              | Europe/London        | GBP                   | DD/MM/YYYY  | standard
+ regional-defaults-check | en-GB              | UTC                  | USD                   | DD/MM/YYYY  | standard
+(3 rows)
+

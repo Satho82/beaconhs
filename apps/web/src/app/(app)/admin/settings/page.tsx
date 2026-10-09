@@ -11,6 +11,7 @@ import {
   Info,
   LayoutGrid,
   Settings,
+  Globe,
   UserPlus,
   Users,
 } from 'lucide-react'
@@ -139,10 +140,10 @@ async function SettingsPage({ activeSection }: { activeSection: SettingsSection 
   const regulatory = resolveRegulatoryTerminology(tenant.settings)
 
   return (
-    <PageContainer className="max-w-[100rem] py-5 sm:py-6">
+    <PageContainer className="uvanoo-settings max-w-[100rem] py-5 sm:py-6">
       <div className="space-y-4">
         <div className="border-b border-slate-200 pb-4 dark:border-slate-800">
-          <div className="mb-3 flex items-center gap-2 text-sm text-teal-700">
+          <div className="mb-3 flex items-center gap-2 text-sm text-[#546f9c]">
             <Link href="/dashboard">{t('home')}</Link>
             <span>›</span>
             <span>{t('title')}</span>
@@ -150,7 +151,7 @@ async function SettingsPage({ activeSection }: { activeSection: SettingsSection 
             <span className="font-medium text-slate-900">{t(activeSection)}</span>
           </div>
           <div className="flex items-start gap-4">
-            <div className="rounded-xl bg-teal-50 p-3 text-teal-700">
+            <div className="py-1 text-[#101b55]">
               <Settings size={34} />
             </div>
             <div>
@@ -158,7 +159,9 @@ async function SettingsPage({ activeSection }: { activeSection: SettingsSection 
                 {t('title')}
               </h1>
               <p className="mt-1 text-sm text-slate-600">
-                {tenant.name} {tBoard('· Changes apply to this tenant.')}
+                {tBoard(
+                  'Manage your tenant configuration, branding, integrations and operational preferences.',
+                )}
               </p>
             </div>
           </div>
@@ -178,7 +181,8 @@ async function SettingsPage({ activeSection }: { activeSection: SettingsSection 
             className="scroll-mt-6 border-slate-200 shadow-none dark:border-slate-800"
           >
             <CardHeader>
-              <CardTitle>
+              <CardTitle className="flex items-center gap-3">
+                <Globe size={28} className="text-blue-600" />
                 <GeneratedValue value={t('operationalDefaults')} />
               </CardTitle>
               <CardDescription>
@@ -187,7 +191,17 @@ async function SettingsPage({ activeSection }: { activeSection: SettingsSection 
             </CardHeader>
             <CardContent className="grid grid-cols-1 gap-5 sm:grid-cols-2">
               <Field label={tGeneratedValue(t('operationalLocale'))}>
-                <Select name="operationalLocale" defaultValue={tenant.operationalLocale} required>
+                <Select
+                  name="operationalLocale"
+                  aria-label={t('operationalLocale')}
+                  defaultValue={tenant.operationalLocale}
+                  required
+                >
+                  <option value="en-GB">English (United Kingdom)</option>
+                  {tenant.operationalLocale !== 'en-GB' &&
+                    !LOCALE_OPTIONS.some((locale) => locale.value === tenant.operationalLocale) && (
+                      <option value={tenant.operationalLocale}>{tenant.operationalLocale}</option>
+                    )}
                   {LOCALE_OPTIONS.map((locale) => (
                     <option key={locale.value} value={locale.value}>
                       {locale.nativeLabel}
@@ -198,6 +212,7 @@ async function SettingsPage({ activeSection }: { activeSection: SettingsSection 
               <Field label={tGeneratedValue(t('operationalTimezone'))}>
                 <Select
                   name="operationalTimezone"
+                  aria-label={t('operationalTimezone')}
                   defaultValue={tenant.operationalTimezone}
                   required
                 >
@@ -211,6 +226,7 @@ async function SettingsPage({ activeSection }: { activeSection: SettingsSection 
               <Field label={tGeneratedValue(t('dateFormat'))}>
                 <Select
                   name="dateFormat"
+                  aria-label={t('dateFormat')}
                   defaultValue={
                     (DATE_FORMATS as readonly string[]).includes(tenant.dateFormat)
                       ? tenant.dateFormat
@@ -230,7 +246,11 @@ async function SettingsPage({ activeSection }: { activeSection: SettingsSection 
                 ) : null}
               </Field>
               <Field label={tGeneratedValue(t('numberFormat'))}>
-                <Select name="numberFormat" defaultValue={tenant.numberFormat}>
+                <Select
+                  name="numberFormat"
+                  aria-label={t('numberFormat')}
+                  defaultValue={tenant.numberFormat}
+                >
                   {NUMBER_FORMATS.map((format) => (
                     <option key={format} value={format}>
                       {tGeneratedValue(t(`numberFormat_${format}`))}
@@ -241,6 +261,7 @@ async function SettingsPage({ activeSection }: { activeSection: SettingsSection 
               <Field label={tGeneratedValue(t('defaultCurrencyCode'))}>
                 <Select
                   name="defaultCurrencyCode"
+                  aria-label={t('defaultCurrencyCode')}
                   defaultValue={tenant.defaultCurrencyCode}
                   required
                 >
@@ -268,71 +289,79 @@ async function SettingsPage({ activeSection }: { activeSection: SettingsSection 
                 <Input name="name" defaultValue={tenant.name} />
               </Field>
               <Field label={tGeneratedValue(t('slug'))}>
-                <Input name="slug" defaultValue={tenant.slug} className="font-mono" />
+                <Input name="slug" defaultValue={tenant.slug} readOnly className="font-mono" />
+                <p className="text-xs text-slate-500">
+                  {tBoard('Permanent identifier used in URLs and system references.')}
+                </p>
               </Field>
             </CardContent>
           </Card>
 
-          <div id="additional-controls" className="space-y-4">
-            <Card
-              id="regulatory-terminology"
-              className="scroll-mt-6 border-slate-200 shadow-none dark:border-slate-800"
-            >
-              <CardHeader>
-                <CardTitle>
-                  <GeneratedValue value={t('regulatoryTerminology')} />
-                </CardTitle>
-                <CardDescription>
-                  <GeneratedValue value={t('regulatoryTerminologyDescription')} />
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <Field label={tGeneratedValue(t('authorityName'))}>
-                  <Input
-                    name="authorityName"
-                    required
-                    maxLength={160}
-                    defaultValue={regulatory.authorityName}
-                  />
-                </Field>
-                <Field label={tGeneratedValue(t('authorityAbbreviation'))}>
-                  <Input
-                    name="authorityAbbreviation"
-                    required
-                    maxLength={24}
-                    defaultValue={regulatory.authorityAbbreviation}
-                  />
-                </Field>
-                <Field label={tGeneratedValue(t('legislationName'))}>
-                  <Input
-                    name="legislationName"
-                    required
-                    maxLength={200}
-                    defaultValue={regulatory.legislationName}
-                  />
-                </Field>
-                <Field label={tGeneratedValue(t('legislationAbbreviation'))}>
-                  <Input
-                    name="legislationAbbreviation"
-                    required
-                    maxLength={24}
-                    defaultValue={regulatory.legislationAbbreviation}
-                  />
-                </Field>
-                <Field
-                  label={tGeneratedValue(t('otherApplicableLegislation'))}
-                  className="sm:col-span-2"
-                >
-                  <Textarea
-                    name="otherApplicableLegislation"
-                    rows={3}
-                    maxLength={2000}
-                    defaultValue={regulatory.otherApplicableLegislation}
-                    placeholder={tGeneratedValue(t('otherApplicableLegislationPlaceholder'))}
-                  />
-                </Field>
-              </CardContent>
-            </Card>
+          <div id="additional-controls" className="flex flex-col gap-4">
+            <details className="order-2 rounded-lg border border-blue-100 bg-white p-4">
+              <summary className="cursor-pointer text-sm font-semibold text-[#101b55]">
+                {t('regulatoryTerminology')}
+              </summary>
+              <Card
+                id="regulatory-terminology"
+                className="scroll-mt-6 border-slate-200 shadow-none dark:border-slate-800"
+              >
+                <CardHeader>
+                  <CardTitle>
+                    <GeneratedValue value={t('regulatoryTerminology')} />
+                  </CardTitle>
+                  <CardDescription>
+                    <GeneratedValue value={t('regulatoryTerminologyDescription')} />
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <Field label={tGeneratedValue(t('authorityName'))}>
+                    <Input
+                      name="authorityName"
+                      required
+                      maxLength={160}
+                      defaultValue={regulatory.authorityName}
+                    />
+                  </Field>
+                  <Field label={tGeneratedValue(t('authorityAbbreviation'))}>
+                    <Input
+                      name="authorityAbbreviation"
+                      required
+                      maxLength={24}
+                      defaultValue={regulatory.authorityAbbreviation}
+                    />
+                  </Field>
+                  <Field label={tGeneratedValue(t('legislationName'))}>
+                    <Input
+                      name="legislationName"
+                      required
+                      maxLength={200}
+                      defaultValue={regulatory.legislationName}
+                    />
+                  </Field>
+                  <Field label={tGeneratedValue(t('legislationAbbreviation'))}>
+                    <Input
+                      name="legislationAbbreviation"
+                      required
+                      maxLength={24}
+                      defaultValue={regulatory.legislationAbbreviation}
+                    />
+                  </Field>
+                  <Field
+                    label={tGeneratedValue(t('otherApplicableLegislation'))}
+                    className="sm:col-span-2"
+                  >
+                    <Textarea
+                      name="otherApplicableLegislation"
+                      rows={3}
+                      maxLength={2000}
+                      defaultValue={regulatory.otherApplicableLegislation}
+                      placeholder={tGeneratedValue(t('otherApplicableLegislationPlaceholder'))}
+                    />
+                  </Field>
+                </CardContent>
+              </Card>
+            </details>
 
             <Card
               id="languages"
@@ -367,6 +396,7 @@ async function SettingsPage({ activeSection }: { activeSection: SettingsSection 
                 <Field label={tGeneratedValue(t('defaultLanguage'))}>
                   <Select
                     name="defaultLanguage"
+                    aria-label={t('defaultLanguage')}
                     defaultValue={tenant.defaultLanguage}
                     className="h-10 w-32 pl-3 text-sm"
                   >
@@ -460,13 +490,13 @@ async function SettingsSidebar({
       <Card className="border-slate-200 shadow-none dark:border-slate-800">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-base text-slate-900 dark:text-slate-100">
-            <Building2 className="text-teal-700" size={22} />
+            <Building2 className="text-blue-600" size={22} />
             {t('tenantOverview')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-3 border-b border-slate-200 pb-4 dark:border-slate-800">
-            <div className="rounded-full bg-teal-50 p-3 text-teal-700">
+            <div className="rounded-full bg-blue-50 p-3 text-blue-600">
               <Building2 size={26} />
             </div>
             <div>
@@ -487,7 +517,7 @@ async function SettingsSidebar({
       <Card className="border-slate-200 shadow-none dark:border-slate-800">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-base text-slate-900 dark:text-slate-100">
-            <Settings className="text-teal-700" size={22} />
+            <Settings className="text-blue-600" size={22} />
             {t('quickActions')}
           </CardTitle>
         </CardHeader>
@@ -498,7 +528,7 @@ async function SettingsSidebar({
               <Link
                 key={href}
                 href={href}
-                className="flex min-h-12 items-center gap-2 rounded-md border border-slate-200 px-3 py-2 text-sm font-medium text-teal-700 transition-colors hover:bg-teal-50 dark:border-slate-800"
+                className="flex min-h-12 items-center gap-2 rounded-md border border-slate-200 px-3 py-2 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-50 dark:border-slate-800"
               >
                 <Icon size={20} />
                 {label}
@@ -506,10 +536,10 @@ async function SettingsSidebar({
             ))}
         </CardContent>
       </Card>
-      <Card className="border-slate-200 bg-teal-50/60 shadow-none dark:border-slate-800">
+      <Card className="border-slate-200 bg-blue-50/60 shadow-none dark:border-slate-800">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-base text-slate-900 dark:text-slate-100">
-            <Info className="text-teal-700" size={22} />
+            <Info className="text-blue-600" size={22} />
             {t('aboutTheseSettings')}
           </CardTitle>
         </CardHeader>
@@ -521,7 +551,7 @@ async function SettingsSidebar({
       <Card className="border-slate-200 shadow-none dark:border-slate-800">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-base text-slate-900 dark:text-slate-100">
-            <CircleHelp className="text-teal-700" size={22} />
+            <CircleHelp className="text-blue-600" size={22} />
             {t('needHelp')}
           </CardTitle>
         </CardHeader>
@@ -529,7 +559,7 @@ async function SettingsSidebar({
           {t('helpDescription')}
           <Link
             href="/help"
-            className="mt-3 flex items-center gap-2 font-medium text-teal-700 hover:underline"
+            className="mt-3 flex items-center gap-2 font-medium text-blue-600 hover:underline"
           >
             {t('openUserGuide')} <span aria-hidden="true">→</span>
           </Link>

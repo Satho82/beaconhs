@@ -1,0 +1,139 @@
+
+> beaconhs@0.1.0 typecheck /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final
+> turbo run typecheck --concurrency=1 --force
+
+
+   • Packages in scope: @beaconhs/ai, @beaconhs/analytics, @beaconhs/audit, @beaconhs/auth, @beaconhs/compliance, @beaconhs/crypto, @beaconhs/db, @beaconhs/design-studio, @beaconhs/email-render, @beaconhs/emails, @beaconhs/events, @beaconhs/forms-core, @beaconhs/forms-pdf, @beaconhs/i18n, @beaconhs/integrations, @beaconhs/jobs, @beaconhs/office, @beaconhs/reports, @beaconhs/sms, @beaconhs/storage, @beaconhs/sync, @beaconhs/tenant, @beaconhs/ui, @beaconhs/web, @beaconhs/worker
+   • Running typecheck in 25 packages
+   • Remote caching disabled, using shared worktree cache
+
+@beaconhs/crypto:typecheck: cache bypass, force executing 75f1603ba37d3a90
+@beaconhs/crypto:typecheck: 
+@beaconhs/crypto:typecheck: > @beaconhs/crypto@0.1.0 typecheck /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/crypto
+@beaconhs/crypto:typecheck: > tsc --noEmit
+@beaconhs/crypto:typecheck: 
+@beaconhs/design-studio:typecheck: cache bypass, force executing 14b97d3423461137
+@beaconhs/design-studio:typecheck: 
+@beaconhs/design-studio:typecheck: > @beaconhs/design-studio@0.1.0 typecheck /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/design-studio
+@beaconhs/design-studio:typecheck: > tsc --noEmit
+@beaconhs/design-studio:typecheck: 
+@beaconhs/office:typecheck: cache bypass, force executing 697513a0982999e9
+@beaconhs/office:typecheck: 
+@beaconhs/office:typecheck: > @beaconhs/office@0.1.0 typecheck /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/office
+@beaconhs/office:typecheck: > tsc --noEmit
+@beaconhs/office:typecheck: 
+@beaconhs/i18n:typecheck: cache bypass, force executing f796914e10d7a78a
+@beaconhs/i18n:typecheck: 
+@beaconhs/i18n:typecheck: > @beaconhs/i18n@0.1.0 typecheck /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/i18n
+@beaconhs/i18n:typecheck: > tsc --noEmit
+@beaconhs/i18n:typecheck: 
+@beaconhs/email-render:typecheck: cache bypass, force executing f2155d2d746eed11
+@beaconhs/email-render:typecheck: 
+@beaconhs/email-render:typecheck: > @beaconhs/email-render@0.1.0 typecheck /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/email-render
+@beaconhs/email-render:typecheck: > tsc --noEmit
+@beaconhs/email-render:typecheck: 
+@beaconhs/storage:typecheck: cache bypass, force executing 96710d186ca2de0c
+@beaconhs/storage:typecheck: 
+@beaconhs/storage:typecheck: > @beaconhs/storage@0.1.0 typecheck /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/storage
+@beaconhs/storage:typecheck: > tsc --noEmit
+@beaconhs/storage:typecheck: 
+@beaconhs/forms-core:typecheck: cache bypass, force executing 167beacf7a7a7f79
+@beaconhs/forms-core:typecheck: 
+@beaconhs/forms-core:typecheck: > @beaconhs/forms-core@0.1.0 typecheck /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/forms-core
+@beaconhs/forms-core:typecheck: > tsc --noEmit
+@beaconhs/forms-core:typecheck: 
+@beaconhs/ui:typecheck: cache bypass, force executing 06caf262aa6185c4
+@beaconhs/ui:typecheck: 
+@beaconhs/ui:typecheck: > @beaconhs/ui@0.1.0 typecheck /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/ui
+@beaconhs/ui:typecheck: > tsc --noEmit
+@beaconhs/ui:typecheck: 
+@beaconhs/db:typecheck: cache bypass, force executing c583c20f72e22d3c
+@beaconhs/db:typecheck: 
+@beaconhs/db:typecheck: > @beaconhs/db@0.1.0 typecheck /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/db
+@beaconhs/db:typecheck: > tsc --noEmit
+@beaconhs/db:typecheck: 
+@beaconhs/tenant:typecheck: cache bypass, force executing 74fce3fe92337132
+@beaconhs/tenant:typecheck: 
+@beaconhs/tenant:typecheck: > @beaconhs/tenant@0.1.0 typecheck /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/tenant
+@beaconhs/tenant:typecheck: > tsc --noEmit
+@beaconhs/tenant:typecheck: 
+@beaconhs/sync:typecheck: cache bypass, force executing 3429c4e9c6c2eb0a
+@beaconhs/sync:typecheck: 
+@beaconhs/sync:typecheck: > @beaconhs/sync@0.1.0 typecheck /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/sync
+@beaconhs/sync:typecheck: > tsc --noEmit
+@beaconhs/sync:typecheck: 
+@beaconhs/audit:typecheck: cache bypass, force executing 0743f435b87e51b6
+@beaconhs/audit:typecheck: 
+@beaconhs/audit:typecheck: > @beaconhs/audit@0.1.0 typecheck /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/audit
+@beaconhs/audit:typecheck: > tsc --noEmit
+@beaconhs/audit:typecheck: 
+@beaconhs/compliance:typecheck: cache bypass, force executing 5016917b343d4949
+@beaconhs/compliance:typecheck: 
+@beaconhs/compliance:typecheck: > @beaconhs/compliance@0.1.0 typecheck /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/compliance
+@beaconhs/compliance:typecheck: > tsc --noEmit
+@beaconhs/compliance:typecheck: 
+@beaconhs/reports:typecheck: cache bypass, force executing 1570346a276ae738
+@beaconhs/reports:typecheck: 
+@beaconhs/reports:typecheck: > @beaconhs/reports@0.1.0 typecheck /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/reports
+@beaconhs/reports:typecheck: > tsc --noEmit
+@beaconhs/reports:typecheck: 
+@beaconhs/jobs:typecheck: cache bypass, force executing bc0e832b83aed207
+@beaconhs/jobs:typecheck: 
+@beaconhs/jobs:typecheck: > @beaconhs/jobs@0.1.0 typecheck /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/jobs
+@beaconhs/jobs:typecheck: > tsc --noEmit
+@beaconhs/jobs:typecheck: 
+@beaconhs/emails:typecheck: cache bypass, force executing 000ff216266d6beb
+@beaconhs/emails:typecheck: 
+@beaconhs/emails:typecheck: > @beaconhs/emails@0.1.0 typecheck /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/emails
+@beaconhs/emails:typecheck: > tsc --noEmit
+@beaconhs/emails:typecheck: 
+@beaconhs/ai:typecheck: cache bypass, force executing 82c3a27fd6d6c168
+@beaconhs/ai:typecheck: 
+@beaconhs/ai:typecheck: > @beaconhs/ai@0.1.0 typecheck /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/ai
+@beaconhs/ai:typecheck: > tsc --noEmit
+@beaconhs/ai:typecheck: 
+@beaconhs/sms:typecheck: cache bypass, force executing d30d24dd5ce6f3f2
+@beaconhs/sms:typecheck: 
+@beaconhs/sms:typecheck: > @beaconhs/sms@0.1.0 typecheck /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/sms
+@beaconhs/sms:typecheck: > tsc --noEmit
+@beaconhs/sms:typecheck: 
+@beaconhs/analytics:typecheck: cache bypass, force executing d83aa7e41f9d4424
+@beaconhs/analytics:typecheck: 
+@beaconhs/analytics:typecheck: > @beaconhs/analytics@0.1.0 typecheck /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/analytics
+@beaconhs/analytics:typecheck: > tsc --noEmit
+@beaconhs/analytics:typecheck: 
+@beaconhs/forms-pdf:typecheck: cache bypass, force executing 82848c52997bf1cc
+@beaconhs/forms-pdf:typecheck: 
+@beaconhs/forms-pdf:typecheck: > @beaconhs/forms-pdf@0.1.0 typecheck /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/forms-pdf
+@beaconhs/forms-pdf:typecheck: > tsc --noEmit
+@beaconhs/forms-pdf:typecheck: 
+@beaconhs/events:typecheck: cache bypass, force executing 10776fb6e064a5fa
+@beaconhs/events:typecheck: 
+@beaconhs/events:typecheck: > @beaconhs/events@0.1.0 typecheck /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/events
+@beaconhs/events:typecheck: > tsc --noEmit
+@beaconhs/events:typecheck: 
+@beaconhs/integrations:typecheck: cache bypass, force executing e1f77ed74ef25035
+@beaconhs/integrations:typecheck: 
+@beaconhs/integrations:typecheck: > @beaconhs/integrations@0.1.0 typecheck /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/integrations
+@beaconhs/integrations:typecheck: > tsc --noEmit
+@beaconhs/integrations:typecheck: 
+@beaconhs/auth:typecheck: cache bypass, force executing 44ab36b047e22e79
+@beaconhs/auth:typecheck: 
+@beaconhs/auth:typecheck: > @beaconhs/auth@0.1.0 typecheck /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/packages/auth
+@beaconhs/auth:typecheck: > tsc --noEmit
+@beaconhs/auth:typecheck: 
+@beaconhs/worker:typecheck: cache bypass, force executing 6ccf9dcbdb750e6d
+@beaconhs/worker:typecheck: 
+@beaconhs/worker:typecheck: > @beaconhs/worker@0.1.0 typecheck /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/apps/worker
+@beaconhs/worker:typecheck: > tsc --noEmit
+@beaconhs/worker:typecheck: 
+@beaconhs/web:typecheck: cache bypass, force executing 85c05c63bdd97b67
+@beaconhs/web:typecheck: 
+@beaconhs/web:typecheck: > @beaconhs/web@0.1.0 typecheck /Users/antoc/Documents/Codex/2026-10-09/referenced-chatgpt-conversation-this-is-an/work/visual-final/apps/web
+@beaconhs/web:typecheck: > tsc --noEmit
+@beaconhs/web:typecheck: 
+
+ Tasks:    25 successful, 25 total
+Cached:    0 cached, 25 total
+  Time:    11m7.105s 
+

@@ -67,6 +67,15 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(function 
   )
   const current = isControlled ? String(value ?? '') : uncontrolled
 
+  React.useEffect(() => {
+    const select = innerRef.current
+    const form = select?.form
+    if (!select || !form || isControlled) return
+    const reset = () => queueMicrotask(() => setUncontrolled(select.value))
+    form.addEventListener('reset', reset)
+    return () => form.removeEventListener('reset', reset)
+  }, [isControlled])
+
   const childParsed = React.useMemo(() => parseSelectChildren(children), [children])
   const [parsed, setParsed] = React.useState(childParsed)
 

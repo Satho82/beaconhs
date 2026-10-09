@@ -126,7 +126,7 @@ export default async function PlatformTenantPage({
           ].map(([label, value]) => (
             <div key={label} className="rounded-lg border bg-white p-4 dark:bg-slate-900">
               <p className="text-xs text-slate-500">{label}</p>
-              <p className="mt-1 text-lg font-semibold">
+              <div className="mt-1 text-lg font-semibold">
                 <Badge
                   variant={
                     label === tGenerated('m_0b9da892d6faf0') && value === 'active'
@@ -136,7 +136,7 @@ export default async function PlatformTenantPage({
                 >
                   {value}
                 </Badge>
-              </p>
+              </div>
             </div>
           ))}
         </div>

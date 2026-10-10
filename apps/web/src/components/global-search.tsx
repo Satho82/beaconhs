@@ -13,7 +13,6 @@ import {
   BookOpen,
   ListChecks,
   Loader2,
-  Radiation,
   Search,
   Users,
   Wrench,
@@ -54,11 +53,6 @@ const ENTITY_META: Record<
     label: 'Documents',
     icon: BookOpen,
     viewAllHref: (q) => `/documents?q=${encodeURIComponent(q)}`,
-  },
-  hazid_assessments: {
-    label: 'Hazard Assessments',
-    icon: Radiation,
-    viewAllHref: (q) => `/hazard-assessments?q=${encodeURIComponent(q)}`,
   },
 }
 

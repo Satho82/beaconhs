@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import {
+  RISK_CATALOGUE_TEMPLATES,
   SLIPS_TRIPS_TEMPLATE,
   SLIPS_TRIPS_TEMPLATE_ID,
   slipsTripsTemplateSnapshot,
@@ -73,6 +74,20 @@ describe('Risk Library and property adoption', () => {
     expect(snapshot).toEqual(slipsTripsTemplateSnapshot())
   })
 
+  it('retains RA-002 storage identity and source draft provenance in adoption snapshots', () => {
+    const ra002 = {
+      ...RISK_CATALOGUE_TEMPLATES[1]!,
+      createdAt: new Date('2026-01-01T00:00:00Z'),
+      updatedAt: new Date('2026-01-01T00:00:00Z'),
+      deletedAt: null,
+    } satisfies typeof riskTemplates.$inferSelect
+    const snapshot = buildRiskTemplateSnapshot(ra002)
+    expect(snapshot.version).toBe('1.1')
+    expect(snapshot.templateId).not.toBe(SLIPS_TRIPS_TEMPLATE_ID)
+    expect(snapshot.description).toContain('Source catalogue version: 1.0-draft.')
+    expect(snapshot.description).toContain('guidance draft for competent review')
+  })
+
   it('expands every template hazard into an independently editable property hazard', () => {
     const snapshot = buildRiskTemplateSnapshot(templateRow())
     const inputs = templateHazardsToInput(snapshot.hazards)
@@ -92,9 +107,9 @@ describe('Risk Library and property adoption', () => {
   })
 
   it('seeds the platform template idempotently in fresh or existing seed runs', () => {
-    expect(seedSource).toContain('.insert(riskTemplates)')
-    expect(seedSource).toContain('.onConflictDoUpdate({')
-    expect(seedSource.indexOf('.insert(riskTemplates)')).toBeLessThan(
+    expect(seedSource).toContain('await installStandardRiskLibrary(tx)')
+    expect(seedSource).not.toContain('.insert(riskTemplates)')
+    expect(seedSource.indexOf('await installStandardRiskLibrary(tx)')).toBeLessThan(
       seedSource.indexOf('if (inserted.length === 0)'),
     )
   })
@@ -102,11 +117,24 @@ describe('Risk Library and property adoption', () => {
   it('enforces property and tenant authorization server-side for adoption and edits', () => {
     expect(serviceSource).toContain('assertCanAccessProperty(ctx, input.propertyId)')
     expect(serviceSource).toContain('eq(hospitalityProperties.tenantId, ctx.tenantId)')
-    expect(serviceSource).toContain(
-      'or(isNull(riskTemplates.tenantId), eq(riskTemplates.tenantId, ctx.tenantId))',
-    )
+    expect(serviceSource).toContain('eq(riskTemplates.tenantId, ctx.tenantId)')
+    expect(serviceSource).toContain('isNull(riskTemplates.tenantId)')
     expect(serviceSource).toContain('assertCanAccessProperty(ctx, current.propertyId)')
     expect(serviceSource).toContain('hospitalityPropertyWhere(ctx, riskAssessments.propertyId)')
+  })
+
+  it('locks tenant templates but reads immutable platform templates under their SELECT policy', () => {
+    const adoption = serviceSource.slice(
+      serviceSource.indexOf('export async function adoptRiskAssessment'),
+      serviceSource.indexOf('export async function updateRiskAssessment'),
+    )
+    expect(adoption).toContain('eq(riskTemplates.tenantId, ctx.tenantId)')
+    expect(adoption).toContain(".for('share')")
+    expect(adoption).toContain('isNull(riskTemplates.tenantId)')
+    expect(adoption.indexOf('isNull(riskTemplates.tenantId)')).toBeGreaterThan(
+      adoption.indexOf(".for('share')"),
+    )
+    expect(adoption).toContain('Platform templates are deliberately read-only under RLS')
   })
 
   it('uses the central matrix, persists multiple hazards, and keeps audit atomic', () => {

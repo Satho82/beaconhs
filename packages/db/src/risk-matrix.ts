@@ -1,4 +1,26 @@
 type RiskRating = 'Low' | 'Medium' | 'High' | 'Critical'
+import type { RiskMatrixSnapshot } from './schema/risk'
+
+export function canonicalRiskMatrixSnapshot(): RiskMatrixSnapshot {
+  const colors = { Low: '#10b981', Medium: '#f59e0b', High: '#f97316', Critical: '#dc2626' }
+  const cells: RiskMatrixSnapshot['cells'] = {}
+  for (let s = 1; s <= 5; s++)
+    for (let l = 1; l <= 5; l++) {
+      const score = s * l,
+        label = riskRating(score)
+      cells[`${s - 1}:${l - 1}`] = { score, label, color: colors[label] }
+    }
+  return {
+    schemaVersion: 1,
+    modelKey: 'uvanoo-5x5-v1',
+    size: 5,
+    axes: {
+      severity: { values: ['Negligible', 'Minor', 'Moderate', 'Major', 'Severe'] },
+      likelihood: { values: ['Rare', 'Unlikely', 'Possible', 'Likely', 'Almost certain'] },
+    },
+    cells,
+  }
+}
 type RiskFactor = 1 | 2 | 3 | 4 | 5
 
 function assertRiskFactor(value: number): asserts value is RiskFactor {

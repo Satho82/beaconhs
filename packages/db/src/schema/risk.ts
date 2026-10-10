@@ -1,6 +1,7 @@
 import { sql } from 'drizzle-orm'
 import {
   check,
+  bigint,
   date,
   foreignKey,
   index,
@@ -18,7 +19,7 @@ import { tenants, tenantUsers } from './core'
 import { hospitalityProperties } from './hospitality'
 
 export const riskTemplateScope = pgEnum('risk_template_scope', ['platform', 'tenant'])
-export const riskTemplateState = pgEnum('risk_template_state', ['active', 'retired'])
+export const riskTemplateState = pgEnum('risk_template_state', ['active', 'retired', 'draft'])
 export const riskTemplateCategory = pgEnum('risk_template_category', [
   'catering',
   'engineering',
@@ -59,15 +60,25 @@ export type RiskTemplateHazard = {
   residualLikelihood?: number
   residualSeverity?: number
 }
+export type RiskMatrixSnapshot = {
+  schemaVersion: 1
+  modelKey: 'uvanoo-3x3-v1' | 'uvanoo-5x5-v1'
+  size: 3 | 5
+  axes: { severity: { values: string[] }; likelihood: { values: string[] } }
+  cells: Record<string, { score: number; label: string; color: string }>
+}
 export type RiskAssessmentSignoffSnapshot = {
+  matrix?: RiskMatrixSnapshot | null
+  contentRevision?: number
   assessment: {
     reference: string
     title: string
     areaLocation: string | null
     activityEquipment: string | null
     assessmentDate: string
-    adoptedTemplateVersion: string
-    adoptedTemplateSnapshot: AdoptedRiskTemplateSnapshot
+    adoptedTemplateVersion: string | null
+    adoptedTemplateSnapshot: AdoptedRiskTemplateSnapshot | null
+    assessmentCategory?: string
     comments: string | null
     effectiveDate: string
     validityMonths: number | null
@@ -78,6 +89,9 @@ export type RiskAssessmentSignoffSnapshot = {
     lifecycleVersion: number
   }
   hazards: Array<{
+    id?: string
+    archivedAt?: Date | string | null
+    archiveReason?: string | null
     sortOrder: number
     hazardDescription: string
     harmDescription: string
@@ -98,6 +112,7 @@ export type RiskAssessmentSignoffSnapshot = {
 
 export type AdoptedRiskTemplateSnapshot = {
   templateId: string
+  templateFamilyId?: string
   version: string
   title: string
   category: string
@@ -113,6 +128,24 @@ export type AdoptedRiskTemplateSnapshot = {
   reviewGuidance: string | null
 }
 
+export const riskTemplateFamilies = pgTable(
+  'risk_template_families',
+  {
+    id: id(),
+    tenantId: uuid('tenant_id').references(() => tenants.id, { onDelete: 'restrict' }),
+    ownerKey: uuid('owner_key').notNull(),
+    scope: riskTemplateScope('scope').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => ({
+    ownerIdUx: uniqueIndex('risk_template_families_owner_id_ux').on(t.ownerKey, t.id),
+    ownerCheck: check(
+      'risk_template_families_scope_tenant_ck',
+      sql`(${t.scope} = 'platform' AND ${t.tenantId} IS NULL AND ${t.ownerKey} = '00000000-0000-0000-0000-000000000000') OR (${t.scope} = 'tenant' AND ${t.tenantId} IS NOT NULL AND ${t.tenantId} = ${t.ownerKey})`,
+    ),
+  }),
+)
+
 export const riskTemplates = pgTable(
   'risk_templates',
   {
@@ -120,6 +153,8 @@ export const riskTemplates = pgTable(
     tenantId: uuid('tenant_id').references(() => tenants.id, { onDelete: 'cascade' }),
     ownerKey: uuid('owner_key').notNull(),
     scope: riskTemplateScope('scope').notNull(),
+    templateFamilyId: uuid('template_family_id').notNull(),
+    matrixSnapshot: jsonb('matrix_snapshot').$type<RiskMatrixSnapshot>().notNull(),
     title: text('title').notNull(),
     category: riskTemplateCategory('category').notNull(),
     description: text('description').notNull(),
@@ -138,6 +173,24 @@ export const riskTemplates = pgTable(
     ...softDelete,
   },
   (t) => ({
+    familyFk: foreignKey({
+      name: 'risk_templates_family_fk',
+      columns: [t.ownerKey, t.templateFamilyId],
+      foreignColumns: [riskTemplateFamilies.ownerKey, riskTemplateFamilies.id],
+    })
+      .onDelete('restrict')
+      .onUpdate('restrict'),
+    familyVersionUx: uniqueIndex('risk_templates_owner_family_version_ux').on(
+      t.ownerKey,
+      t.templateFamilyId,
+      t.version,
+    ),
+    activeFamilyUx: uniqueIndex('risk_templates_one_active_family_ux')
+      .on(t.ownerKey, t.templateFamilyId)
+      .where(sql`${t.state} = 'active'`),
+    draftFamilyUx: uniqueIndex('risk_templates_one_draft_family_ux')
+      .on(t.ownerKey, t.templateFamilyId)
+      .where(sql`${t.state} = 'draft'`),
     tenantIdIdUx: uniqueIndex('risk_templates_tenant_id_id_ux').on(t.tenantId, t.id),
     ownerKeyIdUx: uniqueIndex('risk_templates_owner_key_id_ux').on(t.ownerKey, t.id),
     platformTitleVersionUx: uniqueIndex('risk_templates_platform_title_version_ux')
@@ -163,12 +216,16 @@ export const riskAssessments = pgTable(
       .notNull()
       .references(() => tenants.id, { onDelete: 'cascade' }),
     propertyId: uuid('property_id').notNull(),
-    templateOwnerKey: uuid('template_owner_key').notNull(),
-    templateId: uuid('template_id').notNull(),
-    adoptedTemplateVersion: text('adopted_template_version').notNull(),
-    adoptedTemplateSnapshot: jsonb('adopted_template_snapshot')
-      .$type<AdoptedRiskTemplateSnapshot>()
-      .notNull(),
+    sourceKind: text('source_kind').$type<'template' | 'manual'>().default('template').notNull(),
+    assessmentCategory: riskTemplateCategory('assessment_category').notNull(),
+    matrixSnapshot: jsonb('matrix_snapshot').$type<RiskMatrixSnapshot>(),
+    contentRevision: integer('content_revision').default(1).notNull(),
+    templateOwnerKey: uuid('template_owner_key'),
+    templateId: uuid('template_id'),
+    adoptedTemplateVersion: text('adopted_template_version'),
+    adoptedTemplateSnapshot: jsonb(
+      'adopted_template_snapshot',
+    ).$type<AdoptedRiskTemplateSnapshot>(),
     reference: text('reference').notNull(),
     title: text('title').notNull(),
     areaLocation: text('area_location'),
@@ -191,6 +248,11 @@ export const riskAssessments = pgTable(
   },
   (t) => ({
     tenantIdIdUx: uniqueIndex('risk_assessments_tenant_id_id_ux').on(t.tenantId, t.id),
+    revisionCheck: check('risk_assessments_content_revision_ck', sql`${t.contentRevision}>0`),
+    sourceCheck: check(
+      'risk_assessments_source_kind_ck',
+      sql`(${t.sourceKind}='template' AND ${t.templateOwnerKey} IS NOT NULL AND ${t.templateId} IS NOT NULL AND ${t.adoptedTemplateVersion} IS NOT NULL AND ${t.adoptedTemplateSnapshot} IS NOT NULL) OR (${t.sourceKind}='manual' AND ${t.templateOwnerKey} IS NULL AND ${t.templateId} IS NULL AND ${t.adoptedTemplateVersion} IS NULL AND ${t.adoptedTemplateSnapshot} IS NULL)`,
+    ),
     tenantReferenceUx: uniqueIndex('risk_assessments_tenant_reference_ux').on(
       t.tenantId,
       t.reference,
@@ -269,10 +331,27 @@ export const riskHazards = pgTable(
     residualLikelihood: integer('residual_likelihood').notNull(),
     residualSeverity: integer('residual_severity').notNull(),
     residualScore: integer('residual_score').notNull(),
+    archivedAt: timestamp('archived_at', { withTimezone: true }),
+    archivedByTenantUserId: uuid('archived_by_tenant_user_id'),
+    archiveReason: text('archive_reason'),
     ...timestamps,
   },
   (t) => ({
     tenantIdIdUx: uniqueIndex('risk_hazards_tenant_id_id_ux').on(t.tenantId, t.id),
+    archiveActorFk: foreignKey({
+      name: 'risk_hazards_archive_actor_fk',
+      columns: [t.tenantId, t.archivedByTenantUserId],
+      foreignColumns: [tenantUsers.tenantId, tenantUsers.id],
+    })
+      .onDelete('restrict')
+      .onUpdate('restrict'),
+    archiveState: check(
+      'risk_hazards_archive_state_ck',
+      sql`(${t.archivedAt} IS NULL AND ${t.archivedByTenantUserId} IS NULL AND ${t.archiveReason} IS NULL) OR (${t.archivedAt} IS NOT NULL AND ${t.archivedByTenantUserId} IS NOT NULL AND ${t.archiveReason} IS NOT NULL AND char_length(btrim(${t.archiveReason})) BETWEEN 1 AND 2000)`,
+    ),
+    activeAssessmentIdx: index('risk_hazards_active_assessment_idx')
+      .on(t.tenantId, t.assessmentId, t.sortOrder)
+      .where(sql`${t.archivedAt} IS NULL`),
     assessmentOrderUx: uniqueIndex('risk_hazards_assessment_order_ux').on(
       t.tenantId,
       t.assessmentId,
@@ -310,6 +389,57 @@ export const riskHazards = pgTable(
   }),
 )
 
+export const riskAssessmentVersions = pgTable(
+  'risk_assessment_versions',
+  {
+    id: id(),
+    tenantId: uuid('tenant_id')
+      .notNull()
+      .references(() => tenants.id, { onDelete: 'restrict' }),
+    assessmentId: uuid('assessment_id').notNull(),
+    revision: integer('revision').notNull(),
+    transactionId: bigint('transaction_id', { mode: 'bigint' })
+      .default(sql`txid_current()`)
+      .notNull(),
+    actorTenantUserId: uuid('actor_tenant_user_id'),
+    event: text('event')
+      .$type<
+        | 'baseline'
+        | 'adopted'
+        | 'edited'
+        | 'hazard_archived'
+        | 'hazard_restored'
+        | 'matrix_changed'
+        | 'signed_off'
+      >()
+      .notNull(),
+    reason: text('reason'),
+    snapshot: jsonb('snapshot').$type<Record<string, unknown>>().notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => ({
+    revisionUx: uniqueIndex('risk_assessment_versions_revision_ux').on(
+      t.tenantId,
+      t.assessmentId,
+      t.revision,
+    ),
+    assessmentFk: foreignKey({
+      name: 'risk_assessment_versions_assessment_fk',
+      columns: [t.tenantId, t.assessmentId],
+      foreignColumns: [riskAssessments.tenantId, riskAssessments.id],
+    })
+      .onDelete('restrict')
+      .onUpdate('restrict'),
+    actorFk: foreignKey({
+      name: 'risk_assessment_versions_actor_fk',
+      columns: [t.tenantId, t.actorTenantUserId],
+      foreignColumns: [tenantUsers.tenantId, tenantUsers.id],
+    })
+      .onDelete('restrict')
+      .onUpdate('restrict'),
+  }),
+)
+
 export const riskAssessmentSignoffs = pgTable(
   'risk_assessment_signoffs',
   {
@@ -323,7 +453,8 @@ export const riskAssessmentSignoffs = pgTable(
     signedByName: text('signed_by_name').notNull(),
     signedByRole: text('signed_by_role').notNull(),
     action: riskSignoffAction('action').notNull(),
-    templateVersion: text('template_version').notNull(),
+    templateVersion: text('template_version'),
+    contentRevision: integer('content_revision'),
     lifecycleVersion: integer('lifecycle_version').notNull(),
     validityMonths: integer('validity_months'),
     effectiveDate: date('effective_date').notNull(),
@@ -335,6 +466,21 @@ export const riskAssessmentSignoffs = pgTable(
   },
   (t) => ({
     tenantIdIdUx: uniqueIndex('risk_assessment_signoffs_tenant_id_id_ux').on(t.tenantId, t.id),
+    revisionFk: foreignKey({
+      name: 'risk_signoffs_revision_fk',
+      columns: [t.tenantId, t.assessmentId, t.contentRevision],
+      foreignColumns: [
+        riskAssessmentVersions.tenantId,
+        riskAssessmentVersions.assessmentId,
+        riskAssessmentVersions.revision,
+      ],
+    })
+      .onDelete('restrict')
+      .onUpdate('restrict'),
+    revisionCheck: check(
+      'risk_signoffs_content_revision_ck',
+      sql`${t.contentRevision} IS NULL OR ${t.contentRevision}>0`,
+    ),
     assessmentVersionUx: uniqueIndex('risk_assessment_signoffs_assessment_version_ux').on(
       t.tenantId,
       t.assessmentId,

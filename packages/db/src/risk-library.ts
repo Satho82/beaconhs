@@ -1,4 +1,5 @@
 import type { AdoptedRiskTemplateSnapshot, RiskTemplateHazard } from './schema/risk'
+import { canonicalRiskMatrixSnapshot } from './risk-matrix'
 
 export const PLATFORM_RISK_TEMPLATE_OWNER = '00000000-0000-0000-0000-000000000000'
 export const SLIPS_TRIPS_TEMPLATE_ID = '1044c44e-ec35-4fcb-8fea-962d62ee72a4'
@@ -91,6 +92,8 @@ export const SLIPS_TRIPS_HAZARDS: RiskTemplateHazard[] = [
 ]
 
 export const SLIPS_TRIPS_TEMPLATE = {
+  templateFamilyId: SLIPS_TRIPS_TEMPLATE_ID,
+  matrixSnapshot: canonicalRiskMatrixSnapshot(),
   id: SLIPS_TRIPS_TEMPLATE_ID,
   tenantId: null,
   ownerKey: PLATFORM_RISK_TEMPLATE_OWNER,
@@ -132,6 +135,7 @@ export const SLIPS_TRIPS_TEMPLATE = {
 export function slipsTripsTemplateSnapshot(): AdoptedRiskTemplateSnapshot {
   return structuredClone({
     templateId: SLIPS_TRIPS_TEMPLATE.id,
+    templateFamilyId: SLIPS_TRIPS_TEMPLATE.templateFamilyId,
     version: SLIPS_TRIPS_TEMPLATE.version,
     title: SLIPS_TRIPS_TEMPLATE.title,
     category: SLIPS_TRIPS_TEMPLATE.category,

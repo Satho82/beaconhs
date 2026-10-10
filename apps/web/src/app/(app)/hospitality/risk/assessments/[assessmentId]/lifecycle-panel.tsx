@@ -12,12 +12,14 @@ export function RiskLifecyclePanel({
   effectiveDate,
   nextReviewDate,
   reminderLeadDays,
+  contentRevision,
 }: {
   assessmentId: string
   status: string
   effectiveDate: string | null
   nextReviewDate: string | null
   reminderLeadDays: number
+  contentRevision: number
 }) {
   const translateValue = useGeneratedValueTranslations()
   const today = useMemo(() => new Date().toISOString().slice(0, 10), [])
@@ -36,6 +38,7 @@ export function RiskLifecyclePanel({
       try {
         await applyRiskLifecycleActionRequest(assessmentId, {
           action,
+          expectedRevision: contentRevision,
           effectiveDate: effective,
           validityMonths: validity === 'custom' ? null : Number(validity),
           customReviewDate: validity === 'custom' ? customReview : null,
@@ -52,7 +55,7 @@ export function RiskLifecyclePanel({
   }
 
   return (
-    <section className="space-y-4 rounded-lg border p-5">
+    <section id="review-signoff" className="space-y-4 rounded-lg border p-5">
       <div>
         <h2 className="font-semibold">{translateValue('Review and sign-off')}</h2>
         <p className="text-muted-foreground text-sm">

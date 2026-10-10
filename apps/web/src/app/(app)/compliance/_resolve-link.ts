@@ -66,7 +66,7 @@ export function resolveComplianceLink(
         ? { href: `/inspections/records/new?typeId=${ref.inspectionTypeId}`, prefetch: false }
         : { href: '/inspections/records', prefetch: true }
     case 'hazard_assessment':
-      return { href: '/hazard-assessments/new', prefetch: false }
+      return { href: '/hospitality/risk?view=templates', prefetch: false }
     case 'job_title_signoff':
       // Title tasks are signed off inline on the holder's own person page.
       return opts.personId ? { href: `/people/${opts.personId}`, prefetch: true } : null

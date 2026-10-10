@@ -3,7 +3,6 @@
 
 import { loadEnabledModuleKeys } from '@/lib/module-entitlements/server'
 import { and, asc, count, desc, eq, gte, inArray, isNotNull, isNull, lte, sql } from 'drizzle-orm'
-import { htmlToSnippet } from '@beaconhs/forms-core'
 import type { Database } from '@beaconhs/db'
 import { can, actionPropertyScope, type RequestContext } from '@beaconhs/tenant'
 import {
@@ -15,7 +14,6 @@ import {
   equipmentTypes,
   formResponses,
   formTemplates,
-  hazidAssessments,
   incidentHoursPeriods,
   incidents,
   inspectionRecords,
@@ -198,7 +196,7 @@ export type DashboardMetrics = {
   }
 
   // In-progress entries the current user has started but not finished, across
-  // modules (journals, hazard assessments, incidents, inspections). Newest-
+  // modules (journals, incidents, inspections). Newest-
   // touched first. Empty for accounts with no tenant membership (e.g. super-admin).
   inProgressEntries: InProgressEntry[]
 }
@@ -209,7 +207,7 @@ export type DashboardMetrics = {
  */
 export type InProgressEntry = {
   id: string
-  kind: 'journal' | 'hazard_assessment' | 'incident' | 'inspection'
+  kind: 'journal' | 'incident' | 'inspection'
   title: string
   href: string
   updatedAt: string
@@ -217,7 +215,7 @@ export type InProgressEntry = {
 
 /**
  * Drafts / in-progress records the given tenant-user authored across modules
- * (journals, hazard assessments, incidents, inspections), newest-touched first
+ * (journals, incidents, inspections), newest-touched first
  * and capped at 12. Must run inside a tenant-scoped executor so RLS applies.
  * Shared by the dashboard widget and the Workspace so both read identical data.
  */
@@ -227,7 +225,7 @@ export async function loadInProgressEntries(
 ): Promise<InProgressEntry[]> {
   const entries: InProgressEntry[] = []
   const toIso = (d: unknown) => (d instanceof Date ? d.toISOString() : String(d))
-  const [jDrafts, hzDrafts, incDrafts, insDrafts] = await Promise.all([
+  const [jDrafts, incDrafts, insDrafts] = await Promise.all([
     tx
       .select({
         id: journalEntries.id,
@@ -243,24 +241,6 @@ export async function loadInProgressEntries(
         ),
       )
       .orderBy(desc(journalEntries.updatedAt))
-      .limit(8),
-    tx
-      .select({
-        id: hazidAssessments.id,
-        reference: hazidAssessments.reference,
-        jobScope: hazidAssessments.jobScope,
-        updatedAt: hazidAssessments.updatedAt,
-      })
-      .from(hazidAssessments)
-      .where(
-        and(
-          eq(hazidAssessments.reportedByTenantUserId, myTenantUserId),
-          eq(hazidAssessments.inProgress, true),
-          eq(hazidAssessments.locked, false),
-          isNull(hazidAssessments.deletedAt),
-        ),
-      )
-      .orderBy(desc(hazidAssessments.updatedAt))
       .limit(8),
     tx
       .select({
@@ -304,14 +284,6 @@ export async function loadInProgressEntries(
       kind: 'journal',
       title: r.title?.trim() || 'Untitled journal entry',
       href: `/journals/${r.id}`,
-      updatedAt: toIso(r.updatedAt),
-    })
-  for (const r of hzDrafts)
-    entries.push({
-      id: r.id,
-      kind: 'hazard_assessment',
-      title: htmlToSnippet(r.jobScope, 120) || r.reference,
-      href: `/hazard-assessments/${r.id}`,
       updatedAt: toIso(r.updatedAt),
     })
   for (const r of incDrafts)

@@ -9,7 +9,7 @@ import {
   tenants,
   users,
 } from '@beaconhs/db/schema'
-import { riskRating } from '@beaconhs/db'
+import { riskRatingForAssessmentScore } from '@/lib/risk-assessment-matrix'
 import { assertCan, type RequestContext } from '@beaconhs/tenant'
 import {
   assertCanAccessProperty,
@@ -17,6 +17,7 @@ import {
 } from '@/lib/hospitality/property-access'
 import { getPlatformBranding } from '@/lib/platform-branding-config'
 import { riskLifecycleStatus } from '@/lib/risk-lifecycle'
+import { riskAssessmentTemplateVersion } from '@/lib/risk-library-views'
 
 export function escapeRiskReport(value: unknown): string {
   return String(value ?? '')
@@ -25,8 +26,10 @@ export function escapeRiskReport(value: unknown): string {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
 }
-function csv(value: unknown): string {
-  return `"${String(value ?? '').replaceAll('"', '""')}"`
+export function escapeRiskCsv(value: unknown): string {
+  const raw = String(value ?? '')
+  const safe = /^[\t\r\n ]*[=+\-@]/.test(raw) ? "'" + raw : raw
+  return `"${safe.replaceAll('"', '""')}"`
 }
 function contactValue(settings: Record<string, unknown>, key: string): string {
   const value = settings[key]
@@ -166,16 +169,19 @@ export async function buildRiskAssessmentHtml(
   const signedSnapshot = historicalSignoff?.snapshot
   const a = signedSnapshot?.assessment ?? report.assessment
   const snapshot = a.adoptedTemplateSnapshot
+  const savedMatrix = signedSnapshot ? signedSnapshot.matrix : report.assessment.matrixSnapshot
+  const rating = (score: number) =>
+    savedMatrix ? riskRatingForAssessmentScore(score, savedMatrix) : 'Historical matrix unknown'
   const hazards = signedSnapshot?.hazards ?? report.hazards
   const hazardRows = hazards
     .map(
       (hazard) => `<tr>
-    <td style="${cell}">${escapeRiskReport(hazard.hazardDescription)}<br><small>${escapeRiskReport(hazard.harmDescription)}</small></td>
+    <td style="${cell}">${escapeRiskReport(hazard.hazardDescription)}${hazard.archivedAt ? ' (Archived)' : ''}<br><small>${escapeRiskReport(hazard.harmDescription)}</small></td>
     <td style="${cell}">${escapeRiskReport(hazard.peopleAtRisk.join(', '))}</td>
-    <td style="${cell}">${hazard.initialLikelihood} × ${hazard.initialSeverity} = ${hazard.initialScore}<br>${riskRating(hazard.initialScore)}</td>
+    <td style="${cell}">${hazard.initialLikelihood} × ${hazard.initialSeverity} = ${hazard.initialScore}<br>${rating(hazard.initialScore)}</td>
     <td style="${cell}">${escapeRiskReport(hazard.controls)}</td>
     <td style="${cell}">${escapeRiskReport(hazard.additionalControls || '')}</td>
-    <td style="${cell}">${hazard.residualLikelihood} × ${hazard.residualSeverity} = ${hazard.residualScore}<br>${riskRating(hazard.residualScore)}</td>
+    <td style="${cell}">${hazard.residualLikelihood} × ${hazard.residualSeverity} = ${hazard.residualScore}<br>${rating(hazard.residualScore)}</td>
   </tr>`,
     )
     .join('')
@@ -215,8 +221,8 @@ export async function buildRiskAssessmentHtml(
     <h1 style="font-size:20px;margin:0">Risk Assessment ${escapeRiskReport(a.reference)}</h1>
     <p style="font-size:11px;color:#475569">${escapeRiskReport(tenant.name)} · ${escapeRiskReport(property.name)} · ${escapeRiskReport(address)}</p>
     <table style="width:100%;border-collapse:collapse;margin-bottom:12px"><tbody>
-      <tr><th style="${head}">Title</th><td style="${cell}">${escapeRiskReport(a.title)}</td><th style="${head}">Category</th><td style="${cell}">${escapeRiskReport(snapshot.category)}</td></tr>
-      <tr><th style="${head}">Template</th><td style="${cell}">${escapeRiskReport(snapshot.title)} v${escapeRiskReport(a.adoptedTemplateVersion)}</td><th style="${head}">Assessment date</th><td style="${cell}">${a.assessmentDate}</td></tr>
+      <tr><th style="${head}">Title</th><td style="${cell}">${escapeRiskReport(a.title)}</td><th style="${head}">Category</th><td style="${cell}">${escapeRiskReport(a.assessmentCategory ?? snapshot?.category ?? '')}</td></tr>
+      <tr><th style="${head}">Template</th><td style="${cell}">${snapshot ? escapeRiskReport(snapshot.title) + ' v' + escapeRiskReport(riskAssessmentTemplateVersion(snapshot)) : 'Manual assessment'}</td><th style="${head}">Assessment date</th><td style="${cell}">${a.assessmentDate}</td></tr>
       <tr><th style="${head}">Area</th><td style="${cell}">${escapeRiskReport(a.areaLocation)}</td><th style="${head}">Activity / equipment</th><td style="${cell}">${escapeRiskReport(a.activityEquipment)}</td></tr>
       <tr><th style="${head}">Assessor</th><td style="${cell}">${escapeRiskReport(assessorName)}</td><th style="${head}">Lifecycle</th><td style="${cell}">${lifecycle}</td></tr>
       <tr><th style="${head}">Effective</th><td style="${cell}">${escapeRiskReport(a.effectiveDate)}</td><th style="${head}">Next review</th><td style="${cell}">${escapeRiskReport(a.nextReviewDate)} · ${a.validityMonths ? `${a.validityMonths} months` : 'custom'}</td></tr>
@@ -229,7 +235,7 @@ export async function buildRiskAssessmentHtml(
     <table style="width:100%;border-collapse:collapse"><thead><tr><th style="${head}">Manager</th><th style="${head}">Role</th><th style="${head}">Action</th><th style="${head}">Date/time</th><th style="${head}">Comments</th><th style="${head}">Review version</th></tr></thead><tbody>${signoffRows}</tbody></table>
     <footer style="margin-top:16px;border-top:1px solid #cbd5e1;padding-top:8px;font-size:9px;color:#64748b">
       ${escapeRiskReport(branding.platformSupport)} · ${escapeRiskReport(branding.customerEmail)} · ${escapeRiskReport(branding.customerPhone)} · ${escapeRiskReport(branding.customerWebsite)}
-      <br>Historical template snapshot: ${escapeRiskReport(snapshot.title)} v${escapeRiskReport(snapshot.version)}
+      <br>Source: ${snapshot ? escapeRiskReport(snapshot.title) + ' v' + escapeRiskReport(riskAssessmentTemplateVersion(snapshot)) : 'Manual assessment'}
     </footer></div>`
 }
 
@@ -242,6 +248,9 @@ export async function buildRiskRegisterCsv(ctx: RequestContext, propertyId?: str
         assessment: riskAssessments,
         property: hospitalityProperties,
         residualScore: sql<number>`max(${riskHazards.residualScore})`,
+        peopleAtRisk: sql<
+          string[]
+        >`coalesce((SELECT array_agg(DISTINCT person.value) FROM risk_hazards people_hazard CROSS JOIN LATERAL jsonb_array_elements_text(people_hazard.people_at_risk) person(value) WHERE people_hazard.tenant_id = ${riskAssessments.tenantId} AND people_hazard.assessment_id = ${riskAssessments.id} AND people_hazard.archived_at IS NULL), ARRAY[]::text[])`,
       })
       .from(riskAssessments)
       .innerJoin(
@@ -256,6 +265,7 @@ export async function buildRiskRegisterCsv(ctx: RequestContext, propertyId?: str
         and(
           eq(riskHazards.tenantId, riskAssessments.tenantId),
           eq(riskHazards.assessmentId, riskAssessments.id),
+          isNull(riskHazards.archivedAt),
         ),
       )
       .where(
@@ -270,40 +280,138 @@ export async function buildRiskRegisterCsv(ctx: RequestContext, propertyId?: str
       .groupBy(riskAssessments.id, hospitalityProperties.id)
       .orderBy(asc(hospitalityProperties.name), asc(riskAssessments.reference)),
   )
-  return [
+  return formatRiskRegisterCsv(rows)
+}
+
+type RiskRegisterCsvRow = {
+  assessment: Pick<
+    typeof riskAssessments.$inferSelect,
+    | 'reference'
+    | 'title'
+    | 'adoptedTemplateSnapshot'
+    | 'assessmentCategory'
+    | 'matrixSnapshot'
+    | 'status'
+    | 'nextReviewDate'
+    | 'reminderLeadDays'
+    | 'effectiveDate'
+  >
+  property: Pick<typeof hospitalityProperties.$inferSelect, 'name'>
+  residualScore: number | null
+  peopleAtRisk: string[] | null
+}
+
+export function formatRiskRegisterCsv(rows: readonly RiskRegisterCsvRow[]) {
+  return (
+    '\uFEFF' +
     [
-      'Reference',
-      'Assessment',
-      'Property',
-      'Category',
-      'Template version',
-      'Status',
-      'Residual score',
-      'Residual rating',
-      'Effective date',
-      'Next review',
-    ]
-      .map(csv)
-      .join(','),
-    ...rows.map(({ assessment, property, residualScore }) =>
       [
-        assessment.reference,
-        assessment.title,
-        property.name,
-        assessment.adoptedTemplateSnapshot.category,
-        assessment.adoptedTemplateVersion,
-        riskLifecycleStatus({
-          storedStatus: assessment.status,
-          nextReviewDate: assessment.nextReviewDate,
-          reminderLeadDays: assessment.reminderLeadDays,
-        }),
-        residualScore || '',
-        residualScore ? riskRating(Number(residualScore)) : '',
-        assessment.effectiveDate || '',
-        assessment.nextReviewDate || '',
+        'Reference',
+        'Assessment',
+        'Property',
+        'Category',
+        'Template version',
+        'Status',
+        'People at risk',
+        'Residual score',
+        'Residual rating',
+        'Effective date',
+        'Next review',
       ]
-        .map(csv)
+        .map(escapeRiskCsv)
         .join(','),
-    ),
-  ].join('\r\n')
+      ...rows.map(({ assessment, property, residualScore, peopleAtRisk }) =>
+        [
+          assessment.reference,
+          assessment.title,
+          property.name,
+          assessment.assessmentCategory,
+          riskAssessmentTemplateVersion(assessment.adoptedTemplateSnapshot),
+          riskLifecycleStatus({
+            storedStatus: assessment.status,
+            nextReviewDate: assessment.nextReviewDate,
+            reminderLeadDays: assessment.reminderLeadDays,
+          }),
+          (peopleAtRisk ?? []).join(', '),
+          residualScore || '',
+          residualScore
+            ? assessment.matrixSnapshot
+              ? riskRatingForAssessmentScore(Number(residualScore), assessment.matrixSnapshot)
+              : 'Historical matrix unknown'
+            : '',
+          assessment.effectiveDate || '',
+          assessment.nextReviewDate || '',
+        ]
+          .map(escapeRiskCsv)
+          .join(','),
+      ),
+    ].join('\r\n')
+  )
+}
+
+export function parseRiskRegisterCsv(input: string): string[][] {
+  const text = input.charCodeAt(0) === 65279 ? input.slice(1) : input
+  const rows: string[][] = []
+  let row: string[] = []
+  let field = ''
+  let quoted = false
+  for (let index = 0; index < text.length; index++) {
+    const char = text[index]!
+    if (quoted) {
+      if (char === '"' && text[index + 1] === '"') {
+        field += '"'
+        index++
+      } else if (char === '"') quoted = false
+      else field += char
+    } else if (char === '"' && field.length === 0) quoted = true
+    else if (char === ',') {
+      row.push(field)
+      field = ''
+    } else if (char.charCodeAt(0) === 10) {
+      row.push(field.endsWith(String.fromCharCode(13)) ? field.slice(0, -1) : field)
+      rows.push(row)
+      row = []
+      field = ''
+    } else field += char
+  }
+  if (field || row.length) {
+    row.push(field.endsWith(String.fromCharCode(13)) ? field.slice(0, -1) : field)
+    rows.push(row)
+  }
+  return rows
+}
+
+export async function buildRiskRegisterHtml(ctx: RequestContext, propertyId?: string) {
+  const [contents, branding] = await Promise.all([
+    buildRiskRegisterCsv(ctx, propertyId),
+    riskReportBranding(ctx),
+  ])
+  const rows = parseRiskRegisterCsv(contents)
+  const headers = rows[0] ?? []
+  const body = rows.slice(1)
+  const headerCells = headers
+    .map((value) => `<th style="${head}">${escapeRiskReport(value)}</th>`)
+    .join('')
+  const bodyRows = body
+    .map(
+      (row) =>
+        `<tr>${headers
+          .map((_, index) => `<td style="${cell}">${escapeRiskReport(row[index] ?? '')}</td>`)
+          .join('')}</tr>`,
+    )
+    .join('')
+  return `<div style="font-family:-apple-system,'Segoe UI',Arial,sans-serif;color:#0f172a">
+    <header style="height:58px;border-bottom:2px solid #0f172a;margin-bottom:14px">
+      ${logo(branding.platformLogoUrl, branding.platformName, 'left')}
+      ${logo(branding.customerLogoUrl, branding.customerName, 'right')}
+    </header>
+    <h1 style="font-size:20px">Risk Register</h1>
+    <p style="font-size:11px;color:#475569">${escapeRiskReport(branding.customerName)}</p>
+    <table style="width:100%;border-collapse:collapse"><thead><tr>${headerCells}</tr></thead>
+      <tbody>${bodyRows || `<tr><td style="${cell}" colspan="${Math.max(headers.length, 1)}">No assessments available</td></tr>`}</tbody>
+    </table>
+    <footer style="margin-top:16px;border-top:1px solid #cbd5e1;padding-top:8px;font-size:9px;color:#64748b">
+      ${escapeRiskReport(branding.platformSupport)} · ${escapeRiskReport(branding.customerEmail)}
+    </footer>
+  </div>`
 }

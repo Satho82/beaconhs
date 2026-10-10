@@ -11,9 +11,11 @@ import {
   tenants,
   users,
 } from '@beaconhs/db/schema'
+import { riskCatalogueMetadata } from '@beaconhs/db'
 import { assertCan, type RequestContext } from '@beaconhs/tenant'
 import { recordAuditInTransaction } from '@/lib/audit'
 import { assertCanAccessProperty } from '@/lib/hospitality/property-access'
+import { validateRiskMatrixSnapshot, writeRiskRevision } from './risk-revisions'
 
 const RISK_VALIDITY_MONTHS = [3, 6, 12, 24] as const
 export type RiskLifecycleAction = 'adopted' | 'reviewed' | 're_adopted' | 'amended' | 'retired'
@@ -23,7 +25,7 @@ function isoDate(date: Date): string {
 }
 function parseDate(value: string): Date {
   const date = new Date(`${value}T00:00:00.000Z`)
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || Number.isNaN(date.valueOf()))
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || Number.isNaN(date.valueOf()) || isoDate(date) !== value)
     throw new Error('A valid date is required')
   return date
 }
@@ -84,6 +86,7 @@ export async function applyRiskLifecycleAction(
   assessmentId: string,
   input: {
     action: RiskLifecycleAction
+    expectedRevision: number
     effectiveDate: string
     validityMonths?: number | null
     customReviewDate?: string | null
@@ -116,6 +119,11 @@ export async function applyRiskLifecycleAction(
       .for('update')
     if (!current) throw new Error('Risk assessment not found')
     assertCanAccessProperty(ctx, current.propertyId)
+    if (current.contentRevision !== input.expectedRevision)
+      throw new Error('Assessment changed. Reload before signing.')
+    validateRiskMatrixSnapshot(current.matrixSnapshot)
+    if (!['adopted', 'reviewed', 're_adopted', 'amended', 'retired'].includes(input.action))
+      throw new Error('Invalid sign-off action')
     if (current.status === 'retired' && input.action !== 're_adopted')
       throw new Error('A retired assessment can only be re-adopted')
     const lifecycleVersion = current.lifecycleVersion + (current.effectiveDate ? 1 : 0)
@@ -135,6 +143,9 @@ export async function applyRiskLifecycleAction(
       tx
         .select({
           sortOrder: riskHazards.sortOrder,
+          id: riskHazards.id,
+          archivedAt: riskHazards.archivedAt,
+          archiveReason: riskHazards.archiveReason,
           hazardDescription: riskHazards.hazardDescription,
           harmDescription: riskHazards.harmDescription,
           peopleAtRisk: riskHazards.peopleAtRisk,
@@ -176,6 +187,8 @@ export async function applyRiskLifecycleAction(
         .limit(1),
     ])
     const property = propertyRows[0]
+    if (!hazards.some((hazard) => !hazard.archivedAt))
+      throw new Error('At least one active hazard is required to sign off')
     const tenant = tenantRows[0]
     const assessor = assessorRows[0]
     if (!property || !tenant || !assessor)
@@ -190,6 +203,7 @@ export async function applyRiskLifecycleAction(
         expiryDate: dates.expiryDate,
         reminderLeadDays: input.reminderLeadDays,
         lifecycleVersion,
+        contentRevision: current.contentRevision + 1,
         lastReminderReviewDate: null,
         status,
         updatedAt: new Date(),
@@ -197,47 +211,57 @@ export async function applyRiskLifecycleAction(
       .where(and(eq(riskAssessments.tenantId, ctx.tenantId), eq(riskAssessments.id, assessmentId)))
       .returning()
     if (!updated) throw new Error('Risk lifecycle update failed')
-    const [signoff] = await tx
-      .insert(riskAssessmentSignoffs)
-      .values({
-        tenantId: ctx.tenantId,
-        propertyId: current.propertyId,
-        assessmentId,
-        signedByTenantUserId: signerId,
-        signedByName: ctx.membership?.displayName || 'Manager',
-        signedByRole,
-        action: input.action,
-        templateVersion: current.adoptedTemplateVersion,
-        lifecycleVersion,
-        validityMonths: dates.validityMonths,
-        effectiveDate: input.effectiveDate,
-        nextReviewDate: dates.nextReviewDate,
-        comments: input.comments?.trim() || null,
-        snapshot: {
-          assessment: {
-            reference: current.reference,
-            title: current.title,
-            areaLocation: current.areaLocation,
-            activityEquipment: current.activityEquipment,
-            assessmentDate: current.assessmentDate,
-            adoptedTemplateVersion: current.adoptedTemplateVersion,
-            adoptedTemplateSnapshot: current.adoptedTemplateSnapshot,
-            comments: current.comments,
-            effectiveDate: input.effectiveDate,
-            validityMonths: dates.validityMonths,
-            nextReviewDate: dates.nextReviewDate,
-            expiryDate: dates.expiryDate,
-            reminderLeadDays: input.reminderLeadDays,
-            status,
-            lifecycleVersion,
-          },
-          hazards,
-          property,
-          tenant,
-          assessorName: assessor.displayName || assessor.name,
+    const signoffValues: typeof riskAssessmentSignoffs.$inferInsert = {
+      tenantId: ctx.tenantId,
+      propertyId: current.propertyId,
+      assessmentId,
+      signedByTenantUserId: signerId,
+      signedByName: ctx.membership?.displayName || 'Manager',
+      signedByRole,
+      action: input.action,
+      templateVersion: current.adoptedTemplateVersion,
+      contentRevision: updated.contentRevision,
+      lifecycleVersion,
+      validityMonths: dates.validityMonths,
+      effectiveDate: input.effectiveDate,
+      nextReviewDate: dates.nextReviewDate,
+      comments: input.comments?.trim() || null,
+      snapshot: {
+        matrix: current.matrixSnapshot,
+        contentRevision: updated.contentRevision,
+        assessment: {
+          reference: current.reference,
+          title: current.title,
+          areaLocation: current.areaLocation,
+          activityEquipment: current.activityEquipment,
+          assessmentDate: current.assessmentDate,
+          adoptedTemplateVersion: current.adoptedTemplateVersion,
+          adoptedTemplateSnapshot: current.adoptedTemplateSnapshot,
+          assessmentCategory: current.assessmentCategory,
+          comments: current.comments,
+          effectiveDate: input.effectiveDate,
+          validityMonths: dates.validityMonths,
+          nextReviewDate: dates.nextReviewDate,
+          expiryDate: dates.expiryDate,
+          reminderLeadDays: input.reminderLeadDays,
+          status,
+          lifecycleVersion,
         },
-      })
-      .returning()
+        hazards,
+        property,
+        tenant,
+        assessorName: assessor.displayName || assessor.name,
+      },
+    }
+    await writeRiskRevision(
+      tx,
+      ctx,
+      updated,
+      'signed_off',
+      undefined,
+      signoffValues.snapshot ?? undefined,
+    )
+    const [signoff] = await tx.insert(riskAssessmentSignoffs).values(signoffValues).returning()
     if (!signoff) throw new Error('Risk sign-off failed')
     await recordAuditInTransaction(tx, ctx, {
       entityType: 'risk_assessment',
@@ -285,14 +309,30 @@ export async function getNewerRiskTemplate(
   ctx: RequestContext,
   assessment: typeof riskAssessments.$inferSelect,
 ) {
-  const title = assessment.adoptedTemplateSnapshot.title
+  if (
+    !assessment.adoptedTemplateSnapshot ||
+    !assessment.templateOwnerKey ||
+    !assessment.adoptedTemplateVersion
+  )
+    return null
+  const familyId =
+    assessment.adoptedTemplateSnapshot.templateFamilyId ??
+    assessment.adoptedTemplateSnapshot.templateId
+  const ownerKey = assessment.templateOwnerKey
+  const adoptedVersion = assessment.adoptedTemplateVersion
+  const adoptedCatalogue = riskCatalogueMetadata({
+    id: assessment.adoptedTemplateSnapshot.templateId,
+    version: assessment.adoptedTemplateSnapshot.version,
+    scope: 'platform',
+  })
   const candidates = await ctx.db((tx) =>
     tx
       .select()
       .from(riskTemplates)
       .where(
         and(
-          eq(riskTemplates.title, title),
+          eq(riskTemplates.templateFamilyId, familyId),
+          eq(riskTemplates.ownerKey, ownerKey),
           eq(riskTemplates.state, 'active'),
           isNull(riskTemplates.deletedAt),
         ),
@@ -300,7 +340,14 @@ export async function getNewerRiskTemplate(
   )
   return (
     candidates
-      .filter((row) => compareVersions(row.version, assessment.adoptedTemplateVersion) > 0)
+      .filter((row) => {
+        const candidateCatalogue = riskCatalogueMetadata(row)
+        // A catalogue storage key is not a cross-template revision number.
+        if (adoptedCatalogue || candidateCatalogue)
+          return candidateCatalogue?.reference === adoptedCatalogue?.reference
+        return true
+      })
+      .filter((row) => compareVersions(row.version, adoptedVersion) > 0)
       .sort((a, b) => compareVersions(b.version, a.version))[0] ?? null
   )
 }

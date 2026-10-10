@@ -3,11 +3,12 @@ import { drizzle } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'
 import { sql } from 'drizzle-orm'
 import { fileURLToPath } from 'node:url'
-import { RLS_POLICY_SQL, TENANT_SCOPED_TABLES } from './rls'
+import { RLS_POLICY_SQL } from './rls'
 import { REPORT_VIEWS_SQL } from './views'
 import { STATS_SQL, STATS_HIGH_VOLUME_TABLES } from './stats'
 import { BUILTIN_ROLES, PERMISSION_CATALOGUE } from './schema'
 import { installStandardRiskLibrary } from './risk-library-install'
+import { riskMigrationTasks } from './risk-migration-readiness'
 import {
   readMigrationFiles,
   validateMigrationState,
@@ -372,9 +373,14 @@ async function applyRuntimeGrants(
 }
 
 async function applyRlsPolicies(db: MigrationDatabase) {
+  const optionalRows = (await db.execute(sql`
+    select to_regclass('public.risk_template_families') is not null as families,
+           to_regclass('public.risk_assessment_versions') is not null as versions
+  `)) as unknown as Array<{ families: boolean; versions: boolean }>
+  const { tables } = riskMigrationTasks(optionalRows[0])
   await db.transaction(async (transaction) => {
     const tx = transaction as unknown as MigrationDatabase
-    for (const table of TENANT_SCOPED_TABLES) {
+    for (const table of tables) {
       try {
         await tx.execute(sql.raw(RLS_POLICY_SQL(table)))
       } catch (error) {
@@ -382,7 +388,7 @@ async function applyRlsPolicies(db: MigrationDatabase) {
       }
     }
   })
-  console.log(`✔ RLS applied atomically (${TENANT_SCOPED_TABLES.length} tables)`)
+  console.log(`✔ RLS applied atomically (${tables.length} tables)`)
 }
 
 async function applyPlannerStatistics(db: MigrationDatabase) {
@@ -471,8 +477,16 @@ async function main() {
     console.log('▶ Verifying security data invariants…')
     await assertKioskPinHashes(maintenanceDb)
 
-    console.log('▶ Installing missing standard Risk Library templates…')
-    await installStandardRiskLibrary(maintenanceDb)
+    const riskSchemaRows = (await migrationDb.execute(sql`
+      select to_regclass('public.risk_template_families') is not null as families,
+             to_regclass('public.risk_assessment_versions') is not null as versions
+    `)) as unknown as Array<{ families: boolean; versions: boolean }>
+    if (riskMigrationTasks(riskSchemaRows[0]).installRiskLibrary) {
+      console.log('▶ Installing missing standard Risk Library templates…')
+      await installStandardRiskLibrary(maintenanceDb)
+    } else {
+      console.log('  Risk Library installation deferred until prepared migrations are approved')
+    }
 
     console.log('▶ Converging role permissions…')
     await convergeRolePermissions(maintenanceDb)

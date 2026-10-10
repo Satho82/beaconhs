@@ -1260,12 +1260,6 @@ const IN_PROGRESS_KIND: Record<InProgressKind, { label: string; icon: LucideIcon
       badge:
         'bg-teal-50 text-teal-700 ring-teal-100 dark:bg-teal-950/50 dark:text-teal-300 dark:ring-teal-900/40',
     },
-    hazard_assessment: {
-      label: 'Hazard assessment',
-      icon: ShieldAlert,
-      badge:
-        'bg-amber-50 text-amber-700 ring-amber-100 dark:bg-amber-950/40 dark:text-amber-300 dark:ring-amber-900/40',
-    },
     incident: {
       label: 'Incident',
       icon: AlertTriangle,

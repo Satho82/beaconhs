@@ -1,6 +1,9 @@
 import Link from 'next/link'
+import { riskCatalogueMetadata } from '@beaconhs/db'
+import { riskSelectedProperty, type RiskSearch } from '@/lib/risk-library-views'
 import { notFound } from 'next/navigation'
-import { Button, PageHeader } from '@beaconhs/ui'
+import { Badge, Button, PageHeader } from '@beaconhs/ui'
+import { assignedPropertyIds, can } from '@beaconhs/tenant'
 import { PageContainer } from '@/components/page-layout'
 import { requireRequestContext } from '@/lib/auth'
 import { isUuid } from '@/lib/list-params'
@@ -8,11 +11,17 @@ import { resolveHospitalityPropertyContext } from '@/lib/hospitality/property-co
 import { getRiskTemplate } from '@/lib/risk-assessments'
 import { getGeneratedValueTranslations } from '@/i18n/generated.server'
 import { AdoptionPanel } from './adoption-panel'
+import { SaveTenantTemplate } from '../../save-tenant-template'
+import { TemplateDraftEditor } from './template-draft-editor'
+import { isRiskSchemaReady } from '@/lib/risk-schema-readiness'
+import { RiskSchemaNotice } from '../../risk-schema-notice'
 
 export default async function RiskTemplatePage({
   params,
+  searchParams,
 }: {
   params: Promise<{ templateId: string }>
+  searchParams?: Promise<RiskSearch>
 }) {
   const { templateId } = await params
   if (!isUuid(templateId)) notFound()
@@ -20,23 +29,60 @@ export default async function RiskTemplatePage({
     requireRequestContext(),
     getGeneratedValueTranslations(),
   ])
+  if (!(await isRiskSchemaReady(ctx))) return <RiskSchemaNotice />
   const [template, propertyContext] = await Promise.all([
     getRiskTemplate(ctx, templateId),
     resolveHospitalityPropertyContext(ctx),
   ])
   if (!template) notFound()
+  const search = (await searchParams) ?? {}
+  let activePropertyId: string | null
+  try {
+    activePropertyId = riskSelectedProperty(search, propertyContext)
+  } catch {
+    notFound()
+  }
+  const metadata = riskCatalogueMetadata(template)
   const description = [
     template.category.replaceAll('_', ' '),
-    `v${template.version}`,
+    `v${metadata?.version ?? template.version}`,
     template.state,
   ].join(' · ')
 
   return (
     <PageContainer>
       <Button asChild variant="ghost" className="mb-3">
-        <Link href="/hospitality/risk">{translateValue('Back to Risk Library')}</Link>
+        <Link
+          href={`/hospitality/risk?view=templates${activePropertyId ? `&property=${activePropertyId}` : ''}`}
+        >
+          {translateValue('Back to Available Templates')}
+        </Link>
       </Button>
-      <PageHeader title={template.title} description={description} />
+      <PageHeader
+        title={template.title}
+        description={description}
+        actions={
+          <Badge variant="outline">
+            {translateValue(template.scope === 'platform' ? 'Uvanoo Template' : 'Tenant Template')}
+          </Badge>
+        }
+      />
+      {metadata && (
+        <p className="text-muted-foreground mt-3 text-sm">
+          {metadata.reference} · {metadata.category} · {metadata.applicability.join(', ')} ·{' '}
+          {metadata.contentStatus}
+        </p>
+      )}
+      {template.scope === 'tenant' &&
+        can(ctx, 'hospitality.manage') &&
+        assignedPropertyIds(ctx) === null && (
+          <TemplateDraftEditor key={template.id} template={template} />
+        )}
+      <p className="text-muted-foreground mt-3 text-sm">
+        {translateValue(
+          'Active templates can be adopted for a property. Drafts must be published before use.',
+        )}
+      </p>
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_22rem]">
         <div className="space-y-6">
           <section className="rounded-lg border p-5">
@@ -55,6 +101,14 @@ export default async function RiskTemplatePage({
                 <dt className="font-medium">{translateValue('People at risk')}</dt>
                 <dd className="text-muted-foreground">
                   {template.peopleAtRiskGuidance.join(', ')}
+                </dd>
+              </div>
+              <div>
+                <dt className="font-medium">
+                  {translateValue('Further controls and corrective actions')}
+                </dt>
+                <dd className="text-muted-foreground whitespace-pre-line">
+                  {template.furtherActionGuidance}
                 </dd>
               </div>
               <div>
@@ -93,10 +147,23 @@ export default async function RiskTemplatePage({
         <AdoptionPanel
           templateId={template.id}
           templateTitle={template.title}
-          activePropertyId={propertyContext.activePropertyId}
+          activePropertyId={activePropertyId}
           properties={propertyContext.properties}
+          canAdopt={can(ctx, 'hospitality.manage')}
+          active={template.state === 'active'}
         />
       </div>
+      {template.state === 'active' &&
+        can(ctx, 'hospitality.manage') &&
+        assignedPropertyIds(ctx) === null && (
+          <div className="mt-6">
+            <SaveTenantTemplate
+              source={{ kind: 'template', id: template.id }}
+              title={template.title}
+              description={template.description}
+            />
+          </div>
+        )}
     </PageContainer>
   )
 }

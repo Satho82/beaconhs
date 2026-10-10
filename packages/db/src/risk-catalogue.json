@@ -1,0 +1,4380 @@
+[
+  {
+    "reference": "RA-001",
+    "title": "General Workplace Health & Safety",
+    "category": "GENERAL HOTEL OPERATIONS",
+    "applicability": ["Hotels", "Serviced apartments"],
+    "scope": "Routine hotel work and shared workplaces",
+    "keywords": ["inspection", "induction", "supervision"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-001-H1",
+        "hazard": "Uncontrolled workplace defects",
+        "harm": "Cuts, impact injuries or falls",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": ["Inspect work areas and isolate defects pending repair"],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: uncontrolled workplace defects.",
+          "Assign general manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "General Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-001-H2",
+        "hazard": "Unclear task arrangements",
+        "harm": "Injury during unfamiliar work",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Give task-specific induction and confirm supervision before work"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: unclear task arrangements.",
+          "Assign general manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "General Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-002",
+    "title": "Slips, Trips and Falls",
+    "category": "GENERAL HOTEL OPERATIONS",
+    "applicability": ["Hotels", "Serviced apartments"],
+    "scope": "Walking routes, entrances and cleaning activities",
+    "keywords": ["spills", "flooring", "matting"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-002-H1",
+        "hazard": "Wet floors and contamination",
+        "harm": "Sprains, fractures or head injuries",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Remove contamination promptly and separate people from wet cleaning areas"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: wet floors and contamination.",
+          "Assign duty manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Duty Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-002-H2",
+        "hazard": "Obstructed or uneven routes",
+        "harm": "Trips and falls",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": ["Keep routes clear and arrange repair of damaged flooring"],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: obstructed or uneven routes.",
+          "Assign duty manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Duty Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-003",
+    "title": "Manual Handling and Lifting",
+    "category": "GENERAL HOTEL OPERATIONS",
+    "applicability": ["Hotels", "Serviced apartments"],
+    "scope": "Moving supplies, equipment and guest items",
+    "keywords": ["lifting", "carrying", "pushing", "pulling"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-003-H1",
+        "hazard": "Heavy or awkward loads",
+        "harm": "Back strain or other musculoskeletal injury",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": ["Avoid unnecessary lifting and use suitable handling aids"],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: heavy or awkward loads.",
+          "Assign department manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Department Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-003-H2",
+        "hazard": "Repetitive handling in restricted space",
+        "harm": "Strain, trapped fingers or crushed feet",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Plan the route, assess the load and arrange assistance matched to the task"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: repetitive handling in restricted space.",
+          "Assign department manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Department Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-004",
+    "title": "Working at Height and Ladders",
+    "category": "GENERAL HOTEL OPERATIONS",
+    "applicability": ["Hotels", "Serviced apartments"],
+    "scope": "Short-duration access and work above floor level",
+    "keywords": ["ladder", "access", "falls"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-004-H1",
+        "hazard": "Fall from access equipment",
+        "harm": "Serious injury or fatality",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Avoid work at height where possible; select inspected equipment for the task"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: fall from access equipment.",
+          "Assign facilities manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 5,
+            "residualLikelihood": 2,
+            "residualSeverity": 5
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 3,
+            "residualLikelihood": 1,
+            "residualSeverity": 3
+          }
+        },
+        "suggestedResponsibleRole": "Facilities Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-004-H2",
+        "hazard": "Falling tools or materials",
+        "harm": "Impact injuries to people below",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": ["Segregate the area below and secure tools and materials"],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: falling tools or materials.",
+          "Assign facilities manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Facilities Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-005",
+    "title": "Lone Working and Out-of-Hours Operations",
+    "category": "GENERAL HOTEL OPERATIONS",
+    "applicability": ["Hotels", "Serviced apartments"],
+    "scope": "Work without nearby assistance, including night shifts",
+    "keywords": ["night", "check-in", "isolation"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-005-H1",
+        "hazard": "Delayed help after injury or illness",
+        "harm": "Worsening injury without prompt assistance",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Agree check-in arrangements and a tested response for missed contact"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: delayed help after injury or illness.",
+          "Assign duty manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Duty Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-005-H2",
+        "hazard": "Threatening encounter while alone",
+        "harm": "Assault or distress",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Provide reliable communication and a safe withdrawal route; prohibit unsuitable lone tasks"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: threatening encounter while alone.",
+          "Assign duty manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Duty Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-006",
+    "title": "Display Screen Equipment (DSE)",
+    "category": "GENERAL HOTEL OPERATIONS",
+    "applicability": ["Hotels", "Serviced apartments"],
+    "scope": "Reception and office screen-based work",
+    "keywords": ["ergonomics", "screen", "workstation"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-006-H1",
+        "hazard": "Poor workstation setup",
+        "harm": "Neck, back or upper-limb discomfort",
+        "personsExposed": ["Employees"],
+        "existingControlsToVerify": [
+          "Assess the user's workstation and adjust furniture, screen and input equipment"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: poor workstation setup.",
+          "Assign department manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Department Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-006-H2",
+        "hazard": "Prolonged static work",
+        "harm": "Eye fatigue and discomfort",
+        "personsExposed": ["Employees"],
+        "existingControlsToVerify": ["Plan changes of activity and report symptoms for review"],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: prolonged static work.",
+          "Assign department manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Department Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-007",
+    "title": "Workplace Violence, Aggression and Abuse",
+    "category": "GENERAL HOTEL OPERATIONS",
+    "applicability": ["Hotels", "Serviced apartments"],
+    "scope": "Guest-facing work and difficult interactions",
+    "keywords": ["aggression", "abuse", "conflict"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-007-H1",
+        "hazard": "Threats or physical aggression",
+        "harm": "Assault, injury or psychological harm",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Train staff to withdraw and summon assistance; keep escape routes available"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: threats or physical aggression.",
+          "Assign front office manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Front Office Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-007-H2",
+        "hazard": "Unmanaged repeat incidents",
+        "harm": "Repeated exposure and distress",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Record incidents, review triggers and provide support after an event"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: unmanaged repeat incidents.",
+          "Assign front office manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Front Office Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-008",
+    "title": "New and Expectant Mothers",
+    "category": "GENERAL HOTEL OPERATIONS",
+    "applicability": ["Hotels", "Serviced apartments"],
+    "scope": "Individual assessment of a notified worker's duties",
+    "keywords": ["pregnancy", "breastfeeding", "individual"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-008-H1",
+        "hazard": "Tasks unsuited to individual pregnancy or postnatal needs",
+        "harm": "Injury or adverse health effects",
+        "personsExposed": ["Employees"],
+        "existingControlsToVerify": [
+          "Review duties individually with the worker and appropriate competent advice"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: tasks unsuited to individual pregnancy or postnatal needs.",
+          "Assign department manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Department Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-008-H2",
+        "hazard": "Inadequate rest or exposure control",
+        "harm": "Fatigue or avoidable exposure",
+        "personsExposed": ["Employees"],
+        "existingControlsToVerify": [
+          "Adjust work and rest arrangements and review when circumstances change"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: inadequate rest or exposure control.",
+          "Assign department manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Department Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-009",
+    "title": "Young Workers and Work Experience",
+    "category": "GENERAL HOTEL OPERATIONS",
+    "applicability": ["Hotels", "Serviced apartments"],
+    "scope": "Induction, task allocation and supervision of young people",
+    "keywords": ["young", "induction", "supervision"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-009-H1",
+        "hazard": "Unfamiliar hazards and limited experience",
+        "harm": "Injury during work beyond competence",
+        "personsExposed": ["Employees"],
+        "existingControlsToVerify": [
+          "Assess the individual's experience and restrict unsuitable activities"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: unfamiliar hazards and limited experience.",
+          "Assign department manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Department Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-009-H2",
+        "hazard": "Insufficient supervision",
+        "harm": "Unsafe decisions or delayed assistance",
+        "personsExposed": ["Employees"],
+        "existingControlsToVerify": [
+          "Provide named supervision, clear instructions and a route to stop and ask"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: insufficient supervision.",
+          "Assign department manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Department Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-010",
+    "title": "Staff Fatigue, Stress and Workload",
+    "category": "GENERAL HOTEL OPERATIONS",
+    "applicability": ["Hotels", "Serviced apartments"],
+    "scope": "Work scheduling, demands and support across departments",
+    "keywords": ["rota", "workload", "wellbeing"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-010-H1",
+        "hazard": "Fatigue during long or disrupted shifts",
+        "harm": "Errors, accidents or reduced alertness",
+        "personsExposed": ["Employees"],
+        "existingControlsToVerify": [
+          "Review rotas, breaks and workload with staff and adjust unsafe demands"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: fatigue during long or disrupted shifts.",
+          "Assign general manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "General Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-010-H2",
+        "hazard": "Sustained work-related pressure",
+        "harm": "Stress-related ill health",
+        "personsExposed": ["Employees"],
+        "existingControlsToVerify": [
+          "Assess demands, control and support; agree actions and confidential escalation"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: sustained work-related pressure.",
+          "Assign general manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "General Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-011",
+    "title": "Fire Safety — Workplace Activities",
+    "category": "FIRE, EMERGENCY AND SECURITY",
+    "applicability": ["Hotels", "Serviced apartments"],
+    "scope": "Daily activities that may start or spread fire; supports the premises fire risk assessment",
+    "keywords": ["ignition", "escape", "storage"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-011-H1",
+        "hazard": "Ignition near combustible materials",
+        "harm": "Burns, smoke exposure or fatal injury",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Control ignition sources and keep combustible storage away from them"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: ignition near combustible materials.",
+          "Assign responsible manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 5,
+            "residualLikelihood": 2,
+            "residualSeverity": 5
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 3,
+            "residualLikelihood": 1,
+            "residualSeverity": 3
+          }
+        },
+        "suggestedResponsibleRole": "Responsible Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-011-H2",
+        "hazard": "Obstructed escape or compromised fire doors",
+        "harm": "Delayed evacuation and smoke exposure",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Keep escape routes available and report fire-door defects promptly"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: obstructed escape or compromised fire doors.",
+          "Assign responsible manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Responsible Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-012",
+    "title": "Emergency Evacuation and Assisted Evacuation",
+    "category": "FIRE, EMERGENCY AND SECURITY",
+    "applicability": ["Hotels", "Serviced apartments"],
+    "scope": "Implementation of the premises evacuation strategy",
+    "keywords": ["evacuation", "assistance", "accessibility"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-012-H1",
+        "hazard": "People unable to use the planned escape route",
+        "harm": "Entrapment or smoke exposure",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Plan assistance and accessible evacuation arrangements for actual occupants"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: people unable to use the planned escape route.",
+          "Assign duty manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Duty Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-012-H2",
+        "hazard": "Unclear roles during evacuation",
+        "harm": "Delay, crowding or missed occupants",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Brief staff and practise the approved plan without unsafe rescue attempts"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: unclear roles during evacuation.",
+          "Assign duty manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Duty Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-013",
+    "title": "Fire Alarm Activation and Emergency Response",
+    "category": "FIRE, EMERGENCY AND SECURITY",
+    "applicability": ["Hotels", "Serviced apartments"],
+    "scope": "Response to alarms under the premises fire strategy",
+    "keywords": ["alarm", "response", "re-entry"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-013-H1",
+        "hazard": "Delayed alarm response",
+        "harm": "Smoke exposure and delayed evacuation",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Follow the approved alarm response and escalation plan immediately"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: delayed alarm response.",
+          "Assign duty manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Duty Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-013-H2",
+        "hazard": "Unsafe investigation or re-entry",
+        "harm": "Exposure to fire or smoke",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Do not enter dangerous areas; allow re-entry only through the authorised procedure"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: unsafe investigation or re-entry.",
+          "Assign duty manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Duty Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-014",
+    "title": "Bomb Threats and Suspicious Packages",
+    "category": "FIRE, EMERGENCY AND SECURITY",
+    "applicability": ["Hotels", "Serviced apartments"],
+    "scope": "Threat reporting and protective action under the security plan",
+    "keywords": ["threat", "suspicious", "package"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-014-H1",
+        "hazard": "Handling a suspicious item",
+        "harm": "Serious injury from a hazardous item",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Do not touch or move it; withdraw and follow police-led instructions"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: handling a suspicious item.",
+          "Assign security lead oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 5,
+            "residualLikelihood": 2,
+            "residualSeverity": 5
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 3,
+            "residualLikelihood": 1,
+            "residualSeverity": 3
+          }
+        },
+        "suggestedResponsibleRole": "Security Lead",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-014-H2",
+        "hazard": "Uncoordinated movement of occupants",
+        "harm": "Crowding or exposure to danger",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Use the incident plan and nominated coordinator to communicate safe instructions"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: uncoordinated movement of occupants.",
+          "Assign security lead oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Security Lead",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-015",
+    "title": "Unauthorised Access, Intruders and Security",
+    "category": "FIRE, EMERGENCY AND SECURITY",
+    "applicability": ["Hotels", "Serviced apartments"],
+    "scope": "Access control, keys and visitor arrangements",
+    "keywords": ["access", "keys", "visitors"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-015-H1",
+        "hazard": "Uncontrolled entry into restricted areas",
+        "harm": "Assault, theft-related confrontation or injury",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Maintain access controls and verify visitors without exposing staff to confrontation"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: uncontrolled entry into restricted areas.",
+          "Assign security lead oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Security Lead",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-015-H2",
+        "hazard": "Lost keys or compromised credentials",
+        "harm": "Repeated unauthorised entry",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Report loss promptly and revoke affected access through the approved process"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: lost keys or compromised credentials.",
+          "Assign security lead oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Security Lead",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-016",
+    "title": "First Aid and Medical Emergencies",
+    "category": "FIRE, EMERGENCY AND SECURITY",
+    "applicability": ["Hotels", "Serviced apartments"],
+    "scope": "First-aid arrangements, communication and access for emergency help",
+    "keywords": ["first", "aid", "emergency", "contacts"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-016-H1",
+        "hazard": "Delay obtaining appropriate assistance",
+        "harm": "Worsening injury or illness",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Complete a needs assessment and provide trained cover, equipment and clear contacts"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: delay obtaining appropriate assistance.",
+          "Assign first aid coordinator oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "First Aid Coordinator",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-016-H2",
+        "hazard": "Responders exposed to scene hazards",
+        "harm": "Further injury or infection",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Check scene safety and act only within training while summoning emergency assistance"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: responders exposed to scene hazards.",
+          "Assign first aid coordinator oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "First Aid Coordinator",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-017",
+    "title": "Lift Breakdown and Entrapment",
+    "category": "FIRE, EMERGENCY AND SECURITY",
+    "applicability": ["Hotels", "Serviced apartments"],
+    "scope": "Passenger communication and response to a stopped lift",
+    "keywords": ["lift", "entrapment", "rescue"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-017-H1",
+        "hazard": "Attempted unauthorised passenger release",
+        "harm": "Falls, crushing or serious injury",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Keep passengers informed and arrange release only by authorised competent responders"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: attempted unauthorised passenger release.",
+          "Assign facilities manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 5,
+            "residualLikelihood": 2,
+            "residualSeverity": 5
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 3,
+            "residualLikelihood": 1,
+            "residualSeverity": 3
+          }
+        },
+        "suggestedResponsibleRole": "Facilities Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-017-H2",
+        "hazard": "Loss of communication with trapped occupants",
+        "harm": "Distress or delayed medical assistance",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Test alarm communication and escalate medical concerns to emergency services"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: loss of communication with trapped occupants.",
+          "Assign facilities manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Facilities Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-018",
+    "title": "Power Failure and Emergency Lighting",
+    "category": "FIRE, EMERGENCY AND SECURITY",
+    "applicability": ["Hotels", "Serviced apartments"],
+    "scope": "Loss of normal lighting and electrically powered services",
+    "keywords": ["outage", "lighting", "restart"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-018-H1",
+        "hazard": "Unlit escape and circulation routes",
+        "harm": "Falls or delayed evacuation",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Maintain emergency lighting and follow the approved outage response plan"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: unlit escape and circulation routes.",
+          "Assign facilities manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Facilities Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-018-H2",
+        "hazard": "Unsafe use or restart of affected equipment",
+        "harm": "Electric shock, fire or injury",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Isolate unsafe equipment and arrange controlled restart by competent personnel"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: unsafe use or restart of affected equipment.",
+          "Assign facilities manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Facilities Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-019",
+    "title": "Guest Bedroom and Apartment Cleaning",
+    "category": "HOUSEKEEPING AND ACCOMMODATION",
+    "applicability": ["Hotels", "Serviced apartments"],
+    "scope": "Routine turnaround and occupied-room cleaning",
+    "keywords": ["bedroom", "cleaning", "turnaround"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-019-H1",
+        "hazard": "Contact with concealed sharp or damaged items",
+        "harm": "Cuts or puncture injuries",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Check before reaching into concealed spaces and isolate/report unsafe items"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: contact with concealed sharp or damaged items.",
+          "Assign housekeeping manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Housekeeping Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-019-H2",
+        "hazard": "Repetitive bending and cleaning movements",
+        "harm": "Musculoskeletal strain",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Use suitable adjustable equipment and plan tasks to reduce awkward postures"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: repetitive bending and cleaning movements.",
+          "Assign housekeeping manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Housekeeping Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-020",
+    "title": "Bathroom Cleaning and Descaling",
+    "category": "HOUSEKEEPING AND ACCOMMODATION",
+    "applicability": ["Hotels", "Serviced apartments"],
+    "scope": "Cleaning wet areas and removing deposits",
+    "keywords": ["bathroom", "descaler", "wet", "floors"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-020-H1",
+        "hazard": "Chemical splash during application",
+        "harm": "Eye or skin injury",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Use the task COSHH assessment, controlled application and specified protection"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: chemical splash during application.",
+          "Assign housekeeping manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Housekeeping Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-020-H2",
+        "hazard": "Slippery wet surfaces",
+        "harm": "Falls or sprains",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Control access until floors are safe and use methods that minimise standing water"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: slippery wet surfaces.",
+          "Assign housekeeping manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Housekeeping Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-021",
+    "title": "COSHH — Cleaning Chemicals",
+    "category": "HOUSEKEEPING AND ACCOMMODATION",
+    "applicability": ["Hotels", "Serviced apartments"],
+    "scope": "Selection, storage, dilution and use of cleaning substances",
+    "keywords": ["COSHH", "chemical", "SDS", "dilution"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-021-H1",
+        "hazard": "Incompatible substances mixed together",
+        "harm": "Harmful fumes or chemical injury",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Never mix products; follow the product-specific assessment and supplier instructions"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: incompatible substances mixed together.",
+          "Assign housekeeping manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Housekeeping Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-021-H2",
+        "hazard": "Unlabelled or insecure chemical containers",
+        "harm": "Exposure or accidental ingestion",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Keep products labelled in suitable containers and restrict storage access"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: unlabelled or insecure chemical containers.",
+          "Assign housekeeping manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Housekeeping Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-022",
+    "title": "Bed Making and Mattress Handling",
+    "category": "HOUSEKEEPING AND ACCOMMODATION",
+    "applicability": ["Hotels", "Serviced apartments"],
+    "scope": "Changing linen and moving beds or mattresses",
+    "keywords": ["mattress", "beds", "linen"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-022-H1",
+        "hazard": "Awkward lifting and reaching",
+        "harm": "Back or shoulder injury",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Use suitable aids and assistance; avoid unsupported mattress lifting"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: awkward lifting and reaching.",
+          "Assign housekeeping manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Housekeeping Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-022-H2",
+        "hazard": "Moving bed frames or furniture",
+        "harm": "Crushed fingers, feet or impact injuries",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": ["Check movement paths and keep hands clear of pinch points"],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: moving bed frames or furniture.",
+          "Assign housekeeping manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Housekeeping Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-023",
+    "title": "Laundry, Linen Handling and Storage",
+    "category": "HOUSEKEEPING AND ACCOMMODATION",
+    "applicability": ["Hotels", "Serviced apartments"],
+    "scope": "Collection, movement and storage of linen",
+    "keywords": ["laundry", "linen", "bags", "storage"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-023-H1",
+        "hazard": "Overfilled bags and high stacks",
+        "harm": "Strain or falling-load injuries",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Limit loads, use trolleys and store linen at safe reachable heights"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: overfilled bags and high stacks.",
+          "Assign housekeeping manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Housekeeping Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-023-H2",
+        "hazard": "Contact with contaminated linen",
+        "harm": "Skin exposure or infection",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Separate contaminated items using the agreed handling and hygiene procedure"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: contact with contaminated linen.",
+          "Assign housekeeping manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Housekeeping Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-024",
+    "title": "Waste Handling and Sharps",
+    "category": "HOUSEKEEPING AND ACCOMMODATION",
+    "applicability": ["Hotels", "Serviced apartments"],
+    "scope": "Collecting and storing general waste and discovered sharps",
+    "keywords": ["waste", "needles", "glass", "sharps"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-024-H1",
+        "hazard": "Concealed needles or broken glass",
+        "harm": "Puncture injury or blood exposure",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Do not compress bags or reach into waste; use trained sharps response arrangements"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: concealed needles or broken glass.",
+          "Assign housekeeping manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Housekeeping Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-024-H2",
+        "hazard": "Heavy or leaking waste bags",
+        "harm": "Strain or contact with contaminants",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Use suitable containers and handling aids; segregate leaking waste"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: heavy or leaking waste bags.",
+          "Assign housekeeping manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Housekeeping Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-025",
+    "title": "Bodily Fluids and Biohazard Cleaning",
+    "category": "HOUSEKEEPING AND ACCOMMODATION",
+    "applicability": ["Hotels", "Serviced apartments"],
+    "scope": "Controlled response to spills and contaminated areas",
+    "keywords": ["spill", "infection", "biological"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-025-H1",
+        "hazard": "Exposure to contaminated fluids",
+        "harm": "Infection or skin/eye exposure",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Restrict access and use the assessed cleaning method and protective equipment"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: exposure to contaminated fluids.",
+          "Assign housekeeping manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Housekeeping Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-025-H2",
+        "hazard": "Uncontrolled spread during cleanup",
+        "harm": "Exposure of other occupants",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Separate equipment and waste and complete hand hygiene and area-release checks"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: uncontrolled spread during cleanup.",
+          "Assign housekeeping manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Housekeeping Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-026",
+    "title": "Guest Room Inspections and Defect Reporting",
+    "category": "HOUSEKEEPING AND ACCOMMODATION",
+    "applicability": ["Hotels", "Serviced apartments"],
+    "scope": "Checking rooms before release and recording defects",
+    "keywords": ["inspection", "defect", "room", "release"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-026-H1",
+        "hazard": "Missed safety-critical defects",
+        "harm": "Guest or staff injury",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Use a structured check and remove unsafe rooms/items from use pending repair"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: missed safety-critical defects.",
+          "Assign duty manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Duty Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-026-H2",
+        "hazard": "Unsafe inspection methods",
+        "harm": "Falls or electric shock",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Do not dismantle equipment or climb furniture; refer specialist checks"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: unsafe inspection methods.",
+          "Assign duty manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Duty Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-027",
+    "title": "Housekeeping Trolleys and Equipment",
+    "category": "HOUSEKEEPING AND ACCOMMODATION",
+    "applicability": ["Hotels", "Serviced apartments"],
+    "scope": "Loading, movement, parking and operation of cleaning equipment",
+    "keywords": ["trolley", "vacuum", "equipment"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-027-H1",
+        "hazard": "Overloaded or unstable trolleys",
+        "harm": "Crushing, strain or impact injuries",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Check wheels and load limits; position loads securely and maintain visibility"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: overloaded or unstable trolleys.",
+          "Assign housekeeping manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Housekeeping Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-027-H2",
+        "hazard": "Equipment or cables obstructing routes",
+        "harm": "Trips or blocked escape",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": ["Park clear of exits and manage cables during use"],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: equipment or cables obstructing routes.",
+          "Assign housekeeping manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Housekeeping Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-028",
+    "title": "Pest Control and Infestation Response",
+    "category": "HOUSEKEEPING AND ACCOMMODATION",
+    "applicability": ["Hotels", "Serviced apartments"],
+    "scope": "Reporting, restricting access and coordinating treatment",
+    "keywords": ["pests", "infestation", "treatment"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-028-H1",
+        "hazard": "Contact with pests or contaminated surfaces",
+        "harm": "Bites, contamination or illness",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Isolate affected areas and arrange competent investigation and treatment"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: contact with pests or contaminated surfaces.",
+          "Assign general manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "General Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-028-H2",
+        "hazard": "Uncontrolled use of pest-control products",
+        "harm": "Chemical exposure",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Use authorised competent contractors and observe access and re-entry instructions"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: uncontrolled use of pest-control products.",
+          "Assign general manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "General Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-029",
+    "title": "General Maintenance and Hand Tools",
+    "category": "MAINTENANCE, PLANT AND ENGINEERING",
+    "applicability": ["Hotels", "Serviced apartments"],
+    "scope": "Routine repairs within staff competence",
+    "keywords": ["tools", "repairs", "maintenance"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-029-H1",
+        "hazard": "Unsuitable or defective tools",
+        "harm": "Cuts, impact or eye injuries",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Select and inspect tools for the task; remove defective tools from use"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: unsuitable or defective tools.",
+          "Assign facilities manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Facilities Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-029-H2",
+        "hazard": "Work area exposed to guests or colleagues",
+        "harm": "Injury from tools, debris or trailing leads",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": ["Set up barriers and housekeeping controls before starting"],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: work area exposed to guests or colleagues.",
+          "Assign facilities manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Facilities Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-030",
+    "title": "Electrical Safety and Portable Equipment",
+    "category": "MAINTENANCE, PLANT AND ENGINEERING",
+    "applicability": ["Hotels", "Serviced apartments"],
+    "scope": "Use and management of electrical equipment",
+    "keywords": ["electricity", "portable", "inspection"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-030-H1",
+        "hazard": "Damaged leads, plugs or equipment",
+        "harm": "Electric shock, burns or fire",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Remove damaged equipment from use and arrange competent inspection/repair"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: damaged leads, plugs or equipment.",
+          "Assign facilities manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Facilities Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-030-H2",
+        "hazard": "Unsuitable equipment in wet areas",
+        "harm": "Electric shock",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Use equipment suited to the environment and keep supplies protected from water"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: unsuitable equipment in wet areas.",
+          "Assign facilities manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Facilities Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-031",
+    "title": "Isolation of Equipment and Lockout/Tagout",
+    "category": "MAINTENANCE, PLANT AND ENGINEERING",
+    "applicability": ["Hotels", "Serviced apartments"],
+    "scope": "Planned prevention of unexpected energy release during work",
+    "keywords": ["isolation", "energy", "lockout"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-031-H1",
+        "hazard": "Unexpected restart or energisation",
+        "harm": "Crushing, entanglement or electric shock",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Competent personnel identify and isolate all energy sources under a task-specific procedure"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: unexpected restart or energisation.",
+          "Assign facilities manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Facilities Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-031-H2",
+        "hazard": "Stored energy released during work",
+        "harm": "Serious injury",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Make stored energy safe and verify isolation before work; control reinstatement"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: stored energy released during work.",
+          "Assign facilities manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 5,
+            "residualLikelihood": 2,
+            "residualSeverity": 5
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 3,
+            "residualLikelihood": 1,
+            "residualSeverity": 3
+          }
+        },
+        "suggestedResponsibleRole": "Facilities Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-032",
+    "title": "Plant Rooms and Restricted Technical Areas",
+    "category": "MAINTENANCE, PLANT AND ENGINEERING",
+    "applicability": ["Hotels", "Serviced apartments", "Specialist facilities — where present"],
+    "scope": "Authorised access to plant spaces; excludes unassessed confined-space entry",
+    "keywords": ["plant", "restricted", "confined", "spaces"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-032-H1",
+        "hazard": "Contact with hot or moving plant",
+        "harm": "Burns, entanglement or impact injury",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Restrict access and guard hazards; use task-specific isolation for work"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: contact with hot or moving plant.",
+          "Assign facilities manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Facilities Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-032-H2",
+        "hazard": "Unrecognised hazardous atmosphere or restricted space",
+        "harm": "Serious illness or fatality",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Do not enter suspected confined spaces without competent assessment and a separate safe system"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: unrecognised hazardous atmosphere or restricted space.",
+          "Assign facilities manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 5,
+            "residualLikelihood": 2,
+            "residualSeverity": 5
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 3,
+            "residualLikelihood": 1,
+            "residualSeverity": 3
+          }
+        },
+        "suggestedResponsibleRole": "Facilities Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-033",
+    "title": "Water Hygiene and Legionella Exposure",
+    "category": "MAINTENANCE, PLANT AND ENGINEERING",
+    "applicability": ["Hotels", "Serviced apartments", "Specialist facilities — where present"],
+    "scope": "Management of water-system exposure under a competent control scheme",
+    "keywords": ["legionella", "water", "aerosols"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-033-H1",
+        "hazard": "Inhalation of contaminated water aerosols",
+        "harm": "Serious respiratory illness",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Use a competent system assessment and written control scheme with assigned responsibilities"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: inhalation of contaminated water aerosols.",
+          "Assign water safety responsible person oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 5,
+            "residualLikelihood": 2,
+            "residualSeverity": 5
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 3,
+            "residualLikelihood": 1,
+            "residualSeverity": 3
+          }
+        },
+        "suggestedResponsibleRole": "Water Safety Responsible Person",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-033-H2",
+        "hazard": "Failure to act on monitoring deviations",
+        "harm": "Continued exposure to uncontrolled systems",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Record checks, escalate deviations and restrict affected use until made safe"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: failure to act on monitoring deviations.",
+          "Assign water safety responsible person oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Water Safety Responsible Person",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-034",
+    "title": "Hot Water and Scalding",
+    "category": "MAINTENANCE, PLANT AND ENGINEERING",
+    "applicability": ["Hotels", "Serviced apartments"],
+    "scope": "Hot outlets, bathing facilities and maintenance activities",
+    "keywords": ["scald", "hot", "water", "outlets"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-034-H1",
+        "hazard": "Excessive outlet temperatures",
+        "harm": "Scalds, especially to vulnerable users",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Assess outlets and user vulnerability; maintain suitable temperature controls"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: excessive outlet temperatures.",
+          "Assign facilities manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Facilities Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-034-H2",
+        "hazard": "Bypassed or defective protective devices",
+        "harm": "Uncontrolled hot-water exposure",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Take affected outlets out of use and arrange competent repair and verification"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: bypassed or defective protective devices.",
+          "Assign facilities manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Facilities Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-035",
+    "title": "HVAC and Air Conditioning Maintenance",
+    "category": "MAINTENANCE, PLANT AND ENGINEERING",
+    "applicability": ["Hotels", "Serviced apartments", "Specialist facilities — where present"],
+    "scope": "Inspection and maintenance by competent personnel",
+    "keywords": ["HVAC", "refrigerant", "filters"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-035-H1",
+        "hazard": "Contact with moving or energised components",
+        "harm": "Cuts, entanglement or electric shock",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": ["Isolate equipment and verify safe access before maintenance"],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: contact with moving or energised components.",
+          "Assign facilities manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Facilities Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-035-H2",
+        "hazard": "Refrigerant release or contaminated components",
+        "harm": "Exposure, cold burns or respiratory harm",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Use competent specialists and equipment-specific controls; stop on suspected release"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: refrigerant release or contaminated components.",
+          "Assign facilities manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Facilities Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-036",
+    "title": "Roof Access and Edge Protection",
+    "category": "MAINTENANCE, PLANT AND ENGINEERING",
+    "applicability": ["Hotels", "Serviced apartments", "Specialist facilities — where present"],
+    "scope": "Authorised roof access and work near edges or fragile surfaces",
+    "keywords": ["roof", "edge", "fragile", "weather"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-036-H1",
+        "hazard": "Unprotected edge or opening",
+        "harm": "Fall causing fatal or serious injury",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Prevent access until suitable collective protection and a task-specific plan are in place"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: unprotected edge or opening.",
+          "Assign facilities manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 5,
+            "residualLikelihood": 2,
+            "residualSeverity": 5
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 3,
+            "residualLikelihood": 1,
+            "residualSeverity": 3
+          }
+        },
+        "suggestedResponsibleRole": "Facilities Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-036-H2",
+        "hazard": "Fragile roof surface or adverse weather",
+        "harm": "Fall through surface or loss of footing",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Identify fragile areas, restrict routes and stop work when conditions are unsafe"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: fragile roof surface or adverse weather.",
+          "Assign facilities manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Facilities Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-037",
+    "title": "Contractor and External Works",
+    "category": "MAINTENANCE, PLANT AND ENGINEERING",
+    "applicability": ["Hotels", "Serviced apartments"],
+    "scope": "Coordination of contractor tasks within an occupied property",
+    "keywords": ["contractor", "permit", "handback"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-037-H1",
+        "hazard": "Uncoordinated work affecting hotel operations",
+        "harm": "Injury to workers, guests or visitors",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Check competence and task controls, agree segregation and coordinate interfaces"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: uncoordinated work affecting hotel operations.",
+          "Assign facilities manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Facilities Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-037-H2",
+        "hazard": "Unsafe handback or unfinished work",
+        "harm": "Exposure to residual defects",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Inspect handback, record outstanding hazards and maintain restrictions until safe"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: unsafe handback or unfinished work.",
+          "Assign facilities manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Facilities Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-038",
+    "title": "Asbestos Disturbance During Maintenance",
+    "category": "MAINTENANCE, PLANT AND ENGINEERING",
+    "applicability": ["Hotels", "Serviced apartments", "Specialist facilities — where present"],
+    "scope": "Planning work that may disturb building materials",
+    "keywords": ["asbestos", "survey", "refurbishment"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-038-H1",
+        "hazard": "Disturbance of unidentified asbestos-containing material",
+        "harm": "Inhalation exposure and long-term disease",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Check reliable asbestos information before work; stop if information is insufficient"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: disturbance of unidentified asbestos-containing material.",
+          "Assign facilities manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 5,
+            "residualLikelihood": 2,
+            "residualSeverity": 5
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 3,
+            "residualLikelihood": 1,
+            "residualSeverity": 3
+          }
+        },
+        "suggestedResponsibleRole": "Facilities Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-038-H2",
+        "hazard": "Unexpected suspected material discovered",
+        "harm": "Further fibre release",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Stop work, prevent access and seek competent specialist advice; do not sample or clean it casually"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: unexpected suspected material discovered.",
+          "Assign facilities manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Facilities Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-039",
+    "title": "Reception and Front Desk Operations",
+    "category": "GUEST SERVICES AND PUBLIC AREAS",
+    "applicability": ["Hotels", "Serviced apartments"],
+    "scope": "Check-in, guest enquiries and desk activities",
+    "keywords": ["reception", "check-in", "guests"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-039-H1",
+        "hazard": "Crowding and interrupted work around the desk",
+        "harm": "Collision, trips or handling injury",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Keep the work area and access routes organised and manage queues"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: crowding and interrupted work around the desk.",
+          "Assign front office manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Front Office Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-039-H2",
+        "hazard": "Difficult guest interactions",
+        "harm": "Distress or assault",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Use escalation and safe-withdrawal arrangements; coordinate with the violence assessment"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: difficult guest interactions.",
+          "Assign front office manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Front Office Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-040",
+    "title": "Guest Luggage Handling and Storage",
+    "category": "GUEST SERVICES AND PUBLIC AREAS",
+    "applicability": ["Hotels", "Serviced apartments"],
+    "scope": "Receiving, moving and storing guest luggage",
+    "keywords": ["luggage", "porter", "storage"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-040-H1",
+        "hazard": "Heavy or unstable luggage",
+        "harm": "Strain or crush injury",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Assess items before moving and use suitable handling aids or assistance"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: heavy or unstable luggage.",
+          "Assign front office manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Front Office Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-040-H2",
+        "hazard": "Unsafe storage stacks or blocked routes",
+        "harm": "Falling items or obstructed escape",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Use designated storage, stable stacking and clear access routes"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: unsafe storage stacks or blocked routes.",
+          "Assign front office manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Front Office Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-041",
+    "title": "Public Areas, Corridors and Staircases",
+    "category": "GUEST SERVICES AND PUBLIC AREAS",
+    "applicability": ["Hotels", "Serviced apartments"],
+    "scope": "Guest and staff movement through shared routes",
+    "keywords": ["corridor", "stairs", "handrails"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-041-H1",
+        "hazard": "Damaged stairs, handrails or floor surfaces",
+        "harm": "Falls and impact injury",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": ["Inspect routes and restrict unsafe sections pending repair"],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: damaged stairs, handrails or floor surfaces.",
+          "Assign duty manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Duty Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-041-H2",
+        "hazard": "Obstructions or poor visibility",
+        "harm": "Trips, collisions or delayed escape",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Maintain lighting and keep circulation and escape routes clear"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: obstructions or poor visibility.",
+          "Assign duty manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Duty Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-042",
+    "title": "Guest Balconies, Windows and Fall Prevention",
+    "category": "GUEST SERVICES AND PUBLIC AREAS",
+    "applicability": ["Hotels", "Serviced apartments"],
+    "scope": "Management of accessible windows and balconies",
+    "keywords": ["balcony", "windows", "guarding"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-042-H1",
+        "hazard": "Defective guarding or window restrictions",
+        "harm": "Fall from height with fatal consequences",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Inspect protective features and remove affected rooms/areas from use when unsafe"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: defective guarding or window restrictions.",
+          "Assign facilities manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 5,
+            "residualLikelihood": 2,
+            "residualSeverity": 5
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 3,
+            "residualLikelihood": 1,
+            "residualSeverity": 3
+          }
+        },
+        "suggestedResponsibleRole": "Facilities Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-042-H2",
+        "hazard": "Climbable furniture near an edge",
+        "harm": "Falls involving children or other occupants",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Assess furniture placement and foreseeable use; maintain suitable protective arrangements"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: climbable furniture near an edge.",
+          "Assign facilities manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Facilities Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-043",
+    "title": "Guest Kitchenettes and Cooking Appliances",
+    "category": "GUEST SERVICES AND PUBLIC AREAS",
+    "applicability": ["Hotels", "Serviced apartments"],
+    "scope": "Guest use, cleaning and checks of cooking facilities",
+    "keywords": ["kitchenette", "hob", "appliances"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-043-H1",
+        "hazard": "Unattended cooking or combustible items near heat",
+        "harm": "Burns, smoke exposure or fire",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Provide clear equipment instructions and maintain safe layout and fire controls"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: unattended cooking or combustible items near heat.",
+          "Assign duty manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Duty Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-043-H2",
+        "hazard": "Damaged appliances or hot surfaces",
+        "harm": "Electric shock or burns",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Inspect and remove defective appliances from use; provide appropriate warnings"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: damaged appliances or hot surfaces.",
+          "Assign duty manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Duty Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-044",
+    "title": "Food Preparation, Pantry and Refreshments",
+    "category": "GUEST SERVICES AND PUBLIC AREAS",
+    "applicability": ["Hotels", "Serviced apartments"],
+    "scope": "Preparation and service within the property's food operation",
+    "keywords": ["pantry", "food", "drinks", "hygiene"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-044-H1",
+        "hazard": "Hot liquids, surfaces and sharp utensils",
+        "harm": "Burns, scalds or cuts",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Use suitable equipment, safe handling methods and task training"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: hot liquids, surfaces and sharp utensils.",
+          "Assign food service manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Food Service Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-044-H2",
+        "hazard": "Poor storage or preparation hygiene",
+        "harm": "Foodborne illness",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Apply the site's food-safety system, separation, hygiene and monitoring arrangements"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: poor storage or preparation hygiene.",
+          "Assign food service manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Food Service Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-045",
+    "title": "Food Allergens and Cross-Contamination",
+    "category": "GUEST SERVICES AND PUBLIC AREAS",
+    "applicability": ["Hotels", "Serviced apartments"],
+    "scope": "Ingredient information, preparation and service of food",
+    "keywords": ["allergens", "ingredients", "cross-contact"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-045-H1",
+        "hazard": "Incorrect or incomplete allergen information",
+        "harm": "Severe allergic reaction",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Keep reliable current ingredient information and communicate it through ordering and service"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: incorrect or incomplete allergen information.",
+          "Assign food service manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 5,
+            "residualLikelihood": 2,
+            "residualSeverity": 5
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 3,
+            "residualLikelihood": 1,
+            "residualSeverity": 3
+          }
+        },
+        "suggestedResponsibleRole": "Food Service Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-045-H2",
+        "hazard": "Allergen cross-contact during preparation",
+        "harm": "Allergic reaction",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Use controlled preparation, cleaning and utensils; do not make unsupported allergen-free claims"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: allergen cross-contact during preparation.",
+          "Assign food service manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Food Service Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-046",
+    "title": "Deliveries, Loading and Goods Movement",
+    "category": "GUEST SERVICES AND PUBLIC AREAS",
+    "applicability": ["Hotels", "Serviced apartments"],
+    "scope": "Receiving deliveries and moving supplies to storage",
+    "keywords": ["delivery", "loading", "goods"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-046-H1",
+        "hazard": "Vehicle and pedestrian conflict",
+        "harm": "Crush or collision injuries",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Agree delivery arrangements, separate pedestrians and control movement areas"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: vehicle and pedestrian conflict.",
+          "Assign duty manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Duty Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-046-H2",
+        "hazard": "Unstable loads during unloading",
+        "harm": "Strain or falling-load injury",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Check load condition and use suitable equipment and competent assistance"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: unstable loads during unloading.",
+          "Assign duty manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Duty Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-047",
+    "title": "Car Parks and Vehicle Movement",
+    "category": "SPECIALIST OPERATIONS AND EXTERNAL AREAS",
+    "applicability": ["Hotels", "Serviced apartments", "Specialist facilities — where present"],
+    "scope": "Vehicle circulation, parking and pedestrian access",
+    "keywords": ["parking", "reversing", "pedestrians"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-047-H1",
+        "hazard": "Reversing or turning vehicles near pedestrians",
+        "harm": "Serious collision injury",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Provide a clear traffic arrangement, visibility and pedestrian separation"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: reversing or turning vehicles near pedestrians.",
+          "Assign facilities manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 5,
+            "residualLikelihood": 2,
+            "residualSeverity": 5
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 3,
+            "residualLikelihood": 1,
+            "residualSeverity": 3
+          }
+        },
+        "suggestedResponsibleRole": "Facilities Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-047-H2",
+        "hazard": "Poorly lit or damaged walking surfaces",
+        "harm": "Trips or vehicle conflict",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": ["Inspect surfaces and lighting and restrict defective areas"],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: poorly lit or damaged walking surfaces.",
+          "Assign facilities manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Facilities Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-048",
+    "title": "Outdoor Areas, Ice, Snow and Adverse Weather",
+    "category": "SPECIALIST OPERATIONS AND EXTERNAL AREAS",
+    "applicability": ["Hotels", "Serviced apartments"],
+    "scope": "External routes and activities during changing weather",
+    "keywords": ["ice", "snow", "wind", "rain"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-048-H1",
+        "hazard": "Ice, snow or standing water",
+        "harm": "Slips, falls or loss of safe access",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Monitor conditions and treat, clear or close affected routes"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: ice, snow or standing water.",
+          "Assign duty manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Duty Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-048-H2",
+        "hazard": "Wind-damaged fixtures or loose outdoor items",
+        "harm": "Impact injury",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Secure loose items and restrict access where wind or damage makes use unsafe"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: wind-damaged fixtures or loose outdoor items.",
+          "Assign duty manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Duty Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-049",
+    "title": "Swimming Pool, Spa and Leisure Facilities",
+    "category": "SPECIALIST OPERATIONS AND EXTERNAL AREAS",
+    "applicability": ["Hotels", "Serviced apartments", "Specialist facilities — where present"],
+    "scope": "Operation of specialist leisure facilities under competent site-specific procedures",
+    "keywords": ["pool", "spa", "drowning", "water", "quality"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-049-H1",
+        "hazard": "Water-related distress or unsafe pool access",
+        "harm": "Drowning or serious injury",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Assess supervision and rescue arrangements and restrict use when essential controls are unavailable"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: water-related distress or unsafe pool access.",
+          "Assign leisure manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 5,
+            "residualLikelihood": 2,
+            "residualSeverity": 5
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 3,
+            "residualLikelihood": 1,
+            "residualSeverity": 3
+          }
+        },
+        "suggestedResponsibleRole": "Leisure Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-049-H2",
+        "hazard": "Failure of water-quality or chemical controls",
+        "harm": "Infection or chemical exposure",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Use competent monitoring, maintenance and dosing arrangements; close affected facilities on unsafe results"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: failure of water-quality or chemical controls.",
+          "Assign leisure manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "Leisure Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  },
+  {
+    "reference": "RA-050",
+    "title": "Communicable Diseases and Infection Control",
+    "category": "SPECIALIST OPERATIONS AND EXTERNAL AREAS",
+    "applicability": ["Hotels", "Serviced apartments"],
+    "scope": "Reducing spread through workplace contact and shared facilities",
+    "keywords": ["infection", "disease", "hygiene", "ventilation"],
+    "version": "1.0-draft",
+    "provenance": "Uvanoo master catalogue — topics approved in Master Controller Decision 15; guidance draft for competent review",
+    "contentStatus": "Draft guidance — not a completed assessment",
+    "adoptionStatus": "draft",
+    "hazards": [
+      {
+        "key": "RA-050-H1",
+        "hazard": "Uncontrolled spread through close contact",
+        "harm": "Illness among staff or guests",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Apply current public-health advice, hygiene and ventilation measures appropriate to the situation"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: uncontrolled spread through close contact.",
+          "Assign general manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "General Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      },
+      {
+        "key": "RA-050-H2",
+        "hazard": "Contaminated equipment or surfaces",
+        "harm": "Transfer of infection",
+        "personsExposed": ["Employees", "Contractors", "Guests", "Visitors"],
+        "existingControlsToVerify": [
+          "Use assessed cleaning procedures and safe handling of contaminated materials"
+        ],
+        "furtherControls": [
+          "Confirm and document the property-specific arrangements for: contaminated equipment or surfaces.",
+          "Assign general manager oversight, record gaps and verify completion before relying on this control."
+        ],
+        "scoringExamples": {
+          "5x5": {
+            "initialLikelihood": 3,
+            "initialSeverity": 3,
+            "residualLikelihood": 2,
+            "residualSeverity": 3
+          },
+          "3x3": {
+            "initialLikelihood": 2,
+            "initialSeverity": 2,
+            "residualLikelihood": 1,
+            "residualSeverity": 2
+          }
+        },
+        "suggestedResponsibleRole": "General Manager",
+        "responsiblePerson": null,
+        "targetDate": null,
+        "actionStatus": "Not assigned"
+      }
+    ],
+    "review": {
+      "suggestedIntervalMonths": 12,
+      "triggers": [
+        "Incident or near miss",
+        "Material change in activity, people or premises",
+        "Control failure or new information"
+      ],
+      "assessor": null,
+      "approver": null,
+      "approvalDate": null
+    },
+    "scoringNote": "Illustrative scores only. The property assessor must select the methodology and confirm every factor and control. Residual examples assume listed controls are verified; further actions are not presumed complete."
+  }
+]

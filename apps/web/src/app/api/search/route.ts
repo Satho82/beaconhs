@@ -9,14 +9,12 @@
 
 import { NextResponse } from 'next/server'
 import { and, count, desc, eq, gte, ilike, isNull, or, sql, type SQL } from 'drizzle-orm'
-import { htmlToSnippet } from '@beaconhs/forms-core'
 import { primaryPersonTitleName } from '@beaconhs/db'
 import {
   correctiveActions,
   documentCategories,
   documents,
   equipmentItems,
-  hazidAssessments,
   incidents,
   people,
 } from '@beaconhs/db/schema'
@@ -36,8 +34,7 @@ export type SearchResultItem = {
 }
 
 export type SearchGroup = {
-  type:
-    'incidents' | 'corrective_actions' | 'people' | 'equipment' | 'documents' | 'hazid_assessments'
+  type: 'incidents' | 'corrective_actions' | 'people' | 'equipment' | 'documents'
   total: number
   items: SearchResultItem[]
 }
@@ -79,7 +76,7 @@ export async function GET(req: Request): Promise<NextResponse> {
   const data = await ctx.db(async (tx) => {
     // Per-user record visibility, mirroring each module's list page: read.all →
     // everything, read.site → the caller's sites, else → only their own records.
-    const [incidentVis, caVis, equipmentVis, hazidVis] = await Promise.all([
+    const [incidentVis, caVis, equipmentVis] = await Promise.all([
       moduleScopeWhere(ctx, tx, {
         prefix: 'incidents',
         ownerCols: [incidents.reportedByTenantUserId],
@@ -94,11 +91,6 @@ export async function GET(req: Request): Promise<NextResponse> {
         prefix: 'equipment',
         siteCol: equipmentItems.currentSiteOrgUnitId,
         personCol: equipmentItems.currentHolderPersonId,
-      }),
-      moduleScopeWhere(ctx, tx, {
-        prefix: 'hazid',
-        ownerCols: [hazidAssessments.reportedByTenantUserId],
-        siteCol: hazidAssessments.siteOrgUnitId,
       }),
     ])
     // Documents has a flat read permission instead of tiers — the /documents
@@ -119,8 +111,6 @@ export async function GET(req: Request): Promise<NextResponse> {
       equipmentTotal,
       documentRows,
       documentTotal,
-      hazidRows,
-      hazidTotal,
     ] = await Promise.all([
       // ---- incidents (reference / title / description, last 1 year) ------
       (() => {
@@ -309,35 +299,6 @@ export async function GET(req: Request): Promise<NextResponse> {
           .from(documents)
           .where(and(...where))
       })(),
-
-      // ---- hazid_assessments (reference) -------------------------------
-      (() => {
-        const where: SQL<unknown>[] = [isNull(hazidAssessments.deletedAt)]
-        if (hazidVis) where.push(hazidVis)
-        const match = ilike(hazidAssessments.reference, term)
-        if (match) where.push(match)
-        return tx
-          .select({
-            id: hazidAssessments.id,
-            reference: hazidAssessments.reference,
-            occurredAt: hazidAssessments.occurredAt,
-            jobScope: hazidAssessments.jobScope,
-          })
-          .from(hazidAssessments)
-          .where(and(...where))
-          .orderBy(desc(hazidAssessments.occurredAt))
-          .limit(PER_GROUP_LIMIT)
-      })(),
-      (() => {
-        const where: SQL<unknown>[] = [isNull(hazidAssessments.deletedAt)]
-        if (hazidVis) where.push(hazidVis)
-        const match = ilike(hazidAssessments.reference, term)
-        if (match) where.push(match)
-        return tx
-          .select({ c: count() })
-          .from(hazidAssessments)
-          .where(and(...where))
-      })(),
     ])
 
     return {
@@ -351,8 +312,6 @@ export async function GET(req: Request): Promise<NextResponse> {
       equipmentTotal: Number(equipmentTotal[0]?.c ?? 0),
       documentRows,
       documentTotal: Number(documentTotal[0]?.c ?? 0),
-      hazidRows,
-      hazidTotal: Number(hazidTotal[0]?.c ?? 0),
     }
   })
 
@@ -422,20 +381,6 @@ export async function GET(req: Request): Promise<NextResponse> {
           can(ctx, 'documents.manage') || ctx.isSuperAdmin
             ? `/documents/${r.id}`
             : `/documents/${r.id}/read`,
-      })),
-    })
-  }
-  if (data.hazidTotal > 0) {
-    groups.push({
-      type: 'hazid_assessments',
-      total: data.hazidTotal,
-      items: data.hazidRows.map((r) => ({
-        id: r.id,
-        label: r.reference,
-        sublabel:
-          htmlToSnippet(r.jobScope, 100) ||
-          (r.occurredAt ? formatDate(new Date(r.occurredAt), ctx.timezone, ctx.locale) : undefined),
-        href: `/hazard-assessments/${r.id}`,
       })),
     })
   }

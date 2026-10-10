@@ -6,13 +6,16 @@ import {
   riskAssessments,
   riskHazards,
   riskTemplates,
+  type RiskMatrixSnapshot,
   tenantUsers,
   type AdoptedRiskTemplateSnapshot,
   type RiskTemplateHazard,
 } from '@beaconhs/db/schema'
-import { riskScore, type Database } from '@beaconhs/db'
-import { assertCan, type RequestContext } from '@beaconhs/tenant'
+import { riskCatalogueMetadata, riskScore, type Database } from '@beaconhs/db'
+import { assertCan, can, assignedPropertyIds, type RequestContext } from '@beaconhs/tenant'
+import { validateRiskMatrixSnapshot, writeRiskRevision } from './risk-revisions'
 import { recordAuditInTransaction } from '@/lib/audit'
+import { planRiskHazardEdit } from './risk-hazard-edit'
 import {
   assertCanAccessProperty,
   hospitalityPropertyWhere,
@@ -25,6 +28,7 @@ export type RiskLibraryFilter = {
 }
 
 export type RiskHazardInput = {
+  id?: string
   hazardDescription: string
   harmDescription: string
   peopleAtRisk: string[]
@@ -48,6 +52,7 @@ export type AdoptRiskAssessmentInput = {
 }
 
 export type UpdateRiskAssessmentInput = {
+  expectedRevision: number
   title: string
   areaLocation?: string | null
   activityEquipment?: string | null
@@ -92,6 +97,7 @@ export function buildRiskTemplateSnapshot(
 ): AdoptedRiskTemplateSnapshot {
   return structuredClone({
     templateId: template.id,
+    templateFamilyId: template.templateFamilyId,
     version: template.version,
     title: template.title,
     category: template.category,
@@ -172,6 +178,13 @@ export async function listRiskTemplates(ctx: RequestContext, filter: RiskLibrary
       .where(
         and(
           isNull(riskTemplates.deletedAt),
+          !can(ctx, 'hospitality.manage') || assignedPropertyIds(ctx) !== null
+            ? eq(riskTemplates.state, 'active')
+            : undefined,
+          or(
+            and(eq(riskTemplates.scope, 'platform'), isNull(riskTemplates.tenantId)),
+            and(eq(riskTemplates.scope, 'tenant'), eq(riskTemplates.tenantId, ctx.tenantId)),
+          ),
           filter.category ? eq(riskTemplates.category, filter.category) : undefined,
           filter.state ? eq(riskTemplates.state, filter.state) : undefined,
           search
@@ -195,7 +208,10 @@ export async function getRiskTemplate(ctx: RequestContext, templateId: string) {
       .where(and(eq(riskTemplates.id, templateId), isNull(riskTemplates.deletedAt)))
       .limit(1),
   )
-  return template ?? null
+  return template?.state === 'draft' &&
+    (!can(ctx, 'hospitality.manage') || assignedPropertyIds(ctx) !== null)
+    ? null
+    : (template ?? null)
 }
 
 export async function adoptRiskAssessment(ctx: RequestContext, input: AdoptRiskAssessmentInput) {
@@ -218,19 +234,28 @@ export async function adoptRiskAssessment(ctx: RequestContext, input: AdoptRiskA
       .limit(1)
     if (!property) throw new Error('Property does not exist in this tenant')
 
-    const [template] = await tx
+    const templateIdentity = and(
+      eq(riskTemplates.id, input.templateId),
+      eq(riskTemplates.state, 'active'),
+      isNull(riskTemplates.deletedAt),
+    )
+    // Tenant templates are tenant-owned and can be locked under their UPDATE
+    // policy. Platform templates are deliberately read-only under RLS, so a
+    // locking clause would apply that UPDATE policy and hide the platform row.
+    let [template] = await tx
       .select()
       .from(riskTemplates)
-      .where(
-        and(
-          eq(riskTemplates.id, input.templateId),
-          eq(riskTemplates.state, 'active'),
-          isNull(riskTemplates.deletedAt),
-          or(isNull(riskTemplates.tenantId), eq(riskTemplates.tenantId, ctx.tenantId)),
-        ),
-      )
+      .where(and(templateIdentity, eq(riskTemplates.tenantId, ctx.tenantId)))
       .limit(1)
       .for('share')
+    if (!template) {
+      const [platformTemplate] = await tx
+        .select()
+        .from(riskTemplates)
+        .where(and(templateIdentity, isNull(riskTemplates.tenantId)))
+        .limit(1)
+      template = platformTemplate
+    }
     if (!template) throw new Error('Risk template is not available to this tenant')
 
     await assertTenantUsers(tx, ctx.tenantId, [
@@ -250,6 +275,8 @@ export async function adoptRiskAssessment(ctx: RequestContext, input: AdoptRiskA
         templateId: template.id,
         adoptedTemplateVersion: template.version,
         adoptedTemplateSnapshot: snapshot,
+        assessmentCategory: template.category,
+        matrixSnapshot: validateRiskMatrixSnapshot(template.matrixSnapshot),
         reference,
         title: requiredText(input.title ?? template.title, 'Assessment title', 300),
         areaLocation: optionalText(input.areaLocation ?? template.areaGuidance, 1_000),
@@ -271,12 +298,13 @@ export async function adoptRiskAssessment(ctx: RequestContext, input: AdoptRiskA
       templateHazardsToInput(snapshot.hazards),
     )
     const createdHazards = await tx.insert(riskHazards).values(hazards).returning()
+    await writeRiskRevision(tx, ctx, assessment, 'adopted')
 
     await recordAuditInTransaction(tx, ctx, {
       entityType: 'risk_assessment',
       entityId: assessment.id,
       action: 'create',
-      summary: `Adopted ${template.title} v${template.version} as ${reference}`,
+      summary: `Adopted ${template.title} v${riskCatalogueMetadata(template)?.version ?? template.version} as ${reference}`,
       after: {
         propertyId: property.id,
         templateId: template.id,
@@ -310,6 +338,45 @@ export async function updateRiskAssessment(
       .for('update')
     if (!current) throw new Error('Risk assessment not found')
     assertCanAccessProperty(ctx, current.propertyId)
+    if (current.contentRevision !== input.expectedRevision)
+      throw new Error('This assessment has changed. Reload before saving.')
+    if (current.status === 'retired') throw new Error('Re-adopt this assessment before editing')
+    const matrix = validateRiskMatrixSnapshot(current.matrixSnapshot)
+    for (const hazard of input.hazards) {
+      if (
+        [
+          hazard.initialLikelihood,
+          hazard.initialSeverity,
+          hazard.residualLikelihood,
+          hazard.residualSeverity,
+        ].some((value) => !Number.isInteger(value) || value < 1 || value > matrix.size)
+      )
+        throw new Error('Hazard ratings must fit the assessment matrix')
+    }
+
+    const previousHazards = await tx
+      .select()
+      .from(riskHazards)
+      .where(
+        and(eq(riskHazards.tenantId, ctx.tenantId), eq(riskHazards.assessmentId, assessmentId)),
+      )
+      .orderBy(asc(riskHazards.sortOrder))
+      .for('update')
+    const activeHazards = previousHazards.filter((hazard) => !hazard.archivedAt)
+    const parkedHazards = planRiskHazardEdit(activeHazards, input.hazards)
+    const archivedEnd = Math.max(
+      -1,
+      ...previousHazards.filter((hazard) => hazard.archivedAt).map((hazard) => hazard.sortOrder),
+    )
+    const values = hazardValues(ctx.tenantId, assessmentId, input.hazards).map((value, index) => ({
+      ...value,
+      sortOrder: archivedEnd + 1 + index,
+    }))
+    const parkingStart =
+      Math.max(
+        archivedEnd + values.length + 1,
+        ...previousHazards.map((hazard) => hazard.sortOrder),
+      ) + 1
 
     await assertTenantUsers(tx, ctx.tenantId, [
       input.assessorTenantUserId,
@@ -325,22 +392,41 @@ export async function updateRiskAssessment(
         responsibleTenantUserId: input.responsibleTenantUserId ?? null,
         assessmentDate: input.assessmentDate,
         comments: optionalText(input.comments, 5_000),
+        contentRevision: current.contentRevision + 1,
+        status: 'draft',
         updatedAt: new Date(),
       })
       .where(and(eq(riskAssessments.tenantId, ctx.tenantId), eq(riskAssessments.id, assessmentId)))
       .returning()
     if (!updated) throw new Error('Risk assessment update failed')
 
-    await tx
-      .delete(riskHazards)
-      .where(
-        and(eq(riskHazards.tenantId, ctx.tenantId), eq(riskHazards.assessmentId, assessmentId)),
+    const hazardWhere = (id: string) =>
+      and(
+        eq(riskHazards.tenantId, ctx.tenantId),
+        eq(riskHazards.assessmentId, assessmentId),
+        eq(riskHazards.id, id),
       )
-    const hazards = await tx
-      .insert(riskHazards)
-      .values(hazardValues(ctx.tenantId, assessmentId, input.hazards))
-      .returning()
+    for (const [index, parked] of parkedHazards.entries()) {
+      await tx
+        .update(riskHazards)
+        .set({ sortOrder: parkingStart + index })
+        .where(hazardWhere(parked.id))
+    }
+    const hazards: (typeof riskHazards.$inferSelect)[] = []
+    for (const [index, value] of values.entries()) {
+      const id = input.hazards[index]!.id
+      const [hazard] = id
+        ? await tx
+            .update(riskHazards)
+            .set({ ...value, updatedAt: new Date() })
+            .where(hazardWhere(id))
+            .returning()
+        : await tx.insert(riskHazards).values(value).returning()
+      if (!hazard) throw new Error('Risk hazard update failed')
+      hazards.push(hazard)
+    }
 
+    await writeRiskRevision(tx, ctx, updated, 'edited')
     await recordAuditInTransaction(tx, ctx, {
       entityType: 'risk_assessment',
       entityId: assessmentId,
@@ -354,6 +440,7 @@ export async function updateRiskAssessment(
         responsibleTenantUserId: current.responsibleTenantUserId,
         assessmentDate: current.assessmentDate,
         comments: current.comments,
+        hazards: previousHazards,
       },
       after: {
         title: updated.title,
@@ -364,6 +451,7 @@ export async function updateRiskAssessment(
         assessmentDate: updated.assessmentDate,
         comments: updated.comments,
         hazardCount: hazards.length,
+        hazards,
       },
     })
     return { assessment: updated, hazards }
@@ -430,6 +518,201 @@ export async function listRiskAssessments(ctx: RequestContext, propertyId?: stri
   )
 }
 
+export type ManualRiskAssessmentInput = {
+  propertyId: string
+  title: string
+  category: typeof riskTemplates.$inferSelect.category
+  matrix: RiskMatrixSnapshot
+}
+
+export async function createManualRiskAssessment(
+  ctx: RequestContext,
+  input: ManualRiskAssessmentInput,
+) {
+  assertCan(ctx, 'hospitality.manage')
+  assertCanAccessProperty(ctx, input.propertyId)
+  const actor = requireMembership(ctx)
+  const title = requiredText(input.title, 'Assessment title', 300)
+  if (!riskTemplates.category.enumValues.includes(input.category))
+    throw new Error('Select a category')
+  const matrixSnapshot = validateRiskMatrixSnapshot(input.matrix)
+  return ctx.db(async (tx) => {
+    const [property] = await tx
+      .select({ id: hospitalityProperties.id })
+      .from(hospitalityProperties)
+      .where(
+        and(
+          eq(hospitalityProperties.tenantId, ctx.tenantId),
+          eq(hospitalityProperties.id, input.propertyId),
+          isNull(hospitalityProperties.deletedAt),
+        ),
+      )
+      .limit(1)
+    if (!property) throw new Error('Property not found')
+    await assertTenantUsers(tx, ctx.tenantId, [actor])
+    const [assessment] = await tx
+      .insert(riskAssessments)
+      .values({
+        tenantId: ctx.tenantId,
+        propertyId: property.id,
+        sourceKind: 'manual',
+        assessmentCategory: input.category,
+        matrixSnapshot,
+        title,
+        reference: `RA-${new Date().getUTCFullYear()}-${randomBytes(4).toString('hex').toUpperCase()}`,
+        creatorTenantUserId: actor,
+        assessorTenantUserId: actor,
+        assessmentDate: new Date().toISOString().slice(0, 10),
+      })
+      .returning()
+    if (!assessment) throw new Error('Assessment creation failed')
+    await writeRiskRevision(tx, ctx, assessment, 'adopted')
+    await recordAuditInTransaction(tx, ctx, {
+      entityType: 'risk_assessment',
+      entityId: assessment.id,
+      action: 'create',
+      summary: `Created manual risk assessment ${assessment.reference}`,
+      metadata: { event: 'manual_assessment_created', propertyId: property.id },
+    })
+    return assessment
+  })
+}
+
+export async function setRiskHazardArchived(
+  ctx: RequestContext,
+  assessmentId: string,
+  hazardId: string,
+  input: { archived: boolean; reason: string; expectedRevision: number },
+) {
+  assertCan(ctx, 'hospitality.manage')
+  const actor = requireMembership(ctx)
+  const reason = requiredText(input.reason, 'Reason', 2000)
+  if (typeof input.archived !== 'boolean') throw new Error('Archive state must be a boolean')
+  return ctx.db(async (tx) => {
+    const [assessment] = await tx
+      .select()
+      .from(riskAssessments)
+      .where(
+        and(
+          eq(riskAssessments.tenantId, ctx.tenantId),
+          eq(riskAssessments.id, assessmentId),
+          isNull(riskAssessments.deletedAt),
+        ),
+      )
+      .for('update')
+    if (!assessment) throw new Error('Assessment not found')
+    assertCanAccessProperty(ctx, assessment.propertyId)
+    if (assessment.contentRevision !== input.expectedRevision)
+      throw new Error('Assessment changed. Reload before continuing.')
+    if (assessment.status === 'retired') throw new Error('Re-adopt this assessment before editing')
+    validateRiskMatrixSnapshot(assessment.matrixSnapshot)
+    const [hazard] = await tx
+      .select()
+      .from(riskHazards)
+      .where(
+        and(
+          eq(riskHazards.tenantId, ctx.tenantId),
+          eq(riskHazards.assessmentId, assessmentId),
+          eq(riskHazards.id, hazardId),
+        ),
+      )
+      .for('update')
+    if (!hazard || Boolean(hazard.archivedAt) === input.archived)
+      throw new Error('Hazard state has changed')
+    await tx
+      .update(riskHazards)
+      .set({
+        archivedAt: input.archived ? new Date() : null,
+        archivedByTenantUserId: input.archived ? actor : null,
+        archiveReason: input.archived ? reason : null,
+        updatedAt: new Date(),
+      })
+      .where(eq(riskHazards.id, hazard.id))
+    const [updated] = await tx
+      .update(riskAssessments)
+      .set({
+        contentRevision: assessment.contentRevision + 1,
+        status: 'draft',
+        updatedAt: new Date(),
+      })
+      .where(eq(riskAssessments.id, assessmentId))
+      .returning()
+    if (!updated) throw new Error('Assessment update failed')
+    const event = input.archived ? 'hazard_archived' : 'hazard_restored'
+    await writeRiskRevision(tx, ctx, updated, event, reason)
+    await recordAuditInTransaction(tx, ctx, {
+      entityType: 'risk_assessment',
+      entityId: assessmentId,
+      action: 'update',
+      summary: `${input.archived ? 'Archived' : 'Restored'} hazard in ${assessment.reference}`,
+      metadata: { event, hazardId, reason, contentRevision: updated.contentRevision },
+    })
+    return updated
+  })
+}
+
+export async function selectRiskAssessmentMatrix(
+  ctx: RequestContext,
+  assessmentId: string,
+  input: { matrix: RiskMatrixSnapshot; reason: string; expectedRevision: number },
+) {
+  assertCan(ctx, 'hospitality.manage')
+  const matrixSnapshot = validateRiskMatrixSnapshot(input.matrix)
+  const reason = requiredText(input.reason, 'Reason', 2000)
+  return ctx.db(async (tx) => {
+    const [current] = await tx
+      .select()
+      .from(riskAssessments)
+      .where(
+        and(
+          eq(riskAssessments.tenantId, ctx.tenantId),
+          eq(riskAssessments.id, assessmentId),
+          isNull(riskAssessments.deletedAt),
+        ),
+      )
+      .for('update')
+    if (!current) throw new Error('Assessment not found')
+    assertCanAccessProperty(ctx, current.propertyId)
+    if (current.contentRevision !== input.expectedRevision || current.status === 'retired')
+      throw new Error('Reload the assessment before changing the matrix')
+    const hazards = await tx
+      .select()
+      .from(riskHazards)
+      .where(
+        and(eq(riskHazards.tenantId, ctx.tenantId), eq(riskHazards.assessmentId, assessmentId)),
+      )
+      .for('update')
+    if (
+      hazards.some((h) =>
+        [h.initialLikelihood, h.initialSeverity, h.residualLikelihood, h.residualSeverity].some(
+          (v) => v > matrixSnapshot.size,
+        ),
+      )
+    )
+      throw new Error('Existing hazard ratings exceed the selected matrix')
+    const [updated] = await tx
+      .update(riskAssessments)
+      .set({
+        matrixSnapshot,
+        contentRevision: current.contentRevision + 1,
+        status: 'draft',
+        updatedAt: new Date(),
+      })
+      .where(eq(riskAssessments.id, assessmentId))
+      .returning()
+    if (!updated) throw new Error('Assessment update failed')
+    await writeRiskRevision(tx, ctx, updated, 'matrix_changed', reason)
+    await recordAuditInTransaction(tx, ctx, {
+      entityType: 'risk_assessment',
+      entityId: assessmentId,
+      action: 'update',
+      summary: `Selected matrix for ${current.reference}`,
+      metadata: { event: 'matrix_changed', reason, contentRevision: updated.contentRevision },
+    })
+    return updated
+  })
+}
+
 export async function createRiskCorrectiveAction(
   ctx: RequestContext,
   assessmentId: string,
@@ -438,6 +721,22 @@ export async function createRiskCorrectiveAction(
   assertCan(ctx, 'hospitality.manage')
   assertCan(ctx, 'ca.create')
   return ctx.db(async (tx) => {
+    const [current] = await tx
+      .select()
+      .from(riskAssessments)
+      .where(
+        and(
+          eq(riskAssessments.tenantId, ctx.tenantId),
+          eq(riskAssessments.id, assessmentId),
+          isNull(riskAssessments.deletedAt),
+        ),
+      )
+      .for('update')
+    if (!current) throw new Error('Assessment not found')
+    assertCanAccessProperty(ctx, current.propertyId)
+    validateRiskMatrixSnapshot(current.matrixSnapshot)
+    if (current.status === 'retired')
+      throw new Error('Re-adopt this assessment before adding actions')
     const [source] = await tx
       .select({
         propertyId: riskAssessments.propertyId,
@@ -451,6 +750,7 @@ export async function createRiskCorrectiveAction(
           eq(riskHazards.tenantId, riskAssessments.tenantId),
           eq(riskHazards.assessmentId, riskAssessments.id),
           eq(riskHazards.id, input.hazardId),
+          isNull(riskHazards.archivedAt),
         ),
       )
       .where(
@@ -489,6 +789,13 @@ export async function createRiskCorrectiveAction(
       })
       .returning()
     if (!action) throw new Error('Corrective action creation failed')
+    const [revised] = await tx
+      .update(riskAssessments)
+      .set({ contentRevision: current.contentRevision + 1, updatedAt: new Date() })
+      .where(and(eq(riskAssessments.tenantId, ctx.tenantId), eq(riskAssessments.id, assessmentId)))
+      .returning()
+    if (!revised) throw new Error('Assessment revision failed')
+    await writeRiskRevision(tx, ctx, revised, 'edited')
 
     await recordAuditInTransaction(tx, ctx, {
       entityType: 'corrective_action',

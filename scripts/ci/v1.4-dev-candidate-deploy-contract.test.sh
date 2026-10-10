@@ -96,8 +96,9 @@ require 'git merge-base --is-ancestor' "$candidate"
 # must have passed, and the tag must be bound to the requested source by OCI
 # labels before the digest may enter the reusable deployment workflow.
 require 'uvanoo-v1.4-cloud-build\.yml/runs\?head_sha=' "$candidate"
-require 'mapfile -t run_ids < "\$run_ids_file"' "$candidate"
-require '"\$\{#run_ids\[@\]\}" -ne 1' "$candidate"
+require 'run_id="\$\(< "\$run_ids_file"\)"' "$candidate"
+require '\| sort \| \.\[0\] // empty' "$candidate"
+require 'successful authoritative feature/uvanoo-v1.4 validation run' "$candidate"
 require 'per_page=100' "$candidate"
 forbid 'gh api --paginate' "$candidate"
 require 'redact_gh_stderr' "$candidate"
@@ -569,7 +570,8 @@ Dir.mktmpdir('candidate-verifier-contract-') do |dir|
   SH
   # Feed realistic API responses through the workflow's actual jq expression.
   # Deliberately return unrelated/mismatched rows too: verify response identity
-  # independently of the server-side query, and never choose the newest run.
+  # independently of the server-side query. A retry must choose the oldest
+  # matching run deterministically rather than weakening provenance checks.
   File.write("#{dir}/gh", <<~'RUBY_FIXTURE')
     #!/usr/bin/env ruby
     require 'json'
@@ -661,7 +663,7 @@ Dir.mktmpdir('candidate-verifier-contract-') do |dir|
     overrides['CALLER_SHA'] = 'c' * 40 if scenario == 'old-caller'
     stdout, stderr, status = Open3.capture3(env.merge(overrides), 'bash', '-c', verify.fetch('run'))
     outputs = File.exist?(env['GITHUB_OUTPUT']) ? File.read(env['GITHUB_OUTPUT']) : ''
-    if %w[success feature-plus-visual].include?(scenario)
+    if %w[success feature-plus-visual ambiguous-feature].include?(scenario)
       abort "Verifier rejected valid authoritative run in #{scenario}: #{stdout}#{stderr}" unless status.success? &&
         outputs == "source_sha=#{sha}\nimage_digest=#{digest}\n" &&
         File.read(env['PULL_MARKER']) == "ghcr.io/example/candidate@#{digest}"

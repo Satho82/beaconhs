@@ -88,7 +88,9 @@ jobs:
           }
 
           # Only the exact feature branch can authorize this candidate. Check
-          # response identity too; reject ambiguity or a truncated result set.
+          # response identity too. Retries can leave more than one successful
+          # run for the same immutable SHA, so select the oldest matching run
+          # deterministically rather than treating a safe retry as ambiguity.
           run_ids_file="$(mktemp)"
           required_jobs_file="$(mktemp)"
           gh_stderr_file="$(mktemp)"
@@ -96,19 +98,18 @@ jobs:
           if gh api \
             "repos/${GITHUB_REPOSITORY}/actions/workflows/uvanoo-v1.4-cloud-build.yml/runs?head_sha=${CANDIDATE_SHA}&branch=feature%2Fuvanoo-v1.4&status=completed&per_page=100" \
             --jq "if .total_count > 100 then error(\"Authoritative run lookup exceeds one page\") else
-              .workflow_runs[] | select(.head_sha == \"${CANDIDATE_SHA}\" and
+              [.workflow_runs[] | select(.head_sha == \"${CANDIDATE_SHA}\" and
                 .head_branch == \"feature/uvanoo-v1.4\" and .status == \"completed\" and
-                .conclusion == \"success\") | .id end" > "$run_ids_file" 2> "$gh_stderr_file"; then
+                .conclusion == \"success\") | .id] | sort | .[0] // empty end" > "$run_ids_file" 2> "$gh_stderr_file"; then
             :
           else
             api_failure "authoritative-run lookup" "$?" "$gh_stderr_file"
           fi
-          mapfile -t run_ids < "$run_ids_file"
-          if [ "${#run_ids[@]}" -ne 1 ] || ! [[ "${run_ids[0]}" =~ ^[0-9]+$ ]]; then
-            echo "::error::Expected exactly one successful authoritative feature/uvanoo-v1.4 validation run for source_sha"
+          run_id="$(< "$run_ids_file")"
+          if ! [[ "$run_id" =~ ^[0-9]+$ ]]; then
+            echo "::error::Expected a successful authoritative feature/uvanoo-v1.4 validation run for source_sha"
             exit 1
           fi
-          run_id="${run_ids[0]}"
           if gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}/jobs?per_page=100" \
             --jq '.jobs[] | select(.name == "Validate frozen V1.4 source" or .name == "Publish immutable V1.4 DEV candidate") | [.name, .conclusion] | @tsv' \
             > "$required_jobs_file" 2> "$gh_stderr_file"; then

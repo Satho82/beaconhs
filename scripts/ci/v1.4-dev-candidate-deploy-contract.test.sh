@@ -310,6 +310,13 @@ unless bundle_step.dig('env', 'FEATURE_CANDIDATE_VERIFIED') == '${{ inputs.featu
   abort 'Reusable deployment must fail before URL use when the selected three-role bundle is incomplete'
 end
 migration_step = core_deploy.fetch('steps').find { |step| step['name'] == 'Run database migrations' }
+selection = migration_step['run'][/migration_entrypoint=src\/migrate\.ts\n.*?\nfi/m]
+abort 'Missing explicit prepared Risk / ordinary migration routing' unless selection
+{'true' => 'src/verify-prepared-risk.ts', 'false' => 'src/migrate.ts'}.each do |flag, expected|
+  result, status = Open3.capture2({'FEATURE_CANDIDATE_VERIFIED' => flag}, 'bash', '-eu', '-c', selection + '\nprintf "%s" "$migration_entrypoint"'.gsub('\\n', "\n"))
+  abort 'Unsafe migration entrypoint selection' unless status.success? && result == expected
+end
+abort 'Selected entrypoint must reach the pinned container' unless migration_step['run'].include?('exec tsx "$migration_entrypoint"') && migration_step['run'].include?('-e FEATURE_CANDIDATE_VERIFIED="$FEATURE_CANDIDATE_VERIFIED"')
 abort 'Canonical migrations must use the selected migration Docker network' unless migration_step['run'].include?('--network "$MIGRATION_DOCKER_NETWORK"')
 abort 'Canonical migrations must use the pinned migration runtime without pulling' unless migration_step['run'].include?('--pull=never') && migration_step['run'].include?('"$MIGRATION_NODE_IMAGE"')
 abort 'Canonical migrations must mount the preflighted pnpm toolchain read-only' unless migration_step['run'].include?('"$MIGRATION_PNPM_TOOLCHAIN_ROOT:/pnpm-toolchain:ro"')

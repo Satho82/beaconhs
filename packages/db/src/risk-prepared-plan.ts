@@ -7,7 +7,7 @@ import { isolated0059Statement } from './risk-0059-runner'
 import { RLS_POLICY_SQL } from './rls'
 
 const folder = fileURLToPath(new URL('../drizzle', import.meta.url))
-const proposals = [
+export const preparedRiskProposals = [
   [
     '0059_risk_template_draft_state',
     1791542400002,
@@ -33,7 +33,7 @@ export function preparedRiskPlan(database: string): string {
     throw new Error('Expected unchanged 0058 ordinary journal')
   }
   isolated0059Statement()
-  const stages = proposals.map(([tag, createdAt, hash]) => {
+  const stages = preparedRiskProposals.map(([tag, createdAt, hash]) => {
     const body = readFileSync(`${folder}/prepared/${tag}.sql`, 'utf8')
     if (createHash('sha256').update(body).digest('hex') !== hash)
       throw new Error('Prepared source hash mismatch')

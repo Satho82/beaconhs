@@ -846,6 +846,12 @@ jobs:
           if [ "$FEATURE_CANDIDATE_VERIFIED" = true ]; then
             node .deployment-governance/scripts/cluster/dev-writer-fence.mjs verify-zero
           fi
+          # The clean V1.4 candidate already has the separately rehearsed 0061
+          # ledger. Never run the ordinary 0058 migrator or grants on it.
+          migration_entrypoint=src/migrate.ts
+          if [ "$FEATURE_CANDIDATE_VERIFIED" = true ]; then
+            migration_entrypoint=src/verify-prepared-risk.ts
+          fi
           docker run --rm --pull=never --network "$MIGRATION_DOCKER_NETWORK" \
             -v "$GITHUB_WORKSPACE:/workspace" \
             -v "$MIGRATION_PNPM_TOOLCHAIN_ROOT:/pnpm-toolchain:ro" \
@@ -856,8 +862,9 @@ jobs:
             -e DATABASE_URL="$DATABASE_URL" \
             -e SUPERADMIN_DATABASE_URL="$SUPERADMIN_DATABASE_URL" \
             -e DATABASE_OWNER_ROLE="$DATABASE_OWNER_ROLE" \
+            -e FEATURE_CANDIDATE_VERIFIED="$FEATURE_CANDIDATE_VERIFIED" \
             "$MIGRATION_NODE_IMAGE" \
-            pnpm --filter @beaconhs/db exec tsx src/migrate.ts
+            pnpm --filter @beaconhs/db exec tsx "$migration_entrypoint"
 
       # coolwsd caches browser assets at startup, so a changed branding file
       # needs a Collabora restart; an unchanged file needs nothing.

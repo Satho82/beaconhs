@@ -113,43 +113,6 @@ export const WALKTHROUGHS: Walkthrough[] = [
     ],
   },
   {
-    id: 'hazard-assessment',
-    title: 'Complete a hazard assessment',
-    description: 'Fill out a JSHA / FLHA: tasks, hazards, controls and crew sign-on.',
-    startPath: '/hazard-assessments',
-    defaultEnabled: true,
-    defaultAutoStart: false,
-    steps: [
-      {
-        path: '/hazard-assessments',
-        title: 'Hazard assessments',
-        body: 'Before starting a task, your crew records the hazards and how you will control them. This list shows every assessment you can see.',
-      },
-      {
-        path: '/hazard-assessments',
-        target: 'a[href="/hazard-assessments?drawer=new"]',
-        title: 'Start a new assessment',
-        body: 'Tap New assessment. Pick the assessment type your supervisor told you to use.',
-      },
-      {
-        title: 'Location and job details',
-        body: 'In General information, search Location and choose the customer, project, site or area from your company Locations list. Add the Specific location when the work area needs more detail.',
-      },
-      {
-        title: 'Tasks and hazards',
-        body: 'Add each task, then the hazards that come with it. Rate the risk before and after your controls — the colours follow your company risk matrix. Some types skip ratings: mark each hazard Applicable or N/A and type your site-specific controls.',
-      },
-      {
-        title: 'PPE and sign-on',
-        body: 'Select the PPE the job needs. Then every crew member signs on. Their signature means they read and understood it.',
-      },
-      {
-        title: 'Submit it',
-        body: 'When everything is filled in, tap Submit & lock and confirm. Your submit flows run, your supervisor can see it right away, and you can unlock it if conditions change. Locking the revised assessment runs its submit flows again.',
-      },
-    ],
-  },
-  {
     id: 'site-inspection',
     title: 'Do a site inspection',
     description: 'Walk the site, answer the checklist, flag deficiencies with photos.',

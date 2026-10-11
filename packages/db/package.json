@@ -9,6 +9,8 @@
     ".": "./src/index.ts",
     "./schema": "./src/schema/index.ts",
     "./client": "./src/client.ts",
+    "./risk-matrix": "./src/risk-matrix.ts",
+    "./risk-library": "./src/risk-library.ts",
     "./rls": "./src/rls.ts",
     "./canonical-templates": "./src/canonical-templates.ts",
     "./seed/lift-plan-template": "./src/seed/lift-plan-template.ts",

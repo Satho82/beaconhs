@@ -1,7 +1,7 @@
 import { GeneratedText, GeneratedValue } from '@/i18n/generated'
 import { getGeneratedTranslations } from '@/i18n/generated.server'
 // "In progress" — a card per unfinished entry the current user authored across
-// modules (journals, hazard assessments, incidents, inspections). Each card
+// modules (journals, incidents and inspections). Each card
 // links into the entry to resume it. Same data as the dashboard "In progress"
 // widget and the Workspace tile (see loadInProgressEntries).
 
@@ -12,7 +12,6 @@ import {
   ClipboardCheck,
   NotebookPen,
   PencilLine,
-  ShieldAlert,
   type LucideIcon,
 } from 'lucide-react'
 import { Button, cn, EmptyState, PageHeader } from '@beaconhs/ui'
@@ -37,12 +36,6 @@ const KIND_META: Record<
     icon: NotebookPen,
     chip: 'bg-teal-100 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300',
     ghost: 'text-teal-500/10 dark:text-teal-400/15',
-  },
-  hazard_assessment: {
-    label: 'Hazard assessment',
-    icon: ShieldAlert,
-    chip: 'bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300',
-    ghost: 'text-amber-500/10 dark:text-amber-400/15',
   },
   incident: {
     label: 'Incident',

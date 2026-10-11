@@ -9,6 +9,21 @@ import {
 } from './risk-lifecycle'
 
 describe('Risk review lifecycle', () => {
+  it.each(['2026-02-30', '2026-04-31', '2026-02-29', '2026-13-01'])(
+    'rejects impossible effective date %s',
+    (effectiveDate) => {
+      expect(() => calculateRiskReviewDates({ effectiveDate, validityMonths: 12 })).toThrow(
+        /valid date/,
+      )
+    },
+  )
+
+  it('rejects an impossible custom review date instead of silently moving it to March', () => {
+    expect(() =>
+      calculateRiskReviewDates({ effectiveDate: '2026-01-01', customReviewDate: '2026-02-30' }),
+    ).toThrow(/valid date/)
+  })
+
   it.each([
     [3, '2027-04-30'],
     [6, '2027-07-31'],

@@ -157,7 +157,7 @@ const APPROVED_DESTINATIONS: readonly ApprovedDestination[] = [
     id: 'A054',
     group: 'Risk',
     label: 'Review Schedule',
-    href: '/hospitality/risk?due=due',
+    href: '/hospitality/risk/review-schedule',
     source: '/hospitality/risk',
     permission: 'hospitality.read',
     entitlement: null,
@@ -714,7 +714,6 @@ function destinationParent(item: SidebarNavItem): (typeof APPROVED_APPLICATION_G
     ['/admin', 'Tenant Settings'],
     ['/my', 'Diary & Tasks'],
     ['/journals', 'Diary & Tasks'],
-    ['/hazard-assessments', 'Risk'],
     ['/inspections', 'Inspections'],
     ['/incidents', 'Incidents'],
     ['/corrective-actions', 'Action Plans'],
@@ -738,6 +737,15 @@ export function approvedNavigation(
   entitlements: ReadonlySet<ModuleKey>,
   activePropertyId?: string | null,
 ): SidebarNavGroup[] {
+  const isRetiredHazidHref = (href: string) => {
+    const path = href.split(/[?#]/, 1)[0]!
+    return (
+      path === '/hazard-assessments' ||
+      path.startsWith('/hazard-assessments/') ||
+      path === '/my/hazard-assessments' ||
+      path.startsWith('/my/hazard-assessments/')
+    )
+  }
   const visible = new Map(groups.flatMap((group) => group.items).map((item) => [item.href, item]))
   const childrenByGroup = new Map<string, SidebarNavItem[]>()
   for (const group of APPROVED_APPLICATION_GROUPS) {
@@ -790,6 +798,9 @@ export function approvedNavigation(
     [...childrenByGroup.values()].flatMap((children) => children.map((child) => child.href)),
   )
   for (const item of visible.values()) {
+    // Old saved tenant links are retired with the module; do not surface them
+    // as custom links after the built-in registry entry has been removed.
+    if (isRetiredHazidHref(item.href)) continue
     if (represented.has(item.href)) continue
     childrenByGroup.get(destinationParent(item))!.push({ ...item })
     represented.add(item.href)

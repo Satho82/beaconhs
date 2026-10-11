@@ -2,6 +2,77 @@ import type { ManualArticle } from '../types'
 
 export const HOSPITALITY_ARTICLES: ManualArticle[] = [
   {
+    slug: 'hospitality-risk-review-schedule',
+    title: 'Review Risk Assessments',
+    group: 'Everyday tasks',
+    iconKey: 'clipboard-check',
+    summary: 'Find overdue and upcoming reviews, assign owners and record signed reviews.',
+    keywords: ['risk', 'review schedule', 'overdue', 'next review', 'sign-off'],
+    requiredPermission: 'hospitality.read',
+    body: `
+# Review Risk Assessments
+
+1. Open **Risk → Review Schedule**. The summary cards show overdue reviews, reviews due in 30 days, reviews due in 31–90 days and recently reviewed assessments.
+2. Choose a property, category, status or review period. Search by assessment reference or title and use the page controls to find a record.
+   Choose **Schedule Review** to find an assessment and continue to its review and sign-off form. Summary cards also filter the register.
+3. Choose **Review** to open the assessment. Check the hazards, people at risk and controls, then use **Review and sign-off** to record the effective date, review period and comments.
+4. Choose **Record immutable sign-off**. The signed snapshot and audit history remain available on the assessment.
+5. To assign a responsible person, choose **Edit / assign** and save the assessment.
+
+The schedule shows assessments for properties you are authorised to access. Review completion does not create a diary task automatically. Use the property's Diary & Tasks page for operational tasks.
+`,
+  },
+  {
+    slug: 'hospitality-risk-editing',
+    title: 'Edit a property risk assessment',
+    group: 'Everyday tasks',
+    iconKey: 'clipboard-check',
+    summary: 'Amend assessment hazards and controls while retaining corrective-action history.',
+    keywords: ['risk', 'assessment', 'hazard', 'controls', 'corrective action'],
+    requiredPermission: 'hospitality.read',
+    body: `
+# Edit a property risk assessment
+
+You need hospitality management permission to save changes, and access to the assessment's property. Creating a corrective action also requires corrective-action creation permission.
+
+1. Open **Risk**, choose **Property Risk Assessments**, and select the property. Search by reference or title, filter the register and use the page controls to find an assessment.
+2. Open the assessment, or choose its **Edit** link.
+3. Edit the assessment details, hazards, people at risk and controls.
+4. Choose **Add hazard** to add a hazard. You can use **Remove** on an unsaved addition.
+5. Choose **Save assessment**. Wait for confirmation before continuing.
+6. To create an action for saved further controls, choose **Create corrective action**.
+
+Saved hazards retain their permanent identity and corrective-action links. Enter a **Reason for change**, then choose **Archive** or **Restore** in the content revision panel. These actions preserve earlier revisions and return the assessment to draft for a new sign-off. Editing a hazard does not change the owner, due date or status of an existing corrective action.
+
+If another editor has changed the assessment since you opened it, a stale save or sign-off is rejected. Reload and review the latest revision before applying changes. Each successful content change creates an immutable revision in the same transaction; failed saves do not partially apply. Historical sign-offs remain linked to the exact approved revision.
+
+## Create from scratch
+
+Choose **Create from scratch**, select an authorised property and category, enter a title, and choose **Create draft**. This assessment has no source template. The current matrix is captured at creation. Add hazards and controls, save, and review before signing off.
+
+## Use or amend a template
+
+Open **Risk → Available Templates**. Search by approved RA reference, title or keyword, filter by one of the six hospitality categories or by owner, and use the page controls. Uvanoo catalogue cards show applicability and guidance version; tenant-created and previously installed templates remain available. Only installed templates appear: the page reports how many of the 50 approved topics are installed. Installation is an administrator operation, never a page action.
+
+Choose **Preview**, **Adopt** or **Adopt & Amend** to open the existing template details. The latter links take you to its adoption controls; they do not save anything until you confirm **Use Template** or **Amend**. Choose a property. **Use Template** creates a draft property assessment. **Amend** creates the same independent draft and opens its editor. Neither changes the source template. Review and save your changes before recording the assessment sign-off. Retired templates cannot be adopted.
+
+## Save as a tenant template
+
+Tenant-wide hospitality managers can choose **Save as Tenant Template** on a template or property assessment. Property-only managers cannot publish into the tenant-wide library.
+
+1. Save assessment edits first, if copying an assessment.
+2. Choose **Save as Tenant Template**.
+3. Review the title and description, including any property-specific wording. Use a title that is not already used by a version 1.0 template in your tenant.
+4. Confirm **Save as Tenant Template**. The new independent tenant draft opens.
+5. Edit the title, description, category, hazards, controls and scores. Choose **Save draft**, then **Publish version** when reviewed.
+6. To change a published tenant template, choose **Create next draft version**. Publishing it retires the previous active version in that family.
+
+This copies active saved hazards, people at risk, controls and the captured matrix. Further controls become template guidance. Corrective-action records, assignments and sign-offs stay with their original assessment. Uvanoo templates are read-only. Drafts cannot be adopted, and publishing a new version never changes existing assessments.
+
+Each new assessment keeps its own matrix snapshot. Changing tenant settings does not reinterpret its scores. If the historical matrix was not recorded, the assessment shows **Historical matrix unknown**. Enter a reason and choose **Use current matrix** before further editing or sign-off; earlier revisions remain unknown. A smaller matrix cannot be selected if existing scores use factors outside its range.
+`,
+  },
+  {
     slug: 'hospitality-properties',
     title: 'Create and archive properties',
     group: 'Administration',

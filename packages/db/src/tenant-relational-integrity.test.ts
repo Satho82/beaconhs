@@ -394,9 +394,23 @@ describe('tenant relational integrity', () => {
   })
 
   it('ratchets the reviewed residual single-column tenant FK manifest', () => {
+    // Reviewed owner-scoped edge: tenant owners equal tenant_id on BOTH
+    // tables; platform families use the zero UUID. This is not an unscoped
+    // ID-only relationship. Keep its exact shape and ownership checks pinned.
+    const familyEdge =
+      'risk_templates.owner_key,template_family_id->risk_template_families.owner_key,id'
+    expect(tenantForeignKeys().map(signature)).toContain(familyEdge)
+    const tables = new Map(allTableConfigs().map((table) => [table.name, table]))
+    expect(tables.get('risk_templates')!.checks.map((entry) => entry.name)).toContain(
+      'risk_templates_scope_tenant_check',
+    )
+    expect(tables.get('risk_template_families')!.checks.map((entry) => entry.name)).toContain(
+      'risk_template_families_scope_tenant_ck',
+    )
     const residual = tenantForeignKeys()
       .filter((reference) => !reference.childColumns.includes('tenant_id'))
       .map(signature)
+      .filter((reference) => reference !== familyEdge)
       .sort()
     const digest = createHash('sha256').update(residual.join('\n')).digest('hex')
 

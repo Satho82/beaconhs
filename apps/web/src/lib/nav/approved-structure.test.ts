@@ -19,6 +19,11 @@ describe('approved navigation boundaries', () => {
     const result = flatten(approvedNavigation([], () => true, new Set()))
     expect(result).toEqual([])
   })
+  it('filters retired HazID destinations from old tenant navigation links', () => {
+    const groups = source('/hazard-assessments?drawer=new')
+    const result = flatten(approvedNavigation(groups, () => true, new Set()))
+    expect(result.some((entry) => entry.href.startsWith('/hazard-assessments'))).toBe(false)
+  })
   it('checks permissions AND entitlements for every maintenance child', () => {
     const groups = source('/hospitality/maintenance')
     const allowed = new Set<ModuleKey>(['hospitality.maintenance'])
@@ -121,9 +126,13 @@ describe('approved navigation boundaries', () => {
     const destinations = parents.flatMap((parent) => parent.children!.map((child) => child.href))
     for (const original of groups.flatMap((group) => group.items))
       expect(destinations).toContain(original.href)
-    expect(parents.find((parent) => parent.label === 'Risk')?.children).toContainEqual(
-      expect.objectContaining({ href: '/hazard-assessments' }),
-    )
+    expect(parents.find((parent) => parent.label === 'Risk')?.children).toEqual([
+      expect.objectContaining({ href: '/hospitality/risk', label: 'Risk Assessments' }),
+      expect.objectContaining({
+        href: '/hospitality/risk/review-schedule',
+        label: 'Review Schedule',
+      }),
+    ])
     expect(parents.find((parent) => parent.label === 'Reports')?.children).toContainEqual(
       expect.objectContaining({ href: '/insights' }),
     )

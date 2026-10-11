@@ -94,10 +94,10 @@ ${CSV_EXPORT_LIMIT_GUIDANCE}
   },
   {
     slug: 'hazard-assessments',
-    title: 'Hazard assessments (JSHA / FLHA)',
+    title: 'Risk assessments',
     group: 'Everyday tasks',
     iconKey: 'radiation',
-    summary: 'Assess the hazards of a task before work starts and get the crew signed on.',
+    summary: 'Find a reusable template or manage a property risk assessment.',
     keywords: [
       'JSA',
       'JSHA',
@@ -115,91 +115,23 @@ ${CSV_EXPORT_LIMIT_GUIDANCE}
       'signature',
       'PPE',
     ],
-    body: `A hazard assessment (your company may call it a JSA, JSHA, FLHA, FLRA, or hazard card) captures the hazards of a planned task and the controls that make it safe — before the crew starts work.
-
-## What this is for
-
-Walking through the hazards as a crew catches problems while they are still cheap to fix. The signed record shows everyone understood the risks that day.
+    body: `Risk Assessments is the current place to prepare and manage property-specific assessments. Each adopted template creates an editable draft; a template is not a completed or approved assessment.
 
 ## Where to find it
 
-Open **Hazard Assessments** in the left menu, or go to [Hazard assessments](/hazard-assessments).
+Open [Available Templates](/hospitality/risk?view=templates) to search, filter and preview Uvanoo or tenant templates. Choose **Use Template** or **Adopt & Amend**, then select the property and complete the draft.
 
-Use **All locations** to search the complete set of locations used by assessments you are allowed to open. On **My hazard assessments**, it searches only locations used by assessments you started. If the picker says more results exist, add more of the location name or code.
+Open [Property Risk Assessments](/hospitality/risk?view=assessments) to find assessments already created for an authorised property. Select the property, then open an assessment to edit hazards and controls, review it, manage actions or export its PDF.
 
-## Who can see which assessments
+## Assessment content
 
-Most people see only the assessments they started. Foremen see their site's assessments.
+For each hazard, record who may be exposed, the potential harm, existing controls and any further controls or corrective actions. Set likelihood and severity using the property's configured risk matrix. Review residual risk after the additional controls are in place.
 
-If your company wants you to read other people's assessments — for example to copy a good one for repeat work — an administrator can add the **View others' hazard assessments** permission to your role, or just to you under **Permissions** on your member page. It lets you open, list, email, and copy from anyone's assessment. It does not let you change other people's assessments. Editing still needs the edit permission, and copying still needs the create permission.
+Templates are starting points. A competent assessor must check the actual property, work and people at risk, then complete review and approval using the application's available workflow.
 
-## Starting a new assessment
+## Historical Hazard Identification records
 
-1. Tap **New assessment**.
-2. Use the search box to find the right assessment type (for example a daily FLHA or a task-specific JSHA). Each card shows the PPE, questions, and Builder apps that the type includes. Tap the type to start.
-3. Fill in the **General Information** section: who, what, where, and when. Search **Location** to choose any customer, project, site, or area from the same Locations list used by Journals. Use **Specific location** for the exact work area. Fields save as you type.
-
-## Tasks, hazards, and risk ratings
-
-Depending on the type, you list either the steps of the job or the hazards on site.
-
-1. Tap **Add task** to add a step of the job, or **Add hazard from library** to pick a known hazard. **Add ad-hoc hazard** covers anything not in the list.
-2. For each hazard, rate the risk before controls: how likely it is, and how bad it would be.
-3. Write the controls that reduce the risk — things like lockout/tagout, barricades, or signage.
-4. Rate the risk again after controls. This is the residual risk, and it should be lower.
-
-Some assessment types skip risk ratings and work as a simple checklist instead. Every hazard starts as **N/A**. For each hazard that applies to your job:
-
-1. Tap **Applicable**. The hazard's standard controls appear.
-2. Type your site-specific controls in the box. Every applicable hazard needs them before the assessment counts as complete.
-
-## PPE
-
-1. Tap **Add PPE** to list the gear the task needs.
-2. Add a note on when or why each item is needed.
-
-## Crew sign-on
-
-1. In the signatures section, tap **Add signature**.
-2. Pick **Internal (employee)** and choose the person, or **External (visitor / contractor)** and type their name.
-3. Either have them sign in the **Signature** box right away, or leave the box empty and tap **Save signers** to add them to the list — useful when you build the JSA on a computer first and collect signatures later.
-4. Repeat for everyone on the crew. The header shows how many signatures are collected.
-5. To collect a missing signature, tap **Sign** beside the name (or tap **Sign later** on their card), have them sign in the box, then tap **Save signature**. Pass the phone around the crew until everyone is signed.
-
-## Attached assessment apps
-
-Some assessment types include an **Assessment apps** section for extra company forms.
-
-1. Tap **Start** or **Continue** beside the app.
-2. Complete the form in the full-screen panel.
-3. Tap **Submit** to return to the assessment.
-
-Only published apps allowed for the role you are currently using appear. A locked assessment cannot start or continue an unfinished app. Use **View response** to open a completed record.
-
-An app can depend on one of the assessment questions. It appears as soon as the matching answer is saved and hides again if the answer no longer matches. Previously entered app data is retained if the answer changes.
-
-## Set up assessment types
-
-If your role manages Hazard Assessments, open **Types** to set up the templates crews choose when they start an assessment. Use **Search assessment types…** to find one, and use **Style** to show task-based or hazard-based types. When you attach a Builder app, use **Show only for an answer** and **Required answer** to make it conditional on a type question.
-
-Hazard-based types include a **Risk matrix ratings** setting. Turn it off to run the type as a checklist: hazards start as N/A, and applicable hazards need typed site-specific controls instead of before/after ratings. Turn it back on at any time to restore the matrix.
-
-## Safety review
-
-People with permission to review hazard assessments can record an advisory decision. Open an assessment, tap **Safety review** in the header, and use the flyout to add an optional note. Then tap **Approve** or **Reject**. The decision does not lock the assessment or stop field work. Use the **Safety review** filter on the list to find pending, approved, or rejected assessments.
-
-## Finishing up
-
-1. When everything is rated and signed, tap **Submit & lock**, then tap **Submit & lock** again in the confirmation. This makes the assessment read-only and runs its submit flows. **Unlock** asks to confirm as well, so a mis-tap on a phone cannot submit or reopen an assessment.
-2. Use **Print / PDF** for a paper copy, or **Send email** to share it.
-
-In **Photos**, tap **Take photo or upload** to take a new photo or choose pictures from your phone's photo library. Use the pencil button for a caption or markup, the trash button to remove a photo, and the arrow buttons to change the order. The editor keeps the photo's original shape while you add captions or markup. Large camera photos are optimized automatically when they upload. Unlock the assessment before making photo changes. Locking it again runs the submit flows for the revised assessment.
-
-## Tips
-
-- Unlocking does not remove signatures. Adding another signature also keeps every signature already collected. If the assessment content changes, BeaconHS clears the existing signatures so the crew signs the revised assessment.
-- Conditions change. If the job changes, unlock and update the assessment, or start a new one.
-- **Copy assessment** starts a new one pre-filled from an old one — handy for repeat work. On a phone it lives under **More actions**. The button reads **Copying…** while the new assessment is built, then opens it — tap it once and wait.`,
+The separate legacy Hazard Assessments workflow has been retired. Existing historical records, audit evidence, corrective-action links and database tables are retained; this does not convert them into Risk Assessments or change their historical content.`,
   },
   {
     slug: 'inspections',

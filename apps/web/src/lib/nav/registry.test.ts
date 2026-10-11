@@ -14,6 +14,12 @@ function moduleKeysOf(config: TenantNavConfig): string[] {
 }
 
 describe('withMissingModules', () => {
+  it('does not expose the retired Hazard Assessments module in saved or default navigation', () => {
+    expect(NAV_MODULES.map((module) => module.key)).not.toContain('hazid')
+    const config = stampKnownModules(buildDefaultNavConfig())
+    expect(moduleKeysOf(withMissingModules(config))).not.toContain('hazid')
+  })
+
   it('registers Tenant Settings as the existing permission-gated route', () => {
     expect(NAV_MODULES).toContainEqual(
       expect.objectContaining({

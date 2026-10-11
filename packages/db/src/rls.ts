@@ -120,6 +120,7 @@ export const PROPERTY_REPORTING_TABLES = new Set([
   'risk_assessments',
   'risk_hazards',
   'risk_assessment_signoffs',
+  'risk_assessment_versions',
   'maintenance_issues',
   'maintenance_issue_attachments',
   'maintenance_work_orders',
@@ -187,7 +188,11 @@ DROP POLICY IF EXISTS tenant_write_delete ON ${table};`
   // selectable through ordinary tenant joins, but runtime roles must never be
   // able to insert, update, or delete them. Separate command policies preserve
   // that read-only global union without weakening writes.
-  if (table === 'report_definitions' || table === 'risk_templates') {
+  if (
+    table === 'report_definitions' ||
+    table === 'risk_templates' ||
+    table === 'risk_template_families'
+  ) {
     return `${reset}
 CREATE POLICY tenant_isolation ON ${table}
   FOR SELECT
@@ -275,7 +280,8 @@ CREATE POLICY tenant_write_delete ON ${table}
                                                   table === 'manager_signoffs' ||
                                                   table === 'hospitality_buildings'
                                                 ? directPropertyPredicate(table)
-                                                : table === 'risk_hazards'
+                                                : table === 'risk_hazards' ||
+                                                    table === 'risk_assessment_versions'
                                                   ? propertyParentPredicate(
                                                       table,
                                                       'risk_assessments',
@@ -367,6 +373,8 @@ CREATE POLICY tenant_isolation ON ${table}
 // The Better-Auth tables (user, session, account, verification) are global and
 // not in this list.
 export const TENANT_SCOPED_TABLES = [
+  'risk_template_families',
+  'risk_assessment_versions',
   'risk_templates',
   'risk_assessments',
   'risk_hazards',

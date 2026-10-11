@@ -41,7 +41,6 @@ const NAV_MODULE_MESSAGE_KEYS: Record<string, string> = {
   my: 'Nav.modules.my',
   notifications: 'Nav.modules.notifications',
   inspections: 'Nav.modules.inspections',
-  hazid: 'Nav.modules.hazid',
   journals: 'Nav.modules.journals',
   incidents: 'Nav.modules.incidents',
   'corrective-actions': 'Nav.modules.correctiveActions',
@@ -130,13 +129,6 @@ export const NAV_MODULES: NavModule[] = [
     iconKey: 'clipboard',
     group: 'Frontline',
     requiredPermission: 'inspections.read.self',
-  },
-  {
-    key: 'hazid',
-    href: '/hazard-assessments',
-    label: 'Hazard Assessments',
-    iconKey: 'radiation',
-    group: 'Frontline',
   },
   { key: 'journals', href: '/journals', label: 'Journals', iconKey: 'journal', group: 'Frontline' },
   {

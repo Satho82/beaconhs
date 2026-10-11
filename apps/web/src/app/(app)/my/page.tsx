@@ -15,7 +15,6 @@ import {
   GraduationCap,
   ListChecks,
   PencilLine,
-  Radiation,
   ShieldCheck,
   User,
   Wallet,
@@ -24,7 +23,6 @@ import { and, count, eq, gte, isNull, lt, lte, or, type SQL } from 'drizzle-orm'
 import { Badge, cn, PageHeader } from '@beaconhs/ui'
 import {
   correctiveActions,
-  hazidAssessments,
   incidents,
   inspectionRecords,
   people,
@@ -118,20 +116,6 @@ export default async function MyLandingPage() {
           .from(incidents)
           .where(
             and(eq(incidents.reportedByTenantUserId, membershipId), isNull(incidents.deletedAt)),
-          )
-          .then((r) => Number(r[0]?.c ?? 0))
-      : Promise.resolve(0)
-
-    // ---- hazard assessments started by me --------------------------------
-    const hazardAssessmentsPromise: Promise<number> = membershipId
-      ? tx
-          .select({ c: count() })
-          .from(hazidAssessments)
-          .where(
-            and(
-              eq(hazidAssessments.reportedByTenantUserId, membershipId),
-              isNull(hazidAssessments.deletedAt),
-            ),
           )
           .then((r) => Number(r[0]?.c ?? 0))
       : Promise.resolve(0)
@@ -232,7 +216,6 @@ export default async function MyLandingPage() {
       personId,
       inProgress: await inProgressPromise,
       incidents: await incidentsPromise,
-      hazardAssessments: await hazardAssessmentsPromise,
       openTasks: await openTasksPromise,
       overdueTasks: await overdueTasksPromise,
       trainingRecords: await trainingRecordsPromise,
@@ -353,14 +336,6 @@ export default async function MyLandingPage() {
       icon: AlertTriangle,
       tone: 'rose',
       count: counts.incidents,
-    },
-    {
-      href: '/my/hazard-assessments',
-      label: 'Assessments',
-      description: 'Hazard assessments you started.',
-      icon: Radiation,
-      tone: 'amber',
-      count: counts.hazardAssessments,
     },
     {
       href: '/my/inspections',

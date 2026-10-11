@@ -22,7 +22,6 @@ const ARTICLE_TOURS: Record<string, string> = {
   'getting-started': 'welcome',
   'help-and-tours': 'welcome',
   journals: 'daily-journal',
-  'hazard-assessments': 'hazard-assessment',
   inspections: 'site-inspection',
   incidents: 'report-incident',
   'vehicle-log': 'vehicle-log',

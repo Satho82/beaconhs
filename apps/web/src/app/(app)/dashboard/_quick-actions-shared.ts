@@ -171,13 +171,13 @@ export const CURATED_QUICK_ACTIONS: readonly CuratedQuickAction[] = [
     requiredPermission: 'incidents.create',
   },
   {
-    id: 'd-hazid',
-    label: 'Hazard assessment',
-    href: '/hazard-assessments/new',
+    id: 'd-risk-assessment',
+    label: 'Start risk assessment',
+    href: '/hospitality/risk?view=templates',
     iconKey: 'radiation',
     tone: 'amber',
     hint: 'Create',
-    requiredPermission: 'hazid.create',
+    requiredPermission: 'hospitality.manage',
   },
   {
     id: 'd-ca',

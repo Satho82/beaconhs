@@ -252,14 +252,16 @@ BEGIN
       AND transaction_id=txid_current() AND event <> 'baseline';
   captured := public.risk_capture_content(target_tenant,target_assessment);
   IF stored IS NULL OR captured IS NULL OR
-     (stored->'assessment' - ARRAY['updated_at','last_reminder_review_date','status']) IS DISTINCT FROM
-       (captured->'assessment' - ARRAY['updated_at','last_reminder_review_date','status']) OR
+     ((stored->'assessment') - ARRAY['updated_at','last_reminder_review_date','status']) IS DISTINCT FROM
+       ((captured->'assessment') - ARRAY['updated_at','last_reminder_review_date','status']) OR
      stored->'matrix' IS DISTINCT FROM captured->'matrix' OR
      stored->'hazards' IS DISTINCT FROM captured->'hazards' THEN
     RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'Risk content and immutable revision must commit together';
   END IF;
-  IF TG_TABLE_NAME = 'risk_assessment_versions' AND NEW.revision <> revision_no THEN
-    RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'Risk revision must match current content';
+  IF TG_TABLE_NAME = 'risk_assessment_versions' THEN
+    IF NEW.revision <> revision_no THEN
+      RAISE EXCEPTION USING ERRCODE = '23514', MESSAGE = 'Risk revision must match current content';
+    END IF;
   END IF;
   RETURN NULL;
 END $$;

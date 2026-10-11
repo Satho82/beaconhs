@@ -53,6 +53,28 @@ describe('prepared Risk Assessments migrations', () => {
       expect(journal).not.toContain(name)
   })
 
+  it('extracts assessment JSON before subtracting volatile keys in the revision guard', () => {
+    const migration = readMigration('0061_risk_assessment_revisions_archive_signoffs.sql')
+    // PostgreSQL binds subtraction before ->. Without the inner parentheses it
+    // tries to parse the literal assessment as JSON and raises SQLSTATE 22P02.
+    for (const value of ['stored', 'captured']) {
+      expect(migration).toContain(
+        `((${value}->'assessment') - ARRAY['updated_at','last_reminder_review_date','status'])`,
+      )
+      expect(migration).not.toContain(`(${value}->'assessment' - ARRAY`)
+    }
+  })
+
+  it('resolves version-only trigger fields only inside the version-table branch', () => {
+    const migration = readMigration('0061_risk_assessment_revisions_archive_signoffs.sql')
+    // A compound AND still resolves NEW.revision for assessment/hazard records,
+    // where that field does not exist (PostgreSQL SQLSTATE 42703).
+    expect(migration).toContain(
+      "IF TG_TABLE_NAME = 'risk_assessment_versions' THEN\n    IF NEW.revision <> revision_no THEN",
+    )
+    expect(migration).not.toContain("TG_TABLE_NAME = 'risk_assessment_versions' AND NEW.revision")
+  })
+
   it('preserves unknown historical matrix evidence and separates manual provenance', () => {
     const migration = readMigration('0060_risk_template_families_manual_assessments.sql')
     expect(migration).toMatch(/ALTER TABLE risk_assessments ADD COLUMN matrix_snapshot jsonb NULL/i)

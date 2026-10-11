@@ -200,7 +200,8 @@ jobs:
       DATABASE_URL: ${{ inputs.feature_candidate_verified && secrets.DEV_DATABASE_URL || secrets.MAIN_DATABASE_URL }}
       SUPERADMIN_DATABASE_URL: ${{ inputs.feature_candidate_verified && secrets.DEV_SUPERADMIN_DATABASE_URL || secrets.MAIN_SUPERADMIN_DATABASE_URL }}
       REDIS_URL: ${{ inputs.feature_candidate_verified && secrets.DEV_REDIS_URL || secrets.MAIN_REDIS_URL }}
-      EXPECTED_MIGRATION_HOST: ${{ inputs.feature_candidate_verified && 'uvanoo-dev-postgres' || 'beaconhs-postgres' }}
+      EXPECTED_MIGRATION_HOST: ${{ inputs.feature_candidate_verified && 'uvanoo-clean155-postgres' || 'beaconhs-postgres' }}
+      EXPECTED_DATABASE_NAME: ${{ inputs.feature_candidate_verified && 'beaconhs_clean155_final' || 'beaconhs' }}
     steps:
       # The deploy runner shares storage with Dokploy. Keep stale build cache
       # and superseded images from exhausting the host and taking the Dokploy
@@ -594,6 +595,7 @@ jobs:
           DATABASE_URL: ${{ env.DATABASE_URL }}
           SUPERADMIN_DATABASE_URL: ${{ env.SUPERADMIN_DATABASE_URL }}
           EXPECTED_MIGRATION_HOST: ${{ env.EXPECTED_MIGRATION_HOST }}
+          EXPECTED_DATABASE_NAME: ${{ env.EXPECTED_DATABASE_NAME }}
         run: |
           node -e '
             const urls = [
@@ -607,7 +609,7 @@ jobs:
                 u.protocol !== "postgresql:" ||
                 u.hostname !== process.env.EXPECTED_MIGRATION_HOST ||
                 (u.port && u.port !== "5432") ||
-                u.pathname !== "/beaconhs" ||
+                u.pathname !== "/" + process.env.EXPECTED_DATABASE_NAME ||
                 decodeURIComponent(u.username) !== role ||
                 !u.password
               ) {
@@ -632,7 +634,7 @@ jobs:
               process.exit(1);
             }
             const candidate = process.env.FEATURE_CANDIDATE_VERIFIED === "true";
-            const expectedHost = candidate ? "uvanoo-dev-redis" : "beaconhs-redis";
+            const expectedHost = candidate ? "uvanoo-clean155-redis" : "beaconhs-redis";
             if (url.protocol !== "redis:" || url.hostname !== expectedHost || (url.port && url.port !== "6379")) {
               console.error("::error::Selected Redis credential does not match the deployment topology");
               process.exit(1);
@@ -655,6 +657,7 @@ jobs:
 
       - name: Preflight all migration database roles
         env:
+          EXPECTED_DATABASE_NAME: ${{ env.EXPECTED_DATABASE_NAME }}
           NODE_ENV: production
           MIGRATION_DATABASE_URL: ${{ env.MIGRATION_DATABASE_URL }}
           DATABASE_URL: ${{ env.DATABASE_URL }}
@@ -666,6 +669,7 @@ jobs:
             -w /workspace \
             -e PATH=/pnpm-toolchain/node_modules/.bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
             -e NODE_ENV="$NODE_ENV" \
+            -e EXPECTED_DATABASE_NAME \
             -e MIGRATION_DATABASE_URL="$MIGRATION_DATABASE_URL" \
             -e DATABASE_URL="$DATABASE_URL" \
             -e SUPERADMIN_DATABASE_URL="$SUPERADMIN_DATABASE_URL" \
@@ -683,10 +687,10 @@ jobs:
                     const client = postgres(process.env[name], { connect_timeout: 5, max: 1 });
                     try {
                       const [identity] = await client`SELECT current_user, current_database()`;
-                      if (identity.current_user !== expectedRole || identity.current_database !== "beaconhs") {
-                        throw new Error(`${name} identity did not match ${expectedRole}|beaconhs`);
+                      if (identity.current_user !== expectedRole || identity.current_database !== process.env.EXPECTED_DATABASE_NAME) {
+                        throw new Error(`${name} identity mismatch`);
                       }
-                      console.log(`${name} identity verified as ${expectedRole}|beaconhs`);
+                      console.log(`${name} identity verified`);
                       break;
                     } catch (error) {
                       if (error && typeof error === "object" && error.code === "EAI_AGAIN" && attempt < 3) {
@@ -701,7 +705,7 @@ jobs:
                   }
                 }
               })().catch((error) => {
-                console.error(error);
+                console.error("Database role preflight failed; connection diagnostics withheld");
                 process.exit(1);
               });
             '
@@ -710,6 +714,7 @@ jobs:
         if: inputs.feature_candidate_verified
         env:
           REDIS_URL: ${{ env.REDIS_URL }}
+          EXPECTED_MIGRATION_HOST: ${{ env.EXPECTED_MIGRATION_HOST }}
         run: |
           set -euo pipefail
           if ! docker network inspect "$RUNTIME_DOCKER_NETWORK" | jq -e '
@@ -722,6 +727,7 @@ jobs:
           fi
           docker run --rm --pull=never --network "$RUNTIME_DOCKER_NETWORK" \
             -e REDIS_URL \
+            -e EXPECTED_MIGRATION_HOST \
             --entrypoint node \
             "$MIGRATION_NODE_IMAGE" -e '
               const dns = require("node:dns").promises;
@@ -747,7 +753,7 @@ jobs:
                   fail("REDIS_URL_TOPOLOGY", null, "UNEXPECTED_PROTOCOL");
                   return;
                 }
-                if (url.hostname !== "uvanoo-dev-redis") {
+                if (url.hostname !== "uvanoo-clean155-redis") {
                   fail("REDIS_URL_TOPOLOGY", null, "UNEXPECTED_HOSTNAME");
                   return;
                 }
@@ -761,7 +767,7 @@ jobs:
                 }
                 try {
                   await new Promise((resolve, reject) => {
-                    const socket = net.createConnection({ host: "uvanoo-dev-postgres", port: 5432 });
+                    const socket = net.createConnection({ host: process.env.EXPECTED_MIGRATION_HOST, port: 5432 });
                     socket.setTimeout(5000);
                     socket.once("connect", () => { socket.destroy(); resolve(); });
                     socket.once("error", reject);

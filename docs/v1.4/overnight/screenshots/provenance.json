@@ -1,0 +1,28 @@
+{
+  "sourceCommit": "563fb0e9b79a838a5f394abaffb2f7dc743fc571",
+  "sourceTree": "324c50a60e2cb0639ba920488a150c6531968374",
+  "browserRun": 38318803277,
+  "browserArtifact": 11777954723,
+  "originalArtifactZipSha256": "5d1c96dfa2d043a0ebaca8c6cc07f7a4ad338b8823cf1801415bd115dca1593c",
+  "inspectionRun": 38319543588,
+  "derivation": "Pillow 11.3.0, aspect-preserving thumbnail bounded 1100x1800, JPEG quality82; actual captured pixels, no generated/reconstructed UI",
+  "images": [
+    {
+      "path": "docs/v1.4/overnight/screenshots/core-cluster-people.jpg",
+      "gitBlob": "6a542fbbaeb2bb3afd79be76d151e3e54324d16c"
+    },
+    {
+      "path": "docs/v1.4/overnight/screenshots/core-cluster-approvals.jpg",
+      "gitBlob": "ef787a01b5f1b97d2bf8b8cbc63f0b1f7c5dcc71"
+    },
+    {
+      "path": "docs/v1.4/overnight/screenshots/core-mobile-people.jpg",
+      "gitBlob": "80a6005dab1a8c176c01f95e61f1a5cdb556d660"
+    },
+    {
+      "path": "docs/v1.4/overnight/screenshots/core-mobile-approvals.jpg",
+      "gitBlob": "f4fde9fa49c8a3dd5cad7aebae03204203e78a54"
+    }
+  ],
+  "originals": "Full-resolution PNGs remain in browser artifact, retained until 2027-01-10."
+}

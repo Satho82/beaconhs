@@ -164,7 +164,7 @@ All remaining Board flows and release preflight remain unaccepted. No deployment
 The earlier checkpoints are retained chronologically; these results supersede pending statuses above.
 
 - Both builds passed in run 38277089799 using the existing governed Full Release heap of 8192 MiB, on a verified 16373452 KiB hosted runner. People remained at its original SHA. Safety used the pinned internal-type patch. Standalone web BUILD_ID/server.js and worker dist/index.js assertions passed. See cloud-build-proof.txt.
-- The inherited PR #5 build budget of 6144 MiB was too small for these cold builds. This was corrected only in isolated controls; main/PR #5 were not changed.
+- The supplemental control's initial build budget of 6144 MiB was too small for these cold builds. PR #5 itself already uses 8192 MiB. This was corrected only in isolated controls; main/PR #5 were not changed.
 - Safety run 38275954738 passed all 20 real People provenance groups but exposed obsolete Action Plans synthetic setup after Risk 0060. The additional action-property-current-risk-fixture.patch creates a valid manual Risk assessment matrix. From the risk_hazards insertion through final rollback, all fixture content and denial assertions are byte-identical: SHA256 985719ef444388864c58cc0f958712d5a65db63ff968326a9f8080840e421bd4.
 - Targeted database run 38277765802 **passed**: six property/RLS fixtures, closed Risk revision regression, all Migration Safety replay/CLI/concurrency/rollback/ACL/backup tests, unchanged People 0057 SQL and the pinned unnumbered Approvals privilege fixture. PostgreSQL was 16.14 from the explicit image digest; prior recorded 16.15 evidence was not misrepresented as this run. See migration-safety-cloud-database-proof.txt.
 - Corrected Safety source was then published only to fix/uvanoo-v1.4-migration-safety-cloud-gates as **befe7efc807230862ac1cbd42ab957e1e298e7f1**, parent 6892670fd33e0fe12a1862bb822b451cd1bf7b44, tree cac8f1184b7852629aab49e77f49a693abd0e350.
@@ -173,3 +173,16 @@ The earlier checkpoints are retained chronologically; these results supersede pe
 - Original Approvals property-authority proof **38279023873**, control ae01d309e13c79c2e6f6e0431ae9198cff09c5f2, is running against a canonical, disposable fixture reconstructed from exact Safety source. The original Approvals guard/assertions remain unchanged. No DEV metadata is invented; this does not replace the missing full Batch01 captured-contract evidence.
 
 People still needs authenticated visual acceptance and combined-candidate regression before Board freeze. Approvals still fails full localization coverage and lacks production adapters/migration registration; its proposed dead-code patch remains uncommitted. Remaining Board module gaps and fresh exact-release preflight remain open. No PR was merged, no shared source branch was mutated, and no persistent DEV/database/staging/production action occurred.
+
+
+## Validation-control review correction and Approvals authority result
+Erratum: the earlier attribution of the 6144 MiB build budget to PR #5 was incorrect. Reinspection of exact PR #5 SHA 52b2cf64ea4fe99ea1d15175ee611cf0da65be54 shows its build already uses 8192 MiB. The smaller limit was introduced in the supplemental review workflow. The correction changed only isolated controls.
+
+The separate PR #5 proposal is preserved, NOT applied:
+- Pin control checkout to github.sha instead of a moving branch tip.
+- Allow only the two explicitly named Migration Safety source branches as narrow exceptions, requiring module=migration-safety; retain the original feature-branch regex for other modules.
+- Scope disposable PostgreSQL admin setup to the property-delegation test while its assertions still use beaconhs_app.
+- Preserve all repository/ref/SHA checks, contents:read, no-secrets/no-deploy boundaries and the existing 8192 MiB build setting.
+- YAML/format/shell syntax and **11 boundary acceptance/denial cases passed**. See pr5-isolated-validation-control-proposal.patch and pr5-proposed-boundary-tests.json. PR #5 and its source branch remain unchanged.
+
+Original Approvals fed0709f79922d003aefbdb6674e5b92270bdeea passed **18 unchanged real database property-authority checks** in run 38279023873. Tests cover mixed-role escalation, unrelated property access, stale context, suspended/revoked membership, collection/detail isolation and denied decisions. Synthetic test records rolled back and task containers were disposed. See approvals-original-cloud-property-authority.txt. This is valid partial security evidence; it does not close localization, captured DEV contract, production-adapter, migration-registration or visual acceptance gaps.

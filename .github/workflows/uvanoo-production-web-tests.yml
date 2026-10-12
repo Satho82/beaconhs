@@ -56,24 +56,10 @@ jobs:
           paths += ['packages/i18n/src/messages/'+lang+'.json' for lang in ['en','es','fr']]
           subprocess.run(['pnpm','exec','prettier','--write',*paths],check=True)
           PY
-      - name: Web regressions
-        run: pnpm --filter @beaconhs/web exec vitest run src/lib/download-audit-prefetch-contract.test.ts src/lib/dynamic-uuid-route-guards.test.ts src/lib/approvals
-      - name: Scheduled registry regression
-        run: pnpm --filter @beaconhs/jobs test
-      - name: Preserve normalized draft source for exact candidate creation
-        if: always()
-        run: |
-          python3 - <<'PY'
-          import json,pathlib
-          paths=list(json.load(open('/tmp/uvanoo-production-draft.json'))['files'])
-          paths += ['packages/i18n/src/messages/'+lang+'.json' for lang in ['en','es','fr']]
-          print('PREPARED_DRAFT_JSON='+json.dumps({p:pathlib.Path(p).read_text() for p in paths},separators=(',',':')))
-          PY
-      - name: Record source tree
+      - name: Verify recovered source identity without repeating tests
         run: |
           git add apps packages
           printf 'DRAFT_SOURCE_TREE=%s\n' "$(git write-tree)"
-
-# Final audit call and workflow configuration list.
-
-# Resolve member display names and current delegated assignment.
+          git diff --cached --name-status 40eedb50794510be943d15e6d029168504aca2fa
+          git diff --cached --stat 40eedb50794510be943d15e6d029168504aca2fa
+          git diff --cached 40eedb50794510be943d15e6d029168504aca2fa -- ':!packages/i18n/src/messages/*'

@@ -1,0 +1,10 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+ RUN  v4.1.10 /workspace/scratch/2fcebbc84689/beaconhs/packages/db
+
+
+ Test Files  1 passed (1)
+      Tests  4 passed (4)
+   Start at  17:48:26
+   Duration  1.18s (transform 563ms, setup 0ms, import 1.04s, tests 5ms, environment 0ms)
+

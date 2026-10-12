@@ -1,0 +1,28 @@
+name: Combined release complete-source secret scan
+on:
+  push:
+    branches: [review/uvanoo-v1.4-combined-validation-20261012]
+    paths: [.github/workflows/uvanoo-combined-snapshot-security.yml]
+permissions:
+  contents: read
+jobs:
+  snapshot:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          ref: 563fb0e9b79a838a5f394abaffb2f7dc743fc571
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e
+        env:
+          GITLEAKS_VERSION: 8.30.1
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Scan complete exact candidate working tree
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = 563fb0e9b79a838a5f394abaffb2f7dc743fc571
+          test "$(git rev-parse HEAD^{tree})" = 324c50a60e2cb0639ba920488a150c6531968374
+          /tmp/gitleaks-8.30.1/gitleaks dir . --redact --exit-code=2 --report-format=sarif --report-path="$RUNNER_TEMP/combined-snapshot.sarif"
+          git diff --exit-code

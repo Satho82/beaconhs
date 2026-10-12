@@ -1,0 +1,98 @@
+{
+  "repository": "Satho82/beaconhs",
+  "reviewDate": "2026-10-12",
+  "boardDate": "2026-10-16",
+  "status": "validation_checkpoint_not_board_release",
+  "authoritative": {
+    "governed": "6976a851c18e879df1813bb7c18729d6da5ab846",
+    "main": "665cf958cb5886eeeaad4f94448504108bcb9bd5",
+    "migrationSafety": "6892670fd33e0fe12a1862bb822b451cd1bf7b44",
+    "people": "0a4a04ca13758b68068f9483a3c0816b741478d8",
+    "approvals": "fed0709f79922d003aefbdb6674e5b92270bdeea"
+  },
+  "candidates": {
+    "migrationSafety": {
+      "sha": "befe7efc807230862ac1cbd42ab957e1e298e7f1",
+      "parent": "6892670fd33e0fe12a1862bb822b451cd1bf7b44",
+      "tree": "cac8f1184b7852629aab49e77f49a693abd0e350",
+      "branch": "fix/uvanoo-v1.4-migration-safety-cloud-gates",
+      "draftPullRequest": 8,
+      "changedPaths": [
+        "packages/db/src/migration-execution.ts",
+        "packages/db/src/action-property-rls.integration.sql"
+      ],
+      "migrationBodiesChanged": false,
+      "rlsChanged": false,
+      "riskRuntimeChanged": false,
+      "precommitDatabaseRun": 38277765802,
+      "precommitBuildRun": 38277089799,
+      "exactSourceRun": 38278704970,
+      "exactSourceRunStatus": "in_progress",
+      "frozen": false
+    },
+    "people": {
+      "sha": "0a4a04ca13758b68068f9483a3c0816b741478d8",
+      "sourceChanged": false,
+      "securityRun": 38275388373,
+      "securityPassed": true,
+      "buildRun": 38277089799,
+      "buildPassed": true,
+      "exactSourceRun": 38278704970,
+      "exactSourceRunStatus": "in_progress",
+      "frozen": false,
+      "remaining": [
+        "authenticated visual acceptance",
+        "combined-candidate regression"
+      ]
+    },
+    "approvals": {
+      "sha": "fed0709f79922d003aefbdb6674e5b92270bdeea",
+      "sourceChanged": false,
+      "changedFileManifest": "approvals-source-manifest.json",
+      "propertyAuthorityRun": 38279023873,
+      "propertyAuthorityChecksPassed": 18,
+      "fullExecutorTests": {
+        "passed": 2795,
+        "failed": 3,
+        "skipped": 2,
+        "patch": "approvals-deadcode-fix.patch"
+      },
+      "frozen": false,
+      "remaining": [
+        "dead-code correction not promoted while full gates fail",
+        "129 untranslated JSX/attribute occurrences and missing catalog entries",
+        "captured DEV contract required by separate full Batch01 script",
+        "canonical migration registration",
+        "production routes and source adapters",
+        "authenticated functional and visual acceptance"
+      ]
+    }
+  },
+  "controls": {
+    "branch": "review/uvanoo-v1.4-board-20261016-cloud",
+    "exactSourceWorkflowCommit": "71a1ab819c7030a5205821b7e6d7fc9d4a4bef9f",
+    "pr5ProposalApplied": false,
+    "pr5BoundaryCasesPassed": 11,
+    "pr6ClassifierCasesPassed": 5,
+    "pr5OriginalBuildHeapMiB": 8192,
+    "supplementalInitialBuildHeapMiB": 6144,
+    "supplementalCorrectedBuildHeapMiB": 8192
+  },
+  "release": {
+    "mergeAuthorized": false,
+    "devReleaseAuthorized": false,
+    "persistentDevChanged": false,
+    "sharedDatabaseChanged": false,
+    "stagingProductionExcluded": true,
+    "risk": "closed; regression only",
+    "remaining": [
+      "working Board flows and visual acceptance",
+      "immutable combined source and image digest",
+      "fresh read-only runtime and migration ledger identity",
+      "protected-data inventory and checksums",
+      "verified backup and restore rehearsal",
+      "data-preserving rollback plan and writer fencing",
+      "explicit authorization for that exact DEV release"
+    ]
+  }
+}

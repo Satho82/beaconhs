@@ -78,11 +78,25 @@ try {
     const journal = JSON.parse(fullJournal)
     journal.entries = journal.entries.slice(0, prefix)
     writeFileSync(resolve(folder, 'meta/_journal.json'), JSON.stringify(journal))
+    // Construct each historical state with its own runner and RLS installer.
+    // The current Approvals installer correctly rejects absent pre-0062 tables.
+    const baselineSource =
+      prefix < 62
+        ? 'd18f635a41f092e9e86aa6f53518f9c28992b0d2'
+        : prefix === 62
+          ? 'c306bd6bbe0571eeca18a410c1ac08fe55c524b6'
+          : source
+    for (const file of ['migrate.ts', 'rls.ts'])
+      writeFileSync(
+        resolve(work, 'src', file),
+        execFileSync('git', ['show', baselineSource + ':packages/db/src/' + file], { cwd: repo }),
+      )
     execFileSync(process.execPath, ['--import', 'tsx', resolve(work, 'src/migrate.ts')], {
       cwd: root,
       env,
       stdio: 'pipe',
     })
+    cpSync(resolve(root, 'src'), resolve(work, 'src'), { recursive: true })
     writeFileSync(resolve(folder, 'meta/_journal.json'), fullJournal)
     const client = postgres(url('beaconhs_migrator'), { max: 1, onnotice: () => undefined })
     const reserved = await client.reserve()

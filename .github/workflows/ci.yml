@@ -23,7 +23,9 @@ jobs:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           persist-credentials: false
-          fetch-depth: 1
+          # The range classifier needs the complete commit graph. A shallow
+          # clone cannot reliably prove that `before` is an ancestor of `after`.
+          fetch-depth: 0
       - id: classify
         name: Fail closed unless the pushed range changes application content
         env:
@@ -37,8 +39,9 @@ jobs:
             echo 'Deployment skipped: no trustworthy push range.' >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
-          git fetch --no-tags --depth=1 origin "$BEFORE"
-          if ! git merge-base --is-ancestor "$BEFORE" "$AFTER"; then
+          if ! git cat-file -e "${BEFORE}^{commit}" \
+            || ! git cat-file -e "${AFTER}^{commit}" \
+            || ! git merge-base --is-ancestor "$BEFORE" "$AFTER"; then
             echo 'has_application_changes=false' >> "$GITHUB_OUTPUT"
             echo 'Deployment skipped: push range is not a fast-forward history.' >> "$GITHUB_STEP_SUMMARY"
             exit 0

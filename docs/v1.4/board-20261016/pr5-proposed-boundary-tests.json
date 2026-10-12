@@ -1,0 +1,72 @@
+{
+  "baseSha": "52b2cf64ea4fe99ea1d15175ee611cf0da65be54",
+  "status": "proposal only, not applied to PR5",
+  "cases": [
+    {
+      "case": "people",
+      "expectedAcceptance": true,
+      "exitCode": 0,
+      "passed": true
+    },
+    {
+      "case": "safety",
+      "expectedAcceptance": true,
+      "exitCode": 0,
+      "passed": true
+    },
+    {
+      "case": "safety-correction",
+      "expectedAcceptance": true,
+      "exitCode": 0,
+      "passed": true
+    },
+    {
+      "case": "wrong-module",
+      "expectedAcceptance": false,
+      "exitCode": 1,
+      "passed": true
+    },
+    {
+      "case": "arbitrary-fix",
+      "expectedAcceptance": false,
+      "exitCode": 1,
+      "passed": true
+    },
+    {
+      "case": "main",
+      "expectedAcceptance": false,
+      "exitCode": 1,
+      "passed": true
+    },
+    {
+      "case": "unsafe-branch",
+      "expectedAcceptance": false,
+      "exitCode": 1,
+      "passed": true
+    },
+    {
+      "case": "wrong-repository",
+      "expectedAcceptance": false,
+      "exitCode": 1,
+      "passed": true
+    },
+    {
+      "case": "wrong-control",
+      "expectedAcceptance": false,
+      "exitCode": 1,
+      "passed": true
+    },
+    {
+      "case": "short-sha",
+      "expectedAcceptance": false,
+      "exitCode": 1,
+      "passed": true
+    },
+    {
+      "case": "invalid-module",
+      "expectedAcceptance": false,
+      "exitCode": 1,
+      "passed": true
+    }
+  ]
+}

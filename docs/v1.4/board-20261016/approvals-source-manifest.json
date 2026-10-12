@@ -1,0 +1,194 @@
+{
+  "base": "6976a851c18e879df1813bb7c18729d6da5ab846",
+  "migration_safety": "6892670fd33e0fe12a1862bb822b451cd1bf7b44",
+  "approvals": "fed0709f79922d003aefbdb6674e5b92270bdeea",
+  "changed_path_overlap": [],
+  "textual_overlap_only_not_runtime_compatibility": true,
+  "approvals_manifest": [
+    {
+      "path": "apps/web/scripts/launch-approvals-preview.ts",
+      "git_blob": "7da29adcc64ed1383c9c36a6ace00ab796875632",
+      "sha256": "58ac8480755af16ae28f3e6cb68dfb39a63b8974326ce77074c9d9a937a7ff5a"
+    },
+    {
+      "path": "apps/web/scripts/verify-approvals-batch01.ts",
+      "git_blob": "2aabe4249db848411977eb61241e87cf63cd7418",
+      "sha256": "fda89dc190d4e7cf947b48984e686d724f7ac3693c3eaa54960e002a0d63436f"
+    },
+    {
+      "path": "apps/web/scripts/verify-approvals-property-authority.ts",
+      "git_blob": "18abfdf6b78ab571b31c9fb0f4323f49b2473124",
+      "sha256": "ed6ba27f8d77ec9e211e35268fa7e222d9e77e0d3b681039daf0a8cbec3b5b75"
+    },
+    {
+      "path": "apps/web/src/app/preview/approvals/[[...screen]]/page.tsx",
+      "git_blob": "95c2077f201ccc7f993f728786c62c8c9ec96e72",
+      "sha256": "d010b7a284a9b5d8202e5c3700897a4162ecc0189b15e9af63276f4cbd7f987d"
+    },
+    {
+      "path": "apps/web/src/app/preview/approvals/actions.ts",
+      "git_blob": "904b5f8bc655e37e96b30684c68a952fbce666a0",
+      "sha256": "077c013fae62f3e8397dc6ad4021333fa2d1e26bbf2eed7374d36249ef6ba88d"
+    },
+    {
+      "path": "apps/web/src/app/preview/approvals/login/page.tsx",
+      "git_blob": "8c659fba3e8cc1eb7d5a934f9a314771b828b6c6",
+      "sha256": "0439903f48cd5a3b6f75c6d0baab721e60d9eb6593e9b474530ca5642f259886"
+    },
+    {
+      "path": "apps/web/src/app/preview/approvals/preview.client.tsx",
+      "git_blob": "0e58c4cda7305f09d26b387154dd873a3180a20b",
+      "sha256": "49c43dfc9125a3506b25e91fa795b82d9ce89786bb9d98e32f8b4e3f9176c954"
+    },
+    {
+      "path": "apps/web/src/app/preview/approvals/preview.css",
+      "git_blob": "8fdebc799755a373aa2d2a6e4996e55ef4ed1a4a",
+      "sha256": "2a34549919b3ff919da3e4dc358bb0d75761eb0f9a600aabafeb17707d1297ee"
+    },
+    {
+      "path": "apps/web/src/app/preview/approvals/session/route.ts",
+      "git_blob": "f7f4b715ec87e1056f04ec8cf4b92ed29321a47e",
+      "sha256": "cc618aa2668e6b203f742483993689da6c46a791acdb0f3f42dfd8ed7449b97d"
+    },
+    {
+      "path": "apps/web/src/components/app-shell.tsx",
+      "git_blob": "3b304fe2f1588c3e7cdc9b3457caafb777387519",
+      "sha256": "a374314636d1eac18a3c6bdd4b897281341fb9b3b4fa447f7882e5f05ed0203e"
+    },
+    {
+      "path": "apps/web/src/lib/approvals/contracts.test.ts",
+      "git_blob": "0e2676266e8a3529eff028db9e7bf1107d9312ef",
+      "sha256": "38575112dbf88504a37b71c491107f7d73bf65f13a26c35b7173da55a6b7ce53"
+    },
+    {
+      "path": "apps/web/src/lib/approvals/contracts.ts",
+      "git_blob": "2242406aca8f418f4c1fab445938b42ac34c96bf",
+      "sha256": "9fc43e7911435833ad04d2d9e89c6ae9a8f6b9494ad9cf60e02038b2ba69e189"
+    },
+    {
+      "path": "apps/web/src/lib/approvals/preview-fixtures.ts",
+      "git_blob": "340f952968fd74f7f87b380744bacd5d35dcd5dd",
+      "sha256": "5f1eaf0ffa582fd3a51269e3e751afe792e017f9381e02b5722fc256047505f2"
+    },
+    {
+      "path": "apps/web/src/lib/approvals/preview-guard.test.ts",
+      "git_blob": "f70140677021c4248608e6eca82becaea1a77388",
+      "sha256": "4b998bd560c91870769b80f4ab48790be838afdb477bbf4c0e616ccda7eb1e04"
+    },
+    {
+      "path": "apps/web/src/lib/approvals/preview-guard.ts",
+      "git_blob": "dc6c83ea40b5d1077a34f535e073e73e0ecf7bb6",
+      "sha256": "f85b2ea5365dc475d23990e21af231de77bbc48a109dce1fb70559fdda2378e7"
+    },
+    {
+      "path": "apps/web/src/lib/approvals/preview-queries.ts",
+      "git_blob": "7ec3dad49abcbc6fe4877c2d25f17ee107244af0",
+      "sha256": "310d4b529e01eb800aebbb1fc9ec5ad721124f4b5933c57f506c1b61e3066aa2"
+    },
+    {
+      "path": "apps/web/src/lib/approvals/preview-server.ts",
+      "git_blob": "9c1fb4407a7d34ea7aae15b98f0cae01193711d9",
+      "sha256": "b5357c472fb695c979bfe5b6af79165a5fc7df2a095f5e1e2926a89e067283c8"
+    },
+    {
+      "path": "apps/web/src/lib/approvals/preview-session.test.ts",
+      "git_blob": "4bacd23fe0c3802cabe524d3d2483a2afb98da40",
+      "sha256": "0bd02117aec0fca4dea9aaab9b03b3cfa38e6371aa20789e0ed062b0aab9bdb6"
+    },
+    {
+      "path": "apps/web/src/lib/approvals/preview-session.ts",
+      "git_blob": "77bcf6d787067dcc909a76a5fa6984670818586c",
+      "sha256": "a8b5826def9b1d778ebd677390cef008926393f2904a4e40cad2f6d5bfbfa917"
+    },
+    {
+      "path": "apps/web/src/lib/approvals/preview-submission.test.ts",
+      "git_blob": "e81ade7e981c94489d048347f8caf291304b5cc2",
+      "sha256": "178b2fbcc0befb199419d65fc6e2e2a592db801821966426c5476b09058632ba"
+    },
+    {
+      "path": "apps/web/src/lib/approvals/preview-submission.ts",
+      "git_blob": "5e055afa97baba9053c345420738ee53212349df",
+      "sha256": "a85bc60ad64887d0109f48da8acefd2b480784a0028ba7bdde22f6c204cb4c6a"
+    },
+    {
+      "path": "apps/web/src/lib/approvals/property-authority.test.ts",
+      "git_blob": "db0bf65401e1140ebc92b708c3ea310e6c4cbd58",
+      "sha256": "ff2f4334096cafb86d4ac88ccc55e9f77b3bc99e1b911a963f80c7df8d0de3f4"
+    },
+    {
+      "path": "apps/web/src/lib/approvals/property-authority.ts",
+      "git_blob": "a213bf748da1897a5b496110a3704faedea2ea66",
+      "sha256": "fa8322f4a34a4308dfab490ebe3834d78688a706a2a7cf8a994c35f638f6f8a0"
+    },
+    {
+      "path": "apps/web/src/lib/approvals/service.ts",
+      "git_blob": "5cddf402226340dcff1482e2623b1f54cde84c98",
+      "sha256": "0805afd13bff005ddc6378821131850eeafae2e4a55d8ba3faa9fc8ed0d713cd"
+    },
+    {
+      "path": "apps/web/src/lib/manual/content/approvals-preview.ts",
+      "git_blob": "29e7390922f46e52ac54ac5aa429e01eb43018af",
+      "sha256": "f06c1368c43c04c334af16833e2420459832fcc89342b8496616cf13827eeda0"
+    },
+    {
+      "path": "apps/web/src/lib/module-entitlements/catalogue.ts",
+      "git_blob": "2257ce01123ad081c3460574966cd908375b687e",
+      "sha256": "e894a5da2ac54422099ff22cbe98340f96ecdad70debdb96e4d5e10120122340"
+    },
+    {
+      "path": "apps/web/src/lib/nav/approvals-preview.ts",
+      "git_blob": "810f4ff83a3786fdcb5928fc600b27994376e683",
+      "sha256": "ff4f47b2017d93f27e491d8a590caa012418a626d1e20192c42577064ceeb5eb"
+    },
+    {
+      "path": "apps/web/src/lib/permissions-meta.ts",
+      "git_blob": "f3551293f97e8422b03437eecb543ebda71b415a",
+      "sha256": "16f4391bfb81bedcc527b5cb9bc10209e01e97b952289eedb844fed202eb6b55"
+    },
+    {
+      "path": "apps/web/tsconfig.approvals-preview.json",
+      "git_blob": "59c82193231ed91e3aa9350f9a482ce49d96de2a",
+      "sha256": "21063a1416724e25ea48130c58d017b0b0cabc786c2fc4cd09e51785635f3910"
+    },
+    {
+      "path": "apps/web/tsconfig.approvals-security.json",
+      "git_blob": "5ef8845723f771c77b466f1b874c7b836be500e6",
+      "sha256": "b5e741e27bd81293a4c6c60530e715bc67d68bc25ae74ca47e84bcef5c70b3d4"
+    },
+    {
+      "path": "apps/web/tsconfig.approvals.json",
+      "git_blob": "8ba929978895eedc2fef6bb2435c60d98c1b7ded",
+      "sha256": "a6a8becc26a1812068672ebbb9386131b2b13c327be0bc4d21f6daedf6e9b457"
+    },
+    {
+      "path": "packages/db/proposals/approvals-batch01.sql",
+      "git_blob": "53839559d77311234b730e9dff16a513afbeecc4",
+      "sha256": "9d7e47851e1ddf38335826fe0160099e8839d542d18505f141f36653da8c7780"
+    },
+    {
+      "path": "packages/db/src/approvals.test.ts",
+      "git_blob": "8b1ae94ddd22268ca7b9d89cc29abe0eaf850853",
+      "sha256": "42814089f2bf91f0a0e5cbef47ee8d567007830c6c85b4d34c2a9ef05e5002d9"
+    },
+    {
+      "path": "packages/db/src/rls.ts",
+      "git_blob": "a9619cc1dbfd9e5425a922438743a20f13c67b1b",
+      "sha256": "fe7a8d155bd7d20f6773308b65ee6ce0399faa1f68599945355376d877dc76a1"
+    },
+    {
+      "path": "packages/db/src/schema/approvals.ts",
+      "git_blob": "f32dfd81a19850879c811a2188eba0c92c5c718b",
+      "sha256": "3dfd3333bc5e5fd012750e3e59709ecad8362eaebf2f812f75a72dbd76b687cd"
+    },
+    {
+      "path": "packages/db/src/schema/iam.ts",
+      "git_blob": "c2e3b306f2035bac33c1c2fddf524c9c8adb5736",
+      "sha256": "9e1b71f7c689c144feeca89f9d67070ba505266d6f270d2cfabf0ece798cc2a1"
+    },
+    {
+      "path": "packages/db/src/schema/index.ts",
+      "git_blob": "bf72f7a42fd3be7d0eb095f56366f2cf0d9b7b37",
+      "sha256": "98b9ffa1dfd8af9fb1e86d0e30a5d4681d074540c609cff7b9168c2563844038"
+    }
+  ]
+}

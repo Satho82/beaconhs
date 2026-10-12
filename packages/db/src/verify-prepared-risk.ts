@@ -2,7 +2,7 @@
 import { fileURLToPath } from 'node:url'
 import postgres from 'postgres'
 import { readMigrationFiles } from './migration-state'
-import { preparedRiskPlan, preparedRiskProposals } from './risk-prepared-plan'
+import { preparedRiskPlan } from './risk-prepared-plan'
 
 const target = 'beaconhs_clean155_final'
 type Query = (sql: string) => Promise<Array<Record<string, unknown>>>
@@ -13,12 +13,9 @@ export async function verifyPreparedRisk(connections: {
   runtime: ReadOnly
   maintenance: ReadOnly
 }): Promise<void> {
-  // Reuse the plan's exact source-hash and unchanged ordinary-journal checks.
+  // Reuse the historical plan's exact canonical source-identity checks.
   preparedRiskPlan(target)
-  const expected = [
-    ...readMigrationFiles(fileURLToPath(new URL('../drizzle', import.meta.url))),
-    ...preparedRiskProposals.map(([tag, createdAt, hash]) => ({ tag, createdAt, hash })),
-  ]
+  const expected = readMigrationFiles(fileURLToPath(new URL('../drizzle', import.meta.url)))
   for (const [kind, connection] of Object.entries(connections)) {
     await connection(async (query) => {
       const [identity] = await query(`SELECT current_database() AS database, session_user AS login,

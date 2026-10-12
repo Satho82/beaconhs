@@ -1,0 +1,595 @@
+Initial default-heap build: exit 1 (4 GB heap exhaustion).
+Command: env -u DATABASE_URL -u SUPERADMIN_DATABASE_URL -u MIGRATION_DATABASE_URL -u CYCAS_TEST_DATABASE_URL -u REDIS_URL TURBO_FORCE=true pnpm build
+
+
+> beaconhs@0.1.0 build /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety
+> turbo run build
+
+• turbo 2.10.5
+
+   • Packages in scope: @beaconhs/ai, @beaconhs/analytics, @beaconhs/audit, @beaconhs/auth, @beaconhs/compliance, @beaconhs/crypto, @beaconhs/db, @beaconhs/design-studio, @beaconhs/email-render, @beaconhs/emails, @beaconhs/events, @beaconhs/forms-core, @beaconhs/forms-pdf, @beaconhs/i18n, @beaconhs/integrations, @beaconhs/jobs, @beaconhs/office, @beaconhs/reports, @beaconhs/sms, @beaconhs/storage, @beaconhs/sync, @beaconhs/tenant, @beaconhs/ui, @beaconhs/web, @beaconhs/worker
+   • Running build in 25 packages
+   • Remote caching disabled, using shared worktree cache
+
+@beaconhs/worker:build: cache bypass, force executing d671b9293d3e64f7
+@beaconhs/web:build: cache bypass, force executing 5a3b4b655cbf3617
+@beaconhs/web:build:
+@beaconhs/web:build: > @beaconhs/web@0.1.0 build /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/apps/web
+@beaconhs/web:build: > next build --webpack
+@beaconhs/web:build:
+@beaconhs/worker:build:
+@beaconhs/worker:build: > @beaconhs/worker@0.1.0 build /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/apps/worker
+@beaconhs/worker:build: > node build.mjs
+@beaconhs/worker:build:
+@beaconhs/worker:build:
+@beaconhs/worker:build:   dist/index.js               5.9mb ⚠️
+@beaconhs/worker:build:   dist/health.js            813.9kb
+@beaconhs/worker:build:   dist/scheduler.js          10.8kb
+@beaconhs/worker:build:   dist/storage-init.js        8.8kb
+@beaconhs/worker:build:   dist/index.js.map           8.4mb
+@beaconhs/worker:build:   dist/health.js.map          1.5mb
+@beaconhs/worker:build:   dist/scheduler.js.map      88.0kb
+@beaconhs/worker:build:   dist/storage-init.js.map   29.0kb
+@beaconhs/worker:build:
+@beaconhs/worker:build: ⚡ Done in 1009ms
+@beaconhs/web:build: ▲ Next.js 16.3.8 (webpack)
+@beaconhs/web:build: ✓ Running next.config.ts took 18.2s
+@beaconhs/web:build: - Experiments (use with caution):
+@beaconhs/web:build:   · clientTraceMetadata
+@beaconhs/web:build:   ✓ webpackBuildWorker
+@beaconhs/web:build:   ✓ webpackMemoryOptimizations
+@beaconhs/web:build:
+@beaconhs/web:build:   Creating an optimized production build ...
+@beaconhs/web:build:
+@beaconhs/web:build: <--- Last few GCs --->
+@beaconhs/web:build:
+@beaconhs/web:build: [45894:0x7ff6e600a000]   762608 ms: Mark-Compact 4073.9 (4115.1) -> 4073.5 (4129.4) MB, pooled: 0 MB, 2485.80 / 0.00 ms  (average mu = 0.184, current mu = 0.058) allocation failure; scavenge might not succeed
+@beaconhs/web:build: [45894:0x7ff6e600a000]   768633 ms: Mark-Compact (reduce) 4077.4 (4133.0) -> 4077.3 (4102.3) MB, pooled: 0 MB, 5474.88 / 0.00 ms  (+ 51.6 ms in 10 steps since start of marking, biggest step 5.8 ms, walltime since start of marking 5585 ms) (average mu = 0.
+@beaconhs/web:build: FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory
+@beaconhs/web:build: ----- Native stack trace -----
+@beaconhs/web:build:
+@beaconhs/web:build:  1: 0x1071bec13 node::OOMErrorHandler(char const*, v8::OOMDetails const&) [/usr/local/bin/node]
+@beaconhs/web:build:  2: 0x107477b7d v8::internal::V8::FatalProcessOutOfMemory(v8::internal::Isolate*, char const*, v8::OOMDetails const&) [/usr/local/bin/node]
+@beaconhs/web:build:  3: 0x1076f3d07 v8::internal::Heap::FatalProcessOutOfMemory(char const*) [/usr/local/bin/node]
+@beaconhs/web:build:  4: 0x1076f1981 v8::internal::Heap::CollectGarbage(v8::internal::AllocationSpace, v8::internal::GarbageCollectionReason, v8::GCCallbackFlags) [/usr/local/bin/node]
+@beaconhs/web:build:  5: 0x1076e5035 v8::internal::HeapAllocator::AllocateRawWithRetryOrFailSlowPath(int, v8::internal::AllocationType, v8::internal::AllocationOrigin, v8::internal::AllocationAlignment) [/usr/local/bin/node]
+@beaconhs/web:build:  6: 0x1076aec7c v8::internal::FactoryBase<v8::internal::Factory>::NewRawTwoByteString(int, v8::internal::AllocationType) [/usr/local/bin/node]
+@beaconhs/web:build:  7: 0x1076c6051 v8::internal::Factory::NewStringFromUtf8(v8::base::Vector<unsigned char const>, unibrow::Utf8Variant, v8::internal::AllocationType) [/usr/local/bin/node]
+@beaconhs/web:build:  8: 0x107497544 v8::String::NewFromUtf8(v8::Isolate*, char const*, v8::NewStringType, int) [/usr/local/bin/node]
+@beaconhs/web:build:  9: 0x107149b35 napi_create_string_utf8 [/usr/local/bin/node]
+@beaconhs/web:build: 10: 0x14eb9a92f BrotliDecoderVersion [/Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/node_modules/.pnpm/@next+swc-darwin-x64@16.3.8/node_modules/@next/swc-darwin-x64/next-swc.darwin-x64.node]
+@beaconhs/web:build: 11: 0x14f70ae92 napi_register_module_v1 [/Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/node_modules/.pnpm/@next+swc-darwin-x64@16.3.8/node_modules/@next/swc-darwin-x64/next-swc.darwin-x64.node]
+@beaconhs/web:build: 12: 0x14f6f96bf napi_register_module_v1 [/Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/node_modules/.pnpm/@next+swc-darwin-x64@16.3.8/node_modules/@next/swc-darwin-x64/next-swc.darwin-x64.node]
+@beaconhs/web:build: 13: 0x14f4b06cf napi_register_module_v1 [/Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/node_modules/.pnpm/@next+swc-darwin-x64@16.3.8/node_modules/@next/swc-darwin-x64/next-swc.darwin-x64.node]
+@beaconhs/web:build: 14: 0x10716c789 (anonymous namespace)::uvimpl::Work::AfterThreadPoolWork(int) [/usr/local/bin/node]
+@beaconhs/web:build: 15: 0x10716cd0f node::ThreadPoolWork::ScheduleWork()::'lambda'(uv_work_s*, int)::operator()(uv_work_s*, int) const [/usr/local/bin/node]
+@beaconhs/web:build: 16: 0x10716cbd6 node::ThreadPoolWork::ScheduleWork()::'lambda'(uv_work_s*, int)::__invoke(uv_work_s*, int) [/usr/local/bin/node]
+@beaconhs/web:build: 17: 0x1081cd479 uv__work_done [/usr/local/bin/node]
+@beaconhs/web:build: 18: 0x1081d19d1 uv__async_io [/usr/local/bin/node]
+@beaconhs/web:build: 19: 0x1081e71fd uv__io_poll [/usr/local/bin/node]
+@beaconhs/web:build: 20: 0x1081d2330 uv_run [/usr/local/bin/node]
+@beaconhs/web:build: 21: 0x1070848f5 node::SpinEventLoopInternal(node::Environment*) [/usr/local/bin/node]
+@beaconhs/web:build: 22: 0x107224a6e node::NodeMainInstance::Run() [/usr/local/bin/node]
+@beaconhs/web:build: 23: 0x10716545e node::Start(int, char**) [/usr/local/bin/node]
+@beaconhs/web:build: 24: 0x7ff8199501c8 start [/usr/lib/dyld]
+@beaconhs/web:build: Next.js build worker exited with code: null and signal: SIGABRT
+@beaconhs/web:build:  ELIFECYCLE  Command failed with exit code 1.
+@beaconhs/web#build:  ERROR  command (/Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/apps/web) /usr/local/bin/pnpm run build exited (1)
+
+ Tasks:    1 successful, 2 total
+Cached:    0 cached, 2 total
+  Time:    13m25.471s
+Failed:    @beaconhs/web#build
+
+ ERROR  run failed: command  exited (1)
+ ELIFECYCLE  Command failed with exit code 1.
+
+Final build: exit 0, 2/2 tasks uncached.
+Command: env -u DATABASE_URL -u SUPERADMIN_DATABASE_URL -u MIGRATION_DATABASE_URL -u CYCAS_TEST_DATABASE_URL -u REDIS_URL NODE_OPTIONS=--max-old-space-size=6144 TURBO_FORCE=true pnpm build --concurrency=1
+Heap setting from .github/workflows/ci.yml; no configuration edits.
+
+@beaconhs/web:build: cache bypass, force executing c7dc9826fcc82d3c
+@beaconhs/web:build:
+@beaconhs/web:build: > @beaconhs/web@0.1.0 build /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/apps/web
+@beaconhs/web:build: > next build --webpack
+@beaconhs/web:build:
+@beaconhs/web:build: ▲ Next.js 16.3.8 (webpack)
+@beaconhs/web:build: ✓ Running next.config.ts took 1389ms
+@beaconhs/web:build: - Experiments (use with caution):
+@beaconhs/web:build:   · clientTraceMetadata
+@beaconhs/web:build:   ✓ webpackBuildWorker
+@beaconhs/web:build:   ✓ webpackMemoryOptimizations
+@beaconhs/web:build:
+@beaconhs/web:build:   Creating an optimized production build ...
+@beaconhs/web:build: ⚠ Compiled with warnings in 10.6min
+@beaconhs/web:build:
+@beaconhs/web:build: ../../packages/sync/src/db-drivers.ts
+@beaconhs/web:build: Critical dependency: the request of a dependency is an expression
+@beaconhs/web:build:
+@beaconhs/web:build: Import trace for requested module:
+@beaconhs/web:build: ../../packages/sync/src/db-drivers.ts
+@beaconhs/web:build: ../../packages/sync/src/index.ts
+@beaconhs/web:build: ../../packages/integrations/src/dispatch.ts
+@beaconhs/web:build: ../../packages/integrations/src/index.ts
+@beaconhs/web:build: ./src/app/(app)/corrective-actions/_actions.ts
+@beaconhs/web:build:
+@beaconhs/web:build: ../../packages/sync/src/db-drivers.ts
+@beaconhs/web:build: Critical dependency: the request of a dependency is an expression
+@beaconhs/web:build:
+@beaconhs/web:build: Import trace for requested module:
+@beaconhs/web:build: ../../packages/sync/src/db-drivers.ts
+@beaconhs/web:build: ../../packages/sync/src/index.ts
+@beaconhs/web:build: ./src/app/(app)/admin/integrations/page.tsx
+@beaconhs/web:build:
+@beaconhs/web:build: ../../node_modules/.pnpm/bullmq@5.80.2/node_modules/bullmq/dist/esm/classes/child-processor.js
+@beaconhs/web:build: Critical dependency: the request of a dependency is an expression
+@beaconhs/web:build:
+@beaconhs/web:build: Import trace for requested module:
+@beaconhs/web:build: ../../node_modules/.pnpm/bullmq@5.80.2/node_modules/bullmq/dist/esm/classes/child-processor.js
+@beaconhs/web:build: ../../node_modules/.pnpm/bullmq@5.80.2/node_modules/bullmq/dist/esm/classes/index.js
+@beaconhs/web:build: ../../node_modules/.pnpm/bullmq@5.80.2/node_modules/bullmq/dist/esm/index.js
+@beaconhs/web:build: ../../packages/jobs/src/queues/email.ts
+@beaconhs/web:build: ../../packages/jobs/src/index.ts
+@beaconhs/web:build: ./src/lib/pdf-route.ts
+@beaconhs/web:build: ./src/app/(app)/documents/[id]/pdf/route.ts
+@beaconhs/web:build:
+@beaconhs/web:build: ../../node_modules/.pnpm/yargs@18.0.0/node_modules/yargs/build/lib/utils/apply-extends.js
+@beaconhs/web:build: Critical dependency: Accessing import.meta directly is unsupported (only property access or destructuring is supported)
+@beaconhs/web:build:
+@beaconhs/web:build: Import trace for requested module:
+@beaconhs/web:build: ../../node_modules/.pnpm/yargs@18.0.0/node_modules/yargs/build/lib/utils/apply-extends.js
+@beaconhs/web:build: ../../node_modules/.pnpm/yargs@18.0.0/node_modules/yargs/helpers/helpers.mjs
+@beaconhs/web:build: ../../node_modules/.pnpm/@puppeteer+browsers@3.0.6/node_modules/@puppeteer/browsers/lib/CLI.js
+@beaconhs/web:build: ../../node_modules/.pnpm/@puppeteer+browsers@3.0.6/node_modules/@puppeteer/browsers/lib/main.js
+@beaconhs/web:build: ../../node_modules/.pnpm/puppeteer-core@25.3.0/node_modules/puppeteer-core/lib/puppeteer/node/ChromeLauncher.js
+@beaconhs/web:build: ../../node_modules/.pnpm/puppeteer-core@25.3.0/node_modules/puppeteer-core/lib/puppeteer/node/node.js
+@beaconhs/web:build: ../../node_modules/.pnpm/puppeteer-core@25.3.0/node_modules/puppeteer-core/lib/puppeteer/index.js
+@beaconhs/web:build: ../../node_modules/.pnpm/puppeteer-core@25.3.0/node_modules/puppeteer-core/lib/puppeteer/puppeteer-core.js
+@beaconhs/web:build: ../../packages/forms-pdf/src/util.ts
+@beaconhs/web:build: ../../packages/forms-pdf/src/index.ts
+@beaconhs/web:build: ./src/lib/training-certificate-issuance.ts
+@beaconhs/web:build: ./src/app/(app)/training/learn/_lib/completion.ts
+@beaconhs/web:build: ./src/app/(app)/training/learn/_actions.ts
+@beaconhs/web:build:
+@beaconhs/web:build: ✓ Compiled successfully in 11.8min
+@beaconhs/web:build:   Running TypeScript ...
+@beaconhs/web:build:   Finished TypeScript in 10.8min ...
+@beaconhs/web:build:   Collecting page data using 11 workers ...
+@beaconhs/web:build:   Generating static pages using 11 workers (0/9) ...
+@beaconhs/web:build:   Generating static pages using 11 workers (2/9)
+@beaconhs/web:build:   Generating static pages using 11 workers (4/9)
+@beaconhs/web:build:   Generating static pages using 11 workers (6/9)
+@beaconhs/web:build: ✓ Generating static pages using 11 workers (9/9) in 1012ms
+@beaconhs/web:build:   Finalizing page optimization ...
+@beaconhs/web:build:   Collecting build traces ...
+@beaconhs/web:build:
+@beaconhs/web:build: Route (app)
+@beaconhs/web:build: ┌ ƒ /
+@beaconhs/web:build: ├ ƒ /_not-found
+@beaconhs/web:build: ├ ƒ /account
+@beaconhs/web:build: ├ ƒ /admin
+@beaconhs/web:build: ├ ƒ /admin/ai
+@beaconhs/web:build: ├ ƒ /admin/api-keys
+@beaconhs/web:build: ├ ƒ /admin/api-keys/[id]
+@beaconhs/web:build: ├ ƒ /admin/audit
+@beaconhs/web:build: ├ ƒ /admin/data-sources
+@beaconhs/web:build: ├ ƒ /admin/data-sources/[id]
+@beaconhs/web:build: ├ ƒ /admin/email
+@beaconhs/web:build: ├ ƒ /admin/email-log
+@beaconhs/web:build: ├ ƒ /admin/email-log/[id]
+@beaconhs/web:build: ├ ƒ /admin/email-templates
+@beaconhs/web:build: ├ ƒ /admin/email-templates/[id]
+@beaconhs/web:build: ├ ƒ /admin/export
+@beaconhs/web:build: ├ ƒ /admin/integrations
+@beaconhs/web:build: ├ ƒ /admin/integrations/[id]
+@beaconhs/web:build: ├ ƒ /admin/integrations/[id]/runs/[runId]
+@beaconhs/web:build: ├ ƒ /admin/integrations/outbound/[id]
+@beaconhs/web:build: ├ ƒ /admin/navigation
+@beaconhs/web:build: ├ ƒ /admin/notifications
+@beaconhs/web:build: ├ ƒ /admin/pdf-templates
+@beaconhs/web:build: ├ ƒ /admin/pdf-templates/[id]
+@beaconhs/web:build: ├ ƒ /admin/printing
+@beaconhs/web:build: ├ ƒ /admin/roles
+@beaconhs/web:build: ├ ƒ /admin/roles/[id]
+@beaconhs/web:build: ├ ƒ /admin/roles/new
+@beaconhs/web:build: ├ ƒ /admin/settings
+@beaconhs/web:build: ├ ƒ /admin/settings/advanced
+@beaconhs/web:build: ├ ƒ /admin/settings/branding
+@beaconhs/web:build: ├ ƒ /admin/settings/branding/assets/[kind]
+@beaconhs/web:build: ├ ƒ /admin/settings/import-export
+@beaconhs/web:build: ├ ƒ /admin/settings/import-export/property-structure/export
+@beaconhs/web:build: ├ ƒ /admin/settings/import-export/property-structure/preview/[batchId]
+@beaconhs/web:build: ├ ƒ /admin/settings/import-export/property-structure/result/[batchId]
+@beaconhs/web:build: ├ ƒ /admin/settings/import-export/property-structure/result/[batchId]/download
+@beaconhs/web:build: ├ ƒ /admin/settings/import-export/property-structure/review/[batchId]
+@beaconhs/web:build: ├ ƒ /admin/settings/import-export/property-structure/template
+@beaconhs/web:build: ├ ƒ /admin/settings/import-export/property-structure/upload
+@beaconhs/web:build: ├ ƒ /admin/settings/modules
+@beaconhs/web:build: ├ ƒ /admin/sms
+@beaconhs/web:build: ├ ƒ /admin/sms-log
+@beaconhs/web:build: ├ ƒ /admin/sms-log/[id]
+@beaconhs/web:build: ├ ƒ /admin/users
+@beaconhs/web:build: ├ ƒ /admin/users/[id]
+@beaconhs/web:build: ├ ƒ /admin/users/invite
+@beaconhs/web:build: ├ ƒ /admin/walkthroughs
+@beaconhs/web:build: ├ ƒ /api/apps/draft-save
+@beaconhs/web:build: ├ ƒ /api/attachments/[id]
+@beaconhs/web:build: ├ ƒ /api/auth/[...all]
+@beaconhs/web:build: ├ ƒ /api/health/ready
+@beaconhs/web:build: ├ ƒ /api/internal/domain-events/[id]
+@beaconhs/web:build: ├ ƒ /api/picker-options
+@beaconhs/web:build: ├ ƒ /api/search
+@beaconhs/web:build: ├ ƒ /api/v1
+@beaconhs/web:build: ├ ƒ /api/v1/[entity]
+@beaconhs/web:build: ├ ƒ /api/v1/[entity]/[id]
+@beaconhs/web:build: ├ ƒ /api/v1/apps
+@beaconhs/web:build: ├ ƒ /api/v1/apps/[templateKey]/responses
+@beaconhs/web:build: ├ ƒ /api/v1/apps/[templateKey]/responses/[id]
+@beaconhs/web:build: ├ ƒ /api/v1/docs
+@beaconhs/web:build: ├ ƒ /api/v1/openapi.json
+@beaconhs/web:build: ├ ○ /apple-icon.png
+@beaconhs/web:build: ├ ƒ /apps
+@beaconhs/web:build: ├ ƒ /apps/by-key/[key]/fill
+@beaconhs/web:build: ├ ƒ /apps/responses
+@beaconhs/web:build: ├ ƒ /apps/responses/[id]
+@beaconhs/web:build: ├ ƒ /apps/responses/[id]/pdf
+@beaconhs/web:build: ├ ƒ /apps/responses/export.csv
+@beaconhs/web:build: ├ ƒ /apps/sessions
+@beaconhs/web:build: ├ ƒ /apps/templates/[id]
+@beaconhs/web:build: ├ ƒ /apps/templates/[id]/designer
+@beaconhs/web:build: ├ ƒ /apps/templates/[id]/fill
+@beaconhs/web:build: ├ ƒ /apps/templates/[id]/flows
+@beaconhs/web:build: ├ ƒ /apps/templates/[id]/records
+@beaconhs/web:build: ├ ƒ /apps/templates/new
+@beaconhs/web:build: ├ ƒ /apps/transcripts
+@beaconhs/web:build: ├ ƒ /apps/transcripts/[personId]
+@beaconhs/web:build: ├ ƒ /assistant
+@beaconhs/web:build: ├ ƒ /assistant/[id]
+@beaconhs/web:build: ├ ƒ /assistant/chat
+@beaconhs/web:build: ├ ƒ /auth/continue
+@beaconhs/web:build: ├ ƒ /compliance
+@beaconhs/web:build: ├ ƒ /compliance/aging
+@beaconhs/web:build: ├ ƒ /compliance/by-person
+@beaconhs/web:build: ├ ƒ /compliance/expiring
+@beaconhs/web:build: ├ ƒ /compliance/mine
+@beaconhs/web:build: ├ ƒ /compliance/obligations
+@beaconhs/web:build: ├ ƒ /compliance/obligations/[id]
+@beaconhs/web:build: ├ ƒ /corrective-actions
+@beaconhs/web:build: ├ ƒ /corrective-actions/[id]
+@beaconhs/web:build: ├ ƒ /corrective-actions/[id]/pdf
+@beaconhs/web:build: ├ ƒ /corrective-actions/[id]/print
+@beaconhs/web:build: ├ ƒ /corrective-actions/export.csv
+@beaconhs/web:build: ├ ƒ /corrective-actions/flows
+@beaconhs/web:build: ├ ƒ /corrective-actions/manage
+@beaconhs/web:build: ├ ƒ /corrective-actions/new
+@beaconhs/web:build: ├ ƒ /corrective-actions/reports/aging
+@beaconhs/web:build: ├ ƒ /corrective-actions/reports/by-assignee
+@beaconhs/web:build: ├ ƒ /corrective-actions/reports/by-source
+@beaconhs/web:build: ├ ƒ /corrective-actions/reports/overdue
+@beaconhs/web:build: ├ ƒ /dashboard
+@beaconhs/web:build: ├ ƒ /dashboard/customize
+@beaconhs/web:build: ├ ƒ /documents
+@beaconhs/web:build: ├ ƒ /documents/[id]
+@beaconhs/web:build: ├ ƒ /documents/[id]/editor
+@beaconhs/web:build: ├ ƒ /documents/[id]/master
+@beaconhs/web:build: ├ ƒ /documents/[id]/pdf
+@beaconhs/web:build: ├ ƒ /documents/[id]/read
+@beaconhs/web:build: ├ ƒ /documents/[id]/sign-off
+@beaconhs/web:build: ├ ƒ /documents/[id]/versions/[versionId]/changes
+@beaconhs/web:build: ├ ƒ /documents/[id]/versions/[versionId]/download
+@beaconhs/web:build: ├ ƒ /documents/books
+@beaconhs/web:build: ├ ƒ /documents/books/[id]
+@beaconhs/web:build: ├ ƒ /documents/books/[id]/pdf
+@beaconhs/web:build: ├ ƒ /documents/categories
+@beaconhs/web:build: ├ ƒ /documents/export.csv
+@beaconhs/web:build: ├ ƒ /documents/flows
+@beaconhs/web:build: ├ ƒ /documents/manage
+@beaconhs/web:build: ├ ƒ /documents/management-reviews
+@beaconhs/web:build: ├ ƒ /documents/management-reviews/[id]
+@beaconhs/web:build: ├ ƒ /documents/management-reviews/[id]/pdf
+@beaconhs/web:build: ├ ƒ /documents/management-reviews/flows
+@beaconhs/web:build: ├ ƒ /documents/sign-off-sessions/[sessionId]
+@beaconhs/web:build: ├ ƒ /documents/sign-off-sessions/[sessionId]/pdf
+@beaconhs/web:build: ├ ƒ /documents/types
+@beaconhs/web:build: ├ ƒ /equipment
+@beaconhs/web:build: ├ ƒ /equipment-kiosk
+@beaconhs/web:build: ├ ƒ /equipment/[id]
+@beaconhs/web:build: ├ ƒ /equipment/[id]/pdf
+@beaconhs/web:build: ├ ƒ /equipment/[id]/qr
+@beaconhs/web:build: ├ ƒ /equipment/[id]/qr/pdf
+@beaconhs/web:build: ├ ƒ /equipment/assets/flows
+@beaconhs/web:build: ├ ƒ /equipment/categories
+@beaconhs/web:build: ├ ƒ /equipment/custom-fields
+@beaconhs/web:build: ├ ƒ /equipment/export.csv
+@beaconhs/web:build: ├ ƒ /equipment/flows
+@beaconhs/web:build: ├ ƒ /equipment/inspection-types
+@beaconhs/web:build: ├ ƒ /equipment/inspection-types/[id]
+@beaconhs/web:build: ├ ƒ /equipment/inspections
+@beaconhs/web:build: ├ ƒ /equipment/inspections/[id]
+@beaconhs/web:build: ├ ƒ /equipment/inspections/[id]/pdf
+@beaconhs/web:build: ├ ƒ /equipment/inspections/flows
+@beaconhs/web:build: ├ ƒ /equipment/inspections/new
+@beaconhs/web:build: ├ ƒ /equipment/labels/design
+@beaconhs/web:build: ├ ƒ /equipment/maintenance
+@beaconhs/web:build: ├ ƒ /equipment/manage
+@beaconhs/web:build: ├ ƒ /equipment/new
+@beaconhs/web:build: ├ ƒ /equipment/qr/bulk
+@beaconhs/web:build: ├ ƒ /equipment/qr/labels
+@beaconhs/web:build: ├ ƒ /equipment/scan/[qrToken]
+@beaconhs/web:build: ├ ƒ /equipment/station
+@beaconhs/web:build: ├ ƒ /equipment/station/settings
+@beaconhs/web:build: ├ ƒ /equipment/types
+@beaconhs/web:build: ├ ƒ /equipment/vehicle-log
+@beaconhs/web:build: ├ ƒ /equipment/vehicle-log/[id]
+@beaconhs/web:build: ├ ƒ /equipment/vehicle-log/export.csv
+@beaconhs/web:build: ├ ƒ /equipment/vehicle-log/flows
+@beaconhs/web:build: ├ ƒ /equipment/vehicle-log/new
+@beaconhs/web:build: ├ ƒ /equipment/vehicle-log/pdf
+@beaconhs/web:build: ├ ƒ /equipment/vehicle-log/settings
+@beaconhs/web:build: ├ ƒ /equipment/vehicle-log/summary
+@beaconhs/web:build: ├ ƒ /equipment/work-orders
+@beaconhs/web:build: ├ ƒ /equipment/work-orders/[id]
+@beaconhs/web:build: ├ ƒ /equipment/work-orders/[id]/pdf
+@beaconhs/web:build: ├ ƒ /equipment/work-orders/new
+@beaconhs/web:build: ├ ƒ /feed
+@beaconhs/web:build: ├ ƒ /forgot-password
+@beaconhs/web:build: ├ ƒ /guest/maintenance/[token]
+@beaconhs/web:build: ├ ƒ /hazard-assessments
+@beaconhs/web:build: ├ ƒ /hazard-assessments/[id]
+@beaconhs/web:build: ├ ƒ /hazard-assessments/[id]/pdf
+@beaconhs/web:build: ├ ƒ /hazard-assessments/flows
+@beaconhs/web:build: ├ ƒ /hazard-assessments/hazards
+@beaconhs/web:build: ├ ƒ /hazard-assessments/hazards/sets
+@beaconhs/web:build: ├ ƒ /hazard-assessments/hazards/types
+@beaconhs/web:build: ├ ƒ /hazard-assessments/manage
+@beaconhs/web:build: ├ ƒ /hazard-assessments/new
+@beaconhs/web:build: ├ ƒ /hazard-assessments/risk-matrix
+@beaconhs/web:build: ├ ƒ /hazard-assessments/tasks
+@beaconhs/web:build: ├ ƒ /hazard-assessments/types
+@beaconhs/web:build: ├ ƒ /hazard-assessments/types/[id]
+@beaconhs/web:build: ├ ƒ /hazard-assessments/types/new
+@beaconhs/web:build: ├ ƒ /help
+@beaconhs/web:build: ├ ƒ /help/[slug]
+@beaconhs/web:build: ├ ƒ /hospitality
+@beaconhs/web:build: ├ ƒ /hospitality/handover
+@beaconhs/web:build: ├ ƒ /hospitality/maintenance
+@beaconhs/web:build: ├ ƒ /hospitality/maintenance/[issueId]
+@beaconhs/web:build: ├ ƒ /hospitality/maintenance/report
+@beaconhs/web:build: ├ ƒ /hospitality/metering
+@beaconhs/web:build: ├ ƒ /hospitality/properties
+@beaconhs/web:build: ├ ƒ /hospitality/properties/[propertyId]
+@beaconhs/web:build: ├ ƒ /hospitality/properties/[propertyId]/buildings/[buildingId]
+@beaconhs/web:build: ├ ƒ /hospitality/properties/[propertyId]/buildings/[buildingId]/floors/[floorId]
+@beaconhs/web:build: ├ ƒ /hospitality/properties/[propertyId]/buildings/[buildingId]/floors/[floorId]/rooms/[roomId]
+@beaconhs/web:build: ├ ƒ /hospitality/properties/[propertyId]/buildings/[buildingId]/floors/[floorId]/rooms/[roomId]/qr
+@beaconhs/web:build: ├ ƒ /hospitality/properties/[propertyId]/diary
+@beaconhs/web:build: ├ ƒ /hospitality/properties/[propertyId]/diary/tasks/[occurrenceId]
+@beaconhs/web:build: ├ ƒ /hospitality/properties/[propertyId]/diary/templates/[scheduleId]
+@beaconhs/web:build: ├ ƒ /hospitality/properties/[propertyId]/signoff
+@beaconhs/web:build: ├ ƒ /hospitality/properties/new
+@beaconhs/web:build: ├ ƒ /hospitality/risk
+@beaconhs/web:build: ├ ƒ /hospitality/risk/assessments/[assessmentId]
+@beaconhs/web:build: ├ ƒ /hospitality/risk/assessments/[assessmentId]/pdf
+@beaconhs/web:build: ├ ƒ /hospitality/risk/export.csv
+@beaconhs/web:build: ├ ƒ /hospitality/risk/library/export.csv
+@beaconhs/web:build: ├ ƒ /hospitality/risk/register/pdf
+@beaconhs/web:build: ├ ƒ /hospitality/risk/review-schedule
+@beaconhs/web:build: ├ ƒ /hospitality/risk/templates/[templateId]
+@beaconhs/web:build: ├ ○ /icon.png
+@beaconhs/web:build: ├ ○ /icon0.svg
+@beaconhs/web:build: ├ ○ /icon1.png
+@beaconhs/web:build: ├ ƒ /incidents
+@beaconhs/web:build: ├ ƒ /incidents/[id]
+@beaconhs/web:build: ├ ƒ /incidents/[id]/pdf
+@beaconhs/web:build: ├ ƒ /incidents/classifications
+@beaconhs/web:build: ├ ƒ /incidents/export.csv
+@beaconhs/web:build: ├ ƒ /incidents/flows
+@beaconhs/web:build: ├ ƒ /incidents/hours
+@beaconhs/web:build: ├ ƒ /incidents/injury-types
+@beaconhs/web:build: ├ ƒ /incidents/manage
+@beaconhs/web:build: ├ ƒ /incidents/new
+@beaconhs/web:build: ├ ƒ /insights
+@beaconhs/web:build: ├ ƒ /insights/cards/[id]
+@beaconhs/web:build: ├ ƒ /insights/cards/[id]/edit
+@beaconhs/web:build: ├ ƒ /insights/cards/[id]/export
+@beaconhs/web:build: ├ ƒ /insights/cards/new
+@beaconhs/web:build: ├ ƒ /insights/library
+@beaconhs/web:build: ├ ƒ /inspections
+@beaconhs/web:build: ├ ƒ /inspections/banks
+@beaconhs/web:build: ├ ƒ /inspections/banks/[id]
+@beaconhs/web:build: ├ ƒ /inspections/export.csv
+@beaconhs/web:build: ├ ƒ /inspections/flows
+@beaconhs/web:build: ├ ƒ /inspections/manage
+@beaconhs/web:build: ├ ƒ /inspections/records
+@beaconhs/web:build: ├ ƒ /inspections/records/[id]
+@beaconhs/web:build: ├ ƒ /inspections/records/[id]/pdf
+@beaconhs/web:build: ├ ƒ /inspections/records/new
+@beaconhs/web:build: ├ ƒ /inspections/types
+@beaconhs/web:build: ├ ƒ /inspections/types/[id]
+@beaconhs/web:build: ├ ƒ /invite/accept
+@beaconhs/web:build: ├ ƒ /invite/status
+@beaconhs/web:build: ├ ƒ /journals
+@beaconhs/web:build: ├ ƒ /journals/[id]
+@beaconhs/web:build: ├ ƒ /journals/[id]/pdf
+@beaconhs/web:build: ├ ƒ /journals/ai
+@beaconhs/web:build: ├ ƒ /journals/export.csv
+@beaconhs/web:build: ├ ƒ /journals/flows
+@beaconhs/web:build: ├ ƒ /journals/manage
+@beaconhs/web:build: ├ ƒ /journals/records
+@beaconhs/web:build: ├ ƒ /journals/tags
+@beaconhs/web:build: ├ ƒ /locations
+@beaconhs/web:build: ├ ƒ /locations/[id]
+@beaconhs/web:build: ├ ƒ /locations/custom-fields
+@beaconhs/web:build: ├ ƒ /locations/export.csv
+@beaconhs/web:build: ├ ƒ /locations/manage
+@beaconhs/web:build: ├ ƒ /locations/new
+@beaconhs/web:build: ├ ƒ /locations/units
+@beaconhs/web:build: ├ ƒ /login
+@beaconhs/web:build: ├ ƒ /manifest.webmanifest
+@beaconhs/web:build: ├ ƒ /my
+@beaconhs/web:build: ├ ƒ /my/hazard-assessments
+@beaconhs/web:build: ├ ƒ /my/in-progress
+@beaconhs/web:build: ├ ƒ /my/incidents
+@beaconhs/web:build: ├ ƒ /my/inspections
+@beaconhs/web:build: ├ ƒ /my/notifications
+@beaconhs/web:build: ├ ƒ /my/tasks
+@beaconhs/web:build: ├ ƒ /my/training
+@beaconhs/web:build: ├ ƒ /my/wallet
+@beaconhs/web:build: ├ ƒ /notifications
+@beaconhs/web:build: ├ ƒ /notifications/preferences
+@beaconhs/web:build: ├ ƒ /people
+@beaconhs/web:build: ├ ƒ /people/[id]
+@beaconhs/web:build: ├ ƒ /people/[id]/badge
+@beaconhs/web:build: ├ ƒ /people/[id]/badge/print
+@beaconhs/web:build: ├ ƒ /people/badges/design
+@beaconhs/web:build: ├ ƒ /people/crews
+@beaconhs/web:build: ├ ƒ /people/custom-fields
+@beaconhs/web:build: ├ ƒ /people/departments
+@beaconhs/web:build: ├ ƒ /people/export.csv
+@beaconhs/web:build: ├ ƒ /people/groups
+@beaconhs/web:build: ├ ƒ /people/groups/[id]
+@beaconhs/web:build: ├ ƒ /people/manage
+@beaconhs/web:build: ├ ƒ /people/new
+@beaconhs/web:build: ├ ƒ /people/org-chart
+@beaconhs/web:build: ├ ƒ /people/titles
+@beaconhs/web:build: ├ ƒ /people/titles/[id]
+@beaconhs/web:build: ├ ƒ /people/titles/[id]/pdf
+@beaconhs/web:build: ├ ƒ /people/titles/[id]/tasks
+@beaconhs/web:build: ├ ƒ /people/titles/new
+@beaconhs/web:build: ├ ƒ /people/trades
+@beaconhs/web:build: ├ ƒ /platform
+@beaconhs/web:build: ├ ƒ /platform-branding/favicon
+@beaconhs/web:build: ├ ƒ /platform-branding/logo
+@beaconhs/web:build: ├ ƒ /platform/ai
+@beaconhs/web:build: ├ ƒ /platform/branding
+@beaconhs/web:build: ├ ƒ /platform/database
+@beaconhs/web:build: ├ ƒ /platform/email
+@beaconhs/web:build: ├ ƒ /platform/email-log
+@beaconhs/web:build: ├ ƒ /platform/email-log/[id]
+@beaconhs/web:build: ├ ƒ /platform/modules
+@beaconhs/web:build: ├ ƒ /platform/settings
+@beaconhs/web:build: ├ ƒ /platform/sms
+@beaconhs/web:build: ├ ƒ /platform/sms-log
+@beaconhs/web:build: ├ ƒ /platform/sms-log/[id]
+@beaconhs/web:build: ├ ƒ /platform/tenants
+@beaconhs/web:build: ├ ƒ /platform/tenants/[tenantId]
+@beaconhs/web:build: ├ ƒ /platform/tenants/[tenantId]/audit
+@beaconhs/web:build: ├ ƒ /platform/tenants/[tenantId]/branding
+@beaconhs/web:build: ├ ƒ /platform/tenants/[tenantId]/branding/letterhead
+@beaconhs/web:build: ├ ƒ /platform/tenants/[tenantId]/branding/logo
+@beaconhs/web:build: ├ ƒ /platform/tenants/[tenantId]/communications
+@beaconhs/web:build: ├ ƒ /platform/tenants/[tenantId]/entitlements
+@beaconhs/web:build: ├ ƒ /platform/tenants/[tenantId]/properties
+@beaconhs/web:build: ├ ƒ /platform/tenants/[tenantId]/settings
+@beaconhs/web:build: ├ ƒ /platform/tenants/[tenantId]/usage
+@beaconhs/web:build: ├ ƒ /platform/tenants/[tenantId]/users
+@beaconhs/web:build: ├ ƒ /platform/tenants/new
+@beaconhs/web:build: ├ ƒ /platform/tenants/seed-templates
+@beaconhs/web:build: ├ ƒ /platform/users
+@beaconhs/web:build: ├ ƒ /platform/users/[id]
+@beaconhs/web:build: ├ ƒ /ppe
+@beaconhs/web:build: ├ ƒ /ppe/[id]
+@beaconhs/web:build: ├ ƒ /ppe/[id]/inspections/[inspectionId]/pdf
+@beaconhs/web:build: ├ ƒ /ppe/[id]/issues/[issueId]/pdf
+@beaconhs/web:build: ├ ƒ /ppe/banks
+@beaconhs/web:build: ├ ƒ /ppe/banks/[id]
+@beaconhs/web:build: ├ ƒ /ppe/custom-fields
+@beaconhs/web:build: ├ ƒ /ppe/export.csv
+@beaconhs/web:build: ├ ƒ /ppe/flows
+@beaconhs/web:build: ├ ƒ /ppe/issue
+@beaconhs/web:build: ├ ƒ /ppe/manage
+@beaconhs/web:build: ├ ƒ /ppe/new
+@beaconhs/web:build: ├ ƒ /ppe/types
+@beaconhs/web:build: ├ ƒ /ppe/types/[id]
+@beaconhs/web:build: ├ ƒ /ppe/types/new
+@beaconhs/web:build: ├ ƒ /reports
+@beaconhs/web:build: ├ ƒ /reports/definitions
+@beaconhs/web:build: ├ ƒ /reports/definitions/[id]
+@beaconhs/web:build: ├ ƒ /reports/definitions/[id]/edit
+@beaconhs/web:build: ├ ƒ /reports/definitions/[id]/export
+@beaconhs/web:build: ├ ƒ /reports/definitions/new
+@beaconhs/web:build: ├ ƒ /reports/schedules
+@beaconhs/web:build: ├ ƒ /reports/schedules/[id]
+@beaconhs/web:build: ├ ƒ /reports/schedules/[id]/runs/[runId]
+@beaconhs/web:build: ├ ƒ /reports/schedules/[id]/runs/[runId]/pdf
+@beaconhs/web:build: ├ ƒ /reports/schedules/new
+@beaconhs/web:build: ├ ƒ /reset-password
+@beaconhs/web:build: ├ ƒ /tenant-branding/logo
+@beaconhs/web:build: ├ ƒ /tools
+@beaconhs/web:build: ├ ƒ /tools/safe-distance
+@beaconhs/web:build: ├ ƒ /tools/safe-distance/[id]
+@beaconhs/web:build: ├ ƒ /tools/safe-distance/[id]/print
+@beaconhs/web:build: ├ ƒ /tools/safe-distance/export.csv
+@beaconhs/web:build: ├ ƒ /training
+@beaconhs/web:build: ├ ƒ /training/assessments
+@beaconhs/web:build: ├ ƒ /training/assessments/[id]
+@beaconhs/web:build: ├ ƒ /training/assessments/[id]/certificate
+@beaconhs/web:build: ├ ƒ /training/assessments/[id]/pdf
+@beaconhs/web:build: ├ ƒ /training/assessments/types
+@beaconhs/web:build: ├ ƒ /training/assessments/types/[id]
+@beaconhs/web:build: ├ ƒ /training/authorities
+@beaconhs/web:build: ├ ƒ /training/authorities/[id]
+@beaconhs/web:build: ├ ƒ /training/classes
+@beaconhs/web:build: ├ ƒ /training/classes/[id]
+@beaconhs/web:build: ├ ƒ /training/classes/[id]/pdf
+@beaconhs/web:build: ├ ƒ /training/classes/calendar
+@beaconhs/web:build: ├ ƒ /training/classes/flows
+@beaconhs/web:build: ├ ƒ /training/courses
+@beaconhs/web:build: ├ ƒ /training/courses/[id]
+@beaconhs/web:build: ├ ƒ /training/courses/[id]/completions
+@beaconhs/web:build: ├ ƒ /training/courses/[id]/evaluations
+@beaconhs/web:build: ├ ƒ /training/courses/[id]/present
+@beaconhs/web:build: ├ ƒ /training/courses/export.csv
+@beaconhs/web:build: ├ ƒ /training/credential-designs
+@beaconhs/web:build: ├ ƒ /training/credential-designs/preview
+@beaconhs/web:build: ├ ƒ /training/flows
+@beaconhs/web:build: ├ ƒ /training/learn
+@beaconhs/web:build: ├ ƒ /training/learn/[courseId]
+@beaconhs/web:build: ├ ƒ /training/library
+@beaconhs/web:build: ├ ƒ /training/library/[id]
+@beaconhs/web:build: ├ ƒ /training/manage
+@beaconhs/web:build: ├ ƒ /training/pptx/[target]/[id]/download
+@beaconhs/web:build: ├ ƒ /training/records
+@beaconhs/web:build: ├ ƒ /training/records/[id]
+@beaconhs/web:build: ├ ƒ /training/records/[id]/certificate
+@beaconhs/web:build: ├ ƒ /training/records/[id]/certificate/print
+@beaconhs/web:build: ├ ƒ /training/records/wallet-cards
+@beaconhs/web:build: ├ ƒ /training/skills
+@beaconhs/web:build: ├ ƒ /training/skills/[id]
+@beaconhs/web:build: ├ ƒ /training/skills/[id]/certificate
+@beaconhs/web:build: ├ ƒ /training/skills/[id]/certificate/print
+@beaconhs/web:build: ├ ƒ /training/skills/types
+@beaconhs/web:build: ├ ƒ /training/skills/types/[id]
+@beaconhs/web:build: ├ ƒ /verify/[token]
+@beaconhs/web:build: ├ ƒ /verify/person/[token]
+@beaconhs/web:build: ├ ƒ /verify/person/[token]/record/[recordId]
+@beaconhs/web:build: ├ ƒ /verify/person/[token]/skill/[assignmentId]
+@beaconhs/web:build: ├ ƒ /wopi/files/[fileId]
+@beaconhs/web:build: └ ƒ /wopi/files/[fileId]/contents
+@beaconhs/web:build:
+@beaconhs/web:build:
+@beaconhs/web:build: ƒ Proxy (Middleware)
+@beaconhs/web:build:
+@beaconhs/web:build: ○  (Static)   prerendered as static content
+@beaconhs/web:build: ƒ  (Dynamic)  server-rendered on demand
+@beaconhs/web:build:
+@beaconhs/worker:build: cache bypass, force executing 35e130b1fc72237a
+@beaconhs/worker:build:
+@beaconhs/worker:build: > @beaconhs/worker@0.1.0 build /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/apps/worker
+@beaconhs/worker:build: > node build.mjs
+@beaconhs/worker:build:
+@beaconhs/worker:build:
+@beaconhs/worker:build:   dist/index.js               5.9mb ⚠️
+@beaconhs/worker:build:   dist/health.js            813.9kb
+@beaconhs/worker:build:   dist/scheduler.js          10.8kb
+@beaconhs/worker:build:   dist/storage-init.js        8.8kb
+@beaconhs/worker:build:   dist/index.js.map           8.4mb
+@beaconhs/worker:build:   dist/health.js.map          1.5mb
+@beaconhs/worker:build:   dist/scheduler.js.map      88.0kb
+@beaconhs/worker:build:   dist/storage-init.js.map   29.0kb
+@beaconhs/worker:build:
+@beaconhs/worker:build: ⚡ Done in 419ms
+
+ Tasks:    2 successful, 2 total
+Cached:    0 cached, 2 total
+  Time:    27m1.795s

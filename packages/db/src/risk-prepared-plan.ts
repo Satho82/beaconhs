@@ -28,14 +28,24 @@ export const preparedRiskProposals = [
 export function preparedRiskPlan(database: string): string {
   // A literal, independently verified database identity is mandatory, not a URL.
   if (!/^[a-z_][a-z0-9_]{0,62}$/.test(database)) throw new Error('Invalid target database')
-  const baseline = readMigrationFiles(folder)
-  if (baseline.length !== 58 || baseline.at(-1)?.tag !== '0058_platform_regional_defaults') {
-    throw new Error('Expected unchanged 0058 ordinary journal')
+  const canonical = readMigrationFiles(folder)
+  const baseline = canonical.slice(0, 58)
+  if (
+    canonical.length !== 61 ||
+    baseline.length !== 58 ||
+    baseline.at(-1)?.tag !== '0058_platform_regional_defaults'
+  ) {
+    throw new Error('Expected canonical 0061 journal with unchanged 0058 prefix')
   }
   isolated0059Statement()
   const stages = preparedRiskProposals.map(([tag, createdAt, hash]) => {
-    const body = readFileSync(`${folder}/prepared/${tag}.sql`, 'utf8')
-    if (createHash('sha256').update(body).digest('hex') !== hash)
+    const body = readFileSync(`${folder}/${tag}.sql`, 'utf8')
+    if (
+      createHash('sha256').update(body).digest('hex') !== hash ||
+      !canonical.some(
+        (entry) => entry.tag === tag && entry.createdAt === createdAt && entry.hash === hash,
+      )
+    )
       throw new Error('Prepared source hash mismatch')
     return { tag, createdAt, hash, body }
   })
@@ -52,7 +62,7 @@ export function preparedRiskPlan(database: string): string {
     '-- Requires approved writer fence, target identity, recovery and role checks.',
     '-- Stop on any error. No automatic resume, retry, down migration or ledger repair.',
     '-- Writes three explicit ledger rows; does NOT edit the ordinary source journal.',
-    '-- Ordinary migrate.ts remains incompatible with the resulting 0061 ledger.',
+    '-- Historical 58-to-61 application plan; ordinary migrate.ts now consumes the canonical 61-entry journal.',
     '\\set ON_ERROR_STOP on',
     "SET lock_timeout='5s'; SET statement_timeout='120s';",
     `DO $guard$ BEGIN

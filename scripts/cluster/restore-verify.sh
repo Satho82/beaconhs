@@ -56,7 +56,7 @@ trap cleanup EXIT HUP INT TERM
 checksum_file="$archive_input.sha256"
 if [ -f "$checksum_file" ]; then
   if command -v sha256sum >/dev/null 2>&1; then
-    (cd "$(dirname "$archive_input")" && sha256sum --check "$(basename "$checksum_file")")
+    (cd "$(dirname "$archive_input")" && sha256sum -c "$(basename "$checksum_file")")
   else
     expected=$(awk '{print $1}' "$checksum_file")
     actual=$(shasum -a 256 "$archive_input" | awk '{print $1}')

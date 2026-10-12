@@ -1,0 +1,374 @@
+Full workspace test rerun: exit 0. All 23 task executions uncached.
+Command: env -u DATABASE_URL -u SUPERADMIN_DATABASE_URL -u MIGRATION_DATABASE_URL -u CYCAS_TEST_DATABASE_URL -u REDIS_URL VITEST_MAX_WORKERS=2 TURBO_FORCE=true pnpm test --concurrency=1 --env-mode=loose
+Local listeners permitted for synthetic SMTP/browser tests. Existing two opt-in DB integrations remained skipped. No test timeout, assertion, source or configuration was changed.
+
+• turbo 2.10.5
+
+   • Packages in scope: @beaconhs/ai, @beaconhs/analytics, @beaconhs/audit, @beaconhs/auth, @beaconhs/compliance, @beaconhs/crypto, @beaconhs/db, @beaconhs/design-studio, @beaconhs/email-render, @beaconhs/emails, @beaconhs/events, @beaconhs/forms-core, @beaconhs/forms-pdf, @beaconhs/i18n, @beaconhs/integrations, @beaconhs/jobs, @beaconhs/office, @beaconhs/reports, @beaconhs/sms, @beaconhs/storage, @beaconhs/sync, @beaconhs/tenant, @beaconhs/ui, @beaconhs/web, @beaconhs/worker
+   • Running test in 25 packages
+   • Remote caching disabled, using shared worktree cache
+
+@beaconhs/storage:test: cache bypass, force executing a01f82a0c64c9ef1
+@beaconhs/storage:test:
+@beaconhs/storage:test: > @beaconhs/storage@0.1.0 test /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/packages/storage
+@beaconhs/storage:test: > vitest run
+@beaconhs/storage:test:
+@beaconhs/storage:test:
+@beaconhs/storage:test:  RUN  v4.1.10 /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/packages/storage
+@beaconhs/storage:test:
+@beaconhs/storage:test:
+@beaconhs/storage:test:  Test Files  4 passed (4)
+@beaconhs/storage:test:       Tests  12 passed (12)
+@beaconhs/storage:test:    Start at  15:20:07
+@beaconhs/storage:test:    Duration  1.66s (transform 230ms, setup 0ms, import 800ms, tests 48ms, environment 1ms)
+@beaconhs/storage:test:
+@beaconhs/crypto:test: cache bypass, force executing 78c44f9859f41540
+@beaconhs/crypto:test:
+@beaconhs/crypto:test: > @beaconhs/crypto@0.1.0 test /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/packages/crypto
+@beaconhs/crypto:test: > vitest run
+@beaconhs/crypto:test:
+@beaconhs/crypto:test:
+@beaconhs/crypto:test:  RUN  v4.1.10 /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/packages/crypto
+@beaconhs/crypto:test:
+@beaconhs/crypto:test:
+@beaconhs/crypto:test:  Test Files  2 passed (2)
+@beaconhs/crypto:test:       Tests  6 passed (6)
+@beaconhs/crypto:test:    Start at  15:20:11
+@beaconhs/crypto:test:    Duration  586ms (transform 138ms, setup 0ms, import 217ms, tests 50ms, environment 1ms)
+@beaconhs/crypto:test:
+@beaconhs/email-render:test: cache bypass, force executing 04231a6bb40c385f
+@beaconhs/email-render:test:
+@beaconhs/email-render:test: > @beaconhs/email-render@0.1.0 test /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/packages/email-render
+@beaconhs/email-render:test: > vitest run
+@beaconhs/email-render:test:
+@beaconhs/email-render:test:
+@beaconhs/email-render:test:  RUN  v4.1.10 /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/packages/email-render
+@beaconhs/email-render:test:
+@beaconhs/email-render:test:
+@beaconhs/email-render:test:  Test Files  2 passed (2)
+@beaconhs/email-render:test:       Tests  48 passed (48)
+@beaconhs/email-render:test:    Start at  15:20:13
+@beaconhs/email-render:test:    Duration  2.64s (transform 321ms, setup 0ms, import 2.31s, tests 147ms, environment 0ms)
+@beaconhs/email-render:test:
+@beaconhs/i18n:test: cache bypass, force executing e9935c55da4b5f27
+@beaconhs/i18n:test:
+@beaconhs/i18n:test: > @beaconhs/i18n@0.1.0 test /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/packages/i18n
+@beaconhs/i18n:test: > vitest run
+@beaconhs/i18n:test:
+@beaconhs/i18n:test:
+@beaconhs/i18n:test:  RUN  v4.1.10 /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/packages/i18n
+@beaconhs/i18n:test:
+@beaconhs/i18n:test:
+@beaconhs/i18n:test:  Test Files  2 passed (2)
+@beaconhs/i18n:test:       Tests  12 passed (12)
+@beaconhs/i18n:test:    Start at  15:20:18
+@beaconhs/i18n:test:    Duration  4.42s (transform 2.08s, setup 0ms, import 3.38s, tests 805ms, environment 1ms)
+@beaconhs/i18n:test:
+@beaconhs/design-studio:test: cache bypass, force executing a5c30592ff6e3782
+@beaconhs/design-studio:test:
+@beaconhs/design-studio:test: > @beaconhs/design-studio@0.1.0 test /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/packages/design-studio
+@beaconhs/design-studio:test: > vitest run
+@beaconhs/design-studio:test:
+@beaconhs/design-studio:test:
+@beaconhs/design-studio:test:  RUN  v4.1.10 /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/packages/design-studio
+@beaconhs/design-studio:test:
+@beaconhs/design-studio:test:
+@beaconhs/design-studio:test:  Test Files  2 passed (2)
+@beaconhs/design-studio:test:       Tests  6 passed (6)
+@beaconhs/design-studio:test:    Start at  15:20:24
+@beaconhs/design-studio:test:    Duration  582ms (transform 176ms, setup 0ms, import 266ms, tests 16ms, environment 0ms)
+@beaconhs/design-studio:test:
+@beaconhs/office:test: cache bypass, force executing a86e0e6a591e1f60
+@beaconhs/office:test:
+@beaconhs/office:test: > @beaconhs/office@0.1.0 test /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/packages/office
+@beaconhs/office:test: > vitest run
+@beaconhs/office:test:
+@beaconhs/office:test:
+@beaconhs/office:test:  RUN  v4.1.10 /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/packages/office
+@beaconhs/office:test:
+@beaconhs/office:test:
+@beaconhs/office:test:  Test Files  2 passed (2)
+@beaconhs/office:test:       Tests  14 passed (14)
+@beaconhs/office:test:    Start at  15:20:26
+@beaconhs/office:test:    Duration  577ms (transform 182ms, setup 0ms, import 254ms, tests 26ms, environment 1ms)
+@beaconhs/office:test:
+@beaconhs/forms-core:test: cache bypass, force executing 17e60a4b0fda2494
+@beaconhs/forms-core:test:
+@beaconhs/forms-core:test: > @beaconhs/forms-core@0.1.0 test /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/packages/forms-core
+@beaconhs/forms-core:test: > vitest run
+@beaconhs/forms-core:test:
+@beaconhs/forms-core:test:
+@beaconhs/forms-core:test:  RUN  v4.1.10 /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/packages/forms-core
+@beaconhs/forms-core:test:
+@beaconhs/forms-core:test:
+@beaconhs/forms-core:test:  Test Files  14 passed (14)
+@beaconhs/forms-core:test:       Tests  246 passed (246)
+@beaconhs/forms-core:test:    Start at  15:20:29
+@beaconhs/forms-core:test:    Duration  9.79s (transform 763ms, setup 0ms, import 12.60s, tests 816ms, environment 4ms)
+@beaconhs/forms-core:test:
+@beaconhs/ui:test: cache bypass, force executing cf130e51fbdad116
+@beaconhs/ui:test:
+@beaconhs/ui:test: > @beaconhs/ui@0.1.0 test /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/packages/ui
+@beaconhs/ui:test: > vitest run
+@beaconhs/ui:test:
+@beaconhs/ui:test:
+@beaconhs/ui:test:  RUN  v4.1.10 /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/packages/ui
+@beaconhs/ui:test:
+@beaconhs/ui:test:
+@beaconhs/ui:test:  Test Files  2 passed (2)
+@beaconhs/ui:test:       Tests  4 passed (4)
+@beaconhs/ui:test:    Start at  15:20:40
+@beaconhs/ui:test:    Duration  552ms (transform 159ms, setup 0ms, import 242ms, tests 18ms, environment 0ms)
+@beaconhs/ui:test:
+@beaconhs/db:test: cache bypass, force executing 43606bd6a4789761
+@beaconhs/db:test:
+@beaconhs/db:test: > @beaconhs/db@0.1.0 test /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/packages/db
+@beaconhs/db:test: > vitest run
+@beaconhs/db:test:
+@beaconhs/db:test:
+@beaconhs/db:test:  RUN  v4.1.10 /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/packages/db
+@beaconhs/db:test:
+@beaconhs/db:test:
+@beaconhs/db:test:  Test Files  71 passed (71)
+@beaconhs/db:test:       Tests  361 passed (361)
+@beaconhs/db:test:    Start at  15:20:43
+@beaconhs/db:test:    Duration  60.85s (transform 4.78s, setup 0ms, import 78.56s, tests 7.29s, environment 20ms)
+@beaconhs/db:test:
+@beaconhs/sync:test: cache bypass, force executing 72f68bf9ab30e7f7
+@beaconhs/sync:test:
+@beaconhs/sync:test: > @beaconhs/sync@0.1.0 test /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/packages/sync
+@beaconhs/sync:test: > node --import tsx --test src/*.test.ts
+@beaconhs/sync:test:
+@beaconhs/sync:test: ✔ public IP policy rejects local, private, special, mapped, and documentation ranges (49.445004ms)
+@beaconhs/sync:test: ✔ hostname normalization rejects URL-shaped and malformed database hosts (2.454893ms)
+@beaconhs/sync:test: ✔ DNS policy rejects a hostname if any answer is non-public (18.127068ms)
+@beaconhs/sync:test: ✔ every DNS resolution is revalidated so a rebinding answer fails closed (4.473464ms)
+@beaconhs/sync:test: ✔ outbound configuration and redirect policy reject unsafe request metadata (64.207957ms)
+@beaconhs/sync:test: ✔ secure fetch rejects unsafe schemes, credentials, normalized private literals, and hop headers (5.519436ms)
+@beaconhs/sync:test: ✔ an abort signal interrupts an in-flight DNS resolution (1.354476ms)
+@beaconhs/sync:test: ✔ database connections reject private hosts and unencrypted credentials before loading a driver (0.989067ms)
+@beaconhs/sync:test: ✔ snapshot archive policy fails closed for processing failures and empty entities (0.814786ms)
+@beaconhs/sync:test: ▶ people sync convergence policy
+@beaconhs/sync:test:   ✔ does not treat an unchanged source hash as proof the target is unchanged (5.806065ms)
+@beaconhs/sync:test:   ✔ protects differing manual rows during first natural-key adoption (0.512972ms)
+@beaconhs/sync:test:   ✔ repairs provenance without conflicting when the visible manual title matches (0.516248ms)
+@beaconhs/sync:test:   ✔ conflicts only when manual-wins target edits overlap a changed source (0.337799ms)
+@beaconhs/sync:test: ✔ people sync convergence policy (11.980194ms)
+@beaconhs/sync:test: ▶ people sync canonical title cutover
+@beaconhs/sync:test:   ✔ reads the primary title relationship instead of the retired people column (4.156819ms)
+@beaconhs/sync:test:   ✔ tracks source ownership without deleting co-owned manual titles (1.724899ms)
+@beaconhs/sync:test:   ✔ checks target convergence instead of trusting rowHash alone (0.4293ms)
+@beaconhs/sync:test:   ✔ uses the last persisted sync result as the manual-wins drift baseline (0.619864ms)
+@beaconhs/sync:test:   ✔ does not overwrite a differing manual person during natural-key adoption (0.509018ms)
+@beaconhs/sync:test:   ✔ serializes title ownership changes through the parent person (0.514344ms)
+@beaconhs/sync:test:   ✔ normalizes source display text before resolving the unique catalogue key (0.346573ms)
+@beaconhs/sync:test: ✔ people sync canonical title cutover (13.380087ms)
+@beaconhs/sync:test: ℹ tests 20
+@beaconhs/sync:test: ℹ suites 2
+@beaconhs/sync:test: ℹ pass 20
+@beaconhs/sync:test: ℹ fail 0
+@beaconhs/sync:test: ℹ cancelled 0
+@beaconhs/sync:test: ℹ skipped 0
+@beaconhs/sync:test: ℹ todo 0
+@beaconhs/sync:test: ℹ duration_ms 1538.842766
+@beaconhs/reports:test: cache bypass, force executing ef59d55cb852fdeb
+@beaconhs/reports:test:
+@beaconhs/reports:test: > @beaconhs/reports@0.1.0 test /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/packages/reports
+@beaconhs/reports:test: > vitest run
+@beaconhs/reports:test:
+@beaconhs/reports:test:
+@beaconhs/reports:test:  RUN  v4.1.10 /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/packages/reports
+@beaconhs/reports:test:
+@beaconhs/reports:test:
+@beaconhs/reports:test:  Test Files  5 passed (5)
+@beaconhs/reports:test:       Tests  15 passed (15)
+@beaconhs/reports:test:    Start at  15:21:49
+@beaconhs/reports:test:    Duration  4.18s (transform 1.86s, setup 0ms, import 3.99s, tests 84ms, environment 2ms)
+@beaconhs/reports:test:
+@beaconhs/compliance:test: cache bypass, force executing 450010faef080dcb
+@beaconhs/compliance:test:
+@beaconhs/compliance:test: > @beaconhs/compliance@0.1.0 test /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/packages/compliance
+@beaconhs/compliance:test: > vitest run
+@beaconhs/compliance:test:
+@beaconhs/compliance:test:
+@beaconhs/compliance:test:  RUN  v4.1.10 /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/packages/compliance
+@beaconhs/compliance:test:
+@beaconhs/compliance:test:
+@beaconhs/compliance:test:  Test Files  12 passed (12)
+@beaconhs/compliance:test:       Tests  57 passed (57)
+@beaconhs/compliance:test:    Start at  15:21:56
+@beaconhs/compliance:test:    Duration  17.45s (transform 5.30s, setup 0ms, import 26.73s, tests 1.22s, environment 4ms)
+@beaconhs/compliance:test:
+@beaconhs/emails:test: cache bypass, force executing 5f5402dca8ad6138
+@beaconhs/emails:test:
+@beaconhs/emails:test: > @beaconhs/emails@0.1.0 test /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/packages/emails
+@beaconhs/emails:test: > vitest run
+@beaconhs/emails:test:
+@beaconhs/emails:test:
+@beaconhs/emails:test:  RUN  v4.1.10 /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/packages/emails
+@beaconhs/emails:test:
+@beaconhs/emails:test:
+@beaconhs/emails:test:  Test Files  2 passed (2)
+@beaconhs/emails:test:       Tests  53 passed (53)
+@beaconhs/emails:test:    Start at  15:22:15
+@beaconhs/emails:test:    Duration  1.09s (transform 562ms, setup 0ms, import 807ms, tests 335ms, environment 1ms)
+@beaconhs/emails:test:
+@beaconhs/jobs:test: cache bypass, force executing 82816fba655f09eb
+@beaconhs/jobs:test:
+@beaconhs/jobs:test: > @beaconhs/jobs@0.1.0 test /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/packages/jobs
+@beaconhs/jobs:test: > vitest run
+@beaconhs/jobs:test:
+@beaconhs/jobs:test:
+@beaconhs/jobs:test:  RUN  v4.1.10 /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/packages/jobs
+@beaconhs/jobs:test:
+@beaconhs/jobs:test:
+@beaconhs/jobs:test:  Test Files  4 passed (4)
+@beaconhs/jobs:test:       Tests  19 passed (19)
+@beaconhs/jobs:test:    Start at  15:22:19
+@beaconhs/jobs:test:    Duration  2.24s (transform 586ms, setup 0ms, import 1.32s, tests 651ms, environment 1ms)
+@beaconhs/jobs:test:
+@beaconhs/sms:test: cache bypass, force executing 1868b485349f3ce1
+@beaconhs/sms:test:
+@beaconhs/sms:test: > @beaconhs/sms@0.1.0 test /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/packages/sms
+@beaconhs/sms:test: > vitest run
+@beaconhs/sms:test:
+@beaconhs/sms:test:
+@beaconhs/sms:test:  RUN  v4.1.10 /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/packages/sms
+@beaconhs/sms:test:
+@beaconhs/sms:test:
+@beaconhs/sms:test:  Test Files  1 passed (1)
+@beaconhs/sms:test:       Tests  21 passed (21)
+@beaconhs/sms:test:    Start at  15:22:23
+@beaconhs/sms:test:    Duration  810ms (transform 171ms, setup 0ms, import 254ms, tests 86ms, environment 0ms)
+@beaconhs/sms:test:
+@beaconhs/ai:test: cache bypass, force executing 62867c81944133a4
+@beaconhs/ai:test:
+@beaconhs/ai:test: > @beaconhs/ai@0.1.0 test /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/packages/ai
+@beaconhs/ai:test: > node --import tsx --test src/*.test.ts
+@beaconhs/ai:test:
+@beaconhs/ai:test: ✔ AI provider validation accepts catalogue entries only, never inherited object keys (2.243018ms)
+@beaconhs/ai:test: ✔ AI base URL validation accepts only canonical public HTTPS overrides (43.302592ms)
+@beaconhs/ai:test: ✔ AI provider transport rejects unsafe endpoints before opening a socket (7.17024ms)
+@beaconhs/ai:test: ✔ extractJsonObject reads fenced and raw objects (4.369192ms)
+@beaconhs/ai:test: ✔ coerceJournalAnalysis maps the OpenRouter/Kimi field names onto the stored schema (7.56698ms)
+@beaconhs/ai:test: ▶ AI vision request bounds
+@beaconhs/ai:test:   ✔ accepts bounded storage bytes (2.192727ms)
+@beaconhs/ai:test:   ✔ rejects empty, excessive-count, and individually oversized images (1.33295ms)
+@beaconhs/ai:test:   ✔ rejects aggregate base64-expansion risk and oversized prompts (0.59229ms)
+@beaconhs/ai:test: ✔ AI vision request bounds (6.93601ms)
+@beaconhs/ai:test: ℹ tests 8
+@beaconhs/ai:test: ℹ suites 1
+@beaconhs/ai:test: ℹ pass 8
+@beaconhs/ai:test: ℹ fail 0
+@beaconhs/ai:test: ℹ cancelled 0
+@beaconhs/ai:test: ℹ skipped 0
+@beaconhs/ai:test: ℹ todo 0
+@beaconhs/ai:test: ℹ duration_ms 1675.16217
+@beaconhs/analytics:test: cache bypass, force executing 0e96910104e39102
+@beaconhs/analytics:test:
+@beaconhs/analytics:test: > @beaconhs/analytics@0.1.0 test /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/packages/analytics
+@beaconhs/analytics:test: > vitest run
+@beaconhs/analytics:test:
+@beaconhs/analytics:test:
+@beaconhs/analytics:test:  RUN  v4.1.10 /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/packages/analytics
+@beaconhs/analytics:test:
+@beaconhs/analytics:test:
+@beaconhs/analytics:test:  Test Files  5 passed (5)
+@beaconhs/analytics:test:       Tests  16 passed (16)
+@beaconhs/analytics:test:    Start at  15:22:29
+@beaconhs/analytics:test:    Duration  11.49s (transform 4.21s, setup 0ms, import 19.25s, tests 431ms, environment 1ms)
+@beaconhs/analytics:test:
+@beaconhs/forms-pdf:test: cache bypass, force executing 63ae88bc4c596e56
+@beaconhs/forms-pdf:test:
+@beaconhs/forms-pdf:test: > @beaconhs/forms-pdf@0.1.0 test /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/packages/forms-pdf
+@beaconhs/forms-pdf:test: > vitest run --no-file-parallelism
+@beaconhs/forms-pdf:test:
+@beaconhs/forms-pdf:test:
+@beaconhs/forms-pdf:test:  RUN  v4.1.10 /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/packages/forms-pdf
+@beaconhs/forms-pdf:test:
+@beaconhs/forms-pdf:test:
+@beaconhs/forms-pdf:test:  Test Files  5 passed (5)
+@beaconhs/forms-pdf:test:       Tests  18 passed (18)
+@beaconhs/forms-pdf:test:    Start at  15:22:42
+@beaconhs/forms-pdf:test:    Duration  24.89s (transform 5.63s, setup 0ms, import 22.37s, tests 18.42s, environment 1ms)
+@beaconhs/forms-pdf:test:
+@beaconhs/events:test: cache bypass, force executing 48ce03a1d086117c
+@beaconhs/events:test:
+@beaconhs/events:test: > @beaconhs/events@0.1.0 test /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/packages/events
+@beaconhs/events:test: > vitest run
+@beaconhs/events:test:
+@beaconhs/events:test:
+@beaconhs/events:test:  RUN  v4.1.10 /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/packages/events
+@beaconhs/events:test:
+@beaconhs/events:test:
+@beaconhs/events:test:  Test Files  3 passed (3)
+@beaconhs/events:test:       Tests  10 passed (10)
+@beaconhs/events:test:    Start at  15:23:10
+@beaconhs/events:test:    Duration  5.64s (transform 1.70s, setup 0ms, import 7.60s, tests 37ms, environment 1ms)
+@beaconhs/events:test:
+@beaconhs/auth:test: cache bypass, force executing b97f0a13e0d51d26
+@beaconhs/auth:test:
+@beaconhs/auth:test: > @beaconhs/auth@0.1.0 test /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/packages/auth
+@beaconhs/auth:test: > vitest run
+@beaconhs/auth:test:
+@beaconhs/auth:test:
+@beaconhs/auth:test:  RUN  v4.1.10 /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/packages/auth
+@beaconhs/auth:test:
+@beaconhs/auth:test:
+@beaconhs/auth:test:  Test Files  3 passed | 1 skipped (4)
+@beaconhs/auth:test:       Tests  25 passed | 1 skipped (26)
+@beaconhs/auth:test:    Start at  15:23:17
+@beaconhs/auth:test:    Duration  1.47s (transform 249ms, setup 0ms, import 380ms, tests 153ms, environment 1ms)
+@beaconhs/auth:test:
+@beaconhs/integrations:test: cache bypass, force executing 1725f31c0c46cf5c
+@beaconhs/integrations:test:
+@beaconhs/integrations:test: > @beaconhs/integrations@0.1.0 test /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/packages/integrations
+@beaconhs/integrations:test: > node --import tsx --test src/*.test.ts
+@beaconhs/integrations:test:
+@beaconhs/integrations:test: ✔ PMS room states normalize behind a vendor-neutral boundary (2.582933ms)
+@beaconhs/integrations:test: ✔ PMS room identity is stable and rejects unsafe identifiers (2.874092ms)
+@beaconhs/integrations:test: ✔ email destination sanitizes authored markup and cannot promote record values to HTML (42.116222ms)
+@beaconhs/integrations:test: ✔ HTTP destination connectivity checks reject non-HTTPS and private targets without egress (5.28224ms)
+@beaconhs/integrations:test: ✔ HTTP destination resumes a known partial attempt without replaying successful items (2.704171ms)
+@beaconhs/integrations:test: ✔ partial ledger refs remain retryable and only completed refs satisfy send-once (0.604708ms)
+@beaconhs/integrations:test: ✔ SQL destination requires an identity column before it can connect or insert (1.215858ms)
+@beaconhs/integrations:test: ℹ tests 7
+@beaconhs/integrations:test: ℹ suites 0
+@beaconhs/integrations:test: ℹ pass 7
+@beaconhs/integrations:test: ℹ fail 0
+@beaconhs/integrations:test: ℹ cancelled 0
+@beaconhs/integrations:test: ℹ skipped 0
+@beaconhs/integrations:test: ℹ todo 0
+@beaconhs/integrations:test: ℹ duration_ms 7790.961343
+@beaconhs/worker:test: cache bypass, force executing 9fe919207cdf29ff
+@beaconhs/worker:test:
+@beaconhs/worker:test: > @beaconhs/worker@0.1.0 test /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/apps/worker
+@beaconhs/worker:test: > vitest run
+@beaconhs/worker:test:
+@beaconhs/worker:test:
+@beaconhs/worker:test:  RUN  v4.1.10 /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/apps/worker
+@beaconhs/worker:test:
+@beaconhs/worker:test:
+@beaconhs/worker:test:  Test Files  27 passed (27)
+@beaconhs/worker:test:       Tests  96 passed (96)
+@beaconhs/worker:test:    Start at  15:23:30
+@beaconhs/worker:test:    Duration  26.57s (transform 6.56s, setup 0ms, import 32.76s, tests 2.24s, environment 9ms)
+@beaconhs/worker:test:
+@beaconhs/web:test: cache bypass, force executing dbc54a29cfdd419e
+@beaconhs/web:test:
+@beaconhs/web:test: > @beaconhs/web@0.1.0 test /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/apps/web
+@beaconhs/web:test: > vitest run --passWithNoTests
+@beaconhs/web:test:
+@beaconhs/web:test:
+@beaconhs/web:test:  RUN  v4.1.10 /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/apps/web
+@beaconhs/web:test:
+@beaconhs/web:test:
+@beaconhs/web:test:  Test Files  274 passed | 1 skipped (275)
+@beaconhs/web:test:       Tests  1686 passed | 1 skipped (1687)
+@beaconhs/web:test:    Start at  15:23:59
+@beaconhs/web:test:    Duration  275.31s (transform 18.19s, setup 0ms, import 353.17s, tests 33.65s, environment 22.90s)
+@beaconhs/web:test:
+
+ Tasks:    23 successful, 23 total
+Cached:    0 cached, 23 total
+  Time:    8m31.345s

@@ -37,6 +37,6 @@ describe('offline governed Risk migration plan', () => {
     expect(revoke).toBeGreaterThan(plan.indexOf('CREATE TRIGGER risk_signoff_revision_guard'))
     expect(revoke).toBeLessThan(plan.lastIndexOf('\nCOMMIT;'))
     expect(plan).toContain('FORCE ROW LEVEL SECURITY')
-    expect(plan).toContain('Ordinary migrate.ts remains incompatible')
+    expect(plan).toContain('ordinary migrate.ts now consumes the canonical 61-entry journal')
   })
 })

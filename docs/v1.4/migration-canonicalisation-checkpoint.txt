@@ -1,0 +1,230 @@
+UVANOO V1.4 — MIGRATION CANONICALISATION CHECKPOINT
+Date: 2026-10-12, Europe/London
+Status: CANONICALISATION IMPLEMENTED AND ISOLATED VALIDATION PASSED
+No commit, push, merge, rebase, CI dispatch, deployment or module freeze.
+Branch: chore/v1.4-migration-safety
+Worktree: /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety
+HEAD remains 6976a851c18e879df1813bb7c18729d6da5ab846; candidate remains uncommitted.
+This checkpoint supersedes the canonicalisation blockers in the earlier migration-safety/backup reports, not their historical evidence.
+
+A. EXACT FILE CHANGES THIS TURN
+Byte-preserving moves from packages/db/drizzle/prepared/ to packages/db/drizzle/:
+- 0059_risk_template_draft_state.sql
+- 0060_risk_template_families_manual_assessments.sql
+- 0061_risk_assessment_revisions_archive_signoffs.sql
+The old locations are removed; the new files remain untracked until separately authorised staging/commit.
+
+Modified:
+- packages/db/drizzle/meta/_journal.json — append exactly three entries, 21 added lines, zero removed lines.
+- packages/db/src/risk-0059-runner.ts — read canonical SQL for offline inspection; retire standalone execution before any database transport. Canonical DDL must use the transactional ledger-writing runner.
+- packages/db/src/risk-0059-runner.test.ts — prove exact offline statement and rejection of obsolete callers without a database call.
+- packages/db/src/risk-prepared-plan.ts — historical offline 58-to-61 plan reads the canonical files, validates their recorded hashes/timestamps, and uses the unchanged first 58 journal entries as its historical prefix. Existing 61-row ledgers still fail the plan's 58-row precondition, preventing reapplication.
+- packages/db/src/risk-prepared-plan.test.ts — canonical compatibility expectation.
+- packages/db/src/verify-prepared-risk.ts — read canonical journal exactly once, no duplicate append; retain identity, ledger, RLS, privilege, trigger and inventory checks.
+- packages/db/src/verify-prepared-risk.test.ts — construct 61-row fixture once from canonical source.
+- packages/db/src/risk-migration-preparation.test.ts — canonical paths and journal expectations.
+- packages/db/src/production-cutover-integrity.test.ts — exact linear file/tag list now includes the three recorded identities.
+- packages/db/src/migration-safety.integration.ts — canonical source sequence; fresh/forward/already-applied complete CLI runs, each followed by exact ledger verification.
+- apps/web/src/lib/legacy-hazid-retirement.test.ts — canonical Risk paths only; historical HazID preservation checks unchanged.
+
+Added:
+- packages/db/src/test/recorded-dev-migration-ledger.json — copy of independently captured 61-entry ledger evidence, no application data.
+- packages/db/src/migration-canonicalisation.test.ts — compare every source hash/timestamp/order against recorded evidence and verify exact Risk journal metadata/single canonical location.
+- docs/v1.4/migration-canonicalisation-checkpoint.txt — this evidence report.
+
+Previously authorised uncommitted runner/connection/execution/privilege changes, restore checksum fix and backup-review report are preserved. They must accompany canonicalisation during owner-reviewed promotion. They are not new changes in this turn.
+
+B. CANONICAL CHAIN
+61 journal entries. Existing numbering starts at 0000 and omits 0033; do not renumber it.
+First 58 journal objects are identical to HEAD.
+All 61 SQL bodies equal their original HEAD bytes (using old prepared paths for the last three).
+Existing snapshot files unchanged; no fabricated/regenerated snapshot metadata.
+Historical PREPARED ONLY comments remain byte-identical inside applied SQL; journal location and metadata now determine canonical execution.
+
+Risk additions (version 7, breakpoints true):
+idx 58; tag 0059_risk_template_draft_state; when 1791542400002
+SHA256 049a5465885f59b8a3d582d20ccb8e3f742b79c0133718a8ec8c1e506e53ff4b
+idx 59; tag 0060_risk_template_families_manual_assessments; when 1791542400003
+SHA256 870037015142f7764bf0ea1645a65a8152097ae1e14caba28f5096761953915d
+idx 60; tag 0061_risk_assessment_revisions_archive_signoffs; when 1791542400004
+SHA256 967e01c579434a1230124f1659ac451bd4834a46106d27261a7e2fc61e4ba602
+No 0062 reservation or new module migration.
+
+C. RECORDED DEV COMPATIBILITY
+Verified BEFORE moving files against outputs/migration-ledger-evidence.json:
+recordedAt 2026-10-12T07:57:05.287Z
+recorded database beaconhs_clean155_final
+readOnly on; 61 entries; baseline 6976a851c18e879df1813bb7c18729d6da5ab846.
+Every ordered hash and created_at matches exactly, including ledger row order 1–61.
+Recovered reconciliation records describe Decision155's separate transaction per migration and corresponding ledger INSERT, with 0059 committed before 0060.
+The corrected applied 0061 hash is 967e01c5..., not the superseded Decision154 value.
+This is compatibility with independently recorded history, NOT a claim of current live schema/data/routing parity. No persistent database was accessed in this task.
+
+D. DISPOSABLE POSTGRESQL VALIDATION
+PostgreSQL 16.15; image postgres:16-alpine.
+Container 007aebb295cf79bb68127a96cb90f288c84bb597702a4c671188bd31799d4aef.
+Label uvanoo.task=migration-safety; network none; no published ports; tmpfs /var/lib/postgresql/data; no host data volumes.
+Harness checks these restrictions and uses only explicitly constructed loopback fixture URLs.
+Container and synthetic backups removed after evidence capture.
+
+Creation:
+docker run --detach --rm --name uvanoo-migration-safety-20261012 --label uvanoo.task=migration-safety --network none --memory 768m --cpus 2 --tmpfs /var/lib/postgresql/data:rw -e POSTGRES_HOST_AUTH_METHOD=trust -e POSTGRES_DB=safety_admin postgres:16-alpine
+
+Integration command:
+pnpm --filter @beaconhs/db exec tsx src/migration-safety.integration.ts
+Exit 0.
+Complete output:
+PostgreSQL: PostgreSQL 16.15 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit
+PASS safety_fresh: replay, exact 61-entry ledger, no-op, Risk privilege preservation
+PASS existing prepared-Risk security predicate; injected application ACL drift detected and rolled back
+PASS unchanged People 0057 provenance/property-isolation SQL regression
+Approvals proposal SHA256: 9d7e47851e1ddf38335826fe0160099e8839d542d18505f141f36653da8c7780
+PASS actual unnumbered Approvals proposal table/column privilege preservation
+PASS backup SELECT, denied writes with read-only disabled, no escalation; column-ACL and role-membership drift rejected
+Creating consistent logical backup…
+Backup verified: /tmp/safety-backups/beaconhs-20261012T135502Z.dump
+ beaconhs-20261012T135502Z.dump: OK
+Restore verified; disposable database will be removed: beaconhs_restore_20261012135503_107
+PASS repository backup.sh and checksum-portable restore-verify.sh against disposable data
+PASS old broad default grants removed before new objects are created
+PASS safety_forward: replay, exact 61-entry ledger, no-op, Risk privilege preservation
+PASS ledger insertion failure rolls back SQL; unchanged retry commits both
+PASS failure rollback, previous commit survives, unchanged-SQL retry, duplicate/hash ledger rejection
+PASS explicit zero-access and Approvals-style column privilege preservation
+PASS concurrent connection exclusion and successor no-op
+✔ Database role preflight passed (beaconhs_migrator → beaconhs_owner; runtime beaconhs_app; maintenance beaconhs_super; backup beaconhs_backup)
+▶ Validating migration ledger…
+  Fresh database detected; the full migration journal will run
+▶ Running drizzle migrations…
+  Migration ledger valid: 61 applied, 0 pending, 0 historical
+▶ Applying RLS policies…
+✔ RLS applied atomically (220 tables)
+▶ Applying least-privilege runtime grants…
+✔ Least-privilege grants applied (runtime beaconhs_app; maintenance beaconhs_super; backup beaconhs_backup)
+▶ Verifying security data invariants…
+✔ Kiosk PIN hash invariant verified
+▶ Installing missing standard Risk Library templates…
+▶ Converging role permissions…
+✔ Built-in role permissions backfilled
+▶ Applying planner statistics targets…
+✔ Statistics applied (32 targets)
+▶ Applying reporting views…
+✔ Views applied atomically (10 statements)
+PASS complete migrate.ts CLI fresh using canonical 61-entry journal
+✔ Database role preflight passed (beaconhs_migrator → beaconhs_owner; runtime beaconhs_app; maintenance beaconhs_super; backup beaconhs_backup)
+▶ Validating migration ledger…
+  Migration ledger valid: 61 applied, 0 pending, 0 historical
+▶ Running drizzle migrations…
+  Migration ledger valid: 61 applied, 0 pending, 0 historical
+▶ Applying RLS policies…
+✔ RLS applied atomically (220 tables)
+▶ Applying least-privilege runtime grants…
+✔ Least-privilege grants applied (runtime beaconhs_app; maintenance beaconhs_super; backup beaconhs_backup)
+▶ Verifying security data invariants…
+✔ Kiosk PIN hash invariant verified
+▶ Installing missing standard Risk Library templates…
+▶ Converging role permissions…
+✔ Built-in role permissions backfilled
+▶ Applying planner statistics targets…
+✔ Statistics applied (32 targets)
+▶ Applying reporting views…
+✔ Views applied atomically (10 statements)
+PASS complete migrate.ts CLI no-op using canonical 61-entry journal
+✔ Database role preflight passed (beaconhs_migrator → beaconhs_owner; runtime beaconhs_app; maintenance beaconhs_super; backup beaconhs_backup)
+▶ Validating migration ledger…
+  Migration ledger valid: 58 applied, 3 pending, 0 historical
+▶ Running drizzle migrations…
+  Migration ledger valid: 61 applied, 0 pending, 0 historical
+▶ Applying RLS policies…
+✔ RLS applied atomically (220 tables)
+▶ Applying least-privilege runtime grants…
+✔ Least-privilege grants applied (runtime beaconhs_app; maintenance beaconhs_super; backup beaconhs_backup)
+▶ Verifying security data invariants…
+✔ Kiosk PIN hash invariant verified
+▶ Installing missing standard Risk Library templates…
+▶ Converging role permissions…
+✔ Built-in role permissions backfilled
+▶ Applying planner statistics targets…
+✔ Statistics applied (32 targets)
+▶ Applying reporting views…
+✔ Views applied atomically (10 statements)
+PASS complete migrate.ts CLI forward-58-to-61 using canonical 61-entry journal
+✔ Database role preflight passed (beaconhs_migrator → beaconhs_owner; runtime beaconhs_app; maintenance beaconhs_super; backup beaconhs_backup)
+▶ Validating migration ledger…
+  Migration ledger valid: 61 applied, 0 pending, 0 historical
+▶ Running drizzle migrations…
+  Migration ledger valid: 61 applied, 0 pending, 0 historical
+▶ Applying RLS policies…
+✔ RLS applied atomically (220 tables)
+▶ Applying least-privilege runtime grants…
+✔ Least-privilege grants applied (runtime beaconhs_app; maintenance beaconhs_super; backup beaconhs_backup)
+▶ Verifying security data invariants…
+✔ Kiosk PIN hash invariant verified
+▶ Installing missing standard Risk Library templates…
+▶ Converging role permissions…
+✔ Built-in role permissions backfilled
+▶ Applying planner statistics targets…
+✔ Statistics applied (32 targets)
+▶ Applying reporting views…
+✔ Views applied atomically (10 statements)
+PASS complete migrate.ts CLI existing-61-no-op using canonical 61-entry journal
+
+
+Post-complete-runner READ-ONLY assertions in disposable safety_cli, safety_cli_forward and safety_fresh:
+- exactly 61 ledger entries;
+- app and maintenance cannot UPDATE/DELETE/TRUNCATE risk_assessment_versions;
+- backup SELECT on versions and families, no backup INSERT/UPDATE/DELETE/TRUNCATE on versions.
+All PASS.
+Post-complete-runner Approvals assertions in safety_fresh:
+- no table-level UPDATE/DELETE/TRUNCATE;
+- UPDATE(status) allowed, UPDATE(requester_id) forbidden.
+PASS.
+
+No-op means no migration/ledger reapplication. Existing post-migration convergence phases still run as designed; the complete CLI is not a read-only operation.
+
+OTHER VALIDATION
+pnpm --filter @beaconhs/db test
+PASS: 70 files, 360 tests. Initial run identified one outdated hard-coded 58-entry file list; updated exact expected list, then full rerun passed.
+
+pnpm --filter @beaconhs/web exec vitest run src/lib/legacy-hazid-retirement.test.ts
+PASS: 1 file, 4 tests.
+
+pnpm --filter @beaconhs/db typecheck
+PASS exit 0.
+
+apps/web/node_modules/.bin/eslint --config apps/web/eslint.config.mjs packages/db/src/risk-0059-runner.ts packages/db/src/risk-0059-runner.test.ts packages/db/src/risk-prepared-plan.ts packages/db/src/risk-prepared-plan.test.ts packages/db/src/verify-prepared-risk.ts packages/db/src/verify-prepared-risk.test.ts packages/db/src/risk-migration-preparation.test.ts packages/db/src/production-cutover-integrity.test.ts packages/db/src/migration-safety.integration.ts packages/db/src/migration-canonicalisation.test.ts apps/web/src/lib/legacy-hazid-retirement.test.ts --max-warnings 0
+PASS exit 0; existing web lint configuration emitted React-version detection fallback warning at repository root, no lint rule violations.
+
+pnpm exec prettier --check packages/db/drizzle/meta/_journal.json packages/db/src/test/recorded-dev-migration-ledger.json packages/db/src/risk-0059-runner.ts packages/db/src/risk-0059-runner.test.ts packages/db/src/risk-prepared-plan.ts packages/db/src/risk-prepared-plan.test.ts packages/db/src/verify-prepared-risk.ts packages/db/src/verify-prepared-risk.test.ts packages/db/src/risk-migration-preparation.test.ts packages/db/src/production-cutover-integrity.test.ts packages/db/src/migration-safety.integration.ts packages/db/src/migration-canonicalisation.test.ts apps/web/src/lib/legacy-hazid-retirement.test.ts
+PASS all matched files.
+git diff --check: PASS.
+
+pnpm --filter @beaconhs/db exec node --import tsx src/risk-0059-runner.ts --plan
+PASS offline statement validation. Initial direct tsx CLI invocation was blocked by sandbox IPC permissions; node --import tsx completed without escalation or database access.
+
+PRESERVATION
+All 39 Approvals candidate file hashes and its complete Git status match the previous recorded baseline.
+No edits to People, Approvals or Risk worktrees.
+No applied SQL bytes, existing journal identities, application RBAC/RLS source, deployment files or persistent databases changed.
+Only disposable fixture processes were created/removed; no existing service restarted.
+No live migration execution or module freeze.
+
+E. REMAINING INTEGRATION BLOCKERS
+No unresolved canonicalisation identity or disposable-replay failure remains.
+Promotion must include the already validated per-migration runner and ACL-preservation changes; promoting the journal alone would reintroduce the old transaction/grant hazards.
+Fresh live ledger/schema/role/ACL preflight remains required at the separately authorised batch-release checkpoint. Recorded evidence is not a current live inspection.
+Deployment routing and full platform/module release validation remain separately governed; no full application build or hosted CI was claimed here.
+Existing provisioning scripts retain broad defaults; do not rerun provisioning after security migrations without governed review.
+Backups omit ACLs by design; restored environments require the governed grants/RLS phase before use.
+People and Approvals integration/migration ownership remain separate; no number reserved.
+
+F. PROMOTION READINESS
+READY FOR CONTROLLER REVIEW of the combined isolated migration-safety candidate.
+Local canonical chain, recorded ledger compatibility, migration execution and requested security checks PASS.
+Not committed/promoted/deployed; no module frozen.
+
+G. REQUIRED OWNER APPROVALS
+Review and accept the combined runner, ACL, backup and canonicalisation changes.
+Explicit authorisation before commit, push, merge or governed-branch modification.
+Separate combined-release authorisation and current-environment preflight before any persistent database execution/deployment.
+STOPPED AFTER REPORTING.

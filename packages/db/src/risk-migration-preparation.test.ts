@@ -4,10 +4,9 @@ import { describe, expect, it } from 'vitest'
 import { PROPERTY_REPORTING_TABLES, RLS_POLICY_SQL, TENANT_SCOPED_TABLES } from './rls'
 
 const migrationDir = resolve(import.meta.dirname, '../drizzle')
-const readMigration = (name: string) =>
-  readFileSync(resolve(migrationDir, 'prepared', name), 'utf8')
+const readMigration = (name: string) => readFileSync(resolve(migrationDir, name), 'utf8')
 
-describe('prepared Risk Assessments migrations', () => {
+describe('canonical Risk Assessments migrations', () => {
   it('mirrors the tenant and property RLS boundaries for revisions and families', () => {
     expect(TENANT_SCOPED_TABLES).toContain('risk_assessment_versions')
     expect(TENANT_SCOPED_TABLES).toContain('risk_template_families')
@@ -40,7 +39,7 @@ describe('prepared Risk Assessments migrations', () => {
     expect(migration).not.toContain('SECURITY DEFINER')
     expect(migration).toContain('COALESCE((')
   })
-  it('keeps the enum addition isolated and leaves all three proposals unjournaled', () => {
+  it('keeps the enum addition isolated and journals all three exact canonical identities', () => {
     const state = readMigration('0059_risk_template_draft_state.sql')
     expect(state.match(/ALTER TYPE/gi)).toHaveLength(1)
     expect(state).toContain("ADD VALUE IF NOT EXISTS 'draft'")
@@ -50,7 +49,7 @@ describe('prepared Risk Assessments migrations', () => {
       '0060_risk_template_families_manual_assessments',
       '0061_risk_assessment_revisions_archive_signoffs',
     ])
-      expect(journal).not.toContain(name)
+      expect(journal).toContain(name)
   })
 
   it('extracts assessment JSON before subtracting volatile keys in the revision guard', () => {

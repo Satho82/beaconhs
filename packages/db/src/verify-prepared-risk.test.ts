@@ -1,13 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import { fileURLToPath } from 'node:url'
 import { readMigrationFiles } from './migration-state'
-import { preparedRiskProposals } from './risk-prepared-plan'
 import { verifyPreparedRisk } from './verify-prepared-risk'
 
-const ledger = [
-  ...readMigrationFiles(fileURLToPath(new URL('../drizzle', import.meta.url))),
-  ...preparedRiskProposals.map(([tag, createdAt, hash]) => ({ tag, createdAt, hash })),
-].map((e) => ({ hash: e.hash, created_at: e.createdAt }))
+const ledger = readMigrationFiles(fileURLToPath(new URL('../drizzle', import.meta.url))).map(
+  (e) => ({ hash: e.hash, created_at: e.createdAt }),
+)
 function fixture(
   change: {
     ledger?: typeof ledger

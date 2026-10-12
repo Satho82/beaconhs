@@ -1,5 +1,5 @@
 name: Uvanoo overnight focused acceptance
-# Failed focused checks only plus qualified financial-field regression. Preserve earlier passing core and desktop checks.
+# Failed mobile/property checks only. Preserve successful financial regression in run 38320245029.
 
 # Read-only control workflow validating exact immutable candidates in disposable services. This workflow
 # deliberately has no deploy, image, registry, SSH, or environment path.
@@ -257,13 +257,6 @@ jobs:
       - name: Authenticated browser acceptance
         timeout-minutes: 20
         run: node "$RUNNER_TEMP/browser-acceptance.mjs"
-
-      - name: Qualified financial-field regression through real browser
-        if: ${{ !cancelled() && steps.app_start.outcome == 'success' }}
-        timeout-minutes: 10
-        run: |
-          node --check "$RUNNER_TEMP/browser-financial-acceptance.mjs"
-          node "$RUNNER_TEMP/browser-financial-acceptance.mjs"
 
       - name: Capture immutable migration and source evidence
         if: always()

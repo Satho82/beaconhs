@@ -1,0 +1,73 @@
+{
+  "sourceCommit": "563fb0e9b79a838a5f394abaffb2f7dc743fc571",
+  "sourceTree": "324c50a60e2cb0639ba920488a150c6531968374",
+  "runtime": "production Next standalone; disposable hosted CI",
+  "checks": [
+    {
+      "name": "Authentication cluster",
+      "status": "PASS",
+      "detail": {
+        "role": "cluster",
+        "authentication": "real password UI and server session",
+        "propertyScope": [
+          "3fc9c084-7caf-5a72-8805-c6bc6fc51656",
+          "a8adb358-5b67-5ea2-b3d3-bcf5f7cfa378"
+        ]
+      }
+    },
+    {
+      "name": "Authentication requester",
+      "status": "PASS",
+      "detail": {
+        "role": "requester",
+        "authentication": "real password UI and server session",
+        "propertyScope": [
+          "3fc9c084-7caf-5a72-8805-c6bc6fc51656"
+        ]
+      }
+    },
+    {
+      "name": "Focused financial field entry and persisted detail integrity",
+      "status": "PASS",
+      "detail": {
+        "requestId": "45894dae-25f1-4bd0-9c2c-c2438db76f67",
+        "ambiguousFirstTag": "META",
+        "selector": "input/textarea/select qualified by name",
+        "persistedFields": {
+          "Category": "Maintenance",
+          "Amount": "GBP 125.01",
+          "Supplier": "Synthetic supplier",
+          "Property": "One Fifty Fenchurch",
+          "Creator": "Elena Ward",
+          "Current approver": "Nadia Cole",
+          "Created": "12/10/2026, 23:09:34",
+          "Stage": "1 of 1"
+        },
+        "descriptionMatched": true
+      }
+    }
+  ],
+  "screenshots": [
+    "cluster-landing.png",
+    "requester-landing.png",
+    "qualified-financial-form.png",
+    "qualified-financial-detail.png"
+  ],
+  "gaps": [],
+  "authenticationResponses": [
+    {
+      "role": "cluster",
+      "attempt": 1,
+      "status": 200,
+      "retryAfter": null
+    },
+    {
+      "role": "requester",
+      "attempt": 1,
+      "status": 200,
+      "retryAfter": null
+    }
+  ],
+  "runtimeErrors": [],
+  "status": "FOCUSED_FINANCIAL_CHECK_PASS"
+}

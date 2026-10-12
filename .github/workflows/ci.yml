@@ -11,6 +11,49 @@ on:
   workflow_dispatch:
 
 jobs:
+  deployment-eligibility:
+    name: Classify main push for deployment eligibility
+    # A manual run has no trustworthy before..after range. It must therefore
+    # fail closed rather than turn CI into a deployment entrypoint.
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    outputs:
+      has_application_changes: ${{ steps.classify.outputs.has_application_changes }}
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
+          # The range classifier needs the complete commit graph. A shallow
+          # clone cannot reliably prove that `before` is an ancestor of `after`.
+          fetch-depth: 0
+      - id: classify
+        name: Fail closed unless the pushed range changes application content
+        env:
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          if ! [[ "$BEFORE" =~ ^[0-9a-f]{40}$ && "$AFTER" =~ ^[0-9a-f]{40}$ ]] \
+            || [ "$BEFORE" = 0000000000000000000000000000000000000000 ]; then
+            echo 'has_application_changes=false' >> "$GITHUB_OUTPUT"
+            echo 'Deployment skipped: no trustworthy push range.' >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          if ! git cat-file -e "${BEFORE}^{commit}" \
+            || ! git cat-file -e "${AFTER}^{commit}" \
+            || ! git merge-base --is-ancestor "$BEFORE" "$AFTER"; then
+            echo 'has_application_changes=false' >> "$GITHUB_OUTPUT"
+            echo 'Deployment skipped: push range is not a fast-forward history.' >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          if git diff --name-only --diff-filter=ACDMRT "$BEFORE" "$AFTER" | grep -qv '^\.github/'; then
+            echo 'has_application_changes=true' >> "$GITHUB_OUTPUT"
+            echo 'Deployment eligible: application content changed.' >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'has_application_changes=false' >> "$GITHUB_OUTPUT"
+            echo 'Deployment skipped: workflow/configuration-only push.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
   ci:
     runs-on: ubuntu-latest
     services:
@@ -98,8 +141,11 @@ jobs:
 
   deploy-dev:
     name: Deploy tested commit to dev
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-    needs: ci
+    if: >-
+      github.event_name == 'push' &&
+      needs.deployment-eligibility.result == 'success' &&
+      needs.deployment-eligibility.outputs.has_application_changes == 'true'
+    needs: [ci, deployment-eligibility]
     permissions:
       contents: read
       packages: write

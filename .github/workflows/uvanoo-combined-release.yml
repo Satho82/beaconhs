@@ -26,7 +26,7 @@ jobs:
       matrix:
         include:
           - module: migration-safety
-            source_sha: 6f7048965e8136aaf4067555e93fc048ef2cecb5
+            source_sha: 563fb0e9b79a838a5f394abaffb2f7dc743fc571
             source_branch: integration/uvanoo-v1.4-approvals-dev-gate-20261012
     runs-on: ubuntu-24.04
     timeout-minutes: 120
@@ -79,7 +79,7 @@ jobs:
           test "$GITHUB_REF" = 'refs/heads/review/uvanoo-v1.4-combined-validation-20261012'
           [[ "$SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]]
           case "$MODULE:$SOURCE_BRANCH:$SOURCE_SHA" in
-            migration-safety:integration/uvanoo-v1.4-approvals-dev-gate-20261012:6f7048965e8136aaf4067555e93fc048ef2cecb5) ;;
+            migration-safety:integration/uvanoo-v1.4-approvals-dev-gate-20261012:563fb0e9b79a838a5f394abaffb2f7dc743fc571) ;;
             *) exit 1 ;;
           esac
           [[ "$MODULE" =~ ^[a-z0-9][a-z0-9-]{0,63}$ ]]
@@ -99,10 +99,10 @@ jobs:
           set -euo pipefail
           git fetch --no-tags origin "$SOURCE_SHA" c306bd6bbe0571eeca18a410c1ac08fe55c524b6
           test "$(git ls-remote origin "refs/heads/$SOURCE_BRANCH" | cut -f1)" = "$SOURCE_SHA"
-          test "$(git show -s --format=%P "$SOURCE_SHA")" = '937242e7e35806acab48c28c4163719b00c0f16d ba3f87000b7d2ace82ee74aa1585a91e4237c0af'
+          test "$(git show -s --format=%P "$SOURCE_SHA")" = 6f7048965e8136aaf4067555e93fc048ef2cecb5
           git checkout --detach "$SOURCE_SHA"
           test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
-          test "$(git rev-parse HEAD^{tree})" = d6e5e7c195342cf67c2749f474b6a23c54ad7afb
+          test "$(git rev-parse HEAD^{tree})" = 324c50a60e2cb0639ba920488a150c6531968374
           test "$(git status --porcelain)" = ''
           git diff --check c306bd6bbe0571eeca18a410c1ac08fe55c524b6 HEAD
           git diff --exit-code c306bd6bbe0571eeca18a410c1ac08fe55c524b6 HEAD -- 'packages/db/drizzle/00[0-5]*.sql' 'packages/db/drizzle/006[0-2]*.sql' 'apps/web/src/lib/people' 'apps/web/src/app/(app)/people' 'apps/web/src/lib/risk'
@@ -206,7 +206,7 @@ jobs:
 
       - name: Strict DEV prefixes and schema security drift rejection
         run: |
-          git fetch --no-tags origin 937242e7e35806acab48c28c4163719b00c0f16d
+          git fetch --no-tags origin 937242e7e35806acab48c28c4163719b00c0f16d d18f635a41f092e9e86aa6f53518f9c28992b0d2 c306bd6bbe0571eeca18a410c1ac08fe55c524b6
           pnpm --filter @beaconhs/db exec tsx src/dev-migration-gate.integration.ts
 
       - name: Unit and regression tests
@@ -303,6 +303,70 @@ jobs:
           scripts/ci/workflow-repository-immutability.test.sh
           scripts/ci/v1.4-dev-candidate-deploy-contract.test.sh
 
+      - name: Verify exact final source identity
+        run: |
+          set -euo pipefail
+          git diff --exit-code
+          git diff --cached --exit-code
+          test -z "$(git ls-files --others --exclude-standard)"
+          test "$(git rev-parse HEAD)" = 563fb0e9b79a838a5f394abaffb2f7dc743fc571
+          test "$(git rev-parse HEAD^{tree})" = 324c50a60e2cb0639ba920488a150c6531968374
+          printf 'VALIDATED_RECOVERY_SHA=%s\nVALIDATED_RECOVERY_TREE=%s\n' "$(git rev-parse HEAD)" "$(git rev-parse HEAD^{tree})" | tee -a "$GITHUB_STEP_SUMMARY"
+
+  secret-scan:
+    name: Gitleaks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          ref: 563fb0e9b79a838a5f394abaffb2f7dc743fc571
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3
+        env:
+          GITLEAKS_VERSION: 8.30.1
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  codeql:
+    name: CodeQL (JavaScript/TypeScript)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          ref: 563fb0e9b79a838a5f394abaffb2f7dc743fc571
+          persist-credentials: false
+      - uses: github/codeql-action/init@99df26d4f13ea111d4ec1a7dddef6063f76b97e9 # v4.37.0
+        with:
+          languages: javascript-typescript
+          build-mode: none
+          queries: security-extended
+      - uses: github/codeql-action/analyze@99df26d4f13ea111d4ec1a7dddef6063f76b97e9 # v4.37.0
+
+
+  build:
+    name: Combined production web and worker build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          ref: 563fb0e9b79a838a5f394abaffb2f7dc743fc571
+          persist-credentials: false
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
       - name: Production build only
         env:
           NODE_OPTIONS: --max-old-space-size=8192
@@ -322,45 +386,6 @@ jobs:
           git diff --exit-code
           git diff --cached --exit-code
           test -z "$(git ls-files --others --exclude-standard)"
-          test "$(git rev-parse HEAD)" = 6f7048965e8136aaf4067555e93fc048ef2cecb5
-          test "$(git rev-parse HEAD^{tree})" = d6e5e7c195342cf67c2749f474b6a23c54ad7afb
+          test "$(git rev-parse HEAD)" = 563fb0e9b79a838a5f394abaffb2f7dc743fc571
+          test "$(git rev-parse HEAD^{tree})" = 324c50a60e2cb0639ba920488a150c6531968374
           printf 'VALIDATED_RECOVERY_SHA=%s\nVALIDATED_RECOVERY_TREE=%s\n' "$(git rev-parse HEAD)" "$(git rev-parse HEAD^{tree})" | tee -a "$GITHUB_STEP_SUMMARY"
-
-  secret-scan:
-    name: Gitleaks
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    permissions:
-      contents: read
-      pull-requests: read
-    steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-        with:
-          ref: 6f7048965e8136aaf4067555e93fc048ef2cecb5
-          fetch-depth: 0
-          persist-credentials: false
-      - uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3
-        env:
-          GITLEAKS_VERSION: 8.30.1
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  codeql:
-    name: CodeQL (JavaScript/TypeScript)
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    permissions:
-      contents: read
-      packages: read
-      security-events: write
-    steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-        with:
-          ref: 6f7048965e8136aaf4067555e93fc048ef2cecb5
-          persist-credentials: false
-      - uses: github/codeql-action/init@99df26d4f13ea111d4ec1a7dddef6063f76b97e9 # v4.37.0
-        with:
-          languages: javascript-typescript
-          build-mode: none
-          queries: security-extended
-      - uses: github/codeql-action/analyze@99df26d4f13ea111d4ec1a7dddef6063f76b97e9 # v4.37.0
-

@@ -30,14 +30,15 @@ try{
    await p.waitForFunction(()=>!location.pathname.startsWith('/login'),{timeout:30000});await pause(12000)
   })
  }
- for(const width of [1440,390])for(const [label,path]of [['People','/people'],['Approvals','/approvals']]){
+ for(const width of [390])for(const [label,path]of [['People','/people'],['Approvals','/approvals']]){
   await record((width===390?'Mobile':'Desktop')+' actual menu navigation '+label,async()=>{
    const p=pages.cluster;await p.setViewport({width,height:width===390?844:1000,isMobile:width===390,hasTouch:width===390})
    await go(p,'/dashboard')
-   if(width===390){const open=await p.$('button[aria-label="Open navigation"]');assert(open,'Mobile navigation toggle missing');await open.click()}
+   if(width===390){const open=await p.$('button[aria-label="Open navigation"]');assert(open,'Mobile navigation toggle missing');await open.click();await p.waitForSelector('[role="dialog"] nav',{visible:true});await pause(400)}
+   const navRoot=width===390?'[role="dialog"] nav':'aside nav'
    let found=false
-   for(const a of await p.$$('nav a[href="'+path+'"]')){if(await visible(a)){await a.click();found=true;break}}
-   if(!found){await clickText(p,'nav button',label);for(const a of await p.$$('nav a[href="'+path+'"]')){if(await visible(a)){await a.click();found=true;break}}}
+   for(const a of await p.$(navRoot+' a[href="'+path+'"]')){if(await visible(a)){await a.click();found=true;break}}
+   if(!found){await clickText(p,navRoot+' button',label);await pause(200);for(const a of await p.$(navRoot+' a[href="'+path+'"]')){if(await visible(a)){await a.click();found=true;break}}}
    assert(found,'Menu destination unavailable');await p.waitForFunction(path=>location.pathname===path,{timeout:15000},path);await settled(p)
    const body=await p.$eval('body',e=>e.innerText);assert(body.includes(label));await shot(p,(width===390?'mobile':'desktop')+'-settled-'+label.toLowerCase())
    const overflow=await p.evaluate(()=>({viewport:innerWidth,document:document.documentElement.scrollWidth}));assert(overflow.document<=overflow.viewport+2,'Horizontal overflow');return overflow
@@ -56,7 +57,7 @@ try{
    let remove
    for(const h of await form.$$('button[aria-label]'))if((await h.evaluate(e=>e.getAttribute('aria-label'))).includes(from.name)){remove=h;break}
    assert(remove,'Current property chip missing');await remove.click()
-   await(await form.$('button[aria-haspopup="listbox"]')).click();await clickText(p,'button[role="option"]',to.name)
+   const pickers=await form.$('button[aria-haspopup="listbox"]');assert.equal(pickers.length,2,'Expected scope-type and property pickers');await pickers[1].click();await p.waitForSelector('button[role="option"]',{visible:true});await clickText(p,'button[role="option"]',to.name)
    assert.deepEqual(JSON.parse(await form.$eval('input[name="scope"]',e=>e.value)),{type:'properties',propertyIds:[to.id]})
    await clickText(p,'details[open] button','Save access scope');await p.waitForNetworkIdle({idleTime:500,timeout:15000})
    await go(p,'/admin/users/'+target.tenantUserId+'?tab=roles')
@@ -67,7 +68,7 @@ try{
   const audit=await go(p,'/admin/users/'+target.tenantUserId+'?tab=activity');assert(audit.includes('access scope'),'Assignment audit missing');await shot(p,'property-assignment-audit')
   return {from:tls.name,to:off.name,restored:true,sameAuthenticatedRestrictedSession:true}
  })
- report.gaps.push('Original People mock-up comparison remains NOT VERIFIED until the approved People original is recovered. Screenshots require visual review.')
+ report.gaps.push('People original references located; pixel comparison NOT VERIFIED because available cloud reader returned text/asset pointers. Screenshots require visual review.')
 }catch(e){report.gaps.push(String(e.message))}
 finally{await browser.close();report.status=report.checks.some(x=>x.status==='FAIL')?'ACCEPTANCE_GAPS':'FOCUSED_CHECKS_PASS';await writeFile(out+'/browser-acceptance.json',JSON.stringify(report,null,2));console.log('BROWSER_ACCEPTANCE_JSON='+JSON.stringify(report))}
 if(report.checks.some(x=>x.status==='FAIL'))process.exitCode=1

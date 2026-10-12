@@ -1,0 +1,91 @@
+{
+  "status": "proposed_for_owner_decision_not_implemented",
+  "candidate_sha": "c306bd6bbe0571eeca18a410c1ac08fe55c524b6",
+  "preserved_migrations": "Keep original 61 identities and canonical 0062 byte-for-byte; any added schema must be a forward migration.",
+  "decision_required": "Confirm whether the requested 62-migration checkpoint may grow through additive migration(s) for the missing production data and delegation model, or define an explicitly reduced Board scope.",
+  "production_contract": {
+    "routes": [
+      "Authenticated Approvals overview",
+      "My Requests",
+      "Team Requests",
+      "All Requests",
+      "Create Request",
+      "Request detail",
+      "Manager review",
+      "Workflow/category/limit configuration",
+      "Reporting and audit"
+    ],
+    "delegation": [
+      "Only the current assigned approver may delegate a pending current stage.",
+      "Delegate must be another active tenant member with effective approvals.decide permission and same-assignment authority for the request property.",
+      "Reject requester, self-delegation, expired/revoked authority and cross-tenant/property targets.",
+      "Do not change immutable original stage snapshots or grant IAM permissions.",
+      "Append an immutable property-scoped delegation event with actor, target, reason, stage, timestamp and idempotency key.",
+      "Serialize decisions and delegation using the same request-row lock; reject stale assignment versions.",
+      "Decisions must bind to the current authorized assignment while preserving all historical evidence."
+    ],
+    "sources": [
+      "Use server-owned production source adapters; resolve source visibility, property and version in the same tenant transaction.",
+      "Retain the existing no-source-lifecycle-mutation adapter boundary; in particular, do not change Risk.",
+      "Create financial request/source records for title/category/amount/currency/supplier/description and private document evidence; never use preview audit snapshots as production records."
+    ],
+    "security": [
+      "Canonical authenticated RequestContext, explicit entitlements and permission checks, fresh membership/role resolution, property provenance, RLS, audit, idempotency and concurrency protection.",
+      "No production imports from preview fixtures, preview sessions or preview synthetic adapters.",
+      "All lists filtered in SQL before pagination/counts; details/documents/history require the same authority boundary."
+    ],
+    "acceptance": [
+      "Targeted lifecycle/adapter/delegation race and security tests in disposable PostgreSQL.",
+      "New forward migration, original 62 identity checks, backup/restore and rollback/ACL harness.",
+      "Full combined release gates and exact source identity at the completed production SHA.",
+      "Authenticated browser journeys and approved-design comparison before owner freeze acceptance."
+    ]
+  },
+  "design_requirements": [
+    {
+      "id": "E045",
+      "element": "Submission",
+      "approved_requirement": "Create Approval Request; required Title, Category, Amount and Upload Document; Currency; Supplier; Related Property; optional Related Work Order; file drag/drop/picker, filename/size/remove; Description; Cancel; Submit Request. G04 shows PDF/JPG/PNG and maximum 10 MB."
+    },
+    {
+      "id": "E046",
+      "element": "My Requests",
+      "approved_requirement": "New Request; All, Pending, Approved, Rejected and More Info tabs; Ref, Title, Category, Amount, Status, Created columns. Also preserve In Review as a shown status and role-scoped Team/All Requests views."
+    },
+    {
+      "id": "E047",
+      "element": "Approval detail",
+      "approved_requirement": "Reference, title, status, category, amount/currency, supplier, property, creator, creation time and description; Timeline, Documents and Comments tabs; actor/time/status history; Cancel Request; Add Comment; View Document."
+    },
+    {
+      "id": "E048",
+      "element": "Manager review",
+      "approved_requirement": "Request information, attached document with View, comments with actor/time, Approve/Reject/Request more information choices, required-comment prompt, Cancel and Submit Decision."
+    },
+    {
+      "id": "E049",
+      "element": "Role configuration",
+      "approved_requirement": "Staff own submissions; line-manager approvals within limits and requests for information; manager higher limits/approver assignment; property-manager property approvals; optional finance final approval/integration; Super Admin workflow/category/limit configuration. These are intended permissions, not proof that the current RBAC engine supplies them."
+    },
+    {
+      "id": "E050",
+      "element": "Configurable options",
+      "approved_requirement": "Single/multi-level workflow; limits by role/amount/category; categories such as Maintenance, General, CapEx and Supplies; supplier management; links to maintenance work orders/assets; email/in-app notification rules; custom fields; future accounting/finance integration; full audit and reporting."
+    },
+    {
+      "id": "E051",
+      "element": "Use cases",
+      "approved_requirement": "Maintenance invoices and quotes; general supplier invoices; one-off purchases; planned works; contractor costs; non-maintenance expenses; budget control and oversight."
+    },
+    {
+      "id": "E052",
+      "element": "Reporting and audit",
+      "approved_requirement": "Status reports; spend by category/property; pending approvals; who/when/what audit; Excel/CSV export; internal/external audit support."
+    },
+    {
+      "id": "E053",
+      "element": "Benefits represented in the design",
+      "approved_requirement": "Controlled spending; complete documentation/history; flexible rules; reuse across modules; visible request status. Validate these through actual workflow behaviour, not decorative claims."
+    }
+  ]
+}

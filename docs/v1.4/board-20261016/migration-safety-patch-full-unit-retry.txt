@@ -1,7 +1,7 @@
 Cloud executor; base 6892670fd33e0fe12a1862bb822b451cd1bf7b44 plus adjacent migration-safety-deadcode-fix.patch.
 Node 24.18.0; pnpm 10.30.3; @sparticuz/chromium 153.0.0 (Chromium 153.0.8010.0) provisioned outside repository.
 Command: PUPPETEER_EXECUTABLE_PATH=/tmp/chromium VITEST_MAX_WORKERS=2 NODE_OPTIONS=--max-old-space-size=3072 pnpm test --concurrency=1 --env-mode=loose
-Exit: 0. 2725 passed; 2 opt-in integration tests skipped. No real PostgreSQL proof from this executor run.
+Exit: 0. 2760 passed (2725 Vitest + 35 native Node); 2 opt-in integration tests skipped. No real PostgreSQL proof from this executor run.
 
 npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
 

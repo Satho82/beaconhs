@@ -1,3 +1,4 @@
+import { loadDevMigrationGate } from './dev-migration-gate'
 import { executePendingMigrations, loadMigrationBodies } from './migration-execution'
 import { prepareMigrationPrivileges, grantUnmanagedObjects } from './migration-privileges'
 import { pinnedMigrationDatabase, type MigrationDatabase } from './migration-connection'
@@ -59,7 +60,11 @@ async function verifyMigrationTracker(db: MigrationDatabase, requireComplete: bo
   const state = validateMigrationState(
     MIGRATION_FILES,
     rows.map((row) => ({ hash: row.hash, createdAt: row.created_at })),
-    { allowLegacyBefore: MIGRATION_CUTOVER_AT, requireComplete },
+    {
+      allowLegacyBefore:
+        process.env.FEATURE_CANDIDATE_VERIFIED === 'true' ? undefined : MIGRATION_CUTOVER_AT,
+      requireComplete,
+    },
   )
   console.log(
     `  Migration ledger valid: ${state.applied.length} applied, ${state.pending.length} pending, ${state.unknownTrackerRows} historical`,
@@ -400,6 +405,10 @@ async function applyReportingViews(db: MigrationDatabase) {
 }
 
 async function main() {
+  const devGate =
+    process.env.FEATURE_CANDIDATE_VERIFIED === 'true'
+      ? await loadDevMigrationGate(MIGRATIONS_FOLDER)
+      : null
   // DDL uses a dedicated unpooled login that can SET ROLE to a NOLOGIN owner.
   // Runtime and cross-tenant maintenance are distinct, non-owner logins.
   const migrationUrl = process.env.MIGRATION_DATABASE_URL
@@ -447,6 +456,7 @@ async function main() {
     )
     await migrationDb.execute(sql`select pg_advisory_lock(hashtext('beaconhs:schema-migration'))`)
     lockAcquired = true
+    if (devGate) await devGate.before(migrationDb)
 
     console.log('▶ Validating migration ledger…')
     await verifyMigrationTracker(migrationDb, false)
@@ -462,7 +472,7 @@ async function main() {
     await executePendingMigrations(
       migrationDb,
       loadMigrationBodies(MIGRATIONS_FOLDER, MIGRATION_FILES),
-      { allowLegacyBefore: MIGRATION_CUTOVER_AT },
+      { allowLegacyBefore: devGate ? undefined : MIGRATION_CUTOVER_AT },
     )
     await verifyMigrationTracker(migrationDb, true)
 
@@ -507,6 +517,7 @@ async function main() {
       roles.maintenanceRole,
       roles.backupRole,
     )
+    if (devGate) await devGate.after(migrationDb)
   } finally {
     if (lockAcquired) {
       try {

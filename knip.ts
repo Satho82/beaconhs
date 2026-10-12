@@ -48,7 +48,12 @@ const config: KnipConfig = {
       entry: ['src/create-cycas-demo-credentials.ts', 'src/cycas-board.integration.ts'],
     },
     'packages/db': {
-      entry: ['src/scripts/reseed-lift-plan.ts', 'src/forward-migration-cli.ts'],
+      entry: [
+        'src/scripts/reseed-lift-plan.ts',
+        'src/forward-migration-cli.ts',
+        'src/migrate-dev.ts',
+        'src/dev-migration-gate.integration.ts',
+      ],
     },
     'packages/sync': {
       ignoreDependencies: ['mssql'],

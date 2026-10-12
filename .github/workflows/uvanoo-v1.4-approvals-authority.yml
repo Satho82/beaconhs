@@ -1,0 +1,132 @@
+name: Uvanoo Approvals isolated property authority proof
+on:
+  push:
+    branches: [review/uvanoo-v1.4-board-20261016-cloud]
+    paths: [.github/workflows/uvanoo-v1.4-approvals-authority.yml]
+permissions:
+  contents: read
+concurrency:
+  group: uvanoo-approvals-authority-${{ github.sha }}
+  cancel-in-progress: false
+defaults:
+  run:
+    shell: bash
+jobs:
+  authority:
+    name: Original Approvals source — disposable property authority proof only
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      CI: 'true'
+      NEXT_TELEMETRY_DISABLED: '1'
+      TURBO_TELEMETRY_DISABLED: '1'
+    steps:
+      - name: Verify isolated control boundary
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = Satho82/beaconhs
+          test "$GITHUB_REF" = refs/heads/review/uvanoo-v1.4-board-20261016-cloud
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          ref: 6892670fd33e0fe12a1862bb822b451cd1bf7b44
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Verify canonical fixture source
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = 6892670fd33e0fe12a1862bb822b451cd1bf7b44
+          git merge-base --is-ancestor HEAD origin/chore/v1.4-migration-safety
+          test "$(git status --porcelain)" = ''
+          echo '9d7e47851e1ddf38335826fe0160099e8839d542d18505f141f36653da8c7780  packages/db/src/test/approvals-security-contract.fixture.sql' | sha256sum --check
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
+        with:
+          run_install: false
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - name: Verify pinned toolchain
+        run: |
+          set -euo pipefail
+          test "$(node --version)" = "v$(tr -d '\r\n' < .nvmrc)"
+          test "pnpm@$(pnpm --version)" = "$(node -p 'JSON.parse(require("node:fs").readFileSync("package.json", "utf8")).packageManager')"
+      - run: pnpm install --frozen-lockfile
+      - name: Reproduce canonical disposable database with existing harness
+        run: |
+          set -euo pipefail
+          docker pull postgres:16-alpine@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777
+          docker tag postgres:16-alpine@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777 postgres:16-alpine
+          docker run --detach --rm --name uvanoo-migration-safety-20261012 \
+            --label uvanoo.task=migration-safety --network none --memory 768m --cpus 2 \
+            --tmpfs /var/lib/postgresql/data:rw \
+            -e POSTGRES_HOST_AUTH_METHOD=trust -e POSTGRES_DB=safety_admin postgres:16-alpine
+          ready=false
+          for attempt in $(seq 1 30); do
+            if docker exec uvanoo-migration-safety-20261012 pg_isready -U postgres -d safety_admin; then ready=true; break; fi
+            sleep 1
+          done
+          test "$ready" = true
+          pnpm --filter @beaconhs/db exec tsx src/migration-safety.integration.ts
+      - name: Copy only the disposable fixture into the original Approvals guard boundary
+        run: |
+          set -euo pipefail
+          docker run --detach --rm --name uvanoo-approvals-reconcile-20261012 \
+            --label uvanoo.task=approvals-migration-reconciliation --network none --memory 768m --cpus 2 \
+            --tmpfs /var/lib/postgresql/data:rw \
+            -e POSTGRES_HOST_AUTH_METHOD=trust -e POSTGRES_DB=reconcile_fixture postgres:16-alpine
+          ready=false
+          for attempt in $(seq 1 30); do
+            if docker exec uvanoo-approvals-reconcile-20261012 pg_isready -U postgres -d reconcile_fixture; then ready=true; break; fi
+            sleep 1
+          done
+          test "$ready" = true
+          docker exec -i uvanoo-approvals-reconcile-20261012 psql -U postgres -d reconcile_fixture -X -v ON_ERROR_STOP=1 <<'SQL'
+          CREATE ROLE beaconhs_owner NOLOGIN NOSUPERUSER NOBYPASSRLS;
+          CREATE ROLE beaconhs_migrator LOGIN NOINHERIT NOSUPERUSER NOBYPASSRLS;
+          CREATE ROLE beaconhs_app LOGIN NOINHERIT NOSUPERUSER NOBYPASSRLS;
+          CREATE ROLE beaconhs_super LOGIN NOINHERIT NOSUPERUSER BYPASSRLS;
+          CREATE ROLE beaconhs_backup LOGIN NOINHERIT NOSUPERUSER BYPASSRLS;
+          ALTER ROLE beaconhs_backup SET default_transaction_read_only = 'on';
+          GRANT beaconhs_owner TO beaconhs_migrator;
+          CREATE ROLE reconcile_admin LOGIN SUPERUSER;
+          SQL
+          docker exec uvanoo-migration-safety-20261012 pg_dump -U postgres safety_fresh \
+            | docker exec -i uvanoo-approvals-reconcile-20261012 psql -U postgres -d reconcile_fixture -X -v ON_ERROR_STOP=1
+          test "$(docker exec uvanoo-approvals-reconcile-20261012 psql -U postgres -d reconcile_fixture -Atc 'SELECT count(*) FROM drizzle.__drizzle_migrations')" = 61
+          docker exec -i uvanoo-approvals-reconcile-20261012 psql -U postgres -d reconcile_fixture -X -v ON_ERROR_STOP=1 <<'SQL'
+          COMMENT ON TABLE approval_requests IS 'isolated-test-ddl-sha256:9d7e47851e1ddf38335826fe0160099e8839d542d18505f141f36653da8c7780';
+          SQL
+      - name: Checkout and verify original immutable Approvals source
+        run: |
+          set -euo pipefail
+          git diff --exit-code
+          git checkout --detach fed0709f79922d003aefbdb6674e5b92270bdeea
+          test "$(git rev-parse HEAD)" = fed0709f79922d003aefbdb6674e5b92270bdeea
+          git merge-base --is-ancestor HEAD origin/feature/uvanoo-v1.4-approvals
+          test "$(git status --porcelain)" = ''
+          echo '9d7e47851e1ddf38335826fe0160099e8839d542d18505f141f36653da8c7780  packages/db/proposals/approvals-batch01.sql' | sha256sum --check
+          test "$(node --version)" = "v$(tr -d '\r\n' < .nvmrc)"
+          test "pnpm@$(pnpm --version)" = "$(node -p 'JSON.parse(require("node:fs").readFileSync("package.json", "utf8")).packageManager')"
+          pnpm install --frozen-lockfile
+      - name: Run unchanged real property-authority assertions
+        run: |
+          set -euo pipefail
+          pnpm --filter @beaconhs/web exec tsx scripts/verify-approvals-property-authority.ts
+          git diff --exit-code
+          echo 'Original Approvals SHA fed0709f79922d003aefbdb6674e5b92270bdeea; disposable property-authority proof only. No captured DEV metadata or full Batch01 claim. No production adapter, localization, visual or freeze acceptance.' >> "$GITHUB_STEP_SUMMARY"
+      - name: Dispose only the two task-owned fixtures
+        if: always()
+        run: |
+          set -euo pipefail
+          for container in uvanoo-migration-safety-20261012 uvanoo-approvals-reconcile-20261012; do
+            if docker inspect "$container" >/dev/null 2>&1; then
+              case "$container" in
+                uvanoo-migration-safety-20261012) expected=migration-safety ;;
+                uvanoo-approvals-reconcile-20261012) expected=approvals-migration-reconciliation ;;
+                *) exit 1 ;;
+              esac
+              test "$(docker inspect --format '{{ index .Config.Labels "uvanoo.task" }}' "$container")" = "$expected"
+              test "$(docker inspect --format '{{ .HostConfig.NetworkMode }}' "$container")" = none
+              docker stop "$container"
+            fi
+          done

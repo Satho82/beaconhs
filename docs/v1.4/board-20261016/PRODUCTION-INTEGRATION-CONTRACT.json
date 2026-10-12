@@ -1,8 +1,8 @@
 {
-  "status": "proposed_for_owner_decision_not_implemented",
+  "status": "implementation_contract_not_implemented",
   "candidate_sha": "c306bd6bbe0571eeca18a410c1ac08fe55c524b6",
   "preserved_migrations": "Keep original 61 identities and canonical 0062 byte-for-byte; any added schema must be a forward migration.",
-  "decision_required": "Confirm whether the requested 62-migration checkpoint may grow through additive migration(s) for the missing production data and delegation model, or define an explicitly reduced Board scope.",
+  "decision_required": "Isolated engineering is already authorized. Additive migration(s) can preserve all original 62 identities. If 62 is intended as an absolute migration ceiling, clarify that constraint; otherwise the schema extension is remaining implementation work. Any reduced Board scope requires explicit owner acceptance.",
   "production_contract": {
     "routes": [
       "Authenticated Approvals overview",

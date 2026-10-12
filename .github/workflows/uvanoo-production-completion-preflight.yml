@@ -85,3 +85,5 @@ jobs:
           paths += ['packages/i18n/src/messages/'+lang+'.json' for lang in ['en','es','fr']]
           print('PREPARED_DRAFT_JSON='+json.dumps({p:pathlib.Path(p).read_text() for p in paths},separators=(',',':')))
           PY
+
+# Shared Select controls and exact additive migration expectations.

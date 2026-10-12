@@ -276,7 +276,7 @@ redis_url_step = core_deploy.fetch('steps').find { |step| step['name'] == 'Valid
 abort 'Reusable deployment must validate the selected Redis credential before migrations' unless redis_url_step
 unless redis_url_step.dig('env', 'FEATURE_CANDIDATE_VERIFIED') == '${{ inputs.feature_candidate_verified }}' &&
        redis_url_step.dig('env', 'REDIS_URL') == '${{ env.REDIS_URL }}' &&
-       redis_url_step['run'].include?('uvanoo-clean155-redis') &&
+       redis_url_step['run'].include?('uvanoo-dev-redis') &&
        redis_url_step['run'].include?('beaconhs-redis') &&
        redis_url_step['run'].include?('candidate && !url.password')
   abort 'Selected Redis validation must enforce context-specific topology and candidate authentication'
@@ -284,9 +284,9 @@ end
 redis_url_step_index = core_deploy.fetch('steps').index(redis_url_step)
 redis_code = redis_url_step.fetch('run')[/node -e '\n(.*)\n'/m, 1]
 abort 'Missing executable Redis guard' unless redis_code
-{'true' => 'uvanoo-clean155-redis', 'false' => 'beaconhs-redis'}.each do |flag, host|
+{'true' => 'uvanoo-dev-redis', 'false' => 'beaconhs-redis'}.each do |flag, host|
   [ ["redis://:synthetic@#{host}:6379/0", true],
-    ['redis://:synthetic@uvanoo-dev-redis:6379/0', false],
+    ['redis://:synthetic@uvanoo-obsolete-redis:6379/0', false],
     ["redis://#{host}:6379/0", flag == 'false'],
     ["redis://:synthetic@#{host}:6380/0", false] ].each do |url, allowed|
     _, _, status = Open3.capture3({'FEATURE_CANDIDATE_VERIFIED' => flag, 'REDIS_URL' => url}, 'node', '-e', redis_code)
@@ -295,10 +295,10 @@ abort 'Missing executable Redis guard' unless redis_code
 end
 migration_step_index = core_deploy.fetch('steps').index { |step| step['name'] == 'Run database migrations' }
 abort 'Selected Redis credential validation must precede migrations' unless redis_url_step_index && migration_step_index && redis_url_step_index < migration_step_index
-unless core_deploy.dig('env', 'EXPECTED_MIGRATION_HOST') == "${{ inputs.feature_candidate_verified && 'uvanoo-clean155-postgres' || 'beaconhs-postgres' }}"
+unless core_deploy.dig('env', 'EXPECTED_MIGRATION_HOST') == "${{ inputs.feature_candidate_verified && 'uvanoo-dev-postgres' || 'beaconhs-postgres' }}"
   abort 'Reusable deployment must select the matching candidate or normal-main migration host from the verification flag'
 end
-unless core_deploy.dig('env', 'EXPECTED_DATABASE_NAME') == "${{ inputs.feature_candidate_verified && 'beaconhs_clean155_final' || 'beaconhs' }}"
+unless core_deploy.dig('env', 'EXPECTED_DATABASE_NAME') == "${{ inputs.feature_candidate_verified && 'beaconhs' || 'beaconhs' }}"
   abort 'Database identity must remain exact for candidate and main'
 end
 url_step = core_deploy.fetch('steps').find { |step| step['name'] == 'Validate migration database URLs' }
@@ -307,14 +307,14 @@ abort 'Missing executable URL guard' unless url_code
 %w[EXPECTED_DATABASE_NAME EXPECTED_MIGRATION_HOST].each do |key|
   abort 'URL guard context missing' unless url_step.dig('env', key) == "${{ env.#{key} }}"
 end
-[['uvanoo-clean155-postgres', 'beaconhs_clean155_final'], ['beaconhs-postgres', 'beaconhs']].each do |host, database|
+[['uvanoo-dev-postgres', 'beaconhs'], ['beaconhs-postgres', 'beaconhs']].each do |host, database|
   base = {'EXPECTED_MIGRATION_HOST' => host, 'EXPECTED_DATABASE_NAME' => database}
   {'MIGRATION_DATABASE_URL' => 'beaconhs_migrator', 'DATABASE_URL' => 'beaconhs_app', 'SUPERADMIN_DATABASE_URL' => 'beaconhs_super'}.each do |key, role|
     base[key] = "postgresql://#{role}:synthetic@#{host}:5432/#{database}"
   end
   _, _, status = Open3.capture3(base, 'node', '-e', url_code)
   abort 'Valid deployment identity rejected' unless status.success?
-  ['postgresql://beaconhs_app:synthetic@uvanoo-dev-postgres:5432/beaconhs',
+  ['postgresql://beaconhs_app:synthetic@uvanoo-obsolete-postgres:5432/beaconhs',
    "postgresql://beaconhs_app:synthetic@#{host}:5432/wrong",
    "postgresql://beaconhs_super:synthetic@#{host}:5432/#{database}",
    "postgresql://beaconhs_app@#{host}:5432/#{database}"].each do |bad|
@@ -347,7 +347,7 @@ end
 migration_step = core_deploy.fetch('steps').find { |step| step['name'] == 'Run database migrations' }
 selection = migration_step['run'][/migration_entrypoint=src\/migrate\.ts\n.*?\nfi/m]
 abort 'Missing explicit prepared Risk / ordinary migration routing' unless selection
-{'true' => 'src/verify-prepared-risk.ts', 'false' => 'src/migrate.ts'}.each do |flag, expected|
+{'true' => 'src/migrate-dev.ts', 'false' => 'src/migrate.ts'}.each do |flag, expected|
   result, status = Open3.capture2({'FEATURE_CANDIDATE_VERIFIED' => flag}, 'bash', '-eu', '-c', selection + '\nprintf "%s" "$migration_entrypoint"'.gsub('\\n', "\n"))
   abort 'Unsafe migration entrypoint selection' unless status.success? && result == expected
 end
@@ -372,7 +372,7 @@ runtime_step = core_deploy.fetch('steps').find { |step| step['name'] == 'Preflig
 unless runtime_step.dig('env', 'EXPECTED_MIGRATION_HOST') == '${{ env.EXPECTED_MIGRATION_HOST }}' &&
        runtime_step['run'].include?('-e EXPECTED_MIGRATION_HOST') &&
        runtime_step['run'].include?('host: process.env.EXPECTED_MIGRATION_HOST') &&
-       runtime_step['run'].include?('url.hostname !== "uvanoo-clean155-redis"')
+       runtime_step['run'].include?('url.hostname !== "uvanoo-dev-redis"')
   abort 'Runtime probes must target the unique clean endpoints'
 end
 abort 'Reusable deployment must preflight all database roles before migrations' unless preflight_step

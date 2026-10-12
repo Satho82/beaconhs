@@ -25,6 +25,11 @@ on:
         required: false
         type: string
         default: ''
+      release_evidence_sha256:
+        description: Owner-approved DEV backup and release evidence checksum
+        required: false
+        type: string
+        default: ''
       feature_candidate_verified:
         description: Set only by the V1.4 candidate verification workflow
         required: false
@@ -55,6 +60,8 @@ on:
       DEV_ATTACHMENT_CAPABILITY_SECRET:
         required: false
       DEV_BETTER_AUTH_SECRET:
+        required: false
+      DEV_BACKUP_DATABASE_URL:
         required: false
       DEV_REDIS_URL:
         required: false
@@ -200,8 +207,8 @@ jobs:
       DATABASE_URL: ${{ inputs.feature_candidate_verified && secrets.DEV_DATABASE_URL || secrets.MAIN_DATABASE_URL }}
       SUPERADMIN_DATABASE_URL: ${{ inputs.feature_candidate_verified && secrets.DEV_SUPERADMIN_DATABASE_URL || secrets.MAIN_SUPERADMIN_DATABASE_URL }}
       REDIS_URL: ${{ inputs.feature_candidate_verified && secrets.DEV_REDIS_URL || secrets.MAIN_REDIS_URL }}
-      EXPECTED_MIGRATION_HOST: ${{ inputs.feature_candidate_verified && 'uvanoo-clean155-postgres' || 'beaconhs-postgres' }}
-      EXPECTED_DATABASE_NAME: ${{ inputs.feature_candidate_verified && 'beaconhs_clean155_final' || 'beaconhs' }}
+      EXPECTED_MIGRATION_HOST: ${{ inputs.feature_candidate_verified && 'uvanoo-dev-postgres' || 'beaconhs-postgres' }}
+      EXPECTED_DATABASE_NAME: ${{ inputs.feature_candidate_verified && 'beaconhs' || 'beaconhs' }}
     steps:
       # The deploy runner shares storage with Dokploy. Keep stale build cache
       # and superseded images from exhausting the host and taking the Dokploy
@@ -634,7 +641,7 @@ jobs:
               process.exit(1);
             }
             const candidate = process.env.FEATURE_CANDIDATE_VERIFIED === "true";
-            const expectedHost = candidate ? "uvanoo-clean155-redis" : "beaconhs-redis";
+            const expectedHost = candidate ? "uvanoo-dev-redis" : "beaconhs-redis";
             if (url.protocol !== "redis:" || url.hostname !== expectedHost || (url.port && url.port !== "6379")) {
               console.error("::error::Selected Redis credential does not match the deployment topology");
               process.exit(1);
@@ -663,7 +670,12 @@ jobs:
           DATABASE_URL: ${{ env.DATABASE_URL }}
           SUPERADMIN_DATABASE_URL: ${{ env.SUPERADMIN_DATABASE_URL }}
         run: |
+          evidence_mount=()
+          if [ "$FEATURE_CANDIDATE_VERIFIED" = true ]; then
+            evidence_mount=(-v "/opt/uvanoo-dev/release-evidence/$DEPLOY_SOURCE_SHA:/release-evidence:ro")
+          fi
           docker run --rm --pull=never --network "$MIGRATION_DOCKER_NETWORK" \
+            "${evidence_mount[@]}" \
             -v "$GITHUB_WORKSPACE:/workspace" \
             -v "$MIGRATION_PNPM_TOOLCHAIN_ROOT:/pnpm-toolchain:ro" \
             -w /workspace \
@@ -753,7 +765,7 @@ jobs:
                   fail("REDIS_URL_TOPOLOGY", null, "UNEXPECTED_PROTOCOL");
                   return;
                 }
-                if (url.hostname !== "uvanoo-clean155-redis") {
+                if (url.hostname !== "uvanoo-dev-redis") {
                   fail("REDIS_URL_TOPOLOGY", null, "UNEXPECTED_HOSTNAME");
                   return;
                 }
@@ -836,6 +848,20 @@ jobs:
               });
             '
 
+      - name: Validate DEV release evidence input
+        if: inputs.feature_candidate_verified
+        env:
+          EVIDENCE_SHA256: ${{ inputs.release_evidence_sha256 }}
+        run: |
+          set -euo pipefail
+          [[ "$EVIDENCE_SHA256" =~ ^[0-9a-f]{64}$ ]]
+          evidence_dir="/opt/uvanoo-dev/release-evidence/$DEPLOY_SOURCE_SHA"
+          test -d "$evidence_dir"
+          test ! -L "$evidence_dir"
+          test "$(realpath "$evidence_dir")" = "$evidence_dir"
+          test -f "$evidence_dir/manifest.json"
+          test "$(sha256sum "$evidence_dir/manifest.json" | cut -d ' ' -f1)" = "$EVIDENCE_SHA256"
+
       - name: Run database migrations
         id: migrations
         env:
@@ -847,16 +873,18 @@ jobs:
           DATABASE_URL: ${{ env.DATABASE_URL }}
           SUPERADMIN_DATABASE_URL: ${{ env.SUPERADMIN_DATABASE_URL }}
           DATABASE_OWNER_ROLE: beaconhs_owner
+          DEV_RELEASE_EVIDENCE_SHA256: ${{ inputs.release_evidence_sha256 }}
+          DEV_BACKUP_DATABASE_URL: ${{ secrets.DEV_BACKUP_DATABASE_URL }}
         run: |
           set -euo pipefail
           if [ "$FEATURE_CANDIDATE_VERIFIED" = true ]; then
             node .deployment-governance/scripts/cluster/dev-writer-fence.mjs verify-zero
           fi
-          # The clean V1.4 candidate already has the separately rehearsed 0061
-          # ledger. Never run the ordinary 0058 migrator or grants on it.
+          # DEV requires strict source-prefix, schema/security and verified backup evidence.
+          # Ordinary main routing remains unchanged.
           migration_entrypoint=src/migrate.ts
           if [ "$FEATURE_CANDIDATE_VERIFIED" = true ]; then
-            migration_entrypoint=src/verify-prepared-risk.ts
+            migration_entrypoint=src/migrate-dev.ts
           fi
           docker run --rm --pull=never --network "$MIGRATION_DOCKER_NETWORK" \
             -v "$GITHUB_WORKSPACE:/workspace" \
@@ -869,6 +897,11 @@ jobs:
             -e SUPERADMIN_DATABASE_URL="$SUPERADMIN_DATABASE_URL" \
             -e DATABASE_OWNER_ROLE="$DATABASE_OWNER_ROLE" \
             -e FEATURE_CANDIDATE_VERIFIED="$FEATURE_CANDIDATE_VERIFIED" \
+            -e DEV_RELEASE_EVIDENCE_PATH=/release-evidence/manifest.json \
+            -e DEV_RELEASE_EVIDENCE_SHA256 \
+            -e DEV_BACKUP_DATABASE_URL \
+            -e DEPLOY_SOURCE_SHA \
+            -e IMAGE_DIGEST \
             "$MIGRATION_NODE_IMAGE" \
             pnpm --filter @beaconhs/db exec tsx "$migration_entrypoint"
 

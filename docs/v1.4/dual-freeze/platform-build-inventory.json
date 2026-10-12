@@ -1,0 +1,2778 @@
+{
+  "repository": "Satho82/beaconhs",
+  "sourceCommit": "937242e7e35806acab48c28c4163719b00c0f16d",
+  "sourceTree": "9912feac29a30b4b32d219b4cc21f80f1f57f7f7",
+  "scope": "Complete source inventory of the 18 approved application groups, platform surfaces and shared engines. Presence is not a functional-completeness or acceptance claim; historical gap analysis is a planning input requiring current-code confirmation.",
+  "modules": [
+    {
+      "name": "Dashboard",
+      "status": "EXISTING_ENGINE_REQUIRES_V14_COMPLETENESS_AUDIT",
+      "approvedDestinations": [
+        {
+          "id": "A001",
+          "group": "Dashboard",
+          "label": "Overview",
+          "href": "/dashboard",
+          "source": "/dashboard",
+          "permission": null,
+          "entitlement": null
+        },
+        {
+          "id": "A004",
+          "group": "Dashboard",
+          "label": "Compliance Status",
+          "href": "/compliance",
+          "source": "/compliance",
+          "permission": "compliance.read",
+          "entitlement": "hospitality.compliance"
+        },
+        {
+          "id": "A005",
+          "group": "Dashboard",
+          "label": "Open Actions",
+          "href": "/corrective-actions",
+          "source": "/corrective-actions",
+          "permission": null,
+          "entitlement": null
+        },
+        {
+          "id": "A008",
+          "group": "Dashboard",
+          "label": "Alerts / Expiries",
+          "href": "/compliance/expiring",
+          "source": "/compliance",
+          "permission": "compliance.read",
+          "entitlement": "hospitality.compliance"
+        },
+        {
+          "id": "A009",
+          "group": "Dashboard",
+          "label": "Custom Widgets",
+          "href": "/dashboard/customize",
+          "source": "/dashboard",
+          "permission": null,
+          "entitlement": null
+        }
+      ],
+      "reuse": [
+        "packages/analytics",
+        "packages/db/src/schema/dashboard-layouts.ts"
+      ],
+      "remaining": [
+        "Audit live portfolio/property KPIs and configurable widgets; never add fictional commercial values."
+      ],
+      "sourceRoutes": [
+        {
+          "path": "apps/web/src/app/(app)/dashboard/customize/page.tsx",
+          "gitBlob": "426f9488881ccfb7fb71c80239fc17d432e2aa6b"
+        },
+        {
+          "path": "apps/web/src/app/(app)/dashboard/page.tsx",
+          "gitBlob": "cba8beafa48b629aa1c27e892c1f1193e98979d2"
+        },
+        {
+          "path": "apps/web/src/app/(app)/insights/cards/[id]/edit/page.tsx",
+          "gitBlob": "0fc3fe5d29cbbaee50a2cb25a6e12ddf8536b4d0"
+        },
+        {
+          "path": "apps/web/src/app/(app)/insights/cards/[id]/export/route.ts",
+          "gitBlob": "1a796109c8a5e578c6aa2acc65dbe1d9327aad24"
+        },
+        {
+          "path": "apps/web/src/app/(app)/insights/cards/[id]/page.tsx",
+          "gitBlob": "6fee8ce930e1fdd516b46d1435015b9c19e3bf36"
+        },
+        {
+          "path": "apps/web/src/app/(app)/insights/cards/new/page.tsx",
+          "gitBlob": "60b2d8e333285c9d03d0b1a9cea4698d463a410b"
+        },
+        {
+          "path": "apps/web/src/app/(app)/insights/library/page.tsx",
+          "gitBlob": "bc0cdbd1ca3cfa09c6e26c3aeabc884c37ceeae4"
+        },
+        {
+          "path": "apps/web/src/app/(app)/insights/page.tsx",
+          "gitBlob": "526b12db39c46a93eff94a252f402b97998cfccc"
+        }
+      ]
+    },
+    {
+      "name": "Daily Hotel",
+      "status": "NO_REGISTERED_DESTINATION",
+      "approvedDestinations": [],
+      "reuse": [
+        "packages/db/src/schema/hospitality.ts"
+      ],
+      "remaining": [
+        "No registered destination or dedicated Daily Hotel schema/route identified in this candidate.",
+        "Implement only the approved property/date operational dataset, revision history, currency snapshots and occupancy/ADR/RevPAR semantics; do not repurpose checklists as revenue records."
+      ],
+      "sourceRoutes": []
+    },
+    {
+      "name": "Diary & Tasks",
+      "status": "EXISTING_ENGINE_REQUIRES_V14_COMPLETENESS_AUDIT",
+      "approvedDestinations": [
+        {
+          "id": "A022",
+          "group": "Diary & Tasks",
+          "label": "My Tasks",
+          "href": "/my/tasks",
+          "source": "/my",
+          "permission": null,
+          "entitlement": null
+        }
+      ],
+      "reuse": [
+        "packages/db/src/schema/hospitality.ts",
+        "apps/worker/src"
+      ],
+      "remaining": [
+        "Audit operational scheduling, completion, escalation, manager sign-off and multi-property journeys; reuse current operational task engine and forms."
+      ],
+      "sourceRoutes": [
+        {
+          "path": "apps/web/src/app/(app)/hospitality/properties/[propertyId]/buildings/[buildingId]/floors/[floorId]/page.tsx",
+          "gitBlob": "52050982a0fba4abdc78f8a3f113efd84aa4440c"
+        },
+        {
+          "path": "apps/web/src/app/(app)/hospitality/properties/[propertyId]/buildings/[buildingId]/floors/[floorId]/rooms/[roomId]/page.tsx",
+          "gitBlob": "acadc2510b09dcbe9289d287649831d7dff0bde9"
+        },
+        {
+          "path": "apps/web/src/app/(app)/hospitality/properties/[propertyId]/buildings/[buildingId]/floors/[floorId]/rooms/[roomId]/qr/page.tsx",
+          "gitBlob": "ef2aa8d9e5c9714686563a0b688cf5dbac2d0375"
+        },
+        {
+          "path": "apps/web/src/app/(app)/hospitality/properties/[propertyId]/buildings/[buildingId]/page.tsx",
+          "gitBlob": "4f298fa554ae13e1d5704350ec79cb55718074f8"
+        },
+        {
+          "path": "apps/web/src/app/(app)/hospitality/properties/[propertyId]/diary/page.tsx",
+          "gitBlob": "b8fed82456dec3b2cf7a3ab56a201c6d56a1a960"
+        },
+        {
+          "path": "apps/web/src/app/(app)/hospitality/properties/[propertyId]/diary/tasks/[occurrenceId]/page.tsx",
+          "gitBlob": "0479bbb89f2878acce4616db7e05b778eab63205"
+        },
+        {
+          "path": "apps/web/src/app/(app)/hospitality/properties/[propertyId]/diary/templates/[scheduleId]/page.tsx",
+          "gitBlob": "466e54b5fb696a6ed64718b332b9891d3cfc6e62"
+        },
+        {
+          "path": "apps/web/src/app/(app)/hospitality/properties/[propertyId]/page.tsx",
+          "gitBlob": "7ee7c0464b7e346490c9482b62c11822cdb1167b"
+        },
+        {
+          "path": "apps/web/src/app/(app)/hospitality/properties/[propertyId]/signoff/page.tsx",
+          "gitBlob": "9957bef75fb542114b924230f36f4dacbbd22dcc"
+        },
+        {
+          "path": "apps/web/src/app/(app)/hospitality/properties/new/page.tsx",
+          "gitBlob": "719fdc3243e8b6071dbe64e031395cba4b1ecac4"
+        },
+        {
+          "path": "apps/web/src/app/(app)/hospitality/properties/page.tsx",
+          "gitBlob": "eef40340944956d5562a81387c2435b099a414bb"
+        },
+        {
+          "path": "apps/web/src/app/(app)/journals/[id]/page.tsx",
+          "gitBlob": "431a4a636314b6e56a7e864226b5b4ec04fa356d"
+        },
+        {
+          "path": "apps/web/src/app/(app)/journals/[id]/pdf/route.ts",
+          "gitBlob": "eefb6271fd879f073d97c259ff060e0ca124bbf9"
+        },
+        {
+          "path": "apps/web/src/app/(app)/journals/ai/route.ts",
+          "gitBlob": "2c1e19bce92af5b3da42ec666d1118bbb035ec9c"
+        },
+        {
+          "path": "apps/web/src/app/(app)/journals/export.csv/route.ts",
+          "gitBlob": "8b9a2d238a99fc849d2f256750ebedc0e03cc0a5"
+        },
+        {
+          "path": "apps/web/src/app/(app)/journals/flows/page.tsx",
+          "gitBlob": "ed8ac79d0393e19c31777d0d54c75cef0a587708"
+        },
+        {
+          "path": "apps/web/src/app/(app)/journals/manage/page.tsx",
+          "gitBlob": "257dd807af1fb263ef03064b2cfe4821e36c177e"
+        },
+        {
+          "path": "apps/web/src/app/(app)/journals/page.tsx",
+          "gitBlob": "f7122e4939845c1075f567de44d62fa72376e50e"
+        },
+        {
+          "path": "apps/web/src/app/(app)/journals/records/page.tsx",
+          "gitBlob": "d9e4cef4552406010ca4457a65f8552aa2b776f5"
+        },
+        {
+          "path": "apps/web/src/app/(app)/journals/tags/page.tsx",
+          "gitBlob": "210bfbd0fdd0b0726c7908cdb45618d8561df10e"
+        },
+        {
+          "path": "apps/web/src/app/(app)/my/hazard-assessments/page.tsx",
+          "gitBlob": "1f971dfe864c3d0899c2935ec617c1158f976383"
+        },
+        {
+          "path": "apps/web/src/app/(app)/my/in-progress/page.tsx",
+          "gitBlob": "32abf3e66df1ad3c03b6d360afde9190ff1a56d3"
+        },
+        {
+          "path": "apps/web/src/app/(app)/my/incidents/page.tsx",
+          "gitBlob": "09f271cdcfc42da210d98fda429a034ebc129316"
+        },
+        {
+          "path": "apps/web/src/app/(app)/my/inspections/page.tsx",
+          "gitBlob": "166c7492758129d338fa9a36e4024de1ef791555"
+        },
+        {
+          "path": "apps/web/src/app/(app)/my/notifications/page.tsx",
+          "gitBlob": "0831d6169270a55cfec03dff707eaf85e69b9b77"
+        },
+        {
+          "path": "apps/web/src/app/(app)/my/page.tsx",
+          "gitBlob": "5c6afa7f2be329f3ffe772b183f0e702e19d42ee"
+        },
+        {
+          "path": "apps/web/src/app/(app)/my/tasks/page.tsx",
+          "gitBlob": "0914d9ea643cfd58b8addc7341582477c36d3a26"
+        },
+        {
+          "path": "apps/web/src/app/(app)/my/training/page.tsx",
+          "gitBlob": "edf020cdfd3f7c3e2a0ab0c6ea644802a5306719"
+        },
+        {
+          "path": "apps/web/src/app/(app)/my/wallet/page.tsx",
+          "gitBlob": "c079bc6cc1ac36b29141bbb2ab8864f0ff5c7224"
+        }
+      ]
+    },
+    {
+      "name": "Maintenance",
+      "status": "EXISTING_ENGINE_REQUIRES_V14_COMPLETENESS_AUDIT",
+      "approvedDestinations": [
+        {
+          "id": "A029",
+          "group": "Maintenance",
+          "label": "Report Issue",
+          "href": "/hospitality/maintenance/report",
+          "source": "/hospitality/maintenance",
+          "permission": "maintenance.create",
+          "entitlement": "hospitality.maintenance"
+        },
+        {
+          "id": "A030",
+          "group": "Maintenance",
+          "label": "Maintenance Queue",
+          "href": "/hospitality/maintenance",
+          "source": "/hospitality/maintenance",
+          "permission": "maintenance.read",
+          "entitlement": "hospitality.maintenance"
+        }
+      ],
+      "reuse": [
+        "packages/db/src/schema/hospitality.ts",
+        "packages/db/src/schema/equipment-maintenance.ts"
+      ],
+      "remaining": [
+        "Reconcile existing hospitality and equipment work-order lifecycles under approved D01; preserve history.",
+        "Verify staff/front-office/guest QR intake, evidence, asset linking, assignment and verification."
+      ],
+      "sourceRoutes": [
+        {
+          "path": "apps/web/src/app/(app)/hospitality/maintenance/[issueId]/page.tsx",
+          "gitBlob": "ee7cdda69fc46f1e900b86d3ece7ddf1751b6d17"
+        },
+        {
+          "path": "apps/web/src/app/(app)/hospitality/maintenance/page.tsx",
+          "gitBlob": "deb3cf9de06a8e739e0137292c893fbdd25a8f8d"
+        },
+        {
+          "path": "apps/web/src/app/(app)/hospitality/maintenance/report/page.tsx",
+          "gitBlob": "72d7d5fcfc162a632534934ef5c6d3c9278e233b"
+        }
+      ]
+    },
+    {
+      "name": "Compliance",
+      "status": "EXISTING_ENGINE_REQUIRES_V14_COMPLETENESS_AUDIT",
+      "approvedDestinations": [
+        {
+          "id": "A038",
+          "group": "Compliance",
+          "label": "Compliance Dashboard",
+          "href": "/compliance",
+          "source": "/compliance",
+          "permission": "compliance.read",
+          "entitlement": "hospitality.compliance"
+        },
+        {
+          "id": "A039",
+          "group": "Compliance",
+          "label": "Compliance Register",
+          "href": "/compliance/obligations",
+          "source": "/compliance",
+          "permission": "compliance.read",
+          "entitlement": "hospitality.compliance"
+        },
+        {
+          "id": "A041",
+          "group": "Compliance",
+          "label": "Expiries",
+          "href": "/compliance/expiring",
+          "source": "/compliance",
+          "permission": "compliance.read",
+          "entitlement": "hospitality.compliance"
+        }
+      ],
+      "reuse": [
+        "packages/compliance",
+        "packages/db/src/schema/compliance.ts",
+        "packages/db/src/schema/documents.ts"
+      ],
+      "remaining": [
+        "Audit register/configuration inheritance, recurring obligations, evidence, expiry/escalation, property isolation and entitlement enforcement."
+      ],
+      "sourceRoutes": [
+        {
+          "path": "apps/web/src/app/(app)/compliance/aging/page.tsx",
+          "gitBlob": "edb05b09fe4057f174366bae5adfce8cffebea91"
+        },
+        {
+          "path": "apps/web/src/app/(app)/compliance/by-person/page.tsx",
+          "gitBlob": "0b398251baff628197a48131f792000003016038"
+        },
+        {
+          "path": "apps/web/src/app/(app)/compliance/expiring/page.tsx",
+          "gitBlob": "bb17de3ec34b26c639846eff05533de8c2eead39"
+        },
+        {
+          "path": "apps/web/src/app/(app)/compliance/mine/page.tsx",
+          "gitBlob": "dcb1bf21c471f69781c37efef2339a0c1da8502c"
+        },
+        {
+          "path": "apps/web/src/app/(app)/compliance/obligations/[id]/page.tsx",
+          "gitBlob": "e3fc3bddcc870e98f8bf94a661b8383798fdc7c7"
+        },
+        {
+          "path": "apps/web/src/app/(app)/compliance/obligations/page.tsx",
+          "gitBlob": "5efa5728dfd8dc00ea0698de1dd0e586777de2c6"
+        },
+        {
+          "path": "apps/web/src/app/(app)/compliance/page.tsx",
+          "gitBlob": "855e5e51a7ae48896f3d6c0500bb70dc2fd947e2"
+        },
+        {
+          "path": "apps/web/src/app/(app)/documents/[id]/editor/page.tsx",
+          "gitBlob": "13e2efaf03d455e6dacd706b6b97e7564ec5bace"
+        },
+        {
+          "path": "apps/web/src/app/(app)/documents/[id]/master/route.ts",
+          "gitBlob": "5df9892e83adebf3b8fdc33c5931b869b4d41e39"
+        },
+        {
+          "path": "apps/web/src/app/(app)/documents/[id]/page.tsx",
+          "gitBlob": "d309664957b97fe6a7134385a90720da1c10f695"
+        },
+        {
+          "path": "apps/web/src/app/(app)/documents/[id]/pdf/route.ts",
+          "gitBlob": "e0a28f0fdc9cdf050b468fd8f2364092b5bfd5d8"
+        },
+        {
+          "path": "apps/web/src/app/(app)/documents/[id]/read/page.tsx",
+          "gitBlob": "07a35755268ce533c7e5301d0a8f307ac4296fda"
+        },
+        {
+          "path": "apps/web/src/app/(app)/documents/[id]/sign-off/page.tsx",
+          "gitBlob": "fc5bb54099c3b46f54b3109a7387deafec8fa0b0"
+        },
+        {
+          "path": "apps/web/src/app/(app)/documents/[id]/versions/[versionId]/changes/page.tsx",
+          "gitBlob": "b1c934fe8b4d25a4fcb5a911599ceb7fd661c417"
+        },
+        {
+          "path": "apps/web/src/app/(app)/documents/[id]/versions/[versionId]/download/route.ts",
+          "gitBlob": "1a64240665c7c87fa2ce8b7273b325bf17d5d582"
+        },
+        {
+          "path": "apps/web/src/app/(app)/documents/books/[id]/page.tsx",
+          "gitBlob": "3807ad1cd40e58c32f29741cafe1b95ad0a74474"
+        },
+        {
+          "path": "apps/web/src/app/(app)/documents/books/[id]/pdf/route.ts",
+          "gitBlob": "6e381684f0b569f9bb3fb6519e1e5767fef59fb8"
+        },
+        {
+          "path": "apps/web/src/app/(app)/documents/books/page.tsx",
+          "gitBlob": "f8f272b1a8dfdbd2ca294f9e71505392e6dee244"
+        },
+        {
+          "path": "apps/web/src/app/(app)/documents/categories/page.tsx",
+          "gitBlob": "a94ec1519f4a7e3ff1ed7c0410cdfebc4add38c6"
+        },
+        {
+          "path": "apps/web/src/app/(app)/documents/export.csv/route.ts",
+          "gitBlob": "55bb956bcd0eb767be561e2abff0194d3bfac34a"
+        },
+        {
+          "path": "apps/web/src/app/(app)/documents/flows/page.tsx",
+          "gitBlob": "8057cb6086ff88f00226c845ac9b56fa1d4d8393"
+        },
+        {
+          "path": "apps/web/src/app/(app)/documents/manage/page.tsx",
+          "gitBlob": "0600849b00374d7f07c23015d60d270751197571"
+        },
+        {
+          "path": "apps/web/src/app/(app)/documents/management-reviews/[id]/page.tsx",
+          "gitBlob": "42220578f35ceb658619f9fe1f0f36eed60670e1"
+        },
+        {
+          "path": "apps/web/src/app/(app)/documents/management-reviews/[id]/pdf/route.ts",
+          "gitBlob": "392c547a0c5c24dae785fc09905a24ffa5ac586a"
+        },
+        {
+          "path": "apps/web/src/app/(app)/documents/management-reviews/flows/page.tsx",
+          "gitBlob": "5a3106d988a9a3e5632d230efaefeb10e9e78491"
+        },
+        {
+          "path": "apps/web/src/app/(app)/documents/management-reviews/page.tsx",
+          "gitBlob": "a96bfeb4f7c953303ec123dbbaf6d10c69760d81"
+        },
+        {
+          "path": "apps/web/src/app/(app)/documents/page.tsx",
+          "gitBlob": "98f47b46b96c1e2be20b9f2aab5063edcb55f629"
+        },
+        {
+          "path": "apps/web/src/app/(app)/documents/sign-off-sessions/[sessionId]/page.tsx",
+          "gitBlob": "a1ba2621823f09ec66a43123bf3c5d052bd7c85f"
+        },
+        {
+          "path": "apps/web/src/app/(app)/documents/sign-off-sessions/[sessionId]/pdf/route.ts",
+          "gitBlob": "7b9955d0722a26f0b865ce54533aa6f758727f63"
+        },
+        {
+          "path": "apps/web/src/app/(app)/documents/types/page.tsx",
+          "gitBlob": "831701491e888476e1d1baf963620bf466e1dd16"
+        }
+      ]
+    },
+    {
+      "name": "Risk",
+      "status": "PROTECTED_UNCHANGED",
+      "approvedDestinations": [
+        {
+          "id": "A048",
+          "group": "Risk",
+          "label": "Risk Assessments",
+          "href": "/hospitality/risk",
+          "source": "/hospitality/risk",
+          "permission": "hospitality.read",
+          "entitlement": null
+        },
+        {
+          "id": "A054",
+          "group": "Risk",
+          "label": "Review Schedule",
+          "href": "/hospitality/risk/review-schedule",
+          "source": "/hospitality/risk",
+          "permission": "hospitality.read",
+          "entitlement": null
+        }
+      ],
+      "reuse": [
+        "packages/db/src/schema/risk.ts"
+      ],
+      "remaining": [
+        "Protected unchanged scope; no runtime redevelopment. Reuse existing risk engine and preserve immutable revisions, snapshots and ACLs."
+      ],
+      "sourceRoutes": [
+        {
+          "path": "apps/web/src/app/(app)/hospitality/risk/assessments/[assessmentId]/page.tsx",
+          "gitBlob": "d7eec4872463fc84b71d3275ff0be744e2a77ed1"
+        },
+        {
+          "path": "apps/web/src/app/(app)/hospitality/risk/assessments/[assessmentId]/pdf/route.ts",
+          "gitBlob": "090b2e0b6c9de7e98a9717dd81159e7b5d0a358c"
+        },
+        {
+          "path": "apps/web/src/app/(app)/hospitality/risk/export.csv/route.ts",
+          "gitBlob": "ad0a55cb5d9c673aac4ca764e5361d05bf592a2a"
+        },
+        {
+          "path": "apps/web/src/app/(app)/hospitality/risk/library/export.csv/route.ts",
+          "gitBlob": "fc5561c6122402668b3848a233f56e6440ed3316"
+        },
+        {
+          "path": "apps/web/src/app/(app)/hospitality/risk/page.tsx",
+          "gitBlob": "f406808300e97c4dd8022d0ac773d26a11346c74"
+        },
+        {
+          "path": "apps/web/src/app/(app)/hospitality/risk/register/pdf/route.ts",
+          "gitBlob": "dc55c2fcd20238d5b8ae2c2e121dd6eccae8818d"
+        },
+        {
+          "path": "apps/web/src/app/(app)/hospitality/risk/review-schedule/page.tsx",
+          "gitBlob": "d9185c2eb824f4c563c5981a058970d692988a47"
+        },
+        {
+          "path": "apps/web/src/app/(app)/hospitality/risk/templates/[templateId]/page.tsx",
+          "gitBlob": "34170074e91d053f129841f19715db9c778969e9"
+        }
+      ]
+    },
+    {
+      "name": "Inspections",
+      "status": "EXISTING_ENGINE_REQUIRES_V14_COMPLETENESS_AUDIT",
+      "approvedDestinations": [
+        {
+          "id": "A058",
+          "group": "Inspections",
+          "label": "New Inspection",
+          "href": "/inspections/records?drawer=new",
+          "source": "/inspections",
+          "permission": "inspections.read.self",
+          "entitlement": null
+        },
+        {
+          "id": "A059",
+          "group": "Inspections",
+          "label": "Inspection Records",
+          "href": "/inspections/records",
+          "source": "/inspections",
+          "permission": "inspections.read.self",
+          "entitlement": null
+        },
+        {
+          "id": "A062",
+          "group": "Inspections",
+          "label": "Inspection Templates",
+          "href": "/inspections/types",
+          "source": "/inspections",
+          "permission": "inspections.manage",
+          "entitlement": null
+        },
+        {
+          "id": "A065",
+          "group": "Inspections",
+          "label": "Settings",
+          "href": "/inspections/manage",
+          "source": "/inspections",
+          "permission": "inspections.manage",
+          "entitlement": null
+        }
+      ],
+      "reuse": [
+        "packages/forms-core",
+        "packages/db/src/schema/inspection-records.ts",
+        "packages/db/src/schema/inspection-types.ts"
+      ],
+      "remaining": [
+        "Audit hotel inspection/audit programmes, approved templates, evidence, recurrence and Action Plan links."
+      ],
+      "sourceRoutes": [
+        {
+          "path": "apps/web/src/app/(app)/inspections/banks/[id]/page.tsx",
+          "gitBlob": "d1aeba6a7a1133f0ac1cba44b3e136ee3d9434b0"
+        },
+        {
+          "path": "apps/web/src/app/(app)/inspections/banks/page.tsx",
+          "gitBlob": "6e3cd96c0ff3e88f96ca0acd3e34516be88b96d3"
+        },
+        {
+          "path": "apps/web/src/app/(app)/inspections/export.csv/route.ts",
+          "gitBlob": "25cfb8731f5669c38b46cd302164cf74915ad6ad"
+        },
+        {
+          "path": "apps/web/src/app/(app)/inspections/flows/page.tsx",
+          "gitBlob": "3669fefa23d0bfa74f47d96e208707458534255f"
+        },
+        {
+          "path": "apps/web/src/app/(app)/inspections/manage/page.tsx",
+          "gitBlob": "f419487f8067b8120e1f3f690fe275a72578a22d"
+        },
+        {
+          "path": "apps/web/src/app/(app)/inspections/page.tsx",
+          "gitBlob": "af5f7b286d8ed64008ae2d65e2d8a53996ab74c1"
+        },
+        {
+          "path": "apps/web/src/app/(app)/inspections/records/[id]/page.tsx",
+          "gitBlob": "c92ed5577ffea1f4bc8fb976e5e96510ce42930a"
+        },
+        {
+          "path": "apps/web/src/app/(app)/inspections/records/[id]/pdf/route.ts",
+          "gitBlob": "cd411060135dd2977f8dea27837fca61291f3307"
+        },
+        {
+          "path": "apps/web/src/app/(app)/inspections/records/new/page.tsx",
+          "gitBlob": "7f864dc6f7479078efc13a53d5d5609f7fbb014b"
+        },
+        {
+          "path": "apps/web/src/app/(app)/inspections/records/page.tsx",
+          "gitBlob": "ba453ed6b3e5ca5b42483f0983f094fe4b78ac6b"
+        },
+        {
+          "path": "apps/web/src/app/(app)/inspections/types/[id]/page.tsx",
+          "gitBlob": "4eb1d2d954231915b337b57868cecc31ed65e0f7"
+        },
+        {
+          "path": "apps/web/src/app/(app)/inspections/types/page.tsx",
+          "gitBlob": "e14575d82f4529a2a6ec78f565dc30655096a8a4"
+        }
+      ]
+    },
+    {
+      "name": "Incidents",
+      "status": "EXISTING_ENGINE_REQUIRES_V14_COMPLETENESS_AUDIT",
+      "approvedDestinations": [
+        {
+          "id": "A066",
+          "group": "Incidents",
+          "label": "Report Incident",
+          "href": "/incidents/new",
+          "source": "/incidents",
+          "permission": "incidents.create",
+          "entitlement": null
+        },
+        {
+          "id": "A067",
+          "group": "Incidents",
+          "label": "Incident Register",
+          "href": "/incidents",
+          "source": "/incidents",
+          "permission": null,
+          "entitlement": null
+        },
+        {
+          "id": "A070",
+          "group": "Incidents",
+          "label": "Lost Time",
+          "href": "/incidents/hours",
+          "source": "/incidents",
+          "permission": "incidents.read.all",
+          "entitlement": null
+        },
+        {
+          "id": "A073",
+          "group": "Incidents",
+          "label": "Incident Types",
+          "href": "/incidents/classifications",
+          "source": "/incidents",
+          "permission": "incidents.read.all",
+          "entitlement": null
+        },
+        {
+          "id": "A074",
+          "group": "Incidents",
+          "label": "Settings",
+          "href": "/incidents/manage",
+          "source": "/incidents",
+          "permission": "incidents.read.all",
+          "entitlement": null
+        }
+      ],
+      "reuse": [
+        "packages/db/src/schema/incidents.ts"
+      ],
+      "remaining": [
+        "Audit hotel incident taxonomy, investigation, lost-time evidence, scoped reporting and linked corrective actions."
+      ],
+      "sourceRoutes": [
+        {
+          "path": "apps/web/src/app/(app)/incidents/[id]/page.tsx",
+          "gitBlob": "f6405eafd055f4ebfc4fe372eadb216b84dc2208"
+        },
+        {
+          "path": "apps/web/src/app/(app)/incidents/[id]/pdf/route.ts",
+          "gitBlob": "af2ea540a3f53d2a91934ce01d708599ced946aa"
+        },
+        {
+          "path": "apps/web/src/app/(app)/incidents/classifications/page.tsx",
+          "gitBlob": "e0f740a84551590e2e782e6395cf555c185d5546"
+        },
+        {
+          "path": "apps/web/src/app/(app)/incidents/export.csv/route.ts",
+          "gitBlob": "bf647fcb6e4c6fa26d37dcd37e81a641e3d72067"
+        },
+        {
+          "path": "apps/web/src/app/(app)/incidents/flows/page.tsx",
+          "gitBlob": "69e2cd75bc325ac8b76e80878110d8bb40fceb5b"
+        },
+        {
+          "path": "apps/web/src/app/(app)/incidents/hours/page.tsx",
+          "gitBlob": "c542118fd2a834be676e6410b4f63c0038abb977"
+        },
+        {
+          "path": "apps/web/src/app/(app)/incidents/injury-types/page.tsx",
+          "gitBlob": "3bc4dbf47f9510393c9c9ae890b1676796e40fe5"
+        },
+        {
+          "path": "apps/web/src/app/(app)/incidents/manage/page.tsx",
+          "gitBlob": "f85e50b4ff8fb0eab8528365d8b134b7de05cbae"
+        },
+        {
+          "path": "apps/web/src/app/(app)/incidents/new/page.tsx",
+          "gitBlob": "503d143c8eecccfc1b637173a23e3a862d1b16f4"
+        },
+        {
+          "path": "apps/web/src/app/(app)/incidents/page.tsx",
+          "gitBlob": "4e067e066b560b5399b4b2f32b3ae8443b530f30"
+        }
+      ]
+    },
+    {
+      "name": "Action Plans",
+      "status": "EXISTING_ENGINE_REQUIRES_V14_COMPLETENESS_AUDIT",
+      "approvedDestinations": [
+        {
+          "id": "A075",
+          "group": "Action Plans",
+          "label": "Open Actions",
+          "href": "/corrective-actions",
+          "source": "/corrective-actions",
+          "permission": null,
+          "entitlement": null
+        },
+        {
+          "id": "A077",
+          "group": "Action Plans",
+          "label": "Overdue",
+          "href": "/corrective-actions/reports/overdue",
+          "source": "/corrective-actions",
+          "permission": null,
+          "entitlement": null
+        },
+        {
+          "id": "A078",
+          "group": "Action Plans",
+          "label": "Completed",
+          "href": "/corrective-actions?status=closed",
+          "source": "/corrective-actions",
+          "permission": null,
+          "entitlement": null
+        },
+        {
+          "id": "A079",
+          "group": "Action Plans",
+          "label": "Action History",
+          "href": "/corrective-actions?status=all",
+          "source": "/corrective-actions",
+          "permission": null,
+          "entitlement": null
+        },
+        {
+          "id": "A083",
+          "group": "Action Plans",
+          "label": "Settings",
+          "href": "/corrective-actions/manage",
+          "source": "/corrective-actions",
+          "permission": "ca.update",
+          "entitlement": null
+        }
+      ],
+      "reuse": [
+        "packages/db/src/schema/corrective-actions.ts"
+      ],
+      "remaining": [
+        "Audit/complete approved typed sources: Compliance, Risk, Inspections/Audits, Incidents, Training and Manual.",
+        "Reuse corrective_actions; maintenance is a linked consequence, not a duplicate Action Plan engine."
+      ],
+      "sourceRoutes": [
+        {
+          "path": "apps/web/src/app/(app)/corrective-actions/[id]/page.tsx",
+          "gitBlob": "7da63d54302c03573e8b466ff393e54801fd280a"
+        },
+        {
+          "path": "apps/web/src/app/(app)/corrective-actions/[id]/pdf/route.ts",
+          "gitBlob": "4e789baf2924f8327dd83acdcd53475f0eda4f3a"
+        },
+        {
+          "path": "apps/web/src/app/(app)/corrective-actions/[id]/print/page.tsx",
+          "gitBlob": "9a1faf9d5945550ffac7e0ed65bac575444b2cad"
+        },
+        {
+          "path": "apps/web/src/app/(app)/corrective-actions/export.csv/route.ts",
+          "gitBlob": "7ad54ae4b98ec2f35cd14c5d143f3063b94280e9"
+        },
+        {
+          "path": "apps/web/src/app/(app)/corrective-actions/flows/page.tsx",
+          "gitBlob": "fc1924ccfd013cc5bc62f149acc48e1a6b22bb24"
+        },
+        {
+          "path": "apps/web/src/app/(app)/corrective-actions/manage/page.tsx",
+          "gitBlob": "9a6744b36b6cfa66bbfe9502f553839f02eba345"
+        },
+        {
+          "path": "apps/web/src/app/(app)/corrective-actions/new/page.tsx",
+          "gitBlob": "e33d1c5e1cdcf50019cf0985cea647fea040a7d3"
+        },
+        {
+          "path": "apps/web/src/app/(app)/corrective-actions/page.tsx",
+          "gitBlob": "3103c0925171945a1d61e7b4a20cfa374fc7d94d"
+        },
+        {
+          "path": "apps/web/src/app/(app)/corrective-actions/reports/aging/page.tsx",
+          "gitBlob": "91d115f20a9fe743522092e66609107713ace52e"
+        },
+        {
+          "path": "apps/web/src/app/(app)/corrective-actions/reports/by-assignee/page.tsx",
+          "gitBlob": "ff485c7d967d46c4b7b18545fd58bf86eb8e18f1"
+        },
+        {
+          "path": "apps/web/src/app/(app)/corrective-actions/reports/by-source/page.tsx",
+          "gitBlob": "af878cf665e9a7d7c7eb4b4318fd7fa42bc9cdb3"
+        },
+        {
+          "path": "apps/web/src/app/(app)/corrective-actions/reports/overdue/page.tsx",
+          "gitBlob": "2dc5462abc1e6d50c4b610f3f1aa6659d95859f3"
+        }
+      ]
+    },
+    {
+      "name": "Training",
+      "status": "EXISTING_ENGINE_REQUIRES_V14_COMPLETENESS_AUDIT",
+      "approvedDestinations": [
+        {
+          "id": "A085",
+          "group": "Training",
+          "label": "Training Matrix",
+          "href": "/training/skills",
+          "source": "/training",
+          "permission": null,
+          "entitlement": null
+        },
+        {
+          "id": "A086",
+          "group": "Training",
+          "label": "Courses",
+          "href": "/training/courses",
+          "source": "/training",
+          "permission": null,
+          "entitlement": null
+        },
+        {
+          "id": "A087",
+          "group": "Training",
+          "label": "Assessments",
+          "href": "/training/assessments",
+          "source": "/training",
+          "permission": null,
+          "entitlement": null
+        },
+        {
+          "id": "A088",
+          "group": "Training",
+          "label": "Training Records",
+          "href": "/training/records",
+          "source": "/training",
+          "permission": null,
+          "entitlement": null
+        },
+        {
+          "id": "A090",
+          "group": "Training",
+          "label": "Training Providers",
+          "href": "/training/authorities",
+          "source": "/training",
+          "permission": "training.course.manage",
+          "entitlement": null
+        },
+        {
+          "id": "A092",
+          "group": "Training",
+          "label": "Settings",
+          "href": "/training/manage",
+          "source": "/training",
+          "permission": "training.course.manage",
+          "entitlement": null
+        }
+      ],
+      "reuse": [
+        "packages/db/src/schema/training.ts",
+        "packages/db/src/schema/training-lms.ts",
+        "packages/compliance"
+      ],
+      "remaining": [
+        "Audit matrix, courses, providers, assessments, certificates, renewals, People integration and property-scoped evidence."
+      ],
+      "sourceRoutes": [
+        {
+          "path": "apps/web/src/app/(app)/training/assessments/[id]/certificate/page.tsx",
+          "gitBlob": "594614ad81333197f685d95495a2261203140bd7"
+        },
+        {
+          "path": "apps/web/src/app/(app)/training/assessments/[id]/page.tsx",
+          "gitBlob": "c8c931c07aa85f906929101cd3d9e2038c5a58b3"
+        },
+        {
+          "path": "apps/web/src/app/(app)/training/assessments/[id]/pdf/route.ts",
+          "gitBlob": "b0c4d6437c84fc47cc2478c1308c16d745ca0d1d"
+        },
+        {
+          "path": "apps/web/src/app/(app)/training/assessments/page.tsx",
+          "gitBlob": "08328efe057ae8076bb947256c60eda5e6991ce6"
+        },
+        {
+          "path": "apps/web/src/app/(app)/training/assessments/types/[id]/page.tsx",
+          "gitBlob": "676a620038a1d242aa7edb65d201d885f89dceec"
+        },
+        {
+          "path": "apps/web/src/app/(app)/training/assessments/types/page.tsx",
+          "gitBlob": "4d4cf478d920f8d6849e06c081367599ca29478a"
+        },
+        {
+          "path": "apps/web/src/app/(app)/training/authorities/[id]/page.tsx",
+          "gitBlob": "9c19f44df3a0767b0deef0c907f030baa08ae77d"
+        },
+        {
+          "path": "apps/web/src/app/(app)/training/authorities/page.tsx",
+          "gitBlob": "05f2c4954bbf65989699cad70bf3985b7e8bd8f9"
+        },
+        {
+          "path": "apps/web/src/app/(app)/training/classes/[id]/page.tsx",
+          "gitBlob": "469a75d8c86b6f07ec658bb6f6533fe062e27835"
+        },
+        {
+          "path": "apps/web/src/app/(app)/training/classes/[id]/pdf/route.ts",
+          "gitBlob": "ba7cce4afbfbfe92b36fdf7822e8a15b3afb50ef"
+        },
+        {
+          "path": "apps/web/src/app/(app)/training/classes/calendar/page.tsx",
+          "gitBlob": "35d5555e613a9e1835f0978025f8f8cb326f89c2"
+        },
+        {
+          "path": "apps/web/src/app/(app)/training/classes/flows/page.tsx",
+          "gitBlob": "67cca2fa7e6fe255a55ba98274b3b491b5e62871"
+        },
+        {
+          "path": "apps/web/src/app/(app)/training/classes/page.tsx",
+          "gitBlob": "f91e58abbda8a1ccf795314c6e0c1da36671fbf4"
+        },
+        {
+          "path": "apps/web/src/app/(app)/training/courses/[id]/completions/page.tsx",
+          "gitBlob": "46a278aa48a14dde98f55cb61b4ccd50500b8c00"
+        },
+        {
+          "path": "apps/web/src/app/(app)/training/courses/[id]/evaluations/page.tsx",
+          "gitBlob": "16c050a46da7ec03c9588ad0744e44ec4af94ef4"
+        },
+        {
+          "path": "apps/web/src/app/(app)/training/courses/[id]/page.tsx",
+          "gitBlob": "673d0579861b9651b3bf1dce588548d265b62336"
+        },
+        {
+          "path": "apps/web/src/app/(app)/training/courses/[id]/present/page.tsx",
+          "gitBlob": "071bde8e1ac0bd124ed99da853bb30a0514b526d"
+        },
+        {
+          "path": "apps/web/src/app/(app)/training/courses/export.csv/route.ts",
+          "gitBlob": "866ed5d21df3b91e9992bbb77da0612232e8c47f"
+        },
+        {
+          "path": "apps/web/src/app/(app)/training/courses/page.tsx",
+          "gitBlob": "3a253529272eb04381dddf99cd0ed61effa893d1"
+        },
+        {
+          "path": "apps/web/src/app/(app)/training/credential-designs/page.tsx",
+          "gitBlob": "e48551484568c88f68f8b4270ad67a7246acdc7a"
+        },
+        {
+          "path": "apps/web/src/app/(app)/training/credential-designs/preview/route.ts",
+          "gitBlob": "a996aa39e650a1efa3c2ca28fc158bb1dc69baca"
+        },
+        {
+          "path": "apps/web/src/app/(app)/training/flows/page.tsx",
+          "gitBlob": "d62aa05a64308083fa6de1ce746663c770a5a29f"
+        },
+        {
+          "path": "apps/web/src/app/(app)/training/learn/[courseId]/page.tsx",
+          "gitBlob": "eec288fc64e966e3d0d7a073c04f3c05816ffa00"
+        },
+        {
+          "path": "apps/web/src/app/(app)/training/learn/page.tsx",
+          "gitBlob": "8dcddefe994b42801761eac6c0905acf0cd5598d"
+        },
+        {
+          "path": "apps/web/src/app/(app)/training/library/[id]/page.tsx",
+          "gitBlob": "78d59893da73a036553feb38e4d7ffa0e7875d53"
+        },
+        {
+          "path": "apps/web/src/app/(app)/training/library/page.tsx",
+          "gitBlob": "300f92db89a9c7a08f4dbec9d4e4968f37f6cde3"
+        },
+        {
+          "path": "apps/web/src/app/(app)/training/manage/page.tsx",
+          "gitBlob": "15a4c9a7187ef67cb058b6c072202b926fa67926"
+        },
+        {
+          "path": "apps/web/src/app/(app)/training/page.tsx",
+          "gitBlob": "1d5e4f810d2ef9a75abb7382cd85abb0ee9ee37a"
+        },
+        {
+          "path": "apps/web/src/app/(app)/training/pptx/[target]/[id]/download/route.ts",
+          "gitBlob": "8906c32fec3205371510517bb483fe7521034783"
+        },
+        {
+          "path": "apps/web/src/app/(app)/training/records/[id]/certificate/print/route.ts",
+          "gitBlob": "906aa803a1e092a61018a44f617f572210c38eb7"
+        },
+        {
+          "path": "apps/web/src/app/(app)/training/records/[id]/certificate/route.ts",
+          "gitBlob": "34b24ce2341025d30555d8e62af1580f6cae4186"
+        },
+        {
+          "path": "apps/web/src/app/(app)/training/records/[id]/page.tsx",
+          "gitBlob": "8ab490f5c629daa52f84d3deed1aa9e5a02a1ddf"
+        },
+        {
+          "path": "apps/web/src/app/(app)/training/records/page.tsx",
+          "gitBlob": "2b8ff17b4f4a60f0bdc56983f10d4f7f0f92c986"
+        },
+        {
+          "path": "apps/web/src/app/(app)/training/records/wallet-cards/route.ts",
+          "gitBlob": "bf54188ff61b633b2725b962dbbae99b4e96cb86"
+        },
+        {
+          "path": "apps/web/src/app/(app)/training/skills/[id]/certificate/print/route.ts",
+          "gitBlob": "51fe64b981393e9b6e22c465665f41cc95085b4a"
+        },
+        {
+          "path": "apps/web/src/app/(app)/training/skills/[id]/certificate/route.ts",
+          "gitBlob": "708c27e4a953b1d79d8bc02cfcb4b0bcdc880deb"
+        },
+        {
+          "path": "apps/web/src/app/(app)/training/skills/[id]/page.tsx",
+          "gitBlob": "cc0b3a5d998ae1ba2dba0aff2760bd84f0d1c440"
+        },
+        {
+          "path": "apps/web/src/app/(app)/training/skills/page.tsx",
+          "gitBlob": "58a95f356963497d0f7b6ae06b04a06069aebb7b"
+        },
+        {
+          "path": "apps/web/src/app/(app)/training/skills/types/[id]/page.tsx",
+          "gitBlob": "43125077ba13f213be99ac94240f623a7248dcfe"
+        },
+        {
+          "path": "apps/web/src/app/(app)/training/skills/types/page.tsx",
+          "gitBlob": "c6f46e6c1099dcf2f7870be7facab8c09e636a1a"
+        }
+      ]
+    },
+    {
+      "name": "People",
+      "status": "OWNER_ACCEPTED_FREEZE_PENDING",
+      "approvedDestinations": [
+        {
+          "id": "A093",
+          "group": "People",
+          "label": "Staff Directory",
+          "href": "/people",
+          "source": "/people",
+          "permission": null,
+          "entitlement": null
+        },
+        {
+          "id": "A094",
+          "group": "People",
+          "label": "Teams",
+          "href": "/people/groups",
+          "source": "/people",
+          "permission": "admin.org.manage",
+          "entitlement": null
+        },
+        {
+          "id": "A096",
+          "group": "People",
+          "label": "Roles",
+          "href": "/admin/roles",
+          "source": "/admin",
+          "permission": "admin.roles.manage",
+          "entitlement": null
+        },
+        {
+          "id": "A100",
+          "group": "People",
+          "label": "Access Management",
+          "href": "/admin/users",
+          "source": "/admin",
+          "permission": "admin.users.manage",
+          "entitlement": null
+        },
+        {
+          "id": "A101",
+          "group": "People",
+          "label": "Settings",
+          "href": "/people/manage",
+          "source": "/people",
+          "permission": "admin.org.manage",
+          "entitlement": null
+        }
+      ],
+      "reuse": [
+        "packages/db/src/schema/org.ts",
+        "packages/db/src/schema/people-titles.ts"
+      ],
+      "remaining": [
+        "Owner accepted; preserve candidate implementation. Only acceptance gaps may prevent freeze; no feature changes authorized."
+      ],
+      "sourceRoutes": [
+        {
+          "path": "apps/web/src/app/(app)/people/[id]/badge/print/route.ts",
+          "gitBlob": "ee3f08007e1508d7396b7f5eb31f252fbb98629b"
+        },
+        {
+          "path": "apps/web/src/app/(app)/people/[id]/badge/route.ts",
+          "gitBlob": "21bc549c7b2e48f7ca9b414cb8ec910d66b0bc7a"
+        },
+        {
+          "path": "apps/web/src/app/(app)/people/[id]/page.tsx",
+          "gitBlob": "b2e5a9a8b753ab0c0c2338f5e318f56888d97634"
+        },
+        {
+          "path": "apps/web/src/app/(app)/people/badges/design/page.tsx",
+          "gitBlob": "478c5804c885b4926d88532a0dc346e01f9146d9"
+        },
+        {
+          "path": "apps/web/src/app/(app)/people/crews/page.tsx",
+          "gitBlob": "0fb5fdd0b730a28f34bf56aec8d25cb582a90a87"
+        },
+        {
+          "path": "apps/web/src/app/(app)/people/custom-fields/page.tsx",
+          "gitBlob": "af37b7b58100a9bab0cf8b5d5b3de09472e3fcf7"
+        },
+        {
+          "path": "apps/web/src/app/(app)/people/departments/page.tsx",
+          "gitBlob": "c3261eae178485757c483715176900680325be26"
+        },
+        {
+          "path": "apps/web/src/app/(app)/people/export.csv/route.ts",
+          "gitBlob": "bfe83c385bd08516e90602df24a47be67f5d38e2"
+        },
+        {
+          "path": "apps/web/src/app/(app)/people/groups/[id]/page.tsx",
+          "gitBlob": "6ce2539eede605d593c80aaadf22604bb921446a"
+        },
+        {
+          "path": "apps/web/src/app/(app)/people/groups/page.tsx",
+          "gitBlob": "a6436dbd22856c52d7855c9291040a6769278fa3"
+        },
+        {
+          "path": "apps/web/src/app/(app)/people/manage/page.tsx",
+          "gitBlob": "f6d7d3fc470ef37c1f736bc6303fa90a16870a9c"
+        },
+        {
+          "path": "apps/web/src/app/(app)/people/new/page.tsx",
+          "gitBlob": "34cd32f03df9a164177bdce992e23c284cdd5698"
+        },
+        {
+          "path": "apps/web/src/app/(app)/people/org-chart/page.tsx",
+          "gitBlob": "323389c756ab316d8f0a8c1cf909a6d788af8535"
+        },
+        {
+          "path": "apps/web/src/app/(app)/people/page.tsx",
+          "gitBlob": "c03d86c3e6c89eabab708dbe0386c8dc790b3b04"
+        },
+        {
+          "path": "apps/web/src/app/(app)/people/titles/[id]/page.tsx",
+          "gitBlob": "49e5dc506155f75caa759688c01915ce626ccea3"
+        },
+        {
+          "path": "apps/web/src/app/(app)/people/titles/[id]/pdf/page.tsx",
+          "gitBlob": "76dca88b6f21581b1a37ea67abc26faf63b75a54"
+        },
+        {
+          "path": "apps/web/src/app/(app)/people/titles/[id]/tasks/page.tsx",
+          "gitBlob": "4b5b3dd9d46cc1476138be098804852343e0a6ea"
+        },
+        {
+          "path": "apps/web/src/app/(app)/people/titles/new/page.tsx",
+          "gitBlob": "c828cf8950f52aaf2b57a371c577e3feecefc7cd"
+        },
+        {
+          "path": "apps/web/src/app/(app)/people/titles/page.tsx",
+          "gitBlob": "c6baf8de0afac1408cf010c4f09f96ccc445dd26"
+        },
+        {
+          "path": "apps/web/src/app/(app)/people/trades/page.tsx",
+          "gitBlob": "c03c9c1101135fcf3daaef3a35b63ab21ceaf34e"
+        }
+      ]
+    },
+    {
+      "name": "Handover",
+      "status": "EXISTING_ENGINE_REQUIRES_V14_COMPLETENESS_AUDIT",
+      "approvedDestinations": [
+        {
+          "id": "A102",
+          "group": "Handover",
+          "label": "Current Handover",
+          "href": "/hospitality/handover",
+          "source": "/hospitality/handover",
+          "permission": "hospitality.read",
+          "entitlement": null
+        }
+      ],
+      "reuse": [
+        "packages/db/src/schema/hospitality-handover.ts"
+      ],
+      "remaining": [
+        "Audit shift/property handover, acknowledgements, comments, attachments and scoped follow-up."
+      ],
+      "sourceRoutes": [
+        {
+          "path": "apps/web/src/app/(app)/hospitality/handover/page.tsx",
+          "gitBlob": "c7396b92fcb2672cfcf02c0d65760285d6c9c9ab"
+        }
+      ]
+    },
+    {
+      "name": "Assets & PPM",
+      "status": "EXISTING_ENGINE_REQUIRES_V14_COMPLETENESS_AUDIT",
+      "approvedDestinations": [
+        {
+          "id": "A110",
+          "group": "Assets & PPM",
+          "label": "Asset Register",
+          "href": "/equipment",
+          "source": "/equipment",
+          "permission": null,
+          "entitlement": null
+        },
+        {
+          "id": "A111",
+          "group": "Assets & PPM",
+          "label": "Asset Categories",
+          "href": "/equipment/categories",
+          "source": "/equipment",
+          "permission": "equipment.manage",
+          "entitlement": null
+        },
+        {
+          "id": "A112",
+          "group": "Assets & PPM",
+          "label": "PPM Schedule",
+          "href": "/equipment/maintenance",
+          "source": "/equipment",
+          "permission": null,
+          "entitlement": null
+        },
+        {
+          "id": "A118",
+          "group": "Assets & PPM",
+          "label": "Settings",
+          "href": "/equipment/manage",
+          "source": "/equipment",
+          "permission": "equipment.manage",
+          "entitlement": null
+        }
+      ],
+      "reuse": [
+        "packages/db/src/schema/equipment.ts",
+        "packages/db/src/schema/equipment-maintenance.ts"
+      ],
+      "remaining": [
+        "Audit asset hierarchy, PPM scheduling, inspection evidence, reminders and canonical maintenance convergence."
+      ],
+      "sourceRoutes": [
+        {
+          "path": "apps/web/src/app/(app)/equipment/[id]/page.tsx",
+          "gitBlob": "3461c196d586599458981039430f75929ba9be31"
+        },
+        {
+          "path": "apps/web/src/app/(app)/equipment/[id]/pdf/route.ts",
+          "gitBlob": "e75a2c1fbfc8bdd133832493160b476d3fabba73"
+        },
+        {
+          "path": "apps/web/src/app/(app)/equipment/[id]/qr/page.tsx",
+          "gitBlob": "b1f6fc7e0b8d3f4c50294dded3c23ed77afa28ca"
+        },
+        {
+          "path": "apps/web/src/app/(app)/equipment/[id]/qr/pdf/route.ts",
+          "gitBlob": "ff92b7f9861537329b6b8aede3525c3cd3cb9b1c"
+        },
+        {
+          "path": "apps/web/src/app/(app)/equipment/assets/flows/page.tsx",
+          "gitBlob": "a5525cce0e57dff902ac19c07150564b5567df5a"
+        },
+        {
+          "path": "apps/web/src/app/(app)/equipment/categories/page.tsx",
+          "gitBlob": "a22aafe384802a5713d429ce14addb960cb4b044"
+        },
+        {
+          "path": "apps/web/src/app/(app)/equipment/custom-fields/page.tsx",
+          "gitBlob": "f7960ba8f94d43d5080085d7347930ff63550a09"
+        },
+        {
+          "path": "apps/web/src/app/(app)/equipment/export.csv/route.ts",
+          "gitBlob": "d2e918348f016a7b0176fd4f5e392c177511815f"
+        },
+        {
+          "path": "apps/web/src/app/(app)/equipment/flows/page.tsx",
+          "gitBlob": "8fc3cfdbc0f643557b126884596acb55925b1da1"
+        },
+        {
+          "path": "apps/web/src/app/(app)/equipment/inspection-types/[id]/page.tsx",
+          "gitBlob": "4d6a9002b6568cf5911c0b31e2e1e63acb93921b"
+        },
+        {
+          "path": "apps/web/src/app/(app)/equipment/inspection-types/page.tsx",
+          "gitBlob": "60b1d2a28730677594f5ee41cb92715724c2e145"
+        },
+        {
+          "path": "apps/web/src/app/(app)/equipment/inspections/[id]/page.tsx",
+          "gitBlob": "9afc2803b52506fcd13ce3a85e92cca8ab2d70c6"
+        },
+        {
+          "path": "apps/web/src/app/(app)/equipment/inspections/[id]/pdf/route.ts",
+          "gitBlob": "3be42f76fd0dba434a1e92cabb45005d5f44235b"
+        },
+        {
+          "path": "apps/web/src/app/(app)/equipment/inspections/flows/page.tsx",
+          "gitBlob": "dd905d7ae9911dc572f80d34995ae047e901411d"
+        },
+        {
+          "path": "apps/web/src/app/(app)/equipment/inspections/new/page.tsx",
+          "gitBlob": "308550b8a0f09ab9c0c4f53a59f50a9f687c6f72"
+        },
+        {
+          "path": "apps/web/src/app/(app)/equipment/inspections/page.tsx",
+          "gitBlob": "b9ac28c2baf1d444020f3a55e6e3cd5fa33d32ae"
+        },
+        {
+          "path": "apps/web/src/app/(app)/equipment/labels/design/page.tsx",
+          "gitBlob": "08d9dc41cfc47a24f32fe525d507ceb6d60dc05a"
+        },
+        {
+          "path": "apps/web/src/app/(app)/equipment/maintenance/page.tsx",
+          "gitBlob": "e67dd91662729a7f398d984c616dc8566185cec1"
+        },
+        {
+          "path": "apps/web/src/app/(app)/equipment/manage/page.tsx",
+          "gitBlob": "34957c96a3416f58aabef880e6f806e20bdace71"
+        },
+        {
+          "path": "apps/web/src/app/(app)/equipment/new/page.tsx",
+          "gitBlob": "8a622c94ca98e5ce68c7065ff4a76eb7927c1615"
+        },
+        {
+          "path": "apps/web/src/app/(app)/equipment/page.tsx",
+          "gitBlob": "066ea4042a17f5034ca5f743643aa9401a45a635"
+        },
+        {
+          "path": "apps/web/src/app/(app)/equipment/qr/bulk/page.tsx",
+          "gitBlob": "a7c179b2cdbfebe295764648936b9fdd6fa17172"
+        },
+        {
+          "path": "apps/web/src/app/(app)/equipment/qr/labels/route.ts",
+          "gitBlob": "ef24c8c780d5d75ab110f66f0c0f3ba1f2dcf930"
+        },
+        {
+          "path": "apps/web/src/app/(app)/equipment/scan/[qrToken]/page.tsx",
+          "gitBlob": "22ce64b318433625174b82354b80445a47b6d117"
+        },
+        {
+          "path": "apps/web/src/app/(app)/equipment/station/page.tsx",
+          "gitBlob": "274996d1ca02faf8ff667dcce86085e1dbc9e267"
+        },
+        {
+          "path": "apps/web/src/app/(app)/equipment/station/settings/page.tsx",
+          "gitBlob": "293a34ad65d033ff59edf51a62e8565b10493830"
+        },
+        {
+          "path": "apps/web/src/app/(app)/equipment/types/page.tsx",
+          "gitBlob": "4382348ea7cdfbbd20b1a24c8384ae094131bd6d"
+        },
+        {
+          "path": "apps/web/src/app/(app)/equipment/vehicle-log/[id]/page.tsx",
+          "gitBlob": "90bb33c92f4140e298efb555aa304978dc80a718"
+        },
+        {
+          "path": "apps/web/src/app/(app)/equipment/vehicle-log/export.csv/route.ts",
+          "gitBlob": "28e7664c67b47c54af82ae2ac90be78cffb75e5c"
+        },
+        {
+          "path": "apps/web/src/app/(app)/equipment/vehicle-log/flows/page.tsx",
+          "gitBlob": "683c12a85498ffd4c50de70c4e41324cf260945c"
+        },
+        {
+          "path": "apps/web/src/app/(app)/equipment/vehicle-log/new/page.tsx",
+          "gitBlob": "4b3b683a1845840e5dda8d611d6252072e2fde6e"
+        },
+        {
+          "path": "apps/web/src/app/(app)/equipment/vehicle-log/page.tsx",
+          "gitBlob": "0c1dd6ed76104af19ca2a3c1cdffd60232ba11b0"
+        },
+        {
+          "path": "apps/web/src/app/(app)/equipment/vehicle-log/pdf/route.ts",
+          "gitBlob": "91294c7ff4c0eb737f7941225247afc3cfba1b66"
+        },
+        {
+          "path": "apps/web/src/app/(app)/equipment/vehicle-log/settings/page.tsx",
+          "gitBlob": "22b04247303318f017b2710bc83d8f23b443c6d8"
+        },
+        {
+          "path": "apps/web/src/app/(app)/equipment/vehicle-log/summary/page.tsx",
+          "gitBlob": "5a7fc4347d742e4b0b1bf264f895ea60e61d84af"
+        },
+        {
+          "path": "apps/web/src/app/(app)/equipment/work-orders/[id]/page.tsx",
+          "gitBlob": "04a1b467e7d3157d04c9290ba846cdea8b9f8646"
+        },
+        {
+          "path": "apps/web/src/app/(app)/equipment/work-orders/[id]/pdf/route.ts",
+          "gitBlob": "0c0c7325991861197f6e9381f7d2ccaea33040a2"
+        },
+        {
+          "path": "apps/web/src/app/(app)/equipment/work-orders/new/page.tsx",
+          "gitBlob": "b081bcab21c90c787307611c883dc23ff32c5f10"
+        },
+        {
+          "path": "apps/web/src/app/(app)/equipment/work-orders/page.tsx",
+          "gitBlob": "f3a2d7afb69d63512e0b140d214ab05a06ac331c"
+        }
+      ]
+    },
+    {
+      "name": "Metering",
+      "status": "EXISTING_ENGINE_REQUIRES_V14_COMPLETENESS_AUDIT",
+      "approvedDestinations": [
+        {
+          "id": "A119",
+          "group": "Metering",
+          "label": "Meter Dashboard",
+          "href": "/hospitality/metering?tab=overview",
+          "source": "/hospitality/metering",
+          "permission": "hospitality.read",
+          "entitlement": null
+        },
+        {
+          "id": "A123",
+          "group": "Metering",
+          "label": "Meter Readings",
+          "href": "/hospitality/metering?tab=history",
+          "source": "/hospitality/metering",
+          "permission": "hospitality.read",
+          "entitlement": null
+        },
+        {
+          "id": "A124",
+          "group": "Metering",
+          "label": "Consumption Trends",
+          "href": "/hospitality/metering?tab=analytics",
+          "source": "/hospitality/metering",
+          "permission": "hospitality.read",
+          "entitlement": null
+        },
+        {
+          "id": "A126",
+          "group": "Metering",
+          "label": "Settings",
+          "href": "/hospitality/metering?tab=setup",
+          "source": "/hospitality/metering",
+          "permission": "hospitality.manage",
+          "entitlement": null
+        }
+      ],
+      "reuse": [
+        "packages/db/src/schema/hospitality-metering.ts"
+      ],
+      "remaining": [
+        "Audit readings, tariffs, historical currency snapshots, property scope and analytics; verify tenant currency defaults against current code."
+      ],
+      "sourceRoutes": [
+        {
+          "path": "apps/web/src/app/(app)/hospitality/metering/page.tsx",
+          "gitBlob": "7ff875e2cb3886cc8fc50df09ff0a9ce137a61e3"
+        }
+      ]
+    },
+    {
+      "name": "Reporting",
+      "status": "NO_REGISTERED_DESTINATION",
+      "approvedDestinations": [],
+      "reuse": [
+        "packages/reports",
+        "packages/analytics"
+      ],
+      "remaining": [
+        "Approved hierarchy contains Reporting but no explicit destination in this candidate; reconcile its intended presentation with Reports without a second reporting engine."
+      ],
+      "sourceRoutes": []
+    },
+    {
+      "name": "Reports",
+      "status": "EXISTING_ENGINE_REQUIRES_V14_COMPLETENESS_AUDIT",
+      "approvedDestinations": [
+        {
+          "id": "A136",
+          "group": "Reports",
+          "label": "Reports overview",
+          "href": "/reports",
+          "source": "/reports",
+          "permission": null,
+          "entitlement": null
+        },
+        {
+          "id": "A142",
+          "group": "Reports",
+          "label": "Custom Reports",
+          "href": "/reports/definitions/new",
+          "source": "/reports",
+          "permission": "reports.builder",
+          "entitlement": null
+        },
+        {
+          "id": "A143",
+          "group": "Reports",
+          "label": "Export Centre",
+          "href": "/admin/export",
+          "source": "/admin",
+          "permission": "admin.data.export",
+          "entitlement": null
+        },
+        {
+          "id": "A144",
+          "group": "Reports",
+          "label": "Scheduled Reports",
+          "href": "/reports/schedules",
+          "source": "/reports",
+          "permission": "reports.schedule",
+          "entitlement": null
+        }
+      ],
+      "reuse": [
+        "packages/reports",
+        "packages/analytics"
+      ],
+      "remaining": [
+        "Audit built-in/custom reports, schedules, delivery, export auditing and all property/tenant filters."
+      ],
+      "sourceRoutes": [
+        {
+          "path": "apps/web/src/app/(app)/insights/cards/[id]/edit/page.tsx",
+          "gitBlob": "0fc3fe5d29cbbaee50a2cb25a6e12ddf8536b4d0"
+        },
+        {
+          "path": "apps/web/src/app/(app)/insights/cards/[id]/export/route.ts",
+          "gitBlob": "1a796109c8a5e578c6aa2acc65dbe1d9327aad24"
+        },
+        {
+          "path": "apps/web/src/app/(app)/insights/cards/[id]/page.tsx",
+          "gitBlob": "6fee8ce930e1fdd516b46d1435015b9c19e3bf36"
+        },
+        {
+          "path": "apps/web/src/app/(app)/insights/cards/new/page.tsx",
+          "gitBlob": "60b2d8e333285c9d03d0b1a9cea4698d463a410b"
+        },
+        {
+          "path": "apps/web/src/app/(app)/insights/library/page.tsx",
+          "gitBlob": "bc0cdbd1ca3cfa09c6e26c3aeabc884c37ceeae4"
+        },
+        {
+          "path": "apps/web/src/app/(app)/insights/page.tsx",
+          "gitBlob": "526b12db39c46a93eff94a252f402b97998cfccc"
+        },
+        {
+          "path": "apps/web/src/app/(app)/reports/definitions/[id]/edit/page.tsx",
+          "gitBlob": "0cfaebe77e2dfa6a44ec67ca4b1aaa3a2ebc99ea"
+        },
+        {
+          "path": "apps/web/src/app/(app)/reports/definitions/[id]/export/route.ts",
+          "gitBlob": "5a11406d6854c60997456aab588c017374b895b1"
+        },
+        {
+          "path": "apps/web/src/app/(app)/reports/definitions/[id]/page.tsx",
+          "gitBlob": "4deb0d492ef3d334c980ba0aec30b62ba571c800"
+        },
+        {
+          "path": "apps/web/src/app/(app)/reports/definitions/new/page.tsx",
+          "gitBlob": "5290a6222f0bc19b9b488060038a3ff748130f47"
+        },
+        {
+          "path": "apps/web/src/app/(app)/reports/definitions/page.tsx",
+          "gitBlob": "5c15015711dcfa9f39ec00c25d82aa3dc533eea7"
+        },
+        {
+          "path": "apps/web/src/app/(app)/reports/page.tsx",
+          "gitBlob": "6da430e312472dc57ecfd061fc13497fd744160d"
+        },
+        {
+          "path": "apps/web/src/app/(app)/reports/schedules/[id]/page.tsx",
+          "gitBlob": "e1b724f842dcc86afb2d1ec96911037e05cf2ab7"
+        },
+        {
+          "path": "apps/web/src/app/(app)/reports/schedules/[id]/runs/[runId]/page.tsx",
+          "gitBlob": "07d28a53fc812030e8464ef675b69a16b780c04a"
+        },
+        {
+          "path": "apps/web/src/app/(app)/reports/schedules/[id]/runs/[runId]/pdf/route.ts",
+          "gitBlob": "c37977b66a6e4cf193ececc7eb23b6fdf9dcad3f"
+        },
+        {
+          "path": "apps/web/src/app/(app)/reports/schedules/new/page.tsx",
+          "gitBlob": "8c82136d2faf8566267b7f60c3bb50522a30636a"
+        },
+        {
+          "path": "apps/web/src/app/(app)/reports/schedules/page.tsx",
+          "gitBlob": "95c5dad7e7d806cdc36ce044400538370b565013"
+        }
+      ]
+    },
+    {
+      "name": "Approvals",
+      "status": "OWNER_ACCEPTED_FREEZE_PENDING",
+      "approvedDestinations": [
+        {
+          "id": "AP001",
+          "group": "Approvals",
+          "label": "Dashboard",
+          "href": "/approvals",
+          "source": "/approvals",
+          "permission": "approvals.read",
+          "entitlement": "approvals"
+        },
+        {
+          "id": "AP002",
+          "group": "Approvals",
+          "label": "My Requests",
+          "href": "/approvals/my",
+          "source": "/approvals",
+          "permission": "approvals.read",
+          "entitlement": "approvals"
+        },
+        {
+          "id": "AP003",
+          "group": "Approvals",
+          "label": "Awaiting My Approval",
+          "href": "/approvals/awaiting",
+          "source": "/approvals",
+          "permission": "approvals.decide",
+          "entitlement": "approvals"
+        },
+        {
+          "id": "AP004",
+          "group": "Approvals",
+          "label": "Team Requests",
+          "href": "/approvals/team",
+          "source": "/approvals",
+          "permission": "approvals.decide",
+          "entitlement": "approvals"
+        },
+        {
+          "id": "AP005",
+          "group": "Approvals",
+          "label": "Create Request",
+          "href": "/approvals/new",
+          "source": "/approvals",
+          "permission": "approvals.submit",
+          "entitlement": "approvals"
+        },
+        {
+          "id": "AP006",
+          "group": "Approvals",
+          "label": "Workflow Configuration",
+          "href": "/approvals/configure",
+          "source": "/approvals",
+          "permission": "approvals.configure",
+          "entitlement": "approvals"
+        },
+        {
+          "id": "AP007",
+          "group": "Approvals",
+          "label": "Approval History",
+          "href": "/approvals/history",
+          "source": "/approvals",
+          "permission": "approvals.decide",
+          "entitlement": "approvals"
+        },
+        {
+          "id": "AP008",
+          "group": "Approvals",
+          "label": "Reporting & Exports",
+          "href": "/approvals/reports",
+          "source": "/approvals",
+          "permission": "approvals.decide",
+          "entitlement": "approvals"
+        }
+      ],
+      "reuse": [
+        "packages/db/src/schema/approvals.ts",
+        "packages/events",
+        "packages/jobs",
+        "packages/storage"
+      ],
+      "remaining": [
+        "Owner accepted; exact recovered production implementation preserved. Complete remaining authenticated acceptance only."
+      ],
+      "sourceRoutes": [
+        {
+          "path": "apps/web/src/app/(app)/approvals/[[...screen]]/page.tsx",
+          "gitBlob": "40bf5ffb5b308f54b42d3716e5b629cc2da1c9ab"
+        },
+        {
+          "path": "apps/web/src/app/(app)/approvals/export.csv/route.ts",
+          "gitBlob": "4a6fd7ba3152af8fafdc10173141c5117908143d"
+        },
+        {
+          "path": "apps/web/src/app/(app)/approvals/requests/[id]/documents/[documentId]/route.ts",
+          "gitBlob": "bc3cdfe7409c723ee12f350fb0866fbdd22db48c"
+        },
+        {
+          "path": "apps/web/src/app/(app)/approvals/requests/[id]/page.tsx",
+          "gitBlob": "8e0ff804619da94c3efe3ea31b02c86b50940079"
+        }
+      ]
+    },
+    {
+      "name": "Tenant Settings",
+      "status": "EXISTING_ENGINE_REQUIRES_V14_COMPLETENESS_AUDIT",
+      "approvedDestinations": [
+        {
+          "id": "A152",
+          "group": "Tenant Settings",
+          "label": "General",
+          "href": "/admin/settings",
+          "source": "/admin/settings",
+          "permission": "admin.settings.manage",
+          "entitlement": null
+        },
+        {
+          "id": "A153",
+          "group": "Tenant Settings",
+          "label": "Properties",
+          "href": "/hospitality/properties",
+          "source": "/hospitality/properties",
+          "permission": "hospitality.read",
+          "entitlement": "hospitality.properties"
+        },
+        {
+          "id": "A156",
+          "group": "Tenant Settings",
+          "label": "Users & Access",
+          "href": "/admin/users",
+          "source": "/admin",
+          "permission": "admin.users.manage",
+          "entitlement": null
+        },
+        {
+          "id": "A157",
+          "group": "Tenant Settings",
+          "label": "Modules",
+          "href": "/admin/settings/modules",
+          "source": "/admin/settings",
+          "permission": "admin.settings.manage",
+          "entitlement": null
+        },
+        {
+          "id": "A158",
+          "group": "Tenant Settings",
+          "label": "Notifications",
+          "href": "/admin/notifications",
+          "source": "/admin/settings",
+          "permission": "admin.settings.manage",
+          "entitlement": null
+        },
+        {
+          "id": "A159",
+          "group": "Tenant Settings",
+          "label": "Integrations",
+          "href": "/admin/integrations",
+          "source": "/admin",
+          "permission": "admin.integrations.manage",
+          "entitlement": null
+        },
+        {
+          "id": "A160",
+          "group": "Tenant Settings",
+          "label": "Import / Export",
+          "href": "/admin/settings/import-export",
+          "source": "/admin/settings",
+          "permission": "admin.settings.manage",
+          "entitlement": null
+        },
+        {
+          "id": "A161",
+          "group": "Tenant Settings",
+          "label": "Tenant Branding",
+          "href": "/admin/settings/branding",
+          "source": "/admin/settings",
+          "permission": "admin.settings.manage",
+          "entitlement": null
+        },
+        {
+          "id": "A162",
+          "group": "Tenant Settings",
+          "label": "Data Management",
+          "href": "/admin/export",
+          "source": "/admin",
+          "permission": "admin.data.export",
+          "entitlement": null
+        },
+        {
+          "id": "A163",
+          "group": "Tenant Settings",
+          "label": "Templates",
+          "href": "/apps",
+          "source": "/apps",
+          "permission": "forms.template.read",
+          "entitlement": null
+        },
+        {
+          "id": "A164",
+          "group": "Tenant Settings",
+          "label": "Audit Log",
+          "href": "/admin/audit",
+          "source": "/admin",
+          "permission": "admin.audit.read",
+          "entitlement": null
+        },
+        {
+          "id": "A165",
+          "group": "Tenant Settings",
+          "label": "Advanced",
+          "href": "/admin/settings/advanced",
+          "source": "/admin/settings",
+          "permission": "admin.settings.manage",
+          "entitlement": null
+        }
+      ],
+      "reuse": [
+        "packages/db/src/schema/tenant-settings.ts",
+        "packages/db/src/schema/configuration-governance.ts",
+        "packages/db/src/schema/bulk-imports.ts"
+      ],
+      "remaining": [
+        "Audit tenant/platform ownership, branding, currency/locale/timezone, roles, entitlements, properties, configuration adoption and governed imports.",
+        "Inspect existing property-structure import before adding People/Compliance/Assets dataset handlers; preserve one import lifecycle."
+      ],
+      "sourceRoutes": [
+        {
+          "path": "apps/web/src/app/(app)/admin/ai/page.tsx",
+          "gitBlob": "f7b1fef7ad3dfac47ec75b76eea10b4df991f281"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/api-keys/[id]/page.tsx",
+          "gitBlob": "dfd1fddaea98177caff2777d025e23db3e478d95"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/api-keys/page.tsx",
+          "gitBlob": "40657f27378a5c2169362eec193b306973f0217b"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/audit/page.tsx",
+          "gitBlob": "23bd59b35938e890a361ef2be76f3f1ba37b89da"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/data-sources/[id]/page.tsx",
+          "gitBlob": "8201d7f4ea5af4281792f044acc7cc7d4a44a4db"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/data-sources/page.tsx",
+          "gitBlob": "11585d78aa5735c373c4b54e0e1714b7fdbc3901"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/email-log/[id]/page.tsx",
+          "gitBlob": "76fc3e7922a74f7a019c870ba5e3c4714f1b36b4"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/email-log/page.tsx",
+          "gitBlob": "f391718fd212a8231cad7afb1b56b2d17a66eec6"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/email-templates/[id]/page.tsx",
+          "gitBlob": "716081b907622d2035dca6d9114c4c5984c09861"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/email-templates/page.tsx",
+          "gitBlob": "baebcf1386e07a30d1badc09bf06d1888534cea1"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/email/page.tsx",
+          "gitBlob": "f40030cea5c7f97cd2accc1ad8452e0fb35ee844"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/export/page.tsx",
+          "gitBlob": "18848d301a7f1f750037544b799d7fd1b293d2ae"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/integrations/[id]/page.tsx",
+          "gitBlob": "fcf07d533dc2efa9f6de9bd1652afe2fd7587378"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/integrations/[id]/runs/[runId]/page.tsx",
+          "gitBlob": "446401ddf7477ea9ddc83b91dc5374d508392da4"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/integrations/outbound/[id]/page.tsx",
+          "gitBlob": "9598e0a579abf88184d218804b5cbe0351265ca8"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/integrations/page.tsx",
+          "gitBlob": "20d92bac19b8e3cbb1292ac937720cef1c770b5b"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/navigation/page.tsx",
+          "gitBlob": "f6570e5b0b3b2ac709cd114e16f6e0ad968ad8c6"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/notifications/page.tsx",
+          "gitBlob": "4bcfbbcaa3fb0d990b448be99fa17837bd00387e"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/page.tsx",
+          "gitBlob": "c537169021d6dfaa456d8b5bddc2c1d92a7af337"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/pdf-templates/[id]/page.tsx",
+          "gitBlob": "d5cdca822a90a6e888ee0c11ca1a06c2821eeec2"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/pdf-templates/page.tsx",
+          "gitBlob": "18bf9bceef5949a15b95fc33c96787bb0ac5c31d"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/printing/page.tsx",
+          "gitBlob": "98f13bc83e276dcbbbc4a627dad524d228fb72aa"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/roles/[id]/page.tsx",
+          "gitBlob": "1de70d54c7f8dff6d5a24bacf3b9244ce97d9e99"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/roles/new/page.tsx",
+          "gitBlob": "7ec308a178c303333d59a443241fb4b62f5a39b5"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/roles/page.tsx",
+          "gitBlob": "ef6617584508d4b7be08800428ee85d5053fbc93"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/settings/advanced/page.tsx",
+          "gitBlob": "c4dc46682f32546d791a08c190f2e323760bc09f"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/settings/branding/assets/[kind]/route.ts",
+          "gitBlob": "8be2e24519d2980a66d839af7152049cbe178a05"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/settings/branding/page.tsx",
+          "gitBlob": "df60c2b01ef78de553e9177b658dd5cad0e12209"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/settings/import-export/page.tsx",
+          "gitBlob": "c15e578885a21faa7e10f39ce66e3221ba45132f"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/settings/import-export/property-structure/export/route.ts",
+          "gitBlob": "0b8c713b7e806f56e2b4d958fe29166636af7c9d"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/settings/import-export/property-structure/preview/[batchId]/page.tsx",
+          "gitBlob": "9ab4569f2067819829886261d1524cf1c8129c59"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/settings/import-export/property-structure/result/[batchId]/download/route.ts",
+          "gitBlob": "c514885b841153dd1b3eaf376649dfd352e46307"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/settings/import-export/property-structure/result/[batchId]/page.tsx",
+          "gitBlob": "a0f5ef89ba3e735f7f5f4ddccd1575bb8c974abb"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/settings/import-export/property-structure/review/[batchId]/page.tsx",
+          "gitBlob": "6d545341eafc6c665b01e02d48223fd16b3f217b"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/settings/import-export/property-structure/template/route.ts",
+          "gitBlob": "3706c53a48e36db921116b1ee6f0f2b83f3e0b3e"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/settings/import-export/property-structure/upload/page.tsx",
+          "gitBlob": "d712fced1c5cea4051b64a7cd57f8fab992958df"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/settings/modules/page.tsx",
+          "gitBlob": "1cbf380a17e13cc48aea06e955f50c18529fccf7"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/settings/page.tsx",
+          "gitBlob": "686303dc762446c9e1c8b6374de9376c9484bcce"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/sms-log/[id]/page.tsx",
+          "gitBlob": "f847525b7c2a5f2839bdf2bb2800248de5aa1373"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/sms-log/page.tsx",
+          "gitBlob": "c956138a2e701dffe56642919b7968a17ff71e6b"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/sms/page.tsx",
+          "gitBlob": "8f94de5bcfa835d17f0e4288a3b3436778d37866"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/users/[id]/page.tsx",
+          "gitBlob": "f9d79e8ef10fcba3b43f90a0d607be823d6d3b25"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/users/invite/page.tsx",
+          "gitBlob": "7c4dd679b30ec2a8f621a1237b7ddedfa5bbc511"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/users/page.tsx",
+          "gitBlob": "7709ba24da71ccb7ee11961dccafeab939f75e07"
+        },
+        {
+          "path": "apps/web/src/app/(app)/admin/walkthroughs/page.tsx",
+          "gitBlob": "3c5010180c3368b88ade5b0a71d4c29ab4b7b50b"
+        },
+        {
+          "path": "apps/web/src/app/(app)/apps/by-key/[key]/fill/route.ts",
+          "gitBlob": "b3dd7cec0ce98ac45551bb0c7cd87809248222b9"
+        },
+        {
+          "path": "apps/web/src/app/(app)/apps/page.tsx",
+          "gitBlob": "7b95587992f658dab34bded1828fb13bbb428456"
+        },
+        {
+          "path": "apps/web/src/app/(app)/apps/responses/[id]/page.tsx",
+          "gitBlob": "baa50ba012f8705e897c52683e7cba528c07e5c9"
+        },
+        {
+          "path": "apps/web/src/app/(app)/apps/responses/[id]/pdf/route.ts",
+          "gitBlob": "14e31766a8ddf0a2e6176d3880a86a1521f1022f"
+        },
+        {
+          "path": "apps/web/src/app/(app)/apps/responses/export.csv/route.ts",
+          "gitBlob": "2e06ab232ffa7880ac1b54ee6f26b242432bbcec"
+        },
+        {
+          "path": "apps/web/src/app/(app)/apps/responses/page.tsx",
+          "gitBlob": "1048a3774d19865b861c76f7e9e9e35b072d46ab"
+        },
+        {
+          "path": "apps/web/src/app/(app)/apps/sessions/page.tsx",
+          "gitBlob": "bf1b98b80fbc915db04508376f530b57faed1b4b"
+        },
+        {
+          "path": "apps/web/src/app/(app)/apps/templates/[id]/designer/page.tsx",
+          "gitBlob": "9b4d775078944cd35b5092012de688d246ff9fe2"
+        },
+        {
+          "path": "apps/web/src/app/(app)/apps/templates/[id]/fill/page.tsx",
+          "gitBlob": "9b9e22fa4440e23fefb1f480981ed47481fe325c"
+        },
+        {
+          "path": "apps/web/src/app/(app)/apps/templates/[id]/flows/page.tsx",
+          "gitBlob": "e444eb2cae1574998ce79334962081acce40dd8e"
+        },
+        {
+          "path": "apps/web/src/app/(app)/apps/templates/[id]/page.tsx",
+          "gitBlob": "734e477cb6da2bb88ed99bc141d7f538eef0e527"
+        },
+        {
+          "path": "apps/web/src/app/(app)/apps/templates/[id]/records/page.tsx",
+          "gitBlob": "7501aa085186c902ce15ef88a4bf0a3c7d837242"
+        },
+        {
+          "path": "apps/web/src/app/(app)/apps/templates/new/page.tsx",
+          "gitBlob": "51dd3a869f0e23f8d2998c3f00960cb3dee4056e"
+        },
+        {
+          "path": "apps/web/src/app/(app)/apps/transcripts/[personId]/page.tsx",
+          "gitBlob": "a2fdab1e560ba2b9f594eadaaddada1f7334ce10"
+        },
+        {
+          "path": "apps/web/src/app/(app)/apps/transcripts/page.tsx",
+          "gitBlob": "dc9e0d2f1818a1d4399f798b1bb3b46818efd2c4"
+        },
+        {
+          "path": "apps/web/src/app/(app)/hospitality/properties/[propertyId]/buildings/[buildingId]/floors/[floorId]/page.tsx",
+          "gitBlob": "52050982a0fba4abdc78f8a3f113efd84aa4440c"
+        },
+        {
+          "path": "apps/web/src/app/(app)/hospitality/properties/[propertyId]/buildings/[buildingId]/floors/[floorId]/rooms/[roomId]/page.tsx",
+          "gitBlob": "acadc2510b09dcbe9289d287649831d7dff0bde9"
+        },
+        {
+          "path": "apps/web/src/app/(app)/hospitality/properties/[propertyId]/buildings/[buildingId]/floors/[floorId]/rooms/[roomId]/qr/page.tsx",
+          "gitBlob": "ef2aa8d9e5c9714686563a0b688cf5dbac2d0375"
+        },
+        {
+          "path": "apps/web/src/app/(app)/hospitality/properties/[propertyId]/buildings/[buildingId]/page.tsx",
+          "gitBlob": "4f298fa554ae13e1d5704350ec79cb55718074f8"
+        },
+        {
+          "path": "apps/web/src/app/(app)/hospitality/properties/[propertyId]/diary/page.tsx",
+          "gitBlob": "b8fed82456dec3b2cf7a3ab56a201c6d56a1a960"
+        },
+        {
+          "path": "apps/web/src/app/(app)/hospitality/properties/[propertyId]/diary/tasks/[occurrenceId]/page.tsx",
+          "gitBlob": "0479bbb89f2878acce4616db7e05b778eab63205"
+        },
+        {
+          "path": "apps/web/src/app/(app)/hospitality/properties/[propertyId]/diary/templates/[scheduleId]/page.tsx",
+          "gitBlob": "466e54b5fb696a6ed64718b332b9891d3cfc6e62"
+        },
+        {
+          "path": "apps/web/src/app/(app)/hospitality/properties/[propertyId]/page.tsx",
+          "gitBlob": "7ee7c0464b7e346490c9482b62c11822cdb1167b"
+        },
+        {
+          "path": "apps/web/src/app/(app)/hospitality/properties/[propertyId]/signoff/page.tsx",
+          "gitBlob": "9957bef75fb542114b924230f36f4dacbbd22dcc"
+        },
+        {
+          "path": "apps/web/src/app/(app)/hospitality/properties/new/page.tsx",
+          "gitBlob": "719fdc3243e8b6071dbe64e031395cba4b1ecac4"
+        },
+        {
+          "path": "apps/web/src/app/(app)/hospitality/properties/page.tsx",
+          "gitBlob": "eef40340944956d5562a81387c2435b099a414bb"
+        }
+      ]
+    }
+  ],
+  "platform": {
+    "status": "EXISTING_SURFACES_REQUIRE_ACCEPTANCE",
+    "groups": [
+      "Dashboard",
+      "Tenants",
+      "Platform Users",
+      "Modules",
+      "Global Settings",
+      "Branding & White Label",
+      "Email & Communications",
+      "Data & Integrations",
+      "System & Releases"
+    ],
+    "sourceRoutes": [
+      {
+        "path": "apps/web/src/app/(platform)/platform/ai/page.tsx",
+        "gitBlob": "15dd2816f311099771fa362c4e4277cd2d8e965b"
+      },
+      {
+        "path": "apps/web/src/app/(platform)/platform/branding/page.tsx",
+        "gitBlob": "8f2d4ee9da6e8ed6fdc504f93c1e52df697db8fc"
+      },
+      {
+        "path": "apps/web/src/app/(platform)/platform/database/page.tsx",
+        "gitBlob": "7870a93f3b3258ba5268dbd929226993f2862668"
+      },
+      {
+        "path": "apps/web/src/app/(platform)/platform/email-log/[id]/page.tsx",
+        "gitBlob": "5f04ded8378688e0dc435f4207ff2625a14a67a2"
+      },
+      {
+        "path": "apps/web/src/app/(platform)/platform/email-log/page.tsx",
+        "gitBlob": "3a0cd1fcee73fe5111f68c7ddbfb4d06dae981cf"
+      },
+      {
+        "path": "apps/web/src/app/(platform)/platform/email/page.tsx",
+        "gitBlob": "2ea8c5123faeb17fe9036f827257293fd84c94c2"
+      },
+      {
+        "path": "apps/web/src/app/(platform)/platform/modules/page.tsx",
+        "gitBlob": "3789e41cf08f53412f3bc36ab42ec69ed478fbea"
+      },
+      {
+        "path": "apps/web/src/app/(platform)/platform/page.tsx",
+        "gitBlob": "afa831f197ae3e3e3f6090ca42c2f919d00a68dc"
+      },
+      {
+        "path": "apps/web/src/app/(platform)/platform/settings/page.tsx",
+        "gitBlob": "f4d10ada019d0025eda740868a18b3ef1ea5bdb7"
+      },
+      {
+        "path": "apps/web/src/app/(platform)/platform/sms-log/[id]/page.tsx",
+        "gitBlob": "4fee7d3241951c1d40b5677fe4be2cbd2689340d"
+      },
+      {
+        "path": "apps/web/src/app/(platform)/platform/sms-log/page.tsx",
+        "gitBlob": "9e400257846266b033b317c50ff461d302b979ac"
+      },
+      {
+        "path": "apps/web/src/app/(platform)/platform/sms/page.tsx",
+        "gitBlob": "dc838774edb5be78e18ebe5a6f278230a72a027d"
+      },
+      {
+        "path": "apps/web/src/app/(platform)/platform/tenants/[tenantId]/audit/page.tsx",
+        "gitBlob": "83c751dea43978043b0f7444b90b55460a156ad2"
+      },
+      {
+        "path": "apps/web/src/app/(platform)/platform/tenants/[tenantId]/branding/letterhead/route.ts",
+        "gitBlob": "456da06d3e3bbc2776ac560c47b47070687b9293"
+      },
+      {
+        "path": "apps/web/src/app/(platform)/platform/tenants/[tenantId]/branding/logo/route.ts",
+        "gitBlob": "4cc92237173236f1cfdd4699c3146493e7146fd9"
+      },
+      {
+        "path": "apps/web/src/app/(platform)/platform/tenants/[tenantId]/branding/page.tsx",
+        "gitBlob": "218ec8bd0bcddadde89b353699d6269dafdce83a"
+      },
+      {
+        "path": "apps/web/src/app/(platform)/platform/tenants/[tenantId]/communications/page.tsx",
+        "gitBlob": "1e61297b086328392e97852227afada8a7c795cb"
+      },
+      {
+        "path": "apps/web/src/app/(platform)/platform/tenants/[tenantId]/entitlements/page.tsx",
+        "gitBlob": "4dc2c5a04ccef41fff406f68f7c214dfad5a592d"
+      },
+      {
+        "path": "apps/web/src/app/(platform)/platform/tenants/[tenantId]/page.tsx",
+        "gitBlob": "1bb30c2014f137beb5daa33f60740bb9b70e0ba3"
+      },
+      {
+        "path": "apps/web/src/app/(platform)/platform/tenants/[tenantId]/properties/page.tsx",
+        "gitBlob": "a5bc0a6e8e9433c7508f3f9c22366eeb8d316f67"
+      },
+      {
+        "path": "apps/web/src/app/(platform)/platform/tenants/[tenantId]/settings/page.tsx",
+        "gitBlob": "f317f5c09f24066758c7bfb663490be1fdd85359"
+      },
+      {
+        "path": "apps/web/src/app/(platform)/platform/tenants/[tenantId]/usage/page.tsx",
+        "gitBlob": "79c10bb5ce37a638b299e68143ab22efb8fb72bf"
+      },
+      {
+        "path": "apps/web/src/app/(platform)/platform/tenants/[tenantId]/users/page.tsx",
+        "gitBlob": "b1176e138c47725d9908eaf4069c43219947d941"
+      },
+      {
+        "path": "apps/web/src/app/(platform)/platform/tenants/new/page.tsx",
+        "gitBlob": "327ffc10e87fb33113557d0ba89863d59799f65b"
+      },
+      {
+        "path": "apps/web/src/app/(platform)/platform/tenants/page.tsx",
+        "gitBlob": "463783076f82c4ce6a4ffd39d76f83370efd4281"
+      },
+      {
+        "path": "apps/web/src/app/(platform)/platform/tenants/seed-templates/page.tsx",
+        "gitBlob": "afc425ef481046163bcd33f011da34440345a317"
+      },
+      {
+        "path": "apps/web/src/app/(platform)/platform/users/[id]/page.tsx",
+        "gitBlob": "3bba5e4429890d6a3dfa2ecb2d39fe8c1bc739df"
+      },
+      {
+        "path": "apps/web/src/app/(platform)/platform/users/page.tsx",
+        "gitBlob": "b6b8c9b7b3e2d0a73a8f332b4dbd5f85158c77ba"
+      }
+    ],
+    "remaining": [
+      "Complete Platform/tenant ownership and operator authorization acceptance.",
+      "Tenant cloning and demo reset require separately bounded specifications; never clone credentials or permit unscoped database wipes.",
+      "Preserve current manual, controlled source/image-bound release requirements."
+    ]
+  },
+  "sharedEnginePackages": [
+    "ai",
+    "analytics",
+    "audit",
+    "auth",
+    "compliance",
+    "crypto",
+    "db",
+    "design-studio",
+    "email-render",
+    "emails",
+    "events",
+    "forms-core",
+    "forms-pdf",
+    "i18n",
+    "integrations",
+    "jobs",
+    "office",
+    "reports",
+    "sms",
+    "storage",
+    "sync",
+    "tenant",
+    "ui"
+  ],
+  "crossCuttingWork": [
+    "Active-property/portfolio selection must only narrow server-authorized tenant/property scope.",
+    "Configuration governance and immutable template adoption must reuse existing forms/configuration primitives.",
+    "Operational notifications only: reuse events/outbox/jobs/preferences/email/SMS/push; no marketing engine.",
+    "Private storage, audit/history, CSV/PDF, retries, concurrency and localization across every completed vertical slice.",
+    "Uvanoo Light/Terra, teal/coral branding, approved hierarchy, keyboard/accessibility and mobile/tablet acceptance.",
+    "No placeholder buttons, fake metrics, duplicate engines, or UI-only authorization.",
+    "Keep user manuals and walkthroughs synchronized with implemented workflows."
+  ],
+  "supplementalSourceRoutes": [
+    {
+      "path": "apps/web/src/app/(app)/account/page.tsx",
+      "gitBlob": "ebbe5f908ff88aeecdca87fda712471d8e4a3159",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/(app)/assistant/[id]/page.tsx",
+      "gitBlob": "a7c5ddd673e0f1aad90aec50aa7a20801be90340",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/(app)/assistant/chat/route.ts",
+      "gitBlob": "7cb4907186e76602346e9e3901be813ec475bd50",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/(app)/assistant/page.tsx",
+      "gitBlob": "2df44e8143710b66031d7b1c36b05d42271dc8b1",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/(app)/feed/page.tsx",
+      "gitBlob": "eaf576698aded35eb9a207dd5374442e7d67741e",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/(app)/hazard-assessments/[id]/page.tsx",
+      "gitBlob": "ce1c4092be43d6af083b1326d119b13c35a533de",
+      "note": "Retired compatibility route; not a new engine delivery target"
+    },
+    {
+      "path": "apps/web/src/app/(app)/hazard-assessments/[id]/pdf/route.ts",
+      "gitBlob": "979e7bfa63e6f66282c03df71eea988968fcf5c8",
+      "note": "Retired compatibility route; not a new engine delivery target"
+    },
+    {
+      "path": "apps/web/src/app/(app)/hazard-assessments/flows/page.tsx",
+      "gitBlob": "1d25addc2bf9036c9f28429090037feb53337243",
+      "note": "Retired compatibility route; not a new engine delivery target"
+    },
+    {
+      "path": "apps/web/src/app/(app)/hazard-assessments/hazards/page.tsx",
+      "gitBlob": "c0595785f9943200f1984380550006606adb308f",
+      "note": "Retired compatibility route; not a new engine delivery target"
+    },
+    {
+      "path": "apps/web/src/app/(app)/hazard-assessments/hazards/sets/page.tsx",
+      "gitBlob": "85a069d695c5a5dfd8cb8da29d63a15d3d62d30e",
+      "note": "Retired compatibility route; not a new engine delivery target"
+    },
+    {
+      "path": "apps/web/src/app/(app)/hazard-assessments/hazards/types/page.tsx",
+      "gitBlob": "34e42e3d4cfef3daeaf7b660435075e0e628eb03",
+      "note": "Retired compatibility route; not a new engine delivery target"
+    },
+    {
+      "path": "apps/web/src/app/(app)/hazard-assessments/manage/page.tsx",
+      "gitBlob": "4be48f6cb1c5e3dc18c19bce65052755de5ea6ed",
+      "note": "Retired compatibility route; not a new engine delivery target"
+    },
+    {
+      "path": "apps/web/src/app/(app)/hazard-assessments/new/page.tsx",
+      "gitBlob": "e17482f604f1cc61219c57df643bd89ab5b5b318",
+      "note": "Retired compatibility route; not a new engine delivery target"
+    },
+    {
+      "path": "apps/web/src/app/(app)/hazard-assessments/page.tsx",
+      "gitBlob": "a796b85a3a9d9a28bffd38302738a261750b8935",
+      "note": "Retired compatibility route; not a new engine delivery target"
+    },
+    {
+      "path": "apps/web/src/app/(app)/hazard-assessments/risk-matrix/page.tsx",
+      "gitBlob": "2532e010641f368b5614e24ac201929b971e3226",
+      "note": "Retired compatibility route; not a new engine delivery target"
+    },
+    {
+      "path": "apps/web/src/app/(app)/hazard-assessments/tasks/page.tsx",
+      "gitBlob": "857d82994f64ef187efc7fc1d649af36ace5996e",
+      "note": "Retired compatibility route; not a new engine delivery target"
+    },
+    {
+      "path": "apps/web/src/app/(app)/hazard-assessments/types/[id]/page.tsx",
+      "gitBlob": "e1dd5eff489f6e26cd865a0298236c0a7c9a09e6",
+      "note": "Retired compatibility route; not a new engine delivery target"
+    },
+    {
+      "path": "apps/web/src/app/(app)/hazard-assessments/types/new/page.tsx",
+      "gitBlob": "f223c725fd50cdf3a832b1992a95922ef6cbb789",
+      "note": "Retired compatibility route; not a new engine delivery target"
+    },
+    {
+      "path": "apps/web/src/app/(app)/hazard-assessments/types/page.tsx",
+      "gitBlob": "c8230b33342253d0518067d5372c33c25b8b662c",
+      "note": "Retired compatibility route; not a new engine delivery target"
+    },
+    {
+      "path": "apps/web/src/app/(app)/help/[slug]/page.tsx",
+      "gitBlob": "e4f3d0406e142b6b126a45d2de847fd0c7b46cad",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/(app)/help/page.tsx",
+      "gitBlob": "916ea454fd9ba93faa6454b3856bc6b3bdcb910b",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/page.tsx",
+      "gitBlob": "87a65ef6c417627e128f9591062394660bf2ad34",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/(app)/locations/[id]/page.tsx",
+      "gitBlob": "0c170d8eedbd4975016acdec1e1c392c9675f9be",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/(app)/locations/custom-fields/page.tsx",
+      "gitBlob": "06d4a2bf26bdcfab0ba1abaaac74314b6a12d9be",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/(app)/locations/export.csv/route.ts",
+      "gitBlob": "58c5c9816cfc74ec9eafdf55d2df06a6298e53b0",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/(app)/locations/manage/page.tsx",
+      "gitBlob": "79557e0a50fe6d0e98f2608be986b57f73c08dc2",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/(app)/locations/new/page.tsx",
+      "gitBlob": "bc210ca948d836c3e3bb4d1ed4a1fd6bcb3f8792",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/(app)/locations/page.tsx",
+      "gitBlob": "f46d10c4c134f775315a04ea3537d7ff90e0d5f4",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/(app)/locations/units/page.tsx",
+      "gitBlob": "528f9904c05502efe772fb7647e2d9f5e6c39f33",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/(app)/notifications/page.tsx",
+      "gitBlob": "2f5f7f31a63e16b08eee8600ed4bdb20051c3d43",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/(app)/notifications/preferences/page.tsx",
+      "gitBlob": "6b73f48945cba15dc59525efe1fb8217772c9712",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/(app)/ppe/[id]/inspections/[inspectionId]/pdf/route.ts",
+      "gitBlob": "d6aa959f3517d449cab0286bd198a0d265ba3e4d",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/(app)/ppe/[id]/issues/[issueId]/pdf/route.ts",
+      "gitBlob": "8b50ac3471ef584574d162c4443af46e86417108",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/(app)/ppe/[id]/page.tsx",
+      "gitBlob": "c8253a4c7352c6ae8dec473d42e1d7e045935e54",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/(app)/ppe/banks/[id]/page.tsx",
+      "gitBlob": "d77677bdd3b9d47039c28e02002620775f52248d",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/(app)/ppe/banks/page.tsx",
+      "gitBlob": "143405ce9e590137423b24fb0f46d3042dcb71d5",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/(app)/ppe/custom-fields/page.tsx",
+      "gitBlob": "1f0eeabee6d6c8c3bd84c4b5ba5ee939d09708a3",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/(app)/ppe/export.csv/route.ts",
+      "gitBlob": "b384d12b36c64f585024d41755fb1e34a8ea87ee",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/(app)/ppe/flows/page.tsx",
+      "gitBlob": "23b61a8e29e6d934af4837bd5cf3263e4055ba00",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/(app)/ppe/issue/page.tsx",
+      "gitBlob": "3d33f1587949df46b0abe3579dea8cabbcca1e7e",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/(app)/ppe/manage/page.tsx",
+      "gitBlob": "74dce77e6bbc3e93cf6e8566acdc3406b90838f5",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/(app)/ppe/new/page.tsx",
+      "gitBlob": "2a984f52179487fd11bc872fbff884a90f65570e",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/(app)/ppe/page.tsx",
+      "gitBlob": "20bc129c19922a597bc736fc19a399899b6d7a81",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/(app)/ppe/types/[id]/page.tsx",
+      "gitBlob": "4dd9e489ebba14a3ef72da97bd5afbd329116b50",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/(app)/ppe/types/new/page.tsx",
+      "gitBlob": "ef35c6213c61b9b478f8d551c29d2ad4d0d79e88",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/(app)/ppe/types/page.tsx",
+      "gitBlob": "981c72bdf68e4f13e7188697198acdb2cafda1b1",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/(app)/tenant-branding/logo/route.ts",
+      "gitBlob": "a3e8edcdd48b42e93082935cd6e45d881826afc9",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/(app)/tools/page.tsx",
+      "gitBlob": "1619eebb34ef153dc09ddb614a858db708ce36ac",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/(app)/tools/safe-distance/[id]/page.tsx",
+      "gitBlob": "db5d55184cdc85f73edeee244d2247c0b6fcfc6e",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/(app)/tools/safe-distance/[id]/print/page.tsx",
+      "gitBlob": "27f096cb5e7600db1ed855c7497e3bb93ef4adad",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/(app)/tools/safe-distance/export.csv/route.ts",
+      "gitBlob": "b4bd3b8eb4029fa0532922f1953441b700542836",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/(app)/tools/safe-distance/page.tsx",
+      "gitBlob": "568149c8d95d8aff6c0757e704327e0654628146",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/api/approvals/route.ts",
+      "gitBlob": "ff508a6ecd988ebb5fd3789d451948bb83ccc5f0",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/api/apps/draft-save/route.ts",
+      "gitBlob": "c06b05f24d682371b7cda74ae05566f0cb94e2cb",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/api/attachments/[id]/route.ts",
+      "gitBlob": "eed6faad592a8a13cce44fad2982c704a70515b7",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/api/auth/[...all]/route.ts",
+      "gitBlob": "1812f1703a17d3180e1a6fa93012ad35c71b6cc5",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/api/health/ready/route.ts",
+      "gitBlob": "50db00571567aa83664b639dbd066c528d596e29",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/api/internal/domain-events/[id]/route.ts",
+      "gitBlob": "4525da2026326e6da2396509ce377824b87d2016",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/api/picker-options/route.ts",
+      "gitBlob": "2e3b66905ea020a9f02e32e36c48f078253c976e",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/api/search/route.ts",
+      "gitBlob": "b2226f3dd389c6b442e4cab8cba779f21331ac75",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/api/v1/[entity]/[id]/route.ts",
+      "gitBlob": "17af57c2a41b7fe4360897e3117007492252f4b1",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/api/v1/[entity]/route.ts",
+      "gitBlob": "d5d4a96405d6be31bae960b14f49792ee46f615c",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/api/v1/apps/[templateKey]/responses/[id]/route.ts",
+      "gitBlob": "3511f7e02364b88c02b81080b356ed46c62baa4b",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/api/v1/apps/[templateKey]/responses/route.ts",
+      "gitBlob": "e1004354b959c27b761d43cf0b299ef4f9d210a7",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/api/v1/apps/route.ts",
+      "gitBlob": "6823f554294d48e23926594642450297d92305f8",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/api/v1/docs/route.ts",
+      "gitBlob": "50246b71e8154e6cf86f1552c96f856e9991de5e",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/api/v1/openapi.json/route.ts",
+      "gitBlob": "13a7b48382e3ec4c1e5db970a15891def54d5e65",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/api/v1/route.ts",
+      "gitBlob": "4bc958decb7cbe10a5753b9ff2c84b1572815501",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/auth/continue/page.tsx",
+      "gitBlob": "0528a8d96ac8b19214a992c92eca58779786fa9c",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/equipment-kiosk/page.tsx",
+      "gitBlob": "741a81de2ef7ffcfbac05d296ca07e0315b80ce4",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/favicon.ico/route.ts",
+      "gitBlob": "5c059e37689612bea76b0312c73ea5431fa79eac",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/forgot-password/page.tsx",
+      "gitBlob": "b4c402e6679c6ea73fc297552926673a010da6d6",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/guest/maintenance/[token]/page.tsx",
+      "gitBlob": "0c3aea775c973de4a2506fae863ff41ac231e75a",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/invite/accept/route.ts",
+      "gitBlob": "717434f87e55079d2a0b947e10c081a789540d14",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/invite/status/page.tsx",
+      "gitBlob": "81a2440817f300a25ad92201c811a2d7f33ef957",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/login/page.tsx",
+      "gitBlob": "16c2e27874de1b36d75e950abd263325a742cbb5",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/manifest.webmanifest/route.ts",
+      "gitBlob": "c605913220b75ec8d64d27566a5e30693ec875a1",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/page.tsx",
+      "gitBlob": "17a6893e26734d97d6a4d0235f20c90d73653e20",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/platform-branding/favicon/route.ts",
+      "gitBlob": "3342bd2dbbb1fb4399fad13a91483e7cc7730bd6",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/platform-branding/logo/route.ts",
+      "gitBlob": "aee8ffb6e81c72b18f0f2cdf5268b2b04ed1eff8",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/preview/approvals/[[...screen]]/page.tsx",
+      "gitBlob": "95c2077f201ccc7f993f728786c62c8c9ec96e72",
+      "note": "Synthetic preview; never production acceptance evidence"
+    },
+    {
+      "path": "apps/web/src/app/preview/approvals/login/page.tsx",
+      "gitBlob": "f0142ad3257a7739c11a33f8cd7d6107d51f2dfa",
+      "note": "Synthetic preview; never production acceptance evidence"
+    },
+    {
+      "path": "apps/web/src/app/preview/approvals/session/route.ts",
+      "gitBlob": "f7f4b715ec87e1056f04ec8cf4b92ed29321a47e",
+      "note": "Synthetic preview; never production acceptance evidence"
+    },
+    {
+      "path": "apps/web/src/app/reset-password/page.tsx",
+      "gitBlob": "ef900b8d083b3466c1807d1ef95304e99c5f005a",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/verify/[token]/page.tsx",
+      "gitBlob": "731c9664c52332488a931a9550b00546f402b883",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/verify/person/[token]/_card-page.tsx",
+      "gitBlob": "26558f6850f5595f240f7710efc84e247165edc8",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/verify/person/[token]/page.tsx",
+      "gitBlob": "1cb04987aded08831f272df5bffd6b9a712b6b28",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/verify/person/[token]/record/[recordId]/page.tsx",
+      "gitBlob": "d0dc9ab1a41850268aaa2e36a9cca93273c6b44e",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/verify/person/[token]/skill/[assignmentId]/page.tsx",
+      "gitBlob": "757b0e894e3356c2d011008adbb2beb7e662b182",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/wopi/files/[fileId]/contents/route.ts",
+      "gitBlob": "3f6108f5436129f52ad8ab5c68e9e3232ac4780e",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    },
+    {
+      "path": "apps/web/src/app/wopi/files/[fileId]/route.ts",
+      "gitBlob": "ff62c1300964bcf23633bec283012a8e308f2dcc",
+      "note": "Existing supporting/auth/public/API surface; retain authorization and scope controls"
+    }
+  ],
+  "implementationOrder": [
+    "Resolve dual-module acceptance findings without silently changing accepted implementations.",
+    "Confirm exact isolated integrated source937242e7/tree9912 as development parent; keep governedd18 unchanged until separately authorized.",
+    "Audit scope/inventory and reuse contracts, then prioritize approved module slices.",
+    "Resolve maintenance/asset convergence and Action Plan typed integration before extending dependent workflows.",
+    "Deliver Daily Hotel and missing configuration/import slices against canonical engines.",
+    "Complete remaining operational module workflows and cross-module reporting/communications.",
+    "Run focused validation per changed slice, then exact-source full release/security/browser/visual gates before any future freeze or deployment."
+  ],
+  "sourceReferences": [
+    "apps/web/src/lib/nav/approved-structure.ts",
+    "apps/web/src/lib/nav/registry.ts",
+    "apps/web/src/lib/module-admin/registry.ts",
+    "apps/web/src/lib/module-entitlements/catalogue.ts",
+    "apps/web/src/components/use-platform-nav.ts",
+    "docs/v1.4/V1.4_ARCHITECTURE_DECISIONS.md"
+  ]
+}

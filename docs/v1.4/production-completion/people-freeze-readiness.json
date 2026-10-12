@@ -9,7 +9,7 @@
   "validationRun": "https://github.com/Satho82/beaconhs/actions/runs/38306431626",
   "validationStatus": "SUCCESS",
   "module": "People",
-  "status": "NOT_READY_FOR_FREEZE",
+  "status": "ACCEPTED — FREEZE PENDING",
   "implementation": "Unchanged from validated base; all original migration identities preserved.",
   "preservedTechnicalEvidence": [
     "https://github.com/Satho82/beaconhs/actions/runs/38290116395"
@@ -26,7 +26,7 @@
     "Use the approved light application sidebar; desktop and tablet, loading/empty/error states, responsive layout",
     "Owner must approve visual and workflow outcomes separately from database security evidence"
   ],
-  "ownerAcceptance": "PENDING",
+  "ownerAcceptance": "ACCEPTED",
   "engineeringValidation": "PASSED",
   "recordedAt": "2026-10-12 21:11:28 UTC",
   "validationEvidenceFile": "docs/v1.4/production-completion/validation-evidence.json",
@@ -37,5 +37,16 @@
     "migration0057Regression": "PASS",
     "implementationUnchanged": true,
     "fullReleaseGate": "SUCCESS"
-  }
+  },
+  "ownerAcceptanceDate": "2026-10-12",
+  "ownerAcceptanceScope": [
+    "approved workflows",
+    "functionality",
+    "visual specifications"
+  ],
+  "authenticatedBrowserStatus": "IN_PROGRESS",
+  "authenticatedBrowserRun": "https://github.com/Satho82/beaconhs/actions/runs/38310021554",
+  "acceptedModuleCandidate": "0a4a04ca13758b68068f9483a3c0816b741478d8",
+  "acceptedModuleCandidateTree": "2fe071284479217d00856c07e4ad413d3896ed3e",
+  "peopleImplementationUnchanged": true
 }

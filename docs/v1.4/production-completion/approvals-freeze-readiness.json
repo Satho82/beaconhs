@@ -9,7 +9,7 @@
   "validationRun": "https://github.com/Satho82/beaconhs/actions/runs/38306431626",
   "validationStatus": "SUCCESS",
   "module": "Approvals",
-  "status": "NOT_READY_FOR_FREEZE",
+  "status": "ACCEPTED — FREEZE PENDING",
   "functions": [
     "Native financial request records with precise amounts and supported currencies",
     "Secure PDF/JPG/PNG attachments, scoped audited downloads and retry protection",
@@ -32,7 +32,7 @@
     "Compare actual production routes with approved originals, not the synthetic preview",
     "Owner review of list/detail/form/action states, light sidebar, desktop/tablet and accessibility"
   ],
-  "ownerAcceptance": "PENDING",
+  "ownerAcceptance": "ACCEPTED",
   "migration0063": {
     "path": "packages/db/drizzle/0063_approvals_production.sql",
     "gitBlob": "000d76e52c965c6487707f20cd4a7f1c13436e3d",
@@ -48,5 +48,13 @@
     "fullReleaseGate": "SUCCESS",
     "productionBuild": "PASS",
     "cleanImmutableSource": "PASS"
-  }
+  },
+  "ownerAcceptanceDate": "2026-10-12",
+  "ownerAcceptanceScope": [
+    "approved workflows",
+    "functionality",
+    "visual specifications"
+  ],
+  "authenticatedBrowserStatus": "IN_PROGRESS",
+  "authenticatedBrowserRun": "https://github.com/Satho82/beaconhs/actions/runs/38310021554"
 }

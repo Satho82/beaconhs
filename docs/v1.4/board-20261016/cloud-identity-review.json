@@ -1,0 +1,20 @@
+{
+  "baseline": "6976a851c18e879df1813bb7c18729d6da5ab846",
+  "migration_safety": "6892670fd33e0fe12a1862bb822b451cd1bf7b44",
+  "people": "0a4a04ca13758b68068f9483a3c0816b741478d8",
+  "approvals": "fed0709f79922d003aefbdb6674e5b92270bdeea",
+  "journal_entries": 61,
+  "unchanged_journal_prefix": 58,
+  "all_61_sql_bytes_preserved": true,
+  "recorded_ledger_match": true,
+  "live_db_checked": false,
+  "people_is_baseline_ancestor": true,
+  "people_provenance_files_preserved": [
+    "packages/db/drizzle/0057_people_property_provenance.sql",
+    "packages/db/src/people-provenance.integration.ts"
+  ],
+  "rls_note": "People-to-baseline shared RLS changes inspected: Risk-only additions; Migration Safety does not change rls.ts.",
+  "approvals_changed_files": 37,
+  "approvals_sql_equals_security_fixture": true,
+  "approvals_sql_sha256": "9d7e47851e1ddf38335826fe0160099e8839d542d18505f141f36653da8c7780"
+}

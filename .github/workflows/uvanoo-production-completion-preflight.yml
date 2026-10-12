@@ -11,7 +11,7 @@ concurrency:
 jobs:
   draft:
     runs-on: ubuntu-24.04
-    timeout-minutes: 40
+    timeout-minutes: 75
     env:
       CI: 'true'
       NEXT_TELEMETRY_DISABLED: '1'
@@ -56,10 +56,26 @@ jobs:
           paths += ['packages/i18n/src/messages/'+lang+'.json' for lang in ['en','es','fr']]
           subprocess.run(['pnpm','exec','prettier','--write',*paths],check=True)
           PY
-      - run: pnpm --filter @beaconhs/web exec next typegen
-      - run: pnpm typecheck --concurrency=1
-      - run: pnpm --filter @beaconhs/db typecheck
-      - run: pnpm --filter @beaconhs/web exec vitest run src/lib/approvals
+      - name: Formatting gate
+        run: pnpm format:check
+      - name: Lint gate
+        if: success() || failure()
+        run: pnpm lint --concurrency=1
+      - name: Dead-code gate
+        if: success() || failure()
+        env: { NODE_OPTIONS: --max-old-space-size=6144 }
+        run: pnpm deadcode:check
+      - name: Unit and regression gates
+        if: success() || failure()
+        run: pnpm test --concurrency=1
+      - if: success() || failure()
+        run: pnpm --filter @beaconhs/web exec next typegen
+      - if: success() || failure()
+        run: pnpm typecheck --concurrency=1
+      - if: success() || failure()
+        run: pnpm --filter @beaconhs/db typecheck
+      - if: success() || failure()
+        run: pnpm --filter @beaconhs/web exec vitest run src/lib/approvals
       - name: Preserve normalized draft source for exact candidate creation
         if: always()
         run: |

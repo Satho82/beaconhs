@@ -197,6 +197,11 @@ jobs:
           PY
 
       # Keep a bounded V8 heap below the hosted runner's physical-memory limit.
-      - run: pnpm build --concurrency=1
+      - name: Full production build with verified runner capacity
+        run: |
+          set -euo pipefail
+          memory_kib="$(awk '/^MemTotal:/ {print $2}' /proc/meminfo)"
+          test "$memory_kib" -ge 12000000
+          pnpm build --concurrency=1
         env:
-          NODE_OPTIONS: --max-old-space-size=6144
+          NODE_OPTIONS: --max-old-space-size=8192

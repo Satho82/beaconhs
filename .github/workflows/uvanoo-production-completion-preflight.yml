@@ -1,34 +1,55 @@
-name: Uvanoo production completion cloud preflight
-
+name: Uvanoo production completion draft checks
 on:
   push:
     branches: [review/uvanoo-v1.4-production-completion-cloud-20261012]
     paths: [.github/workflows/uvanoo-production-completion-preflight.yml]
-
 permissions:
   contents: read
-
 concurrency:
   group: uvanoo-production-completion-isolated
   cancel-in-progress: false
-
 jobs:
-  cloud-preflight:
+  draft:
     runs-on: ubuntu-24.04
-    timeout-minutes: 5
+    timeout-minutes: 40
+    env:
+      CI: 'true'
+      NEXT_TELEMETRY_DISABLED: '1'
+      DATABASE_URL: postgresql://beaconhs_app:beaconhs_app@localhost:5432/beaconhs_test
+      BETTER_AUTH_SECRET: disposable-production-draft-not-a-real-secret
+      ATTACHMENT_CAPABILITY_SECRET: disposable-production-draft-capability-secret
+      REDIS_URL: redis://localhost:6379
+      APP_URL: http://localhost:3000
+      BETTER_AUTH_URL: http://localhost:3000
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
-        with:
-          ref: c306bd6bbe0571eeca18a410c1ac08fe55c524b6
-          persist-credentials: false
-      - name: Verify cloud runner and unchanged source identity without repeating tests
-        shell: bash
+        with: { persist-credentials: false, fetch-depth: 0 }
+      - name: Apply isolated draft without publishing production source
         run: |
           set -euo pipefail
-          test "$GITHUB_REPOSITORY" = Satho82/beaconhs
           test "$GITHUB_REF" = refs/heads/review/uvanoo-v1.4-production-completion-cloud-20261012
-          test "$(git rev-parse HEAD)" = c306bd6bbe0571eeca18a410c1ac08fe55c524b6
-          test "$(git rev-parse HEAD^{tree})" = cfc536197c361962def84db347d1344924661f1d
-          test -z "$(git status --porcelain)"
-          docker version --format '{{.Server.Version}}'
-          echo 'Cloud execution available. No tests, migration, publication or deployment performed.'
+          cp docs/v1.4/production-completion/source-draft.json /tmp/uvanoo-production-draft.json
+          git checkout --detach c306bd6bbe0571eeca18a410c1ac08fe55c524b6
+          python3 - <<'PY'
+          import json,pathlib
+          d=json.load(open('/tmp/uvanoo-production-draft.json'))
+          assert d['base']=='c306bd6bbe0571eeca18a410c1ac08fe55c524b6'
+          for p,c in d['files'].items():
+              assert p.startswith(('apps/','packages/','docs/')) and '..' not in pathlib.PurePosixPath(p).parts
+              dest=pathlib.Path(p); dest.parent.mkdir(parents=True,exist_ok=True); dest.write_text(c)
+          PY
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with: { node-version-file: .nvmrc, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - name: Format changed draft files only
+        run: |
+          python3 - <<'PY'
+          import json,subprocess
+          paths=[p for p in json.load(open('/tmp/uvanoo-production-draft.json'))['files'] if p.endswith(('.ts','.tsx','.json','.md'))]
+          subprocess.run(['pnpm','exec','prettier','--write',*paths],check=True)
+          PY
+      - run: pnpm --filter @beaconhs/web exec next typegen
+      - run: pnpm typecheck --concurrency=1
+      - run: pnpm --filter @beaconhs/db typecheck
+      - run: pnpm --filter @beaconhs/web exec vitest run src/lib/approvals

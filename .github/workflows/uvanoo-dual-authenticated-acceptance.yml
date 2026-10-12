@@ -194,7 +194,7 @@ jobs:
       - name: Prepare disposable synthetic accounts and hotel fixtures
         env:
           NODE_ENV: test
-        run: pnpm --filter @beaconhs/auth exec tsx "$RUNNER_TEMP/browser-seed.mts"
+        run: pnpm --filter @beaconhs/db exec tsx "$RUNNER_TEMP/browser-seed.mts"
 
       - name: Build runtime for browser acceptance (not a repeated release gate)
         env:

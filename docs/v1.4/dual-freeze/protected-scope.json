@@ -1,0 +1,1136 @@
+{
+  "status": "PROPOSED_PENDING_MANDATORY_ACCEPTANCE",
+  "sourceCommit": "937242e7e35806acab48c28c4163719b00c0f16d",
+  "sourceTree": "9912feac29a30b4b32d219b4cc21f80f1f57f7f7",
+  "peopleCandidate": "0a4a04ca13758b68068f9483a3c0816b741478d8",
+  "peopleTree": "2fe071284479217d00856c07e4ad413d3896ed3e",
+  "governedBase": "d18f635a41f092e9e86aa6f53518f9c28992b0d2",
+  "governedTree": "cac8f1184b7852629aab49e77f49a693abd0e350",
+  "peopleProtectedBlobs": [
+    {
+      "path": "apps/web/src/app/(app)/people/[id]/_files-drawers.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "aaf12d0ba1d7075b63f701a72804d42e5da0d765",
+      "size": 6316,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/aaf12d0ba1d7075b63f701a72804d42e5da0d765"
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/[id]/badge/print/route.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ee3f08007e1508d7396b7f5eb31f252fbb98629b",
+      "size": 1688,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/ee3f08007e1508d7396b7f5eb31f252fbb98629b"
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/[id]/badge/route.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "21bc549c7b2e48f7ca9b414cb8ec910d66b0bc7a",
+      "size": 1690,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/21bc549c7b2e48f7ca9b414cb8ec910d66b0bc7a"
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/[id]/loading.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2df8ed7e8b9c8ebb2ba54f34585998cae3667ddf",
+      "size": 262,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/2df8ed7e8b9c8ebb2ba54f34585998cae3667ddf"
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/[id]/page.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b2e5a9a8b753ab0c0c2338f5e318f56888d97634",
+      "size": 89920,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/b2e5a9a8b753ab0c0c2338f5e318f56888d97634"
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/_actions/bulk.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2c0970eb1450a2c5a041965bcec8216417b5a3e5",
+      "size": 14692,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/2c0970eb1450a2c5a041965bcec8216417b5a3e5"
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/_actions/departments.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4ef7e524ca304c21ef832a472b15a129f7000b14",
+      "size": 5537,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/4ef7e524ca304c21ef832a472b15a129f7000b14"
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/_actions/files.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a6b19d4fa785e2f26416b23d9ecda5013c3b88ce",
+      "size": 2853,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/a6b19d4fa785e2f26416b23d9ecda5013c3b88ce"
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/_actions/groups.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "07a3bb58c89ae3333727e86d44f11fc690321fdc",
+      "size": 13573,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/07a3bb58c89ae3333727e86d44f11fc690321fdc"
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/_actions/titles.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "82254f2d2146db8e99d7874b8589a2f072df7c84",
+      "size": 35968,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/82254f2d2146db8e99d7874b8589a2f072df7c84"
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/_actions/workforce.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9c47607cc4b9fd5822087b5be6b5714ca5124a25",
+      "size": 7995,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/9c47607cc4b9fd5822087b5be6b5714ca5124a25"
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/_bulk-bar.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "aa68a5a2a81135acccd9e828a4f927f813202563",
+      "size": 9239,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/aa68a5a2a81135acccd9e828a4f927f813202563"
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/_components/member-picker.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "37dd50667e5391ba3c2ceb8571236f005843a364",
+      "size": 11921,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/37dd50667e5391ba3c2ceb8571236f005843a364"
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/_components/name-taxonomy-list.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ce6748cb5036399cce111a03ecae0ed85beeec04",
+      "size": 10102,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/ce6748cb5036399cce111a03ecae0ed85beeec04"
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/_components/people-sub-nav.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "93aa0f1a5849551c997617cefe7cd032ef966d2f",
+      "size": 536,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/93aa0f1a5849551c997617cefe7cd032ef966d2f"
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/_lib/person-access.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2dd949d68c28fdd077696b8e30ad17ff4a74002c",
+      "size": 1148,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/2dd949d68c28fdd077696b8e30ad17ff4a74002c"
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/_primary-title-directory-contract.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a3c7f72c33b119acee8831348edc1731ce684c43",
+      "size": 1529,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/a3c7f72c33b119acee8831348edc1731ce684c43"
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/_records-table.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2cd9fe4671fc3a1b3b121bbc4f6df61f865a77b4",
+      "size": 8247,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/2cd9fe4671fc3a1b3b121bbc4f6df61f865a77b4"
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/badges/design/_actions.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0f36e68201e5975dcd9d3643d1110c7145d6f283",
+      "size": 2064,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/0f36e68201e5975dcd9d3643d1110c7145d6f283"
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/badges/design/_studio.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "617a7f52ad240036325983d7b6a6abd4656ffca6",
+      "size": 12501,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/617a7f52ad240036325983d7b6a6abd4656ffca6"
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/badges/design/page.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "478c5804c885b4926d88532a0dc346e01f9146d9",
+      "size": 1636,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/478c5804c885b4926d88532a0dc346e01f9146d9"
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/crews/page.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0fb5fdd0b730a28f34bf56aec8d25cb582a90a87",
+      "size": 1261,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/0fb5fdd0b730a28f34bf56aec8d25cb582a90a87"
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/custom-fields/page.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "af37b7b58100a9bab0cf8b5d5b3de09472e3fcf7",
+      "size": 575,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/af37b7b58100a9bab0cf8b5d5b3de09472e3fcf7"
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/departments/_drawers.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f294fa42e0d3afe561eccb139e21d3cd2ccb6407",
+      "size": 5110,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/f294fa42e0d3afe561eccb139e21d3cd2ccb6407"
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/departments/page.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c3261eae178485757c483715176900680325be26",
+      "size": 11744,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/c3261eae178485757c483715176900680325be26"
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/export.csv/route.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bfe83c385bd08516e90602df24a47be67f5d38e2",
+      "size": 4864,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/bfe83c385bd08516e90602df24a47be67f5d38e2"
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/groups/[id]/page.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6ce2539eede605d593c80aaadf22604bb921446a",
+      "size": 10135,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/6ce2539eede605d593c80aaadf22604bb921446a"
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/groups/page.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a6436dbd22856c52d7855c9291040a6769278fa3",
+      "size": 8955,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/a6436dbd22856c52d7855c9291040a6769278fa3"
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/loading.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bca12ec341c5909f04c0643d46361a381b266c83",
+      "size": 836,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/bca12ec341c5909f04c0643d46361a381b266c83"
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/manage/page.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f6d7d3fc470ef37c1f736bc6303fa90a16870a9c",
+      "size": 1022,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/f6d7d3fc470ef37c1f736bc6303fa90a16870a9c"
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/new/page.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "34cd32f03df9a164177bdce992e23c284cdd5698",
+      "size": 8683,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/34cd32f03df9a164177bdce992e23c284cdd5698"
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/org-chart/_tree-node.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "00a5752f45425ce5b43d4777b7f0d86e15c0b02d",
+      "size": 4524,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/00a5752f45425ce5b43d4777b7f0d86e15c0b02d"
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/org-chart/page.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "323389c756ab316d8f0a8c1cf909a6d788af8535",
+      "size": 6125,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/323389c756ab316d8f0a8c1cf909a6d788af8535"
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/page.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c03d86c3e6c89eabab708dbe0386c8dc790b3b04",
+      "size": 10408,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/c03d86c3e6c89eabab708dbe0386c8dc790b3b04"
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/titles/[id]/page.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "49e5dc506155f75caa759688c01915ce626ccea3",
+      "size": 18164,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/49e5dc506155f75caa759688c01915ce626ccea3"
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/titles/[id]/pdf/page.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "76dca88b6f21581b1a37ea67abc26faf63b75a54",
+      "size": 9008,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/76dca88b6f21581b1a37ea67abc26faf63b75a54"
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/titles/[id]/tasks/page.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4b5b3dd9d46cc1476138be098804852343e0a6ea",
+      "size": 35276,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/4b5b3dd9d46cc1476138be098804852343e0a6ea"
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/titles/new/page.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c828cf8950f52aaf2b57a371c577e3feecefc7cd",
+      "size": 4245,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/c828cf8950f52aaf2b57a371c577e3feecefc7cd"
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/titles/page.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c6baf8de0afac1408cf010c4f09f96ccc445dd26",
+      "size": 11857,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/c6baf8de0afac1408cf010c4f09f96ccc445dd26"
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/trades/page.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c03c9c1101135fcf3daaef3a35b63ab21ceaf34e",
+      "size": 1276,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/c03c9c1101135fcf3daaef3a35b63ab21ceaf34e"
+    },
+    {
+      "path": "apps/web/src/lib/imports/people-references.server.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cc42bfe928c4061422aba3e4274f7e2dd3974a4a",
+      "size": 2905,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/cc42bfe928c4061422aba3e4274f7e2dd3974a4a"
+    },
+    {
+      "path": "apps/web/src/lib/imports/people.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b2258f14eae65bf3257a49a41bad36c87d664db8",
+      "size": 3590,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/b2258f14eae65bf3257a49a41bad36c87d664db8"
+    },
+    {
+      "path": "apps/web/src/lib/imports/people.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "73ee8095bb50e0f17f630aa9b2c56f30b5fcb696",
+      "size": 3459,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/73ee8095bb50e0f17f630aa9b2c56f30b5fcb696"
+    },
+    {
+      "path": "apps/web/src/lib/people-sync.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2b93d598dab777ba881ad5f837205745fb501ff0",
+      "size": 2437,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/2b93d598dab777ba881ad5f837205745fb501ff0"
+    },
+    {
+      "path": "packages/db/src/people-org-relational-integrity.test.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e7e1e966ac12f52ea075f62d249327a165433768",
+      "size": 13318,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/e7e1e966ac12f52ea075f62d249327a165433768"
+    },
+    {
+      "path": "packages/db/src/people-property-provenance.integration.sql",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "301e5f8ee8ae868862f0e3c1f4313c7cafb000c4",
+      "size": 2096,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/301e5f8ee8ae868862f0e3c1f4313c7cafb000c4"
+    },
+    {
+      "path": "packages/db/src/people-provenance.integration.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "627b13ebb23374fb939c7551c98dc818bf9c3080",
+      "size": 23165,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/627b13ebb23374fb939c7551c98dc818bf9c3080"
+    },
+    {
+      "path": "packages/db/src/schema/people-groups.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "794d0c489ef43e0db01b8ab2781a48d25df7959f",
+      "size": 3610,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/794d0c489ef43e0db01b8ab2781a48d25df7959f"
+    },
+    {
+      "path": "packages/db/src/schema/people-titles.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4fae068b62fd814489c71399bcfd37bd7965dd32",
+      "size": 5827,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/4fae068b62fd814489c71399bcfd37bd7965dd32"
+    }
+  ],
+  "riskProtectedBlobs": [
+    {
+      "path": "apps/web/src/app/(app)/hazard-assessments/risk-matrix/_actions.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1f66519751d89f9363f39a1bada89c8ada29ef98",
+      "size": 2157,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/1f66519751d89f9363f39a1bada89c8ada29ef98"
+    },
+    {
+      "path": "apps/web/src/app/(app)/hazard-assessments/risk-matrix/_editor.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "68f5199d744eb76c110ba605cdd543df329ef7f4",
+      "size": 14916,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/68f5199d744eb76c110ba605cdd543df329ef7f4"
+    },
+    {
+      "path": "apps/web/src/app/(app)/hazard-assessments/risk-matrix/_policy.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8fc5303f226f580b3af9bd7b79aa703099ad0bd6",
+      "size": 3339,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/8fc5303f226f580b3af9bd7b79aa703099ad0bd6"
+    },
+    {
+      "path": "apps/web/src/app/(app)/hazard-assessments/risk-matrix/page.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2532e010641f368b5614e24ac201929b971e3226",
+      "size": 1966,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/2532e010641f368b5614e24ac201929b971e3226"
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/risk/actions.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "468358889182aa44f0da11e4bfc9457bed06a134",
+      "size": 6945,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/468358889182aa44f0da11e4bfc9457bed06a134"
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/risk/assessments/[assessmentId]/assessment-editor.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c4674a7aa9e0c8cc5f98b06e48ac8e17c011666b",
+      "size": 13918,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/c4674a7aa9e0c8cc5f98b06e48ac8e17c011666b"
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/risk/assessments/[assessmentId]/lifecycle-panel.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f035000501a40ff55ceae1b3b61005b5d10442c2",
+      "size": 5410,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/f035000501a40ff55ceae1b3b61005b5d10442c2"
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/risk/assessments/[assessmentId]/page.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d7eec4872463fc84b71d3275ff0be744e2a77ed1",
+      "size": 7637,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/d7eec4872463fc84b71d3275ff0be744e2a77ed1"
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/risk/assessments/[assessmentId]/pdf/route.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "090b2e0b6c9de7e98a9717dd81159e7b5d0a358c",
+      "size": 2428,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/090b2e0b6c9de7e98a9717dd81159e7b5d0a358c"
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/risk/assessments/[assessmentId]/people-at-risk-field.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "35573efdb7be5e361141c06d8966c3bc19bc07f3",
+      "size": 4188,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/35573efdb7be5e361141c06d8966c3bc19bc07f3"
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/risk/assessments/[assessmentId]/revision-controls.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8210b354f830e59569fbded0edddf32f79c7ac07",
+      "size": 4809,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/8210b354f830e59569fbded0edddf32f79c7ac07"
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/risk/available-templates.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cbb1c4bc50e9d6b35f118cfd1c8b48260178f1ca",
+      "size": 7358,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/cbb1c4bc50e9d6b35f118cfd1c8b48260178f1ca"
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/risk/create-manual-assessment.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "05494fe0c570ddab547801d805e97d697b708357",
+      "size": 4122,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/05494fe0c570ddab547801d805e97d697b708357"
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/risk/export.csv/route.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ad0a55cb5d9c673aac4ca764e5361d05bf592a2a",
+      "size": 1521,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/ad0a55cb5d9c673aac4ca764e5361d05bf592a2a"
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/risk/library/export.csv/route.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fc5561c6122402668b3848a233f56e6440ed3316",
+      "size": 1823,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/fc5561c6122402668b3848a233f56e6440ed3316"
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/risk/page.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f406808300e97c4dd8022d0ac773d26a11346c74",
+      "size": 17560,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/f406808300e97c4dd8022d0ac773d26a11346c74"
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/risk/register/pdf/route.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dc55c2fcd20238d5b8ae2c2e121dd6eccae8818d",
+      "size": 1838,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/dc55c2fcd20238d5b8ae2c2e121dd6eccae8818d"
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/risk/review-schedule/page.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d9185c2eb824f4c563c5981a058970d692988a47",
+      "size": 22865,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/d9185c2eb824f4c563c5981a058970d692988a47"
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/risk/review-schedule/schedule-review-picker.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "edc004a142d4d9342dfd574a8bba2e13611dea57",
+      "size": 2760,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/edc004a142d4d9342dfd574a8bba2e13611dea57"
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/risk/risk-schema-notice.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b330ecb10e876f024b11e8625bc671b2dccfca04",
+      "size": 618,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/b330ecb10e876f024b11e8625bc671b2dccfca04"
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/risk/risk-view-tabs.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f4277ed94bf8cd2b4b7da6fd4eaff5cf1e1a32df",
+      "size": 946,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/f4277ed94bf8cd2b4b7da6fd4eaff5cf1e1a32df"
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/risk/save-tenant-template.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5de92e78d438bb4489dbdf374706c92a704ee393",
+      "size": 3678,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/5de92e78d438bb4489dbdf374706c92a704ee393"
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/risk/templates/[templateId]/adoption-panel.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a9e2ac150c37a6262b90102787a49923f338464b",
+      "size": 3706,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/a9e2ac150c37a6262b90102787a49923f338464b"
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/risk/templates/[templateId]/page.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "34170074e91d053f129841f19715db9c778969e9",
+      "size": 6781,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/34170074e91d053f129841f19715db9c778969e9"
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/risk/templates/[templateId]/template-draft-editor.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ea8d9d7a78d706ba87e5c8f1afc3f3fe6b52002d",
+      "size": 9842,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/ea8d9d7a78d706ba87e5c8f1afc3f3fe6b52002d"
+    },
+    {
+      "path": "apps/web/src/components/risk-matrix.tsx",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "490217f0abe5ed8dc6b93ccad97f00e8ca1882c3",
+      "size": 18305,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/490217f0abe5ed8dc6b93ccad97f00e8ca1882c3"
+    },
+    {
+      "path": "apps/web/src/lib/risk-assessment-matrix.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "def6f38dcb0bd0fb1fbd36885b5e5932386a06a7",
+      "size": 3170,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/def6f38dcb0bd0fb1fbd36885b5e5932386a06a7"
+    },
+    {
+      "path": "apps/web/src/lib/risk-assessments.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7d7fa5ec2ecdcc8ed88c926f43b6fbf9b73e6c02",
+      "size": 29266,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/7d7fa5ec2ecdcc8ed88c926f43b6fbf9b73e6c02"
+    },
+    {
+      "path": "apps/web/src/lib/risk-export-response.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d35b44da762245b7224c7e0b7f728ac5cc4dc269",
+      "size": 642,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/d35b44da762245b7224c7e0b7f728ac5cc4dc269"
+    },
+    {
+      "path": "apps/web/src/lib/risk-hazard-edit.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2648f7cfb0d5a17fc1ee3553119270d82c5bc202",
+      "size": 1653,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/2648f7cfb0d5a17fc1ee3553119270d82c5bc202"
+    },
+    {
+      "path": "apps/web/src/lib/risk-library-views.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8cc52916f135e7b5f5fe26902c1638bfb9083fe4",
+      "size": 3872,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/8cc52916f135e7b5f5fe26902c1638bfb9083fe4"
+    },
+    {
+      "path": "apps/web/src/lib/risk-lifecycle.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "196e76bd99ac3a4b9a13c79c63f07f058eb90038",
+      "size": 13360,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/196e76bd99ac3a4b9a13c79c63f07f058eb90038"
+    },
+    {
+      "path": "apps/web/src/lib/risk-pdf-response.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f8fddebfd9be634f236390900f2855fa33df5f5c",
+      "size": 1016,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/f8fddebfd9be634f236390900f2855fa33df5f5c"
+    },
+    {
+      "path": "apps/web/src/lib/risk-reporting.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d03456fe89521116757dc53a63bc9d8c96bedea1",
+      "size": 18374,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/d03456fe89521116757dc53a63bc9d8c96bedea1"
+    },
+    {
+      "path": "apps/web/src/lib/risk-review-schedule.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "589f68778b81801fff1763e5b6238a2f8ca14cd4",
+      "size": 3333,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/589f68778b81801fff1763e5b6238a2f8ca14cd4"
+    },
+    {
+      "path": "apps/web/src/lib/risk-revisions.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "70c6ab7f276dba1b0b1e10df19d4680f41ebb40f",
+      "size": 3630,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/70c6ab7f276dba1b0b1e10df19d4680f41ebb40f"
+    },
+    {
+      "path": "apps/web/src/lib/risk-schema-readiness.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b6883d74d7b653fc65d0544e2c050be496f51877",
+      "size": 2092,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/b6883d74d7b653fc65d0544e2c050be496f51877"
+    },
+    {
+      "path": "apps/web/src/lib/risk-tenant-templates.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2fe40aac5cb7a6cdb413c363410ad5479afe2bae",
+      "size": 13662,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/2fe40aac5cb7a6cdb413c363410ad5479afe2bae"
+    },
+    {
+      "path": "apps/worker/src/lib/risk-review-scanner.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "da540f04f3df987eeae49488b73dc2192c6965ac",
+      "size": 3100,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/da540f04f3df987eeae49488b73dc2192c6965ac"
+    },
+    {
+      "path": "packages/db/src/risk-0059-runner.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6bf3f383c0412132a1af2a4618c3043dc22cd7cc",
+      "size": 1554,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/6bf3f383c0412132a1af2a4618c3043dc22cd7cc"
+    },
+    {
+      "path": "packages/db/src/risk-catalogue.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e7c743026616ef34c3cef79e8329cef0e024926a",
+      "size": 174583,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/e7c743026616ef34c3cef79e8329cef0e024926a"
+    },
+    {
+      "path": "packages/db/src/risk-catalogue.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3cacfe6e109c840dbd5edeaf776d79dd9198f4ea",
+      "size": 4565,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/3cacfe6e109c840dbd5edeaf776d79dd9198f4ea"
+    },
+    {
+      "path": "packages/db/src/risk-library-install.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "367a20aaf586ccdddbf308d57e03b508aae7900a",
+      "size": 8077,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/367a20aaf586ccdddbf308d57e03b508aae7900a"
+    },
+    {
+      "path": "packages/db/src/risk-library.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "afd25440f47745fb636b4c9e810ab437b7240625",
+      "size": 6182,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/afd25440f47745fb636b4c9e810ab437b7240625"
+    },
+    {
+      "path": "packages/db/src/risk-matrix.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7bf42a66e65ef07f89828bb3a5450aa43ae1b0ee",
+      "size": 1811,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/7bf42a66e65ef07f89828bb3a5450aa43ae1b0ee"
+    },
+    {
+      "path": "packages/db/src/risk-migration-readiness.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e7861897b93c0e6fa84790bfae420288ff1b631a",
+      "size": 628,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/e7861897b93c0e6fa84790bfae420288ff1b631a"
+    },
+    {
+      "path": "packages/db/src/risk-prepared-plan.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "62ffad9c1fa4ec8bbf9f2a596f26f9a723dc9644",
+      "size": 7050,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/62ffad9c1fa4ec8bbf9f2a596f26f9a723dc9644"
+    },
+    {
+      "path": "packages/db/src/risk-revisions-rls.integration.sql",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c4a4f830660939dfbfe07e1780959f1f23d98cdb",
+      "size": 6642,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/c4a4f830660939dfbfe07e1780959f1f23d98cdb"
+    },
+    {
+      "path": "packages/db/src/schema/risk.ts",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b5c4782b8eca23cea50fe17e35879318e0033e0d",
+      "size": 19124,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/git/blobs/b5c4782b8eca23cea50fe17e35879318e0033e0d"
+    }
+  ],
+  "migrations": [
+    {
+      "path": "packages/db/drizzle/0000_init.sql",
+      "gitBlob": "2744db90b5b4a465f22da65096cd7956f2e21c61",
+      "sha256": "c7805b1e91d63af9c134c229e2da098d7dbb489436113f3399412ac8aee62b74"
+    },
+    {
+      "path": "packages/db/drizzle/0001_migration_cutover.sql",
+      "gitBlob": "3ee36eab15e3cb84ed293800c5435a83ba22bbde",
+      "sha256": "1fd10132c7e72f95bce032679100e26bd48294ba14e2ebd2bff0bb62d4a9d736"
+    },
+    {
+      "path": "packages/db/drizzle/0002_drop_retired_plugin_tables.sql",
+      "gitBlob": "159297688f9ef8aa9e33564a3d5b07176ca749a6",
+      "sha256": "8105875c4fc7ba0987366c253303e5796d74124e64d0b4ece5a76a4a9a08b80a"
+    },
+    {
+      "path": "packages/db/drizzle/0003_converge_dev_schema.sql",
+      "gitBlob": "8a20fa6919430c01c1668e7da9c7780851784373",
+      "sha256": "2190c407479a5fc9b71999a18ffe38716299bff6563a066a7088e4af7b0defc9"
+    },
+    {
+      "path": "packages/db/drizzle/0004_flawless_boomer.sql",
+      "gitBlob": "f1f68aa0eef257e4035e5a29a11cb027ca5d9072",
+      "sha256": "9c94d1b93d2043bd3956930013a2b7960b48308cd8586d66076294a63f08ade8"
+    },
+    {
+      "path": "packages/db/drizzle/0005_production_cutover.sql",
+      "gitBlob": "bf71f2dd16e6d291e2cdcf49fea5358f9bdd9f27",
+      "sha256": "b0bb2e7e6b0fd5a2b5330efa6eb910424f6dd499bfce215fbc3772d4bb7f1437"
+    },
+    {
+      "path": "packages/db/drizzle/0006_tenant_language_policy.sql",
+      "gitBlob": "c0af25f855bd14c3ece6863d19f3f539bbd08cac",
+      "sha256": "a49be807d684ccdd4bfb3c389ba20cf35263b23d49afe8cf4cd7fa3d45c8e12d"
+    },
+    {
+      "path": "packages/db/drizzle/0007_compliance_scan_toggle.sql",
+      "gitBlob": "ad4c5bfb503c96bc758eda859a7c8bf8b4720f29",
+      "sha256": "5e07ece86a13422bec9b4acfec321875807d72a21e257fe626070f1339a3185e"
+    },
+    {
+      "path": "packages/db/drizzle/0008_hazid_review_conditions_signatures.sql",
+      "gitBlob": "fbe00131c5d4b6a65a1c0fca4196cd98730889cc",
+      "sha256": "3640454edf2e8e1713ba032bae27fb819ad73f1490e6610ed7f01bae178e5900"
+    },
+    {
+      "path": "packages/db/drizzle/0009_early_longshot.sql",
+      "gitBlob": "81c3b7143ad306f4aea65f583c1f79de26b0d353",
+      "sha256": "9f35febd646c9f75ff6ff2ea8de2b00cc566df4c892638bba6eb3bd53e39eb40"
+    },
+    {
+      "path": "packages/db/drizzle/0010_lush_sue_storm.sql",
+      "gitBlob": "83798275868ef527afdaf5e960bf0ceab5c2c4a5",
+      "sha256": "56eb034d4566d1152aaa062b0e240af1d968339a819df4cf18b2fd44d4ce0f81"
+    },
+    {
+      "path": "packages/db/drizzle/0011_calm_talkback.sql",
+      "gitBlob": "7efa145ffe47821ab504526a0fb49daf6be30a30",
+      "sha256": "adde52737da23803621010a73d7e4c853ac399005c590dbcdcdb62a89fb96d75"
+    },
+    {
+      "path": "packages/db/drizzle/0012_orange_violations.sql",
+      "gitBlob": "c8936cf6cf30ee331c7e1d5c9ec20e4bd59ff42d",
+      "sha256": "f0abc44ca2cf6b94e50321e1efb0d232315e3c2aa8702e661617b247aad912e3"
+    },
+    {
+      "path": "packages/db/drizzle/0013_remarkable_mimic.sql",
+      "gitBlob": "4269daac5692580a1b949d8a8e33559b4fbb4343",
+      "sha256": "d77f2dab633e266347c4d3ccbfc6c2176c27d92e45fd985eac81074727b27f6d"
+    },
+    {
+      "path": "packages/db/drizzle/0014_military_major_mapleleaf.sql",
+      "gitBlob": "48fcbac0e5f3a6b7d892a542d7d6897f879a6eec",
+      "sha256": "f1562f935682b0832a61706eb049e959d66ad32008b59fb1c61bdf8838dba4b8"
+    },
+    {
+      "path": "packages/db/drizzle/0015_deep_scalphunter.sql",
+      "gitBlob": "46bc6300bcbec9563977cd9067c5c4223fb5ca36",
+      "sha256": "1fafdce1cc1d6369ffc3e4145e502d684a6813b5e08912652358f05c5ef41ce9"
+    },
+    {
+      "path": "packages/db/drizzle/0016_smiling_thunderbolts.sql",
+      "gitBlob": "dcca4b172cb6a9e653b90f703e9b78ad90bb9181",
+      "sha256": "c11459ca200757c6aac16f80c49222767de204931bab57fb75492978451a7be8"
+    },
+    {
+      "path": "packages/db/drizzle/0017_wakeful_jackal.sql",
+      "gitBlob": "8e58c1a003e690732f0fbbcd0b265a645a14554a",
+      "sha256": "ed2062e33d348e4717276631f37a1c35e95fe76fb7cf79212a23e88017c5ea7b"
+    },
+    {
+      "path": "packages/db/drizzle/0018_training_report_parity.sql",
+      "gitBlob": "364091c241791806a7d0d8bd2d6a0927a5a3f231",
+      "sha256": "4e9d314f71ebd1ddfa71f8e306d1d62d6e5875a824e2eb1cc76a197f007dcfeb"
+    },
+    {
+      "path": "packages/db/drizzle/0019_report_parity_cutover.sql",
+      "gitBlob": "12c48d8eb1a503fb683a69bdc1980c4d802b9dfc",
+      "sha256": "a81ef531d56281c839c82ad38ab75df68429a60b0ec381cf3a9cc6297cbd1c22"
+    },
+    {
+      "path": "packages/db/drizzle/0020_inspection_location_storage.sql",
+      "gitBlob": "be8f3bf9ec7289fdee02fed8f18f318796ff9d06",
+      "sha256": "5cda57a168164597499b5c59a72843d07d06520bf34210b92933e6cdce567c40"
+    },
+    {
+      "path": "packages/db/drizzle/0021_training_assessment_history.sql",
+      "gitBlob": "076f9b6e98daaafae48615c2a722719e4eb3584b",
+      "sha256": "d2505918196e91179fec0c771ae88799ec785e2fc4b04c2cdd7066548368bd6a"
+    },
+    {
+      "path": "packages/db/drizzle/0022_hazid_submit_trigger_cutover.sql",
+      "gitBlob": "1b716c4a0eb650a0a188f45a57c8b9bacb6a7cfc",
+      "sha256": "95768d6f7415c464296554b5c6628662169a6a60f6d323e5b50ce53d495a6876"
+    },
+    {
+      "path": "packages/db/drizzle/0023_gorgeous_sheva_callister.sql",
+      "gitBlob": "c2378d05b2920447a91fedd7cb44ca992ff26c4d",
+      "sha256": "8f485ce856f4440ae076e763f04047866fe04d3ea9f51d8b408cb26f750e65c5"
+    },
+    {
+      "path": "packages/db/drizzle/0024_flawless_la_nuit.sql",
+      "gitBlob": "f8da4dd4bc6f14412f02fe88923576989fef1ec6",
+      "sha256": "d2bf2c3bd04356d1990ec2caf6bdca990983baa779f94656d6506433ba62a793"
+    },
+    {
+      "path": "packages/db/drizzle/0025_unify_builder_photo_fields.sql",
+      "gitBlob": "24384319d93ee96cbc6427cd05e5e022b2c98f21",
+      "sha256": "07cb2309ecec5555ecd6edb14e01c13973bd0d49a390d959160d7d00d0745628"
+    },
+    {
+      "path": "packages/db/drizzle/0026_order_frontline_photos.sql",
+      "gitBlob": "4bbe0b1c6b06f6dfef359e8bdc8cb7af56a84fa3",
+      "sha256": "b9ceced563a63c9d5bdc402a41381c08f1a137cae866a50e06090d67a6d321c1"
+    },
+    {
+      "path": "packages/db/drizzle/0027_report_portrait_cutover.sql",
+      "gitBlob": "b665ae5c51b29f2346459418f194175f9e843ed9",
+      "sha256": "1484b1e92ab41a29e21e386042deab847bddf6858920cca52e57db3211019314"
+    },
+    {
+      "path": "packages/db/drizzle/0028_generalize_monitored_sessions.sql",
+      "gitBlob": "cd96d1fe66e6b912b0b13eb0cd79a6ec28141381",
+      "sha256": "fa46f4a55d9148167ef96122fcd0e4bf7da3273c3df58635fcf39fae5e3dd360"
+    },
+    {
+      "path": "packages/db/drizzle/0029_faulty_thunderball.sql",
+      "gitBlob": "012a7918dcc49430205ac6c9c49a6abe3d1fd3e8",
+      "sha256": "a382781c3dbe0815bdd897b5836070e1ae8de047f4412760bc12327a72307527"
+    },
+    {
+      "path": "packages/db/drizzle/0030_unify_hazid_app_locations.sql",
+      "gitBlob": "8771bc2597726f1f37b656afedc8773cef4820a0",
+      "sha256": "cf19c0cc97dfa983b79a6aa021a8258444f082d98a632a91c7b4874650c2c5fb"
+    },
+    {
+      "path": "packages/db/drizzle/0031_hazid_optional_risk_ratings.sql",
+      "gitBlob": "a61093d5f352197df0e0d9bf80d28bcd3864aba4",
+      "sha256": "e901f06be8f63c3d64f7bfc906b0218fbfbe0dc7421ae9dae7a73ca64229f6f3"
+    },
+    {
+      "path": "packages/db/drizzle/0032_ppe_status_lifecycle.sql",
+      "gitBlob": "750a85ec42b6a41b7495ef8709cf5842c52bb2b6",
+      "sha256": "5f1dd84c6c25573332d316365ac519c6f6de2bac8071fa9db2356d4eb63ac1c7"
+    },
+    {
+      "path": "packages/db/drizzle/0034_compliance_group_audience_ppe_report.sql",
+      "gitBlob": "b5a8f28bbb40b58f09d1990de2be406c5d8d0cde",
+      "sha256": "e47a24ab7ca5a4f00f5805c4a7ae6411e3b7497993c9bfe25dc4e223dfe668e7"
+    },
+    {
+      "path": "packages/db/drizzle/0035_journal_analysis_runs.sql",
+      "gitBlob": "b1f6933b52080d32c80efe25a6f9306b9e7ef09d",
+      "sha256": "f71a68b371d2502f69693e60355e6afd7ec1614eed478b573ba360958694b407"
+    },
+    {
+      "path": "packages/db/drizzle/0036_training_report_wallet_cutover.sql",
+      "gitBlob": "df64bb42efb814dfa5078553ecee115f547a952c",
+      "sha256": "ae571d41963083af044ac500ad77ebd7a323638ce30423881d8b8eb7cc5d4215"
+    },
+    {
+      "path": "packages/db/drizzle/0037_platform_branding.sql",
+      "gitBlob": "1aba5ae5086b6e1c23390d55cb33ba5e94e8fbb0",
+      "sha256": "19aede92b7ffd2a0611980dc4e7c593f65c0b4a3f6aa7d5981116792dc21b837"
+    },
+    {
+      "path": "packages/db/drizzle/0038_uvanoo_hospitality_foundation.sql",
+      "gitBlob": "6680b9f7c3bf52d72225c8d9a82c495bf1769902",
+      "sha256": "585c2b6676be835954e33df83eb42b771e3a43a83bd792a193fe2e546922b4bc"
+    },
+    {
+      "path": "packages/db/drizzle/0039_uvanoo_maintenance_issue_lifecycle.sql",
+      "gitBlob": "59671c1b1e3e6cd0894ea56ea0031e09c45fea63",
+      "sha256": "339550e8a44059d9fd8017b544714298429f4c109be8038f70be80d085831cc0"
+    },
+    {
+      "path": "packages/db/drizzle/0040_uvanoo_operational_diary_completion.sql",
+      "gitBlob": "1ef31aa355a77f52b079d95befc22b1b1b5be5ed",
+      "sha256": "d524165e7446d5f5a92e0602f4e6a6aa88c51b702628ea9059bd940af0ee70ae"
+    },
+    {
+      "path": "packages/db/drizzle/0041_uvanoo_operational_task_lifecycle.sql",
+      "gitBlob": "43715a198b43dfd8bc28de3621aa75f6ea2833dc",
+      "sha256": "6fa86a90bea620fdc3471b5f2067b095acd877320ac7d185e8c68d418d0c3f15"
+    },
+    {
+      "path": "packages/db/drizzle/0042_uvanoo_guest_room_reporting.sql",
+      "gitBlob": "b5a2c0d143f0388281164e4d95205898262ee79d",
+      "sha256": "098dc80cab4ee29ec62894c73d548fb886160e00d1a65f053f302ba64d3551fd"
+    },
+    {
+      "path": "packages/db/drizzle/0043_hospitality_issue_sources.sql",
+      "gitBlob": "5bfeae9037440af14a14d514e16970f45ce565c4",
+      "sha256": "4ffdb1941223a24ee976a0975e2ecf96ad7ee5fcaac968225c8d49841fda4619"
+    },
+    {
+      "path": "packages/db/drizzle/0044_risk_assessment_foundation.sql",
+      "gitBlob": "44bae5455f3cdfc2b7544344ff5236af6f54fdff",
+      "sha256": "1defc6d79d24f864413755ab0e7e1d9cda48db4cfe949a8f028e32cf6d08e762"
+    },
+    {
+      "path": "packages/db/drizzle/0045_risk_review_lifecycle.sql",
+      "gitBlob": "5d312aad6a7836b1578adb9d4939bdf42d824ae2",
+      "sha256": "5bfee2f617a0c655e2089ae286eddc416b31c8299ac3000d834c95400af85089"
+    },
+    {
+      "path": "packages/db/drizzle/0046_risk_signoff_snapshot.sql",
+      "gitBlob": "c83bcace76633f0a4cc0d304b28289dbefbf9f41",
+      "sha256": "a1e9fa632fb3d2170a23a525b81a0e0d8ff78aeb127270739b6ed4bd7bbcac47"
+    },
+    {
+      "path": "packages/db/drizzle/0047_hospitality_handover.sql",
+      "gitBlob": "ef8e8e47d1838071a97c3192910e3e9fb068c89c",
+      "sha256": "33bdae588056d33ed74ff5b66970a0d7a274a321e98b9ade514e4fae09864460"
+    },
+    {
+      "path": "packages/db/drizzle/0048_hospitality_metering.sql",
+      "gitBlob": "815e3111ec9f584840ed23411dae8cf4cdee42ad",
+      "sha256": "acadfd230c1a4b77f27e105dbb4e010068b9b1538bf08e5c5f46ad5e3741e328"
+    },
+    {
+      "path": "packages/db/drizzle/0049_maintenance_issue_evidence.sql",
+      "gitBlob": "af4787d0e06b3c0c13894185eeecc630fe00eb4f",
+      "sha256": "2af03ac4a28aab4d630ef275a54d6ed120dcd00be0438bc448ffa339d41b5d5e"
+    },
+    {
+      "path": "packages/db/drizzle/0050_report_property_context.sql",
+      "gitBlob": "ec69299f34a21ed10ba500f69659bc89bc77ef62",
+      "sha256": "595a1a5f3c265a0a6fbd7fd66681e93330c316aec306a96ec70dd89a95547153"
+    },
+    {
+      "path": "packages/db/drizzle/0051_platform_audit.sql",
+      "gitBlob": "bc454319c0524694e8a598189bd08f3bb4642118",
+      "sha256": "5c261632089f0d3460c90435eea4369db14a766fbdd209fd0d5c8c1c8d496656"
+    },
+    {
+      "path": "packages/db/drizzle/0052_user_identity_lifecycle.sql",
+      "gitBlob": "5b41b0e8afe3e5d7d96a57fccd8dbf47256022d8",
+      "sha256": "4d9782da378e88f618d4aa5fe4b391786567849dc3c28e5fe5e3f6432141f8fd"
+    },
+    {
+      "path": "packages/db/drizzle/0053_property_scope_repair.sql",
+      "gitBlob": "e6be1c906a0625fdbcb138ded6e619433601bbad",
+      "sha256": "7b2e3208f49a12cf939e5d3081d9063d89a7eed288c338add87ad74f2db98e42"
+    },
+    {
+      "path": "packages/db/drizzle/0054_v14_configuration_tenant_defaults.sql",
+      "gitBlob": "40037e49b2e86a0b0cbab13cb40cc14838e9a561",
+      "sha256": "ef406dd4383a96cb5d63a5f29b0170092bb7a9cc3ebf1fc277a71489429e4d97"
+    },
+    {
+      "path": "packages/db/drizzle/0055_v14_configuration_governance_lifecycle.sql",
+      "gitBlob": "8756e4bb71c981707c486c0a95e4524e4851f1f7",
+      "sha256": "8c380be9c161935924594cc7b3695792c79643e9150f1235c2dfbba3ba25564b"
+    },
+    {
+      "path": "packages/db/drizzle/0056_v14_governed_bulk_imports.sql",
+      "gitBlob": "04b6af48d83607ac466ed26fd9c8b9e64a403693",
+      "sha256": "6018cd1ebbeb4ec92412872892d0054485e72231f73add7c797826ef96ae1969"
+    },
+    {
+      "path": "packages/db/drizzle/0057_people_property_provenance.sql",
+      "gitBlob": "7d76b61dc6447bbb76f4d72ca1317d6972669492",
+      "sha256": "fd7d15ac8a34a251e4f72e3b4aaa5ee35cb08628ee6dfb8ea084fc91e6e3d7dd"
+    },
+    {
+      "path": "packages/db/drizzle/0058_platform_regional_defaults.sql",
+      "gitBlob": "0d69608905d83238c55d5006f236edf9cf7d7578",
+      "sha256": "fb1fcab4f5cea69815c83a85d8ac4d696e8ae4486ae3d730a512b2f39fe7d4f4"
+    },
+    {
+      "path": "packages/db/drizzle/0059_risk_template_draft_state.sql",
+      "gitBlob": "c478faca2c57b2f47676a61c3356f94f254e4e26",
+      "sha256": "049a5465885f59b8a3d582d20ccb8e3f742b79c0133718a8ec8c1e506e53ff4b"
+    },
+    {
+      "path": "packages/db/drizzle/0060_risk_template_families_manual_assessments.sql",
+      "gitBlob": "ad7f54f883ee62c4522709bfa03c8b58205ef22a",
+      "sha256": "870037015142f7764bf0ea1645a65a8152097ae1e14caba28f5096761953915d"
+    },
+    {
+      "path": "packages/db/drizzle/0061_risk_assessment_revisions_archive_signoffs.sql",
+      "gitBlob": "ce9a4ae38b221b21c81849811bfe9fa8b1e8e4e6",
+      "sha256": "967e01c579434a1230124f1659ac451bd4834a46106d27261a7e2fc61e4ba602"
+    },
+    {
+      "path": "packages/db/drizzle/0062_approvals_batch01.sql",
+      "gitBlob": "77cd4a402e3e8a32acf25b1dedb36f97cb130dff",
+      "sha256": "7add0454405e24eeb957d4d2f4376fe479cfc9ba104725f2c48ed4b12f1be103"
+    },
+    {
+      "path": "packages/db/drizzle/0063_approvals_production.sql",
+      "gitBlob": "000d76e52c965c6487707f20cd4a7f1c13436e3d",
+      "sha256": "db91fbe88b2eb9d3dd8cb28cdb30422f10492c5bafaac9573df16c071b0682f8"
+    }
+  ],
+  "migrationJournal": {
+    "path": "packages/db/drizzle/meta/_journal.json",
+    "gitBlob": "ff41b91201dcf0f26487c204e7d00135c82efcbd",
+    "sha256": "9c14570b03ff750707228ea1e84b9ec98e8665946e2a72e886fa1d65a8ecbc88"
+  },
+  "approvedNavigation": {
+    "path": "apps/web/src/lib/nav/approved-structure.ts",
+    "gitBlob": "bb250f1f187d13a27f781007b9e3633746c9456b"
+  },
+  "scopePolicy": [
+    "No People or Approvals implementation change without separately approved acceptance remediation.",
+    "No Risk runtime changes.",
+    "No historical migration changes; preserve all 63 original identities.",
+    "Preserve owner-accepted Light/Terra design and teal/coral branding; do not infer visual fidelity from unit tests.",
+    "No governed merge, deployment, staging/production or persistent DEV writes authorized by this record."
+  ],
+  "migrationPreservation": {
+    "governedSqlCount": 61,
+    "changedGovernedSql": [],
+    "acceptedSourceSqlCount": 63,
+    "numberingNote": "Canonical journal has 63 entries; file numbering starts 0000 and omits 0033. No files were renumbered."
+  }
+}

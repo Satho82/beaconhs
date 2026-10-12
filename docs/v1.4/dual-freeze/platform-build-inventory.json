@@ -274,7 +274,8 @@
       ],
       "reuse": [
         "packages/db/src/schema/hospitality.ts",
-        "packages/db/src/schema/equipment-maintenance.ts"
+        "packages/db/src/schema/equipment-maintenance.ts",
+        "packages/db/src/schema/equipment.ts"
       ],
       "remaining": [
         "Reconcile existing hospitality and equipment work-order lifecycles under approved D01; preserve history.",
@@ -2774,5 +2775,11 @@
     "apps/web/src/lib/module-entitlements/catalogue.ts",
     "apps/web/src/components/use-platform-nav.ts",
     "docs/v1.4/V1.4_ARCHITECTURE_DECISIONS.md"
-  ]
+  ],
+  "verifiedStructuralGaps": {
+    "DailyHotel": "No dedicated Daily Hotel data schema/route/destination identified; hospitality.ts contains properties, maintenance and operational task tables, not rooms-sold/revenue daily records.",
+    "Reporting": "Approved Reporting group has no explicit destination; Reports group owns report engine routes.",
+    "Maintenance": "Current source retains hospitality maintenance_work_orders and equipment_work_orders plus equipment work-order pages; D01 convergence remains a scoped planning requirement.",
+    "historicalDocumentCaution": "docs/v1.4/batch01/Uvanoo_V1.4_Batch01_Implementation.json is an empty blob in this candidate; do not treat it as evidence. Preserve it unchanged."
+  }
 }

@@ -1,0 +1,72 @@
+{
+  "title": "UVANOO V1.4 — COMPLETE PLATFORM BUILD handover",
+  "status": "BASELINE_IDENTIFIED; MODULE_FREEZE_AND_BROWSER_ACCEPTANCE_PENDING",
+  "repository": "Satho82/beaconhs",
+  "recommendedIsolatedDevelopmentParent": {
+    "commit": "937242e7e35806acab48c28c4163719b00c0f16d",
+    "tree": "9912feac29a30b4b32d219b4cc21f80f1f57f7f7",
+    "reason": "Already contains accepted People implementation, recovered Approvals production, governed Risk and 63 immutable migrations; exact-source full release run 38306431626 passed. Avoid another merge or implementation rewrite."
+  },
+  "governedBranch": {
+    "name": "feature/uvanoo-v1.4",
+    "sha": "d18f635a41f092e9e86aa6f53518f9c28992b0d2",
+    "tree": "cac8f1184b7852629aab49e77f49a693abd0e350",
+    "unchanged": true,
+    "promotionAuthorized": false
+  },
+  "ancestry": {
+    "peopleCandidateAncestor": true,
+    "governedBaseAncestor": true,
+    "commitsAheadOfGoverned": 2,
+    "newMergeNeededForCombinedSource": false
+  },
+  "inventory": "docs/v1.4/dual-freeze/platform-build-inventory.json",
+  "scopeLock": "docs/v1.4/dual-freeze/protected-scope.json",
+  "historicalEvidence": "docs/v1.4/production-completion/validation-evidence.json",
+  "reusableEngines": [
+    "Hospitality maintenance_issues and maintenance_work_orders (D01)",
+    "corrective_actions for Action Plans (D02)",
+    "forms-core/forms versioning with configuration governance (D03)",
+    "Hospitality properties plus existing tenant/role/RLS boundary (D04)",
+    "Existing platform and tenant administration (D05)",
+    "Tenant currency/locale/timezone configuration and snapshots (D06)",
+    "Existing reports/analytics for Daily Hotel outputs, not fabricated KPI feeds (D07)",
+    "events/outbox/jobs and operational communications (D08)",
+    "Existing governed bulk-import lifecycle and private storage (D09)"
+  ],
+  "requiredPreservation": [
+    "Risk runtime and immutable histories",
+    "Owner-accepted People and Approvals implementations",
+    "All 63 migration SQL identities and journal prefix",
+    "Uvanoo Light/Terra and teal/coral branding",
+    "Approved menus/submenus and hospitality workflow semantics",
+    "Multi-user, multi-property, multi-tenant authorization at server/database boundaries",
+    "No duplicate engines, placeholder saves or fabricated dashboard data"
+  ],
+  "readiness": {
+    "technicalBaseline": "VALIDATED",
+    "planningInventory": "PREPARED",
+    "coordinatedModuleFreeze": "PENDING",
+    "completePlatformFeatureAcceptance": "NOT_CLAIMED",
+    "newFeatureImplementationAuthorizedInThisTask": false,
+    "deploymentReadiness": "NOT_READY"
+  },
+  "separateConcurrentWork": {
+    "taskTitle": "DEV Recovery Audit",
+    "scope": "Isolated migration gate modernization",
+    "integration": "Do not assume its result is in this baseline; review its eventual immutable SHA and validation separately before any separately authorized integration."
+  },
+  "deploymentBlockers": [
+    "Current baseline retains the read-only exact-61/clean155 deployment gate; it cannot apply 0062/0063.",
+    "This isolated recovery source is not the governed feature head and has no authoritative governed release-image promotion evidence.",
+    "No live target ledger/schema/security/backup or restore readiness inspected; future deployment preflight requires explicit authorization."
+  ],
+  "nextSequence": [
+    "Finish or explicitly remediate remaining authenticated/visual acceptance gaps without altering accepted implementations under this task.",
+    "Publish immutable final module status and preserve all historical results, including failed harness attempts.",
+    "Owner authorizes a scoped Complete Platform Build work package and priorities from the inventory; new isolated work starts at 937242e7, not at the old People 0a4a or the governed d18 base.",
+    "Audit each module against current source and approved D01–D09 before implementing; use incremental vertical slices and shared engines.",
+    "Review separate deployment-gate correction only after its exact-source tests pass; integrate only with new explicit authority.",
+    "No deployment or governed merge follows automatically from owner module acceptance."
+  ]
+}

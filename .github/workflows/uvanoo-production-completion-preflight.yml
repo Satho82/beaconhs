@@ -29,6 +29,7 @@ jobs:
           set -euo pipefail
           test "$GITHUB_REF" = refs/heads/review/uvanoo-v1.4-production-completion-cloud-20261012
           cp docs/v1.4/production-completion/source-draft.json /tmp/uvanoo-production-draft.json
+          cp .github/recovery/prepare-production-draft.ts /tmp/uvanoo-production-prepare.ts
           git checkout --detach c306bd6bbe0571eeca18a410c1ac08fe55c524b6
           python3 - <<'PY'
           import json,pathlib
@@ -42,14 +43,29 @@ jobs:
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with: { node-version-file: .nvmrc, cache: pnpm }
       - run: pnpm install --frozen-lockfile
+      - name: Apply existing localization primitives
+        run: |
+          cp /tmp/uvanoo-production-prepare.ts apps/web/scripts/prepare-production-draft.ts
+          pnpm --filter @beaconhs/web exec tsx scripts/prepare-production-draft.ts
+          rm apps/web/scripts/prepare-production-draft.ts
       - name: Format changed draft files only
         run: |
           python3 - <<'PY'
           import json,subprocess
           paths=[p for p in json.load(open('/tmp/uvanoo-production-draft.json'))['files'] if p.endswith(('.ts','.tsx','.json','.md'))]
+          paths += ['packages/i18n/src/messages/'+lang+'.json' for lang in ['en','es','fr']]
           subprocess.run(['pnpm','exec','prettier','--write',*paths],check=True)
           PY
       - run: pnpm --filter @beaconhs/web exec next typegen
       - run: pnpm typecheck --concurrency=1
       - run: pnpm --filter @beaconhs/db typecheck
       - run: pnpm --filter @beaconhs/web exec vitest run src/lib/approvals
+      - name: Preserve normalized draft source for exact candidate creation
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json,pathlib
+          paths=list(json.load(open('/tmp/uvanoo-production-draft.json'))['files'])
+          paths += ['packages/i18n/src/messages/'+lang+'.json' for lang in ['en','es','fr']]
+          print('PREPARED_DRAFT_JSON='+json.dumps({p:pathlib.Path(p).read_text() for p in paths},separators=(',',':')))
+          PY

@@ -96,10 +96,13 @@ jobs:
         run: |
           pnpm --filter @beaconhs/db exec tsx src/migrate.ts
           pnpm --filter @beaconhs/db exec tsx src/migrate.ts
-      - name: Disposable private storage
+      - name: Build pinned disposable storage from official source
         run: |
-          docker run --detach --rm --name approvals-disposable-storage --label uvanoo.task=approvals-production -p 127.0.0.1:9000:9000 --tmpfs /data:rw -e MINIO_ROOT_USER=beaconhs -e MINIO_ROOT_PASSWORD=beaconhs-dev-secret minio/minio:latest server /data
-          docker inspect --format '{{.Image}}' approvals-disposable-storage
+          set -euo pipefail
+          GOBIN=/tmp/uvanoo-storage-bin go install github.com/minio/minio@07c3a429bfed433e49018cb0f78a52145d4bedeb
+          mkdir -m 700 /tmp/uvanoo-storage-data
+          MINIO_ROOT_USER=beaconhs MINIO_ROOT_PASSWORD=beaconhs-dev-secret /tmp/uvanoo-storage-bin/minio server --address 127.0.0.1:9000 /tmp/uvanoo-storage-data > /tmp/uvanoo-storage.log 2>&1 &
+          echo $! > /tmp/uvanoo-storage.pid
           for attempt in $(seq 1 30); do
             if curl --fail --silent http://localhost:9000/minio/health/live; then break; fi
             sleep 1
@@ -108,6 +111,7 @@ jobs:
       - name: Production lifecycle and financial security integration
         run: pnpm --filter @beaconhs/web exec tsx scripts/verify-approvals-production.ts
       - name: Migration Safety isolated rollback and ACL harness
+        if: success() || failure()
         run: |
           set -euo pipefail
           docker pull postgres:16-alpine@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777
@@ -140,9 +144,6 @@ jobs:
       - name: Dispose task storage
         if: always()
         run: |
-          if docker inspect approvals-disposable-storage >/dev/null 2>&1; then
-            test "$(docker inspect --format '{{ index .Config.Labels "uvanoo.task" }}' approvals-disposable-storage)" = approvals-production
-            docker stop approvals-disposable-storage
+          if test -f /tmp/uvanoo-storage.pid; then
+            kill "$(cat /tmp/uvanoo-storage.pid)" || true
           fi
-
-# Validate corrected additive activity guard.

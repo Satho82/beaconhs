@@ -21,6 +21,7 @@ export type ScheduledTick =
   | { kind: 'journal_analysis_scan' }
   | { kind: 'operational_task_scan' }
   | { kind: 'risk_review_scan' }
+  | { kind: 'approval_reminder_scan' }
 
 let scheduledQueue: Queue<ScheduledTick> | undefined
 
@@ -40,6 +41,7 @@ const SCHEDULED_KINDS = new Set<ScheduledTick['kind']>([
   'journal_analysis_scan',
   'operational_task_scan',
   'risk_review_scan',
+  'approval_reminder_scan',
 ])
 
 export function assertScheduledTick(data: ScheduledTick): void {
@@ -111,6 +113,13 @@ const SCHEDULES: Array<{
   jobId: string
   repeatKey: string
 }> = [
+  {
+    name: 'tick:approval_reminders',
+    data: { kind: 'approval_reminder_scan' },
+    pattern: '0 * * * *',
+    jobId: 'tick:approval_reminders',
+    repeatKey: 'tick-approval-reminders',
+  },
   {
     name: 'tick:form_session',
     data: { kind: 'form_session_overdue_scan' },

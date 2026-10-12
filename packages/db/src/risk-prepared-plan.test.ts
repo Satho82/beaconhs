@@ -56,7 +56,7 @@ describe('offline governed Risk migration plan', () => {
 it('rejects the later canonical chain for the historical adoption plan', async () => {
   const actual = await vi.importActual<typeof import('./migration-state')>('./migration-state')
   const current = actual.readMigrationFiles(fileURLToPath(new URL('../drizzle', import.meta.url)))
-  expect(current).toHaveLength(62)
+  expect(current).toHaveLength(63)
   vi.mocked(readMigrationFiles).mockReturnValueOnce(current)
   expect(() => preparedRiskPlan('isolated_test')).toThrow('Expected canonical 0061')
 })

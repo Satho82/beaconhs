@@ -355,6 +355,8 @@ describe('tenant relational integrity', () => {
       const parent = tables.get(reference.parentTable)
       expect(parent, reference.parentTable).toBeDefined()
       const uniqueKeys = [
+        // A composite primary key provides the same exact uniqueness guarantee.
+        ...parent!.primaryKeys.map((key) => key.columns.map((column) => column.name)),
         ...parent!.indexes
           .filter((index) => index.config.unique)
           .map((index) =>

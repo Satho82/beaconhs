@@ -40,6 +40,36 @@ export type Walkthrough = {
 
 export const WALKTHROUGHS: Walkthrough[] = [
   {
+    id: 'approvals',
+    title: 'Submitting approval requests',
+    description: 'Create a documented spending request and follow its decisions.',
+    startPath: '/approvals',
+    defaultEnabled: true,
+    defaultAutoStart: false,
+    steps: [
+      {
+        path: '/approvals',
+        title: 'Approvals',
+        body: 'Use your dashboard to follow requests within your property authority.',
+      },
+      {
+        path: '/approvals/new',
+        title: 'Create Request',
+        body: 'Select a workflow, enter the financial details and upload the supporting document. Submit Request saves the complete request.',
+      },
+      {
+        path: '/approvals/my',
+        title: 'My Requests',
+        body: 'Search and filter your submissions. Open a request to review documents, comments and the immutable timeline.',
+      },
+      {
+        path: '/approvals/awaiting',
+        title: 'Awaiting My Approval',
+        body: 'Only the current authorised approver can decide a stage or delegate it to an eligible colleague.',
+      },
+    ],
+  },
+  {
     id: 'welcome',
     title: 'Welcome to Uvanoo',
     description:

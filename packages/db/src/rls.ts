@@ -190,6 +190,10 @@ DROP POLICY IF EXISTS tenant_write_delete ON ${table};`
       'approval_stages',
       'approval_decisions',
       'approval_events',
+      'approval_financial_sources',
+      'approval_workflow_rules',
+      'approval_documents',
+      'approval_activity',
     ].includes(table)
   ) {
     return `${reset}
@@ -397,6 +401,10 @@ export const TENANT_SCOPED_TABLES = [
   'approval_stages',
   'approval_decisions',
   'approval_events',
+  'approval_financial_sources',
+  'approval_workflow_rules',
+  'approval_documents',
+  'approval_activity',
   'risk_template_families',
   'risk_assessment_versions',
   'risk_templates',

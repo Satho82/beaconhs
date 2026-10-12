@@ -1,7 +1,8 @@
 import { createHash, randomUUID } from 'node:crypto'
 import { and, eq, sql } from 'drizzle-orm'
 import type { Database } from '@beaconhs/db'
-import { tenantUsers } from '@beaconhs/db/schema'
+import { tenantUsers, type RoleScope } from '@beaconhs/db/schema'
+import { amountMinor } from './production-contracts'
 import {
   assertCan,
   canSeeProperty,
@@ -10,7 +11,11 @@ import {
 } from '@beaconhs/tenant'
 import { recordAuditInTransaction } from '../audit'
 import { decisionInput, requestInput, workflowInput, type ApprovalAdapters } from './contracts'
-import { approvalPropertyIds, assertApprovalPropertyAuthority } from './property-authority'
+import {
+  assignmentAllowsProperty,
+  approvalPropertyIds,
+  assertApprovalPropertyAuthority,
+} from './property-authority'
 
 type RequestRow = {
   id: string
@@ -42,7 +47,7 @@ type DecisionRow = {
 }
 
 /** Uses RequestContext's existing transaction/RLS boundary; never a root connection. */
-async function gate(tx: Database, ctx: RequestContext) {
+export async function gate(tx: Database, ctx: RequestContext) {
   if (ctx.impersonation || ctx.apiKey || !ctx.membership)
     throw new Error('An active non-impersonated tenant member is required')
   const entitled = await tx.execute(sql`SELECT id FROM tenant_module_entitlements
@@ -69,7 +74,7 @@ async function gate(tx: Database, ctx: RequestContext) {
   return { ...ctx, permissions: fresh.permissions, scopes: fresh.scopes }
 }
 
-async function permission(
+export async function permission(
   tx: Database,
   ctx: RequestContext,
   fresh: RequestContext,
@@ -89,7 +94,12 @@ async function permission(
   )
 }
 
-async function property(tx: Database, ctx: RequestContext, fresh: RequestContext, id: string) {
+export async function property(
+  tx: Database,
+  ctx: RequestContext,
+  fresh: RequestContext,
+  id: string,
+) {
   if (!canSeeProperty(ctx, id) || !canSeeProperty(fresh, id))
     throw new Error('Property access denied')
   const rows = await tx.execute(
@@ -98,7 +108,7 @@ async function property(tx: Database, ctx: RequestContext, fresh: RequestContext
   if (!rows.length) throw new Error('Property access denied')
 }
 
-async function approver(tx: Database, ctx: RequestContext, id: string, propertyId: string) {
+export async function approver(tx: Database, ctx: RequestContext, id: string, propertyId: string) {
   const rows = await tx
     .select()
     .from(tenantUsers)
@@ -122,6 +132,37 @@ async function approver(tx: Database, ctx: RequestContext, id: string, propertyI
   if (!canSeeProperty(candidate, propertyId))
     throw new Error('Approver cannot access this property')
   await assertApprovalPropertyAuthority(tx, ctx, id, 'approvals.decide', propertyId)
+}
+
+export async function financialAuthority(
+  tx: Database,
+  ctx: RequestContext,
+  memberId: string,
+  propertyId: string,
+  stage: Record<string, unknown>,
+  amount: string,
+  activeRoleId?: string | null,
+) {
+  if (activeRoleId && activeRoleId !== stage.roleId)
+    throw new Error('Selected role lacks configured financial role authority')
+  if (
+    !stage.roleId ||
+    !stage.maximumAmount ||
+    amountMinor(amount) > amountMinor(String(stage.maximumAmount))
+  )
+    throw new Error('Stage financial authority exceeded')
+  await approver(tx, ctx, memberId, propertyId)
+  const rows = await tx.execute(
+    sql`SELECT r.permissions,a.scope,a.role_id FROM role_assignments a JOIN roles r ON r.tenant_id=a.tenant_id AND r.id=a.role_id WHERE a.tenant_id=${ctx.tenantId} AND a.tenant_user_id=${memberId} AND a.role_id=${String(stage.roleId)} FOR SHARE OF a,r`,
+  )
+  if (
+    !assignmentAllowsProperty(
+      rows as unknown as Array<{ permissions: string[]; scope: RoleScope; role_id: string }>,
+      'approvals.decide',
+      propertyId,
+    )
+  )
+    throw new Error('Approver lacks configured financial role authority')
 }
 
 async function audit(
@@ -256,10 +297,14 @@ export async function decideApproval(ctx: RequestContext, input: unknown) {
       throw new Error('Self-approval is not permitted')
     const stage = (
       await tx.execute(
-        sql`SELECT approver_id FROM approval_stages WHERE tenant_id=${ctx.tenantId} AND request_id=${request.id} AND position=${value.stage}`,
+        sql`SELECT approval_effective_assignee(${ctx.tenantId},${request.property_id},${request.id},${value.stage}) AS approver_id, approval_assignment_version(${ctx.tenantId},${request.property_id},${request.id},${value.stage}) AS version`,
       )
     )[0]
-    if (!stage || stage.approver_id !== ctx.membership!.id)
+    if (
+      !stage ||
+      stage.approver_id !== ctx.membership!.id ||
+      Number(stage.version) !== value.assignmentVersion
+    )
       throw new Error('Not the assigned approver')
     const previous = (
       await tx.execute(
@@ -279,6 +324,23 @@ export async function decideApproval(ctx: RequestContext, input: unknown) {
     }
     if (request.status !== 'pending' || request.current_stage !== value.stage)
       throw new Error('Approval stage is already resolved or not current')
+    if (request.source_module === 'financial') {
+      const financial = (
+        await tx.execute(
+          sql`SELECT w.stages,f.amount FROM approval_workflows w JOIN approval_financial_sources f ON f.tenant_id=w.tenant_id AND f.property_id=w.property_id WHERE w.tenant_id=${ctx.tenantId} AND w.id=${request.workflow_id} AND f.id=${request.source_id}`,
+        )
+      )[0]
+      if (!financial) throw new Error('Financial source unavailable')
+      await financialAuthority(
+        tx,
+        ctx,
+        ctx.membership!.id,
+        request.property_id,
+        (financial.stages as Array<Record<string, unknown>>)[value.stage - 1]!,
+        String(financial.amount),
+        ctx.activeRoleId,
+      )
+    }
     const id = randomUUID()
     // Shared audit is tenant-visible; sensitive reasons stay in property-scoped evidence.
     const auditId = await audit(tx, ctx, request.id, 'sign', {

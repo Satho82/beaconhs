@@ -1,3 +1,4 @@
+import { scanApprovalReminders } from '../lib/approval-reminders'
 import type { Job } from 'bullmq'
 import { and, asc, eq, gt, or, sql } from 'drizzle-orm'
 import {
@@ -27,6 +28,8 @@ import { scanRiskReviews } from '../lib/risk-review-scanner'
 export async function processScheduledTick(job: Job<ScheduledTick>): Promise<void> {
   assertScheduledTick(job.data)
   switch (job.data.kind) {
+    case 'approval_reminder_scan':
+      return scanApprovalReminders(new Date(job.timestamp + (job.opts.delay ?? 0)))
     case 'form_session_overdue_scan':
       return scanFormSessionOverdue()
     case 'compliance_scan': {

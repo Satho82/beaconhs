@@ -1,6 +1,7 @@
 // Assembles every manual article and provides the permission-aware accessors
 // used by /help, the AI assistant's user-guide tools, and search.
 
+import { APPROVALS_ARTICLE } from './content/approvals'
 import type { RequestContext } from '@beaconhs/tenant'
 import { can } from '@beaconhs/tenant'
 import { translateSystemCopy } from '@beaconhs/i18n/messages'
@@ -13,6 +14,7 @@ import { OVERSIGHT_ADMIN_ARTICLES } from './content/oversight-admin'
 import { MANUAL_GROUP_ORDER, type ManualArticle, type ManualGroup } from './types'
 
 const MANUAL_ARTICLES: ManualArticle[] = [
+  APPROVALS_ARTICLE,
   ...GETTING_STARTED_ARTICLES,
   ...BOARD_ADMINISTRATION_ARTICLES,
   ...FRONTLINE_ARTICLES,

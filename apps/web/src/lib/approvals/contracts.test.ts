@@ -5,7 +5,7 @@ const id = '10000000-0000-4000-8000-000000000001'
 const decision = { requestId: id, stage: 1, decision: 'approve', idempotencyKey: id }
 const stage = { name: 'Review', approverId: id }
 describe('Approvals server contracts', () => {
-  it('accepts the six approved source module contracts only', () => {
+  it('accepts the approved source contracts including native financial requests', () => {
     expect(sourceModule.options).toEqual([
       'risk',
       'maintenance',
@@ -13,6 +13,7 @@ describe('Approvals server contracts', () => {
       'assets_ppm',
       'people',
       'tasks',
+      'financial',
     ])
     expect(sourceModule.safeParse('flow_gates').success).toBe(false)
   })

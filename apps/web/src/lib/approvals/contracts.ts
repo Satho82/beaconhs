@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { moneyInput } from './production-contracts'
 import type { Database } from '@beaconhs/db'
 import type { RequestContext } from '@beaconhs/tenant'
 
@@ -9,6 +10,7 @@ export const sourceModule = z.enum([
   'assets_ppm',
   'people',
   'tasks',
+  'financial',
 ])
 const sourceReference = z
   .object({
@@ -41,7 +43,12 @@ export type ApprovalAdapters = Readonly<
 >
 
 const stageInput = z
-  .object({ name: z.string().trim().min(1).max(200), approverId: z.string().uuid() })
+  .object({
+    name: z.string().trim().min(1).max(200),
+    approverId: z.string().uuid(),
+    roleId: z.string().uuid().optional(),
+    maximumAmount: moneyInput.optional(),
+  })
   .strict()
 export const workflowInput = z
   .object({
@@ -61,6 +68,7 @@ export const decisionInput = z
   .object({
     requestId: z.string().uuid(),
     stage: z.number().int().min(1).max(20),
+    assignmentVersion: z.number().int().min(0).default(0),
     decision: z.enum(['approve', 'reject']),
     reason: z.string().trim().max(4000).default(''),
     idempotencyKey: z.string().uuid(),

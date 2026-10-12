@@ -13,7 +13,7 @@ const recorded = JSON.parse(
 describe('canonical chain against independently recorded DEV ledger', () => {
   it('retains all 61 ordered SQL hashes and timestamps exactly', () => {
     const files = readMigrationFiles(folder)
-    expect(files).toHaveLength(62)
+    expect(files).toHaveLength(63)
     expect(
       files
         .slice(0, 61)
@@ -32,7 +32,7 @@ describe('canonical chain against independently recorded DEV ledger', () => {
     )
     const canonical = readFileSync(folder + '/0062_approvals_batch01.sql', 'utf8')
     expect(canonical.split('\n').slice(3).join('\n')).toBe(proposal.split('\n').slice(3).join('\n'))
-    expect(files.filter((file) => file.tag.includes('approvals'))).toHaveLength(1)
+    expect(files.filter((file) => file.tag === '0062_approvals_batch01')).toHaveLength(1)
   })
   it('has one canonical location and the recorded Risk journal metadata', () => {
     const journal = JSON.parse(readFileSync(folder + '/meta/_journal.json', 'utf8'))

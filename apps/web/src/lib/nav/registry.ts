@@ -101,6 +101,14 @@ function defaultGroupId(label: string): string {
 // entries are intentionally gone — both are form templates now, surfaced as
 // pinned forms by the resolver (auto-pinned by key in resolve.ts).
 export const NAV_MODULES: NavModule[] = [
+  {
+    key: 'approvals',
+    href: '/approvals',
+    label: 'Approvals',
+    iconKey: 'check',
+    group: 'Assurance',
+    requiredPermission: 'approvals.read',
+  },
   // Overview
   { key: 'dashboard', href: '/dashboard', label: 'Dashboard', iconKey: 'gauge', group: 'Overview' },
   {

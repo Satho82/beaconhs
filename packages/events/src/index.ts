@@ -12,6 +12,7 @@
 // domain-event outbox in the same transaction. This module publishes those
 // effects only from retryable worker paths with deterministic queue job IDs.
 
+import { deliverApprovalNotification } from './approvals'
 import { and, eq, inArray, isNull } from 'drizzle-orm'
 import { createHash } from 'node:crypto'
 import { db as defaultDb, withSuperAdmin, type Database } from '@beaconhs/db'
@@ -151,6 +152,8 @@ export async function deliverDomainNotification(
 ): Promise<void> {
   const ctx = workerEventCtx(tenantId)
   switch (event.kind) {
+    case 'approval_updated':
+      return deliverApprovalNotification(tenantId, sourceEventId, event.requestId)
     case 'incident_reported': {
       const incident = await ctx.db(async (tx) => {
         const [row] = await tx

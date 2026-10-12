@@ -16,7 +16,8 @@
     "clean": "rm -rf .next .turbo",
     "preview:approvals": "tsx scripts/launch-approvals-preview.ts",
     "test:approvals-batch01": "tsx scripts/verify-approvals-batch01.ts",
-    "test:approvals-property-authority": "tsx scripts/verify-approvals-property-authority.ts"
+    "test:approvals-property-authority": "tsx scripts/verify-approvals-property-authority.ts",
+    "test:approvals-production": "tsx scripts/verify-approvals-production.ts"
   },
   "dependencies": {
     "@beaconhs/ai": "workspace:*",

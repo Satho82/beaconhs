@@ -22,6 +22,7 @@ export type DomainIntegrationEvent = {
 }
 
 export type DomainNotificationEvent =
+  | { kind: 'approval_updated'; requestId: string }
   | { kind: 'incident_reported'; incidentId: string }
   | {
       kind: 'incident_status_changed'

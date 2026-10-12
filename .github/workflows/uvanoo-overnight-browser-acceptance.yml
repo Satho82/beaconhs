@@ -1,4 +1,5 @@
-name: Uvanoo dual authenticated acceptance
+name: Uvanoo overnight authenticated acceptance
+# Diagnostic continuation: capture auth HTTP status and dismiss first-run tour through its UI.
 
 # Read-only control workflow validating exact immutable candidates in disposable services. This workflow
 # deliberately has no deploy, image, registry, SSH, or environment path.

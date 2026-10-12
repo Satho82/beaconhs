@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "sourceCommit": "563fb0e9b79a838a5f394abaffb2f7dc743fc571",
+  "sourceTree": "324c50a60e2cb0639ba920488a150c6531968374",
+  "sourceBranch": "integration/uvanoo-v1.4-approvals-dev-gate-20261012",
+  "governedBaseline": "d18f635a41f092e9e86aa6f53518f9c28992b0d2",
+  "authoritativePreservedRun": 38313918871,
+  "runUrl": "https://github.com/Satho82/beaconhs/actions/runs/38313918871",
+  "jobs": [
+    {
+      "id": 115025919337,
+      "gate": "CodeQL security-extended",
+      "conclusion": "success"
+    },
+    {
+      "id": 115025919758,
+      "gate": "Full release checks and disposable database integrations",
+      "conclusion": "success"
+    },
+    {
+      "id": 115025919827,
+      "gate": "Production web and worker builds",
+      "conclusion": "success"
+    },
+    {
+      "id": 115025919855,
+      "gate": "Incremental Gitleaks",
+      "conclusion": "success"
+    }
+  ],
+  "validation": {
+    "dbUnitTests": 392,
+    "webTestsPassed": 1738,
+    "existingOptInWebSkip": 1,
+    "propertyDelegationIntegration": "separately executed successfully",
+    "workspaceTasks": 23,
+    "buildTasks": 2,
+    "migrationPaths": [
+      "fresh->63",
+      "63->63 no-op",
+      "58->63",
+      "61->63",
+      "62->63"
+    ],
+    "negativeCoverage": [
+      "altered/unknown/missing/reordered migration history",
+      "schema/ACL/role/trigger drift",
+      "backup DML/escalation denial",
+      "atomic failure rollback",
+      "retry and ledger mismatch",
+      "concurrent migration lock"
+    ],
+    "moduleCoverage": [
+      "Approvals 29 lifecycle cases",
+      "concurrency/delegation/notifications/reminders",
+      "People provenance and property RLS",
+      "Risk SQL integration"
+    ],
+    "backupRestore": "Actual repository backup and restore scripts tested in disposable fixture"
+  },
+  "fixturePostgres": "16.14 (pinned digest)",
+  "reportedDevPostgres": "16.15",
+  "liveDevCompatibility": "NOT VERIFIED",
+  "productRevalidation": "Prior unchanged successful release gates reused; browser runtime build in 38316469229 required to produce an executable artifact and passed.",
+  "runtimeArtifact": {
+    "run": 38316469229,
+    "id": 11777452571,
+    "zipSha256": "e06c24932c70792504d2e489f7ee439ce2f7ce51e289aee5f63282faed8c17d9",
+    "expiresAt": "2026-10-19T22:38:08Z",
+    "purpose": "disposable browser continuation only; not a deployed OCI image"
+  },
+  "immutableMigrationNote": "63 canonical journal entries include 0000_init and the historical absence of 0033; preserve actual journal identities rather than renumbering to a superficially contiguous 0001-0063 sequence.",
+  "evidenceLimits": [
+    "No live DEV ledger, schema, ACL/RLS or data read this turn",
+    "No published release image bound yet",
+    "CodeQL job success is not independently a zero-alert assertion",
+    "Browser and visual acceptance are separate from engineering tests"
+  ]
+}

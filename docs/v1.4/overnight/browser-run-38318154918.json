@@ -1,0 +1,369 @@
+{
+  "sourceCommit": "563fb0e9b79a838a5f394abaffb2f7dc743fc571",
+  "sourceTree": "324c50a60e2cb0639ba920488a150c6531968374",
+  "runtime": "production Next standalone; disposable hosted CI",
+  "checks": [
+    {
+      "name": "Authentication platform",
+      "status": "PASS",
+      "detail": {
+        "role": "platform",
+        "authentication": "real password UI and server session",
+        "propertyScope": [
+          "3fc9c084-7caf-5a72-8805-c6bc6fc51656",
+          "a8adb358-5b67-5ea2-b3d3-bcf5f7cfa378"
+        ]
+      }
+    },
+    {
+      "name": "Authentication cluster",
+      "status": "PASS",
+      "detail": {
+        "role": "cluster",
+        "authentication": "real password UI and server session",
+        "propertyScope": [
+          "3fc9c084-7caf-5a72-8805-c6bc6fc51656",
+          "a8adb358-5b67-5ea2-b3d3-bcf5f7cfa378"
+        ]
+      }
+    },
+    {
+      "name": "Authentication property",
+      "status": "PASS",
+      "detail": {
+        "role": "property",
+        "authentication": "real password UI and server session",
+        "propertyScope": [
+          "3fc9c084-7caf-5a72-8805-c6bc6fc51656"
+        ]
+      }
+    },
+    {
+      "name": "Authentication approver",
+      "status": "FAIL",
+      "error": "Password authentication rejected"
+    },
+    {
+      "name": "Authentication requester",
+      "status": "FAIL",
+      "error": "Password authentication rejected"
+    },
+    {
+      "name": "Authentication restricted",
+      "status": "FAIL",
+      "error": "Password authentication rejected"
+    },
+    {
+      "name": "People Directory platform",
+      "status": "PASS",
+      "detail": {
+        "path": "/people"
+      }
+    },
+    {
+      "name": "Approvals navigation platform",
+      "status": "PASS",
+      "detail": {
+        "path": "/approvals"
+      }
+    },
+    {
+      "name": "People Directory cluster",
+      "status": "PASS",
+      "detail": {
+        "path": "/people"
+      }
+    },
+    {
+      "name": "Approvals navigation cluster",
+      "status": "PASS",
+      "detail": {
+        "path": "/approvals"
+      }
+    },
+    {
+      "name": "People Directory property",
+      "status": "PASS",
+      "detail": {
+        "path": "/people"
+      }
+    },
+    {
+      "name": "Approvals navigation property",
+      "status": "PASS",
+      "detail": {
+        "path": "/approvals"
+      }
+    },
+    {
+      "name": "People Directory approver",
+      "status": "FAIL",
+      "error": "Unauthenticated redirect"
+    },
+    {
+      "name": "Approvals navigation approver",
+      "status": "FAIL",
+      "error": "Unauthenticated redirect"
+    },
+    {
+      "name": "People Directory requester",
+      "status": "FAIL",
+      "error": "Unauthenticated redirect"
+    },
+    {
+      "name": "Approvals navigation requester",
+      "status": "FAIL",
+      "error": "Unauthenticated redirect"
+    },
+    {
+      "name": "People Directory restricted",
+      "status": "FAIL",
+      "error": "Unauthenticated redirect"
+    },
+    {
+      "name": "Approvals navigation restricted",
+      "status": "FAIL",
+      "error": "Unauthenticated redirect"
+    },
+    {
+      "name": "Cluster GM multi-property People profiles",
+      "status": "PASS"
+    },
+    {
+      "name": "Restricted People profile isolation",
+      "status": "FAIL",
+      "error": "Unauthenticated redirect"
+    },
+    {
+      "name": "Configure two-stage approval and financial limits through UI",
+      "status": "FAIL",
+      "error": "Waiting for selector `[name=\"stageName1\"]` failed"
+    },
+    {
+      "name": "Approvals reporting and CSV export through browser session",
+      "status": "FAIL",
+      "error": "The expression evaluated to a falsy value:\n\n  assert(result.body.includes('Synthetic browser'))\n"
+    },
+    {
+      "name": "Notifications page navigation",
+      "status": "FAIL",
+      "error": "Unauthenticated redirect"
+    },
+    {
+      "name": "Mobile responsive navigation /people",
+      "status": "PASS",
+      "detail": {
+        "viewport": 390,
+        "document": 390,
+        "buttons": [
+          {
+            "label": "Collapse sidebar"
+          },
+          {
+            "label": "Dashboard"
+          },
+          {
+            "label": "Diary & Tasks"
+          },
+          {
+            "label": "Maintenance"
+          },
+          {
+            "label": "Compliance"
+          },
+          {
+            "label": "Risk"
+          },
+          {
+            "label": "Inspections"
+          },
+          {
+            "label": "Incidents"
+          },
+          {
+            "label": "Action Plans"
+          },
+          {
+            "label": "Training"
+          },
+          {
+            "label": "People"
+          },
+          {
+            "label": "Handover"
+          },
+          {
+            "label": "Assets & PPM"
+          },
+          {
+            "label": "Metering"
+          },
+          {
+            "label": "Reports"
+          },
+          {
+            "label": "Approvals"
+          },
+          {
+            "label": "Tenant Settings"
+          },
+          {
+            "label": ""
+          },
+          {
+            "label": ""
+          },
+          {
+            "label": ""
+          },
+          {
+            "label": "Open navigation"
+          },
+          {
+            "label": "Notifications"
+          },
+          {
+            "label": "Account menu"
+          },
+          {
+            "label": "All roles"
+          },
+          {
+            "label": "All Properties / Portfolio"
+          },
+          {
+            "label": "Status:Active"
+          },
+          {
+            "label": "Menu"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Mobile responsive navigation /approvals",
+      "status": "PASS",
+      "detail": {
+        "viewport": 390,
+        "document": 390,
+        "buttons": [
+          {
+            "label": "Collapse sidebar"
+          },
+          {
+            "label": "Dashboard"
+          },
+          {
+            "label": "Diary & Tasks"
+          },
+          {
+            "label": "Maintenance"
+          },
+          {
+            "label": "Compliance"
+          },
+          {
+            "label": "Risk"
+          },
+          {
+            "label": "Inspections"
+          },
+          {
+            "label": "Incidents"
+          },
+          {
+            "label": "Action Plans"
+          },
+          {
+            "label": "Training"
+          },
+          {
+            "label": "People"
+          },
+          {
+            "label": "Handover"
+          },
+          {
+            "label": "Assets & PPM"
+          },
+          {
+            "label": "Metering"
+          },
+          {
+            "label": "Reports"
+          },
+          {
+            "label": "Approvals"
+          },
+          {
+            "label": "Tenant Settings"
+          },
+          {
+            "label": ""
+          },
+          {
+            "label": ""
+          },
+          {
+            "label": ""
+          },
+          {
+            "label": "Open navigation"
+          },
+          {
+            "label": "Notifications"
+          },
+          {
+            "label": "Account menu"
+          },
+          {
+            "label": "All roles"
+          },
+          {
+            "label": "All Properties / Portfolio"
+          },
+          {
+            "label": "Status"
+          },
+          {
+            "label": "Property"
+          },
+          {
+            "label": "Apply filters"
+          },
+          {
+            "label": "Menu"
+          },
+          {
+            "label": "Close tour"
+          },
+          {
+            "label": "Skip tour"
+          },
+          {
+            "label": "Next"
+          }
+        ]
+      }
+    }
+  ],
+  "screenshots": [
+    "platform-landing.png",
+    "cluster-landing.png",
+    "property-landing.png",
+    "platform-people.png",
+    "platform-approvals.png",
+    "cluster-people.png",
+    "cluster-approvals.png",
+    "property-people.png",
+    "property-approvals.png",
+    "cluster-two-properties.png",
+    "mobile-people.png",
+    "mobile-approvals.png"
+  ],
+  "gaps": [
+    "Automatic reminder timing and actual recipient notification/email delivery are NOT VERIFIED by this browser run; preserved integration evidence is separate.",
+    "Screenshot capture is evidence, not an automatic visual-fidelity pass. Compare actual rendered UI with approved Light/Terra originals, teal/coral branding and menu hierarchy."
+  ],
+  "status": "ACCEPTANCE_GAPS"
+}

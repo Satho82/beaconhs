@@ -8,14 +8,17 @@ const fixture=JSON.parse(await readFile(process.env.RUNNER_TEMP+'/dual-accounts.
 const req=createRequire(root+'/packages/forms-pdf/package.json')
 const {default:puppeteer}=await import(req.resolve('puppeteer-core'))
 const browser=await puppeteer.launch({executablePath:process.env.CHROME_PATH,headless:true,args:['--no-sandbox','--disable-dev-shm-usage'],defaultViewport:{width:1440,height:1000}})
-const report={sourceCommit:'563fb0e9b79a838a5f394abaffb2f7dc743fc571',sourceTree:'324c50a60e2cb0639ba920488a150c6531968374',runtime:'production Next standalone; disposable hosted CI',checks:[],screenshots:[],gaps:[]}
+const report={sourceCommit:'563fb0e9b79a838a5f394abaffb2f7dc743fc571',sourceTree:'324c50a60e2cb0639ba920488a150c6531968374',runtime:'production Next standalone; disposable hosted CI',checks:[],screenshots:[],gaps:[],authenticationResponses:[],runtimeErrors:[]}
 const pages={}
-async function record(name,fn){try{const detail=await fn();report.checks.push({name,status:'PASS',detail});console.log('BROWSER_PASS '+name)}catch(e){report.checks.push({name,status:'FAIL',error:String(e.message).slice(0,1000)});console.log('BROWSER_FAIL '+name+': '+String(e.message).slice(0,400))}}
+const pause=ms=>new Promise(r=>setTimeout(r,ms))
+async function dismissTour(p){await pause(1400);const close=await p.$('button[aria-label="Close tour"]');if(close){await close.click();await p.waitForNetworkIdle({idleTime:300,timeout:5000}).catch(()=>{})}}
+
+async function record(name,fn){try{const detail=await fn();report.checks.push({name,status:'PASS',detail});console.log('BROWSER_PASS '+name)}catch(e){report.checks.push({name,status:'FAIL',error:String(e.message).slice(0,1000)});console.log('BROWSER_FAIL '+name+': '+String(e.message).slice(0,400));for(const [role,p] of Object.entries(pages)){try{await shot(p,'failure-'+report.checks.length+'-'+role)}catch{}}}}
 async function shot(p,name){const path=out+'/'+name+'.png';await p.screenshot({path,fullPage:true});report.screenshots.push(name+'.png')}
-async function go(p,path){const r=await p.goto('https://localhost:3443'+path,{waitUntil:'networkidle2',timeout:60000});assert(r&&r.status()<500,'Server error at '+path);assert(!new URL(p.url()).pathname.startsWith('/login'),'Unauthenticated redirect');const text=await p.$eval('body',x=>x.innerText);assert(!/Application error:|Unable to load approvals/i.test(text),'Application error at '+path);return text}
+async function go(p,path){const r=await p.goto('https://localhost:3443'+path,{waitUntil:'networkidle2',timeout:60000});assert(r&&r.status()<500,'Server error at '+path);assert(!new URL(p.url()).pathname.startsWith('/login'),'Unauthenticated redirect');await dismissTour(p);const text=await p.$eval('body',x=>x.innerText);assert(!/Application error:|Unable to load approvals/i.test(text),'Application error at '+path);return text}
 async function type(p,name,value){const q='[name="'+name+'"]';await p.waitForSelector(q);await p.$eval(q,x=>{x.value=''});await p.type(q,String(value))}
 async function select(p,name,value){await p.select('select[name="'+name+'"]',String(value))}
-async function button(p,text){const h=await p.$$('button');for(const b of h){if((await b.evaluate(x=>x.textContent.trim()))===text){await b.click();return}}throw Error('Button missing: '+text)}
+async function button(p,text){await dismissTour(p);const h=await p.$$('button');for(const b of h){if((await b.evaluate(x=>x.textContent.trim()))===text){await b.click();return}}throw Error('Button missing: '+text)}
 async function submit(p,label){const response=p.waitForResponse(r=>r.url().endsWith('/api/approvals')&&r.request().method()==='POST',{timeout:30000});await button(p,label);const r=await response;const j=await r.json();assert(r.ok(),j.error||'Request failed');assert(j.id,'Missing returned identity');await p.waitForNetworkIdle({idleTime:500,timeout:15000}).catch(()=>{});return j.id}
 async function activity(p,id,kind){await go(p,'/approvals/requests/'+id);await select(p,'kind',kind);const area=await p.$('select[name="kind"]');const form=await area.evaluateHandle(x=>x.closest('form'));const body=await form.$('textarea[name="body"]');await body.type('Synthetic browser acceptance '+kind);await submit(p,'Save Activity')}
 async function createRequest(title,amount='125.01',expectDeny=false){
@@ -30,12 +33,22 @@ try{
  for(const [role,a] of Object.entries(fixture.accounts)){
   await record('Authentication '+role,async()=>{
    const c=await browser.createBrowserContext(),p=await c.newPage();pages[role]=p
+   p.on('pageerror',e=>report.runtimeErrors.push({role,message:String(e.message).slice(0,500)}))
    await p.goto('https://localhost:3443/login',{waitUntil:'networkidle2'})
    await p.type('#email',a.email);await p.type('#password',a.password)
-   const response=p.waitForResponse(r=>r.url().includes('/api/auth/sign-in/email')&&r.request().method()==='POST')
-   await p.click('button[type="submit"]');assert((await response).ok(),'Password authentication rejected')
+   for(let attempt=0;attempt<2;attempt++){
+    const response=p.waitForResponse(r=>r.url().includes('/api/auth/sign-in/email')&&r.request().method()==='POST')
+    await p.click('button[type="submit"]');const authResponse=await response
+    const detail={role,attempt:attempt+1,status:authResponse.status(),retryAfter:authResponse.headers()['retry-after']??null}
+    if(!authResponse.ok()){const error=await authResponse.json().catch(()=>({}));detail.code=String(error.code??'').slice(0,100);detail.message=String(error.message??'').slice(0,200)}
+    report.authenticationResponses.push(detail);console.log('AUTH_RESPONSE '+JSON.stringify(detail))
+    if(authResponse.ok())break
+    if(authResponse.status()===429&&attempt===0){const seconds=Math.max(60,Number(detail.retryAfter)||0);assert(seconds<=120,'Unexpected retry interval');await pause(seconds*1000);continue}
+    assert.fail('Password authentication rejected: HTTP '+authResponse.status()+' '+(detail.code??''))
+   }
    await p.waitForFunction(()=>!location.pathname.startsWith('/login'),{timeout:30000})
    await go(p,role==='platform'?'/platform':'/dashboard');await shot(p,role+'-landing')
+   await pause(12000)
    return {role,authentication:'real password UI and server session',propertyScope:a.propertyIds}
   })
  }
@@ -83,6 +96,7 @@ try{
  for(const route of ['/people','/approvals']){
   await record('Mobile responsive navigation '+route,async()=>{const p=pages.cluster;await p.setViewport({width:390,height:844,isMobile:true,hasTouch:true});await go(p,route);await shot(p,'mobile-'+route.slice(1));const m=await p.evaluate(()=>({viewport:innerWidth,document:document.documentElement.scrollWidth,buttons:[...document.querySelectorAll('button')].map(x=>({label:x.getAttribute('aria-label')||x.textContent?.trim()}))}));assert(m.document<=m.viewport+2,'Page horizontal overflow');return m})
  }
+ report.gaps.push('Property-assignment mutation and explicit desktop/mobile menu interaction remain outside this first matrix and must be completed separately; direct route navigation is not full menu acceptance.')
  report.gaps.push('Automatic reminder timing and actual recipient notification/email delivery are NOT VERIFIED by this browser run; preserved integration evidence is separate.')
  report.gaps.push('Screenshot capture is evidence, not an automatic visual-fidelity pass. Compare actual rendered UI with approved Light/Terra originals, teal/coral branding and menu hierarchy.')
 }catch(e){report.gaps.push('Browser harness interrupted: '+String(e.message).slice(0,1000))}

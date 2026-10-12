@@ -5,7 +5,7 @@ import { sql } from 'drizzle-orm'
 import type { MigrationDatabase } from './migration-connection'
 import { validateMigrationState, type MigrationFile } from './migration-state'
 
-export type ExecutableMigration = MigrationFile & { body: string }
+type ExecutableMigration = MigrationFile & { body: string }
 export function loadMigrationBodies(folder: string, files: MigrationFile[]): ExecutableMigration[] {
   return files.map((file) => {
     const body = readFileSync(resolve(folder, `${file.tag}.sql`), 'utf8')

@@ -4,6 +4,7 @@ import { systemMessageKey } from '@beaconhs/i18n/messages'
 import { findSourceAudit,normalizeProse } from './i18n-source-audit'
 import { findRuntimeUserFacingLiterals } from './i18n-runtime-audit'
 
+process.chdir(new URL('../../..',import.meta.url).pathname)
 const draft=JSON.parse(fs.readFileSync('/tmp/uvanoo-production-draft.json','utf8'))
 const sources=new Set<string>()
 const attrs=new Set(['actionLabel','alt','aria-label','buttonLabel','cancelLabel','description','label','loadingLabel','message','placeholder','title','tooltip'])

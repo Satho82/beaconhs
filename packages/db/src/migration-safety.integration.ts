@@ -19,7 +19,7 @@ import { pinnedMigrationDatabase } from './migration-connection'
 import { RLS_POLICY_SQL } from './rls'
 import { riskMigrationTasks } from './risk-migration-readiness'
 
-// Test-only, byte-identical approved Batch 01 contract; never part of the migration journal.
+// Historical byte-identical Batch 01 contract: canonical migration 0062 preserves its SQL body.
 // Verify before any database or container operation. No sibling checkout is required.
 const proposal = readFileSync(
   new URL('./test/approvals-security-contract.fixture.sql', import.meta.url),
@@ -73,8 +73,13 @@ const risk = preparedRiskProposals.map(([tag, createdAt, hash]) => ({
   hash,
   body: readFileSync(`${folder}/${tag}.sql`, 'utf8'),
 }))
-assert.equal(sequence.length, 61)
-assert.deepEqual(sequence.slice(58), risk)
+assert.equal(sequence.length, 62)
+assert.deepEqual(sequence.slice(58, 61), risk)
+assert.equal(sequence[61]?.tag, '0062_approvals_batch01')
+assert.equal(
+  sequence[61]?.body.split('\n').slice(3).join('\n'),
+  proposal.split('\n').slice(3).join('\n'),
+)
 function fixture(tag: string, createdAt: number, body: string) {
   return { tag, createdAt, body, hash: createHash('sha256').update(body).digest('hex') }
 }
@@ -94,6 +99,7 @@ try {
     'safety_recovery',
     'safety_cli',
     'safety_cli_forward',
+    'safety_cli_existing',
   ])
     await admin.unsafe(`CREATE DATABASE ${name} OWNER beaconhs_owner`)
   for (const name of ['safety_fresh', 'safety_forward']) {
@@ -122,7 +128,7 @@ try {
     }
     assert.equal(
       (await executePendingMigrations(db, sequence)).length,
-      name === 'safety_fresh' ? 61 : 3,
+      name === 'safety_fresh' ? 62 : 4,
     )
     const before =
       await client`SELECT hash,created_at FROM drizzle.__drizzle_migrations ORDER BY created_at`
@@ -144,7 +150,7 @@ try {
       assert.equal(privileges?.allowed, true)
       assert.equal(privileges?.forbidden, false)
     }
-    console.log(`PASS ${name}: replay, exact 61-entry ledger, no-op, Risk privilege preservation`)
+    console.log(`PASS ${name}: replay, exact 62-entry ledger, no-op, Risk privilege preservation`)
     if (name === 'safety_fresh') {
       for (const table of riskMigrationTasks({ families: true, versions: true }).tables)
         await client.unsafe(RLS_POLICY_SQL(table))
@@ -180,9 +186,7 @@ try {
       )
       console.log('PASS unchanged People 0057 provenance/property-isolation SQL regression')
       await client`SET ROLE beaconhs_owner`
-      await db.transaction(async () => {
-        await client.unsafe(proposal)
-      })
+      // Approvals was installed by the canonical runner above; do not replay unjournalled DDL.
       await grantUnmanagedObjects(db, ...roles)
       for (const role of ['beaconhs_app', 'beaconhs_super']) {
         for (const table of [
@@ -212,7 +216,7 @@ try {
           false,
         )
       }
-      console.log('PASS actual unnumbered Approvals proposal table/column privilege preservation')
+      console.log('PASS canonical Approvals migration table/column privilege preservation')
       await client.unsafe(`CREATE TABLE future_backup_fixture(id int, evidence text);
         REVOKE ALL ON future_backup_fixture FROM beaconhs_app,beaconhs_super;
         INSERT INTO future_backup_fixture VALUES (1,'Synthetic backup evidence');
@@ -419,13 +423,35 @@ try {
   await prepareMigrationPrivileges(forwardDb, ...roles)
   assert.equal((await executePendingMigrations(forwardDb, baseline)).length, 58)
   await forward`SELECT pg_advisory_unlock(hashtext('beaconhs:schema-migration'))`
-  for (const phase of ['fresh', 'no-op', 'forward-58-to-61', 'existing-61-no-op']) {
+  const existing = await connect('safety_cli_existing').reserve()
+  reservations.push(existing)
+  await existing`SET ROLE beaconhs_owner`
+  await existing`SELECT pg_advisory_lock(hashtext('beaconhs:schema-migration'))`
+  const existingDb = pinnedMigrationDatabase(existing)
+  await prepareMigrationPrivileges(existingDb, ...roles)
+  assert.equal((await executePendingMigrations(existingDb, sequence.slice(0, 61))).length, 61)
+  assert.equal(
+    (await existing`SELECT to_regclass('approval_requests') AS table_name`)[0]?.table_name,
+    null,
+  )
+  const preservedLedger =
+    await existing`SELECT id,hash,created_at FROM drizzle.__drizzle_migrations ORDER BY created_at`
+  await existing`SELECT pg_advisory_unlock(hashtext('beaconhs:schema-migration'))`
+  for (const phase of [
+    'fresh',
+    'no-op',
+    'forward-58-to-62',
+    'forward-61-to-62',
+    'existing-62-no-op',
+  ]) {
     const database =
-      phase === 'existing-61-no-op'
+      phase === 'existing-62-no-op'
         ? 'safety_fresh'
-        : phase === 'forward-58-to-61'
+        : phase === 'forward-58-to-62'
           ? 'safety_cli_forward'
-          : 'safety_cli'
+          : phase === 'forward-61-to-62'
+            ? 'safety_cli_existing'
+            : 'safety_cli'
     const cliUrl = (role: string) => `postgres://${role}@127.0.0.1:${port}/${database}`
     await new Promise<void>((resolve, reject) => {
       const child = spawn(
@@ -455,7 +481,20 @@ try {
         code === 0 ? resolve() : reject(new Error(`Complete runner ${phase} failed: ${code}`)),
       )
     })
-    console.log(`PASS complete migrate.ts CLI ${phase} using canonical 61-entry journal`)
+    console.log(`PASS complete migrate.ts CLI ${phase} using canonical 62-entry journal`)
+    if (phase === 'forward-61-to-62') {
+      assert.deepEqual(
+        await existing`SELECT id,hash,created_at FROM drizzle.__drizzle_migrations ORDER BY created_at LIMIT 61`,
+        preservedLedger,
+      )
+      assert.equal(
+        (await existing`SELECT count(*)::int AS n FROM drizzle.__drizzle_migrations`)[0]?.n,
+        62,
+      )
+      console.log(
+        'PASS existing 61 ledger IDs, hashes and timestamps preserved; exactly one canonical migration added',
+      )
+    }
     const verified = await connect(
       database,
     )`SELECT hash,created_at FROM drizzle.__drizzle_migrations ORDER BY created_at`

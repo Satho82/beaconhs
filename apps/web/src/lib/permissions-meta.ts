@@ -8,6 +8,7 @@ import { PERMISSION_CATALOGUE, type CataloguePermission } from '@beaconhs/db/sch
 
 // Group label per leading segment, in the order groups should render.
 const GROUP_LABELS: Record<string, string> = {
+  approvals: 'Approvals',
   forms: 'Builder',
   incidents: 'Incidents',
   inspections: 'Inspections',
@@ -30,6 +31,10 @@ const GROUP_LABELS: Record<string, string> = {
 // Short, professional label per permission key. Keys absent here humanise from
 // the key itself (see `humanize`).
 const PERMISSION_LABELS: Record<string, string> = {
+  'approvals.read': 'View approval requests',
+  'approvals.submit': 'Submit approval requests',
+  'approvals.decide': 'Approve or reject assigned requests',
+  'approvals.configure': 'Configure approval workflows',
   'forms.template.read': 'View templates',
   'forms.template.create': 'Create templates',
   'forms.template.publish': 'Publish templates',

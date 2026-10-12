@@ -13,7 +13,10 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
-    "clean": "rm -rf .next .turbo"
+    "clean": "rm -rf .next .turbo",
+    "preview:approvals": "tsx scripts/launch-approvals-preview.ts",
+    "test:approvals-batch01": "tsx scripts/verify-approvals-batch01.ts",
+    "test:approvals-property-authority": "tsx scripts/verify-approvals-property-authority.ts"
   },
   "dependencies": {
     "@beaconhs/ai": "workspace:*",

@@ -1,0 +1,33 @@
+{
+  "phase": "Awaiting disposable browser runtime and startup diagnosis",
+  "candidate": "563fb0e9b79a838a5f394abaffb2f7dc743fc571",
+  "tree": "324c50a60e2cb0639ba920488a150c6531968374",
+  "reviewBranch": "review/uvanoo-v1.4-overnight-release-20261012",
+  "browserRun": 38316469229,
+  "browserJob": 115034175286,
+  "browserControlSha": "b1a38c82e184a2497596dbf69a415cb41a03fc4e",
+  "preservedGreenRun": 38313918871,
+  "pr": 9,
+  "security": "Three exact false positives reconciled; raw failed scan retained",
+  "completed": [
+    "source recovery",
+    "owner acceptance preservation",
+    "protected source/migration identities",
+    "security reconciliation",
+    "18-group platform handover",
+    "draft governed PR",
+    "DEV recovery and read-only inspection plans"
+  ],
+  "pending": [
+    "startup diagnosis",
+    "authenticated browser matrix",
+    "visual comparison",
+    "final freeze manifests"
+  ],
+  "restrictions": [
+    "no accepted runtime changes",
+    "no governed merge",
+    "no persistent changes",
+    "no deployment"
+  ]
+}

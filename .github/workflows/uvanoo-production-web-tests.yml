@@ -73,3 +73,5 @@ jobs:
         run: |
           git add apps packages
           printf 'DRAFT_SOURCE_TREE=%s\n' "$(git write-tree)"
+
+# Final audit call and workflow configuration list.

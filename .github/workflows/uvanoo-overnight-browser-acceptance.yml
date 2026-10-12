@@ -1,0 +1,298 @@
+name: Uvanoo dual authenticated acceptance
+
+# Read-only control workflow validating exact immutable candidates in disposable services. This workflow
+# deliberately has no deploy, image, registry, SSH, or environment path.
+on:
+  push:
+    branches: [review/uvanoo-v1.4-overnight-release-20261012]
+    paths: [.github/workflows/uvanoo-overnight-browser-acceptance.yml]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: uvanoo-overnight-browser-acceptance-${{ github.sha }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  validate:
+    name: Authenticated People and Approvals on unchanged accepted source
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - module: migration-safety
+            source_sha: 563fb0e9b79a838a5f394abaffb2f7dc743fc571
+            source_branch: integration/uvanoo-v1.4-approvals-dev-gate-20261012
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    services:
+      postgres:
+        image: postgres:16-alpine@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: beaconhs_test
+        ports: ['127.0.0.1:5432:5432']
+        options: >-
+          --health-cmd="pg_isready -U postgres -d beaconhs_test"
+          --health-interval=5s --health-timeout=5s --health-retries=10
+      redis:
+        image: redis:7-alpine@sha256:6ab0b6e7381779332f97b8ca76193e45b0756f38d4c0dcda72dbb3c32061ab99
+        ports: ['127.0.0.1:6379:6379']
+        options: >-
+          --health-cmd="redis-cli ping" --health-interval=5s --health-timeout=5s --health-retries=10
+    env:
+      R2_ENDPOINT: http://localhost:9000
+      R2_ACCESS_KEY_ID: beaconhs
+      R2_SECRET_ACCESS_KEY: beaconhs-dev-secret
+      R2_BUCKET: approvals-disposable
+      CI: 'true'
+      NEXT_TELEMETRY_DISABLED: '1'
+      TURBO_TELEMETRY_DISABLED: '1'
+      DATABASE_URL: postgresql://beaconhs_app:beaconhs_app@localhost:5432/beaconhs_test
+      MIGRATION_DATABASE_URL: postgresql://beaconhs_migrator:beaconhs_migrator@localhost:5432/beaconhs_test
+      SUPERADMIN_DATABASE_URL: postgresql://beaconhs_super:beaconhs_super@localhost:5432/beaconhs_test
+      PEOPLE_PROVENANCE_TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/beaconhs_test
+      DATABASE_OWNER_ROLE: beaconhs_owner
+      DATABASE_BACKUP_ROLE: beaconhs_backup
+      REDIS_URL: redis://localhost:6379
+      BETTER_AUTH_SECRET: module-validation-disposable-secret-not-production
+      ATTACHMENT_CAPABILITY_SECRET: module-validation-disposable-capability-secret
+      BETTER_AUTH_URL: http://localhost:3000
+      APP_URL: http://localhost:3000
+
+    steps:
+      - name: Verify control branch and immutable input shape
+        env:
+          SOURCE_SHA: ${{ matrix.source_sha }}
+          SOURCE_BRANCH: ${{ matrix.source_branch }}
+          MODULE: ${{ matrix.module }}
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = 'Satho82/beaconhs'
+          test "$GITHUB_REF" = 'refs/heads/review/uvanoo-v1.4-overnight-release-20261012'
+          [[ "$SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]]
+          case "$MODULE:$SOURCE_BRANCH:$SOURCE_SHA" in
+            migration-safety:integration/uvanoo-v1.4-approvals-dev-gate-20261012:563fb0e9b79a838a5f394abaffb2f7dc743fc571) ;;
+            *) exit 1 ;;
+          esac
+          [[ "$MODULE" =~ ^[a-z0-9][a-z0-9-]{0,63}$ ]]
+
+      - name: Checkout validation control definition
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Verify source branch provenance and checkout exact candidate
+        env:
+          SOURCE_SHA: ${{ matrix.source_sha }}
+          SOURCE_BRANCH: ${{ matrix.source_branch }}
+        run: |
+          set -euo pipefail
+          cp docs/v1.4/overnight/browser-seed.mts "$RUNNER_TEMP/browser-seed.mts"
+          cp docs/v1.4/overnight/browser-acceptance.mjs "$RUNNER_TEMP/browser-acceptance.mjs"
+          git fetch --no-tags origin "$SOURCE_SHA" c306bd6bbe0571eeca18a410c1ac08fe55c524b6
+          test "$(git ls-remote origin "refs/heads/$SOURCE_BRANCH" | cut -f1)" = "$SOURCE_SHA"
+          test "$(git show -s --format=%P "$SOURCE_SHA")" = 6f7048965e8136aaf4067555e93fc048ef2cecb5
+          git checkout --detach "$SOURCE_SHA"
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          test "$(git rev-parse HEAD^{tree})" = 324c50a60e2cb0639ba920488a150c6531968374
+          test "$(git status --porcelain)" = ''
+          git diff --check c306bd6bbe0571eeca18a410c1ac08fe55c524b6 HEAD
+          git diff --exit-code c306bd6bbe0571eeca18a410c1ac08fe55c524b6 HEAD -- 'packages/db/drizzle/00[0-5]*.sql' 'packages/db/drizzle/006[0-2]*.sql' 'apps/web/src/lib/people' 'apps/web/src/app/(app)/people' 'apps/web/src/lib/risk'
+          test "$(git rev-parse HEAD:packages/db/drizzle/0063_approvals_production.sql)" = 000d76e52c965c6487707f20cd4a7f1c13436e3d
+          printf 'candidate_sha=%s\nsource_branch=%s\n' "$SOURCE_SHA" "$SOURCE_BRANCH" >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
+        with:
+          run_install: false
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Verify pinned toolchain and disposable service boundaries
+        run: |
+          set -euo pipefail
+          test "$(node --version)" = "v$(tr -d '\r\n' < .nvmrc)"
+          test "pnpm@$(pnpm --version)" = "$(node -p 'JSON.parse(require("node:fs").readFileSync("package.json", "utf8")).packageManager')"
+          python3 - <<'PY'
+          import os
+          from urllib.parse import urlparse
+          expected = {
+              'DATABASE_URL': 'beaconhs_app',
+              'MIGRATION_DATABASE_URL': 'beaconhs_migrator',
+              'SUPERADMIN_DATABASE_URL': 'beaconhs_super',
+              'PEOPLE_PROVENANCE_TEST_DATABASE_URL': 'postgres',
+          }
+          for name, user in expected.items():
+              value = urlparse(os.environ[name])
+              if (value.scheme, value.hostname, value.port, value.path, value.username, value.query) != (
+                  'postgresql', 'localhost', 5432, '/beaconhs_test', user, ''):
+                  raise SystemExit('Rejected database boundary: ' + name)
+          if os.environ['REDIS_URL'] != 'redis://localhost:6379':
+              raise SystemExit('Rejected Redis boundary')
+          PY
+
+      - name: Frozen dependency install
+        run: pnpm install --frozen-lockfile
+
+      - name: Provision disposable database roles
+        env:
+          PGPASSWORD: postgres
+        run: |
+          set -euo pipefail
+          psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 <<'SQL'
+          CREATE ROLE beaconhs_owner NOLOGIN NOSUPERUSER NOBYPASSRLS;
+          CREATE ROLE beaconhs_migrator LOGIN NOINHERIT NOSUPERUSER NOBYPASSRLS PASSWORD 'beaconhs_migrator';
+          CREATE ROLE beaconhs_app LOGIN NOINHERIT NOSUPERUSER NOBYPASSRLS PASSWORD 'beaconhs_app';
+          CREATE ROLE beaconhs_super LOGIN NOINHERIT NOSUPERUSER BYPASSRLS PASSWORD 'beaconhs_super';
+          CREATE ROLE beaconhs_backup LOGIN NOINHERIT NOSUPERUSER BYPASSRLS PASSWORD 'beaconhs_backup';
+          ALTER ROLE beaconhs_backup SET default_transaction_read_only = 'on';
+          GRANT beaconhs_owner TO beaconhs_migrator;
+          ALTER DATABASE beaconhs_test OWNER TO beaconhs_owner;
+          REVOKE ALL ON DATABASE beaconhs_test FROM PUBLIC;
+          GRANT CONNECT ON DATABASE beaconhs_test TO beaconhs_migrator, beaconhs_app, beaconhs_super, beaconhs_backup;
+          \connect beaconhs_test
+          ALTER SCHEMA public OWNER TO beaconhs_owner;
+          REVOKE ALL ON SCHEMA public FROM PUBLIC;
+          SQL
+
+      - name: Validate migration journal and apply migrations
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs = require('node:fs')
+          const journal = JSON.parse(fs.readFileSync('packages/db/drizzle/meta/_journal.json', 'utf8'))
+          const tags = journal.entries.map((entry) => entry.tag)
+          if (tags.length !== 63 || tags.at(-1) !== '0063_approvals_production') throw new Error('Expected exact 63-migration recovery journal')
+          if (new Set(tags).size !== tags.length || !tags.every((tag) => /^\d{4}_[a-z0-9_]+$/.test(tag))) {
+            throw new Error('Invalid or duplicate migration journal entries')
+          }
+          console.log(`migration-journal-ok: ${tags.length} entries; terminal=${tags.at(-1)}`)
+          NODE
+          pnpm --filter @beaconhs/db exec tsx src/migrate.ts
+      - name: Build pinned disposable storage from official source
+        run: |
+          set -euo pipefail
+          GOBIN=/tmp/uvanoo-storage-bin go install github.com/minio/minio@07c3a429bfed433e49018cb0f78a52145d4bedeb
+          mkdir -m 700 /tmp/uvanoo-storage-data
+          MINIO_ROOT_USER=beaconhs MINIO_ROOT_PASSWORD=beaconhs-dev-secret /tmp/uvanoo-storage-bin/minio server --address 127.0.0.1:9000 /tmp/uvanoo-storage-data > /tmp/uvanoo-storage.log 2>&1 &
+          echo $! > /tmp/uvanoo-storage.pid
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://localhost:9000/minio/health/live; then break; fi
+            sleep 1
+          done
+          curl --fail --silent http://localhost:9000/minio/health/live
+      - name: Prepare disposable synthetic accounts and hotel fixtures
+        env:
+          NODE_ENV: test
+        run: pnpm --filter @beaconhs/db exec tsx "$RUNNER_TEMP/browser-seed.mts"
+
+      - name: Validate harness syntax
+        run: node --check "$RUNNER_TEMP/browser-acceptance.mjs"
+
+      - name: Build runtime for browser acceptance (not a repeated release gate)
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
+        run: |
+          set -euo pipefail
+          memory_kib="$(awk '/^MemTotal:/ {print $2}' /proc/meminfo)"
+          test "$memory_kib" -ge 12000000
+          pnpm build --concurrency=1
+          test -s apps/web/.next/BUILD_ID
+          test -f apps/web/.next/standalone/apps/web/server.js
+          test -f apps/worker/dist/index.js
+
+
+      - name: Preserve built runtime for diagnostic continuation
+        run: |
+          tar -czf "$RUNNER_TEMP/browser-runtime.tgz" apps/web/.next/standalone apps/web/.next/static apps/web/.next/BUILD_ID apps/worker/dist
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: overnight-runtime-563fb0e9b79a838a5f394abaffb2f7dc743fc571
+          path: ${{ runner.temp }}/browser-runtime.tgz
+          retention-days: 7
+
+      - name: Start exact production application on loopback
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/dual-evidence"
+          export HOSTNAME=127.0.0.1 PORT=3000 NODE_ENV=production
+          node apps/web/scripts/start-standalone.mjs > "$RUNNER_TEMP/dual-app.log" 2>&1 &
+          echo $! > "$RUNNER_TEMP/dual-app.pid"
+          ready=false
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://localhost:3000/login > /dev/null; then ready=true; break; fi
+            sleep 2
+          done
+          ps -p "$(cat "$RUNNER_TEMP/dual-app.pid")" -o pid,stat,comm > "$RUNNER_TEMP/dual-evidence/process-status.txt" || true
+          printf 'ready=%s\n' "$ready" > "$RUNNER_TEMP/dual-evidence/readiness.txt"
+          test "$ready" = true
+          chrome="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
+          test -n "$chrome"
+          echo "CHROME_PATH=$chrome" >> "$GITHUB_ENV"
+          "$chrome" --version
+
+      - name: Authenticated browser acceptance
+        timeout-minutes: 20
+        run: node "$RUNNER_TEMP/browser-acceptance.mjs"
+
+      - name: Capture immutable migration and source evidence
+        if: always()
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/dual-evidence"
+          git diff --exit-code
+          git diff --cached --exit-code
+          test -z "$(git ls-files --others --exclude-standard)"
+          test "$(git rev-parse HEAD)" = 563fb0e9b79a838a5f394abaffb2f7dc743fc571
+          test "$(git rev-parse HEAD^{tree})" = 324c50a60e2cb0639ba920488a150c6531968374
+          git rev-parse HEAD HEAD^{tree} > "$RUNNER_TEMP/dual-evidence/source-identity.txt"
+          sha256sum packages/db/drizzle/*.sql packages/db/drizzle/meta/_journal.json > "$RUNNER_TEMP/dual-evidence/migration-hashes.txt"
+          cat "$RUNNER_TEMP/dual-evidence/migration-hashes.txt"
+
+      - name: Capture sanitized server diagnostics
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import os,pathlib,json,re
+          root=pathlib.Path(os.environ['RUNNER_TEMP']); out=root/'dual-evidence'; out.mkdir(exist_ok=True)
+          text=(root/'dual-app.log').read_text() if (root/'dual-app.log').exists() else 'Server log not created'
+          values=[v for k,v in os.environ.items() if any(x in k for x in ['SECRET','PASSWORD','TOKEN','DATABASE_URL']) and len(v)>5]
+          accounts=root/'dual-accounts.json'
+          if accounts.exists(): values += [a['password'] for a in json.loads(accounts.read_text())['accounts'].values()]
+          for v in values: text=text.replace(v,'[REDACTED]')
+          text=re.sub(r'postgres(?:ql)?://[^\\s]+','[DATABASE_URL_REDACTED]',text)
+          (out/'server.log').write_text(text)
+          print('SANITIZED_SERVER_LOG_START'); print(text[-16000:]); print('SANITIZED_SERVER_LOG_END')
+          PY
+
+      - name: Publish browser evidence only
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: uvanoo-overnight-browser-acceptance
+          path: ${{ runner.temp }}/dual-evidence
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Dispose task application
+        if: always()
+        run: |
+          if test -f "$RUNNER_TEMP/dual-app.pid"; then kill "$(cat "$RUNNER_TEMP/dual-app.pid")" || true; fi
+
+      - name: Dispose task storage
+        if: always()
+        run: |
+          if test -f /tmp/uvanoo-storage.pid; then
+            kill "$(cat /tmp/uvanoo-storage.pid)" || true
+          fi
+

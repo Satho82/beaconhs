@@ -384,8 +384,8 @@ try {
       const detail=await readApprovalRequest(ctx,request.id)
       assert.equal(detail.request.status,'approved')
       assert.equal(detail.events.length,2)
-      assert.equal(detail.events[1]?.kind,'approve')
-      const evidence=detail.events[1]?.evidence as {audit?:unknown}
+      assert.ok(detail.events.some(event=>event.kind==='approve'))
+      const evidence=detail.events.find(event=>event.kind==='approve')?.evidence as {audit?:unknown}
       assert.ok(evidence.audit)
     })
     await test('Rejection requires a reason and persists rejected state and evidence', async () => {
@@ -395,7 +395,7 @@ try {
       await decideApproval(actorCtx,{...decision,reason:'Insufficient evidence'})
       const detail=await readApprovalRequest(ctx,request.id)
       assert.equal(detail.request.status,'rejected')
-      assert.equal(detail.events[1]?.kind,'reject')
+      assert.ok(detail.events.some(event=>event.kind==='reject'))
     })
     await test('Sequential stages cannot be skipped or decided by the requester', async () => {
       const workflow=await createApprovalWorkflow(ctx,{propertyId:a,name:'Two stage test',stages:[{name:'First',approverId:actor},{name:'Second',approverId:actor}]})

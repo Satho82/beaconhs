@@ -93,6 +93,8 @@ export default async function PropertyDiaryPage({
                 <option value="daily">Daily</option>
                 <option value="weekly">Weekly</option>
                 <option value="monthly">Monthly</option>
+                <option value="quarterly">Quarterly</option>
+                <option value="yearly">Yearly</option>
               </Select>
             </Label>
             <Label>
@@ -110,9 +112,29 @@ export default async function PropertyDiaryPage({
             </Label>
             <Label>
               {' '}
-              {translateHospitality('m_1e83395904d2fc')}{' '}
+              {translateHospitality('m_1ef6b7389ac6e0')}{' '}
               <Input name="monthDay" type="number" min="1" max="28" defaultValue="1" />
             </Label>
+            <Label>
+              {translateHospitality('m_13221b9bae08de')}
+              <Select name="annualMonth" defaultValue="1">
+                <option value="1">January</option>
+                <option value="2">February</option>
+                <option value="3">March</option>
+                <option value="4">April</option>
+                <option value="5">May</option>
+                <option value="6">June</option>
+                <option value="7">July</option>
+                <option value="8">August</option>
+                <option value="9">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+              </Select>
+            </Label>
+            <p className="text-muted-foreground text-sm sm:col-span-2">
+              {translateHospitality('m_1cf1955fdc2ed9')}
+            </p>
             <Label>
               {' '}
               {translateHospitality('m_14c7a1feb33b17')}{' '}

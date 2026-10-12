@@ -10115,6 +10115,24 @@
     "m_1f5641e48fd81b": "Revisión del contenido",
     "m_1f5fb590bfa4c2": "Editar / asignar",
     "m_1f8217b75aba15": "Algunos temas del catálogo aprobado no están instalados en este entorno. Solo se pueden previsualizar y adoptar las plantillas guardadas.",
-    "m_1fcd7eba1fa38a": "Se requiere revisión específica del establecimiento"
+    "m_1fcd7eba1fa38a": "Se requiere revisión específica del establecimiento",
+    "m_1ef6b7389ac6e0": "Día del mes (1–28)",
+    "m_13221b9bae08de": "Mes (solo anual)",
+    "m_1cf1955fdc2ed9": "Las tareas trimestrales se programan en enero, abril, julio y octubre.",
+    "m_1c54de87504d56": "Enero",
+    "m_1defab7fe03bbd": "Febrero",
+    "m_15e3516a667250": "Marzo",
+    "m_171e825e4fb5b9": "Abril",
+    "m_167c4e9eff21c1": "Mayo",
+    "m_079d7967c168da": "Junio",
+    "m_046a3e1033bfe1": "Julio",
+    "m_11a10054ff6cba": "Agosto",
+    "m_09575103911ade": "Septiembre",
+    "m_007ffb92e2f4dc": "Octubre",
+    "m_060c5ccd35cc19": "Noviembre",
+    "m_07fead3f89c7f5": "Diciembre",
+    "m_124f1b843f4b37": "Programar tareas recurrentes del diario",
+    "m_0060816cddb6c7": "Crear tareas diarias, semanales, mensuales, trimestrales y anuales del establecimiento.",
+    "m_08d295612268ea": "\n# Programar tareas recurrentes del diario\n\nNecesita permiso de gestión de hospitalidad y acceso al establecimiento para crear o editar una programación de tareas.\n\n1. Abra la página **Diario** del establecimiento y utilice el formulario de nueva tarea, o abra **Editar plantilla** en una tarea existente.\n2. Introduzca el título, las instrucciones, la hora de vencimiento y la zona horaria. Elija una persona responsable o deje la tarea sin asignar.\n3. Elija **Diaria**, **Semanal**, **Mensual**, **Trimestral** o **Anual**.\n4. Para las tareas semanales, elija el día de la semana. Para las mensuales, trimestrales y anuales, introduzca **Día del mes (1–28)**.\n5. Las tareas trimestrales se programan en enero, abril, julio y octubre. Para las anuales, elija **Mes (solo anual)**.\n6. Guarde la programación. El proceso en segundo plano crea las tareas cuando corresponden en la zona horaria seleccionada, incluidos los cambios entre el horario de verano e invierno.\n\nLos días se limitan al 1–28 para que todos los meses seleccionados tengan una fecha de vencimiento. Cambiar la programación afecta a las tareas futuras; no modifica el historial de tareas completadas. Desactivar la programación detiene la creación de nuevas tareas.\n"
   }
 }

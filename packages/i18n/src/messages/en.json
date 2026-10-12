@@ -10115,6 +10115,24 @@
     "m_1f5641e48fd81b": "Content revision",
     "m_1f5fb590bfa4c2": "Edit / assign",
     "m_1f8217b75aba15": "Some approved catalogue topics are not installed in this environment. Only saved templates can be previewed and adopted.",
-    "m_1fcd7eba1fa38a": "Property-specific review required"
+    "m_1fcd7eba1fa38a": "Property-specific review required",
+    "m_1ef6b7389ac6e0": "Day of month (1–28)",
+    "m_13221b9bae08de": "Month (yearly only)",
+    "m_1cf1955fdc2ed9": "Quarterly tasks run in January, April, July and October.",
+    "m_1c54de87504d56": "January",
+    "m_1defab7fe03bbd": "February",
+    "m_15e3516a667250": "March",
+    "m_171e825e4fb5b9": "April",
+    "m_167c4e9eff21c1": "May",
+    "m_079d7967c168da": "June",
+    "m_046a3e1033bfe1": "July",
+    "m_11a10054ff6cba": "August",
+    "m_09575103911ade": "September",
+    "m_007ffb92e2f4dc": "October",
+    "m_060c5ccd35cc19": "November",
+    "m_07fead3f89c7f5": "December",
+    "m_124f1b843f4b37": "Schedule recurring diary tasks",
+    "m_0060816cddb6c7": "Create daily, weekly, monthly, quarterly and yearly property tasks.",
+    "m_08d295612268ea": "\n# Schedule recurring diary tasks\n\nYou need hospitality management permission and access to the property to create or edit a task schedule.\n\n1. Open the property's **Diary** page and use the new task form, or open **Edit template** on an existing task.\n2. Enter the title, instructions, due time and timezone. Choose an assignee or leave the task unassigned.\n3. Choose **Daily**, **Weekly**, **Monthly**, **Quarterly** or **Yearly**.\n4. For weekly tasks, choose the weekday. For monthly, quarterly and yearly tasks, enter **Day of month (1–28)**.\n5. Quarterly tasks run in January, April, July and October. For yearly tasks, choose **Month (yearly only)**.\n6. Save the schedule. The worker creates due occurrences in the selected timezone, including changes between summer and winter time.\n\nDays are limited to 1–28 so every selected month has a due date. Changing a schedule affects future occurrences; it does not rewrite completed task history. Disabling a schedule stops new occurrences.\n"
   }
 }

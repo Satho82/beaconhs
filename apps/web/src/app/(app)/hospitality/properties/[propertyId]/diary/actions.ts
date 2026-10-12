@@ -18,7 +18,13 @@ const path = (propertyId: string) => `/hospitality/properties/${propertyId}/diar
 
 function input(form: FormData): DiaryTemplateInput {
   const recurrence = value(form, 'recurrence')
-  if (recurrence !== 'daily' && recurrence !== 'weekly' && recurrence !== 'monthly')
+  if (
+    recurrence !== 'daily' &&
+    recurrence !== 'weekly' &&
+    recurrence !== 'monthly' &&
+    recurrence !== 'quarterly' &&
+    recurrence !== 'yearly'
+  )
     throw new Error('Invalid diary recurrence.')
   return {
     title: value(form, 'title'),
@@ -27,6 +33,7 @@ function input(form: FormData): DiaryTemplateInput {
     dueTime: value(form, 'dueTime'),
     weekday: optional(form, 'weekday'),
     monthDay: optional(form, 'monthDay'),
+    annualMonth: optional(form, 'annualMonth'),
     timezone: value(form, 'timezone'),
     assigneeId: optional(form, 'assigneeId'),
   }

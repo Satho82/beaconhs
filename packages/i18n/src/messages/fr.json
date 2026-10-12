@@ -10115,6 +10115,24 @@
     "m_1f5641e48fd81b": "Révision du contenu",
     "m_1f5fb590bfa4c2": "Modifier / attribuer",
     "m_1f8217b75aba15": "Certains sujets du catalogue approuvé ne sont pas installés dans cet environnement. Seuls les modèles enregistrés peuvent être prévisualisés et adoptés.",
-    "m_1fcd7eba1fa38a": "Examen propre à l’établissement requis"
+    "m_1fcd7eba1fa38a": "Examen propre à l’établissement requis",
+    "m_1ef6b7389ac6e0": "Jour du mois (1–28)",
+    "m_13221b9bae08de": "Mois (annuel uniquement)",
+    "m_1cf1955fdc2ed9": "Les tâches trimestrielles sont programmées en janvier, avril, juillet et octobre.",
+    "m_1c54de87504d56": "Janvier",
+    "m_1defab7fe03bbd": "Février",
+    "m_15e3516a667250": "Mars",
+    "m_171e825e4fb5b9": "Avril",
+    "m_167c4e9eff21c1": "Mai",
+    "m_079d7967c168da": "Juin",
+    "m_046a3e1033bfe1": "Juillet",
+    "m_11a10054ff6cba": "Août",
+    "m_09575103911ade": "Septembre",
+    "m_007ffb92e2f4dc": "Octobre",
+    "m_060c5ccd35cc19": "Novembre",
+    "m_07fead3f89c7f5": "Décembre",
+    "m_124f1b843f4b37": "Programmer les tâches récurrentes du journal",
+    "m_0060816cddb6c7": "Créer des tâches quotidiennes, hebdomadaires, mensuelles, trimestrielles et annuelles pour l’établissement.",
+    "m_08d295612268ea": "\n# Programmer les tâches récurrentes du journal\n\nVous devez disposer de l’autorisation de gestion hôtelière et d’un accès à l’établissement pour créer ou modifier une programmation de tâches.\n\n1. Ouvrez la page **Journal** de l’établissement et utilisez le formulaire de nouvelle tâche, ou ouvrez **Modifier le modèle** sur une tâche existante.\n2. Saisissez le titre, les instructions, l’heure d’échéance et le fuseau horaire. Choisissez un responsable ou laissez la tâche non attribuée.\n3. Choisissez **Quotidienne**, **Hebdomadaire**, **Mensuelle**, **Trimestrielle** ou **Annuelle**.\n4. Pour les tâches hebdomadaires, choisissez le jour de la semaine. Pour les tâches mensuelles, trimestrielles et annuelles, saisissez le **Jour du mois (1–28)**.\n5. Les tâches trimestrielles sont programmées en janvier, avril, juillet et octobre. Pour les tâches annuelles, choisissez le **Mois (annuel uniquement)**.\n6. Enregistrez la programmation. Le traitement en arrière-plan crée les tâches à échéance dans le fuseau horaire sélectionné, y compris lors des changements d’heure d’été et d’hiver.\n\nLes jours sont limités à 1–28 pour garantir une échéance dans chaque mois sélectionné. Modifier la programmation concerne les tâches futures et ne réécrit pas l’historique des tâches terminées. La désactivation empêche la création de nouvelles tâches.\n"
   }
 }

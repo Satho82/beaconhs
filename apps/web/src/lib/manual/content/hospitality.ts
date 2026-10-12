@@ -2,6 +2,29 @@ import type { ManualArticle } from '../types'
 
 export const HOSPITALITY_ARTICLES: ManualArticle[] = [
   {
+    slug: 'hospitality-diary-schedules',
+    title: 'Schedule recurring diary tasks',
+    group: 'Everyday tasks',
+    iconKey: 'clipboard-check',
+    summary: 'Create daily, weekly, monthly, quarterly and yearly property tasks.',
+    keywords: ['diary', 'tasks', 'schedule', 'quarterly', 'yearly'],
+    requiredPermission: 'hospitality.manage',
+    body: `
+# Schedule recurring diary tasks
+
+You need hospitality management permission and access to the property to create or edit a task schedule.
+
+1. Open the property's **Diary** page and use the new task form, or open **Edit template** on an existing task.
+2. Enter the title, instructions, due time and timezone. Choose an assignee or leave the task unassigned.
+3. Choose **Daily**, **Weekly**, **Monthly**, **Quarterly** or **Yearly**.
+4. For weekly tasks, choose the weekday. For monthly, quarterly and yearly tasks, enter **Day of month (1–28)**.
+5. Quarterly tasks run in January, April, July and October. For yearly tasks, choose **Month (yearly only)**.
+6. Save the schedule. The worker creates due occurrences in the selected timezone, including changes between summer and winter time.
+
+Days are limited to 1–28 so every selected month has a due date. Changing a schedule affects future occurrences; it does not rewrite completed task history. Disabling a schedule stops new occurrences.
+`,
+  },
+  {
     slug: 'hospitality-risk-review-schedule',
     title: 'Review Risk Assessments',
     group: 'Everyday tasks',

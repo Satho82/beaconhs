@@ -124,3 +124,50 @@ describe('recurrence offset input boundary', () => {
     },
   )
 })
+
+describe('London quarterly and yearly operational schedules', () => {
+  it('keeps quarterly 09:30 local time across both London clock changes', () => {
+    const slots = planOperationalTaskOccurrences({
+      schedule: {
+        ...dailyToronto,
+        cron: '30 9 15 1,4,7,10 *',
+        timezone: 'Europe/London',
+        activeFrom: new Date('2026-01-01T00:00:00Z'),
+        dueOffsetMinutes: 0,
+      },
+      after: new Date('2026-01-01T00:00:00Z'),
+      through: new Date('2027-01-16T00:00:00Z'),
+      limit: 10,
+    })
+    expect(slots.map((slot) => slot.scheduledAt.toISOString())).toEqual([
+      '2026-01-15T09:30:00.000Z',
+      '2026-04-15T08:30:00.000Z',
+      '2026-07-15T08:30:00.000Z',
+      '2026-10-15T08:30:00.000Z',
+      '2027-01-15T09:30:00.000Z',
+    ])
+    expect(slots.every((slot) => slot.dueAt.getTime() === slot.scheduledAt.getTime())).toBe(true)
+  })
+
+  it('creates one yearly February occurrence in ordinary and leap years', () => {
+    const slots = planOperationalTaskOccurrences({
+      schedule: {
+        ...dailyToronto,
+        cron: '45 8 28 2 *',
+        timezone: 'Europe/London',
+        activeFrom: new Date('2026-01-01T00:00:00Z'),
+        dueOffsetMinutes: 30,
+      },
+      after: new Date('2026-01-01T00:00:00Z'),
+      through: new Date('2028-03-01T00:00:00Z'),
+      limit: 10,
+    })
+    expect(slots.map((slot) => slot.scheduledAt.toISOString())).toEqual([
+      '2026-02-28T08:45:00.000Z',
+      '2027-02-28T08:45:00.000Z',
+      '2028-02-28T08:45:00.000Z',
+    ])
+    expect(slots[0]?.dueAt.toISOString()).toBe('2026-02-28T09:15:00.000Z')
+    expect(new Set(slots.map((slot) => slot.idempotencyKey)).size).toBe(3)
+  })
+})

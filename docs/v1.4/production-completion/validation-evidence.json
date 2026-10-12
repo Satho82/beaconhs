@@ -1,0 +1,597 @@
+{
+  "schemaVersion": 1,
+  "repository": "Satho82/beaconhs",
+  "source": {
+    "branch": "recovery/uvanoo-v1.4-approvals-production-20261012",
+    "commit": "937242e7e35806acab48c28c4163719b00c0f16d",
+    "tree": "9912feac29a30b4b32d219b4cc21f80f1f57f7f7",
+    "base": "c306bd6bbe0571eeca18a410c1ac08fe55c524b6",
+    "changes": 44,
+    "implementationModifiedAfterRecovery": false
+  },
+  "control": {
+    "branch": "recovery/uvanoo-v1.4-approvals-validation-20261012",
+    "verifierCorrectionCommit": "5d8610652cd9a555a3da16d32fd040747e2468b8",
+    "releaseWorkflowCommit": "9cc6c1c3b1cacf36df1d89fe93c4d8f948076642",
+    "note": "Actions run head is the control commit; every validation job checks out the exact recovered source commit."
+  },
+  "priorFailure": {
+    "run": 38304973942,
+    "staleObject": "40eedb50794510be943d15e6d029168504aca2fa",
+    "command": "git diff --cached --name-status 40eedb50794510be943d15e6d029168504aca2fa",
+    "error": "fatal: bad object 40eedb50794510be943d15e6d029168504aca2fa",
+    "exitCode": 128,
+    "resolution": "Separate verifier correction checks existence of immutable base and exact reconstructed tree, preserves source-identity, protected-path, blob-hash and drift gates."
+  },
+  "identityPreflight": {
+    "run": 38306009284,
+    "result": "SUCCESS",
+    "filesVerified": 44,
+    "diffCheck": "PASS"
+  },
+  "preservedPassingRuns": [
+    38299763258,
+    38300015941,
+    38290116395
+  ],
+  "migration": {
+    "originalEntries": 62,
+    "finalEntries": 63,
+    "prefixUnchanged": true,
+    "newEntries": [
+      {
+        "idx": 62,
+        "version": "7",
+        "when": 1791831600000,
+        "tag": "0063_approvals_production",
+        "breakpoints": true
+      }
+    ],
+    "migration0063": {
+      "path": "packages/db/drizzle/0063_approvals_production.sql",
+      "gitBlob": "000d76e52c965c6487707f20cd4a7f1c13436e3d",
+      "sha256": "db91fbe88b2eb9d3dd8cb28cdb30422f10492c5bafaac9573df16c071b0682f8"
+    },
+    "originalSqlBlobsUnchanged": true,
+    "scope": "Disposable PostgreSQL 16 only",
+    "scenarios": [
+      "fresh63",
+      "forward58to63",
+      "forward61to63",
+      "forward62to63",
+      "existing63NoOp",
+      "transactionAndLedgerRollback",
+      "unchangedSqlRetry",
+      "duplicateAndHashLedgerRejection",
+      "advisoryLockConcurrentExclusion",
+      "People0057Provenance",
+      "RiskPrivilegeImmutability",
+      "ACLDriftRejection",
+      "BackupReadOnlyAndDisposableBackupRestore"
+    ]
+  },
+  "validation": {
+    "run": 38306431626,
+    "url": "https://github.com/Satho82/beaconhs/actions/runs/38306431626",
+    "status": "completed",
+    "conclusion": "success",
+    "controlHead": "9cc6c1c3b1cacf36df1d89fe93c4d8f948076642",
+    "completedBy": "2026-10-12T21:09:56Z",
+    "jobs": [
+      {
+        "id": 115001492001,
+        "name": "CodeQL (JavaScript/TypeScript)",
+        "status": "completed",
+        "conclusion": "success",
+        "run_id": 38306431626,
+        "logs_url": null,
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1
+          },
+          {
+            "name": "Run actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2
+          },
+          {
+            "name": "Run github/codeql-action/init@99df26d4f13ea111d4ec1a7dddef6063f76b97e9",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3
+          },
+          {
+            "name": "Run github/codeql-action/analyze@99df26d4f13ea111d4ec1a7dddef6063f76b97e9",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4
+          },
+          {
+            "name": "Post Run github/codeql-action/analyze@99df26d4f13ea111d4ec1a7dddef6063f76b97e9",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 6
+          },
+          {
+            "name": "Post Run github/codeql-action/init@99df26d4f13ea111d4ec1a7dddef6063f76b97e9",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 7
+          },
+          {
+            "name": "Post Run actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 8
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 9
+          }
+        ],
+        "url": "https://github.com/Satho82/beaconhs/actions/runs/38306431626/job/115001492001"
+      },
+      {
+        "id": 115001492134,
+        "name": "Gitleaks",
+        "status": "completed",
+        "conclusion": "success",
+        "run_id": 38306431626,
+        "logs_url": null,
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1
+          },
+          {
+            "name": "Run actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2
+          },
+          {
+            "name": "Run gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3
+          },
+          {
+            "name": "Post Run actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 6
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 7
+          }
+        ],
+        "url": "https://github.com/Satho82/beaconhs/actions/runs/38306431626/job/115001492134"
+      },
+      {
+        "id": 115001492204,
+        "name": "Committed Approvals release and preserved People Risk gates (migration-safety, 937242e7e35806acab...",
+        "status": "completed",
+        "conclusion": "success",
+        "run_id": 38306431626,
+        "logs_url": null,
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1
+          },
+          {
+            "name": "Initialize containers",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2
+          },
+          {
+            "name": "Verify control branch and immutable input shape",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3
+          },
+          {
+            "name": "Checkout validation control definition",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4
+          },
+          {
+            "name": "Verify source branch provenance and checkout exact candidate",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5
+          },
+          {
+            "name": "Run pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 6
+          },
+          {
+            "name": "Run actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 7
+          },
+          {
+            "name": "Verify pinned toolchain and disposable service boundaries",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 8
+          },
+          {
+            "name": "Frozen dependency install",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 9
+          },
+          {
+            "name": "Record preserved focused evidence",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 10
+          },
+          {
+            "name": "Provision disposable database roles",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 11
+          },
+          {
+            "name": "Formatting",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 12
+          },
+          {
+            "name": "Fresh route types",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 13
+          },
+          {
+            "name": "Typecheck",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 14
+          },
+          {
+            "name": "Database typecheck",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 15
+          },
+          {
+            "name": "Lint",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 16
+          },
+          {
+            "name": "Dead-code gate",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 17
+          },
+          {
+            "name": "Validate migration journal and apply migrations",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 18
+          },
+          {
+            "name": "Prove migration idempotence",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 19
+          },
+          {
+            "name": "Unit and regression tests",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 20
+          },
+          {
+            "name": "Build pinned disposable storage from official source",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 21
+          },
+          {
+            "name": "Production lifecycle and financial security integration",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 22
+          },
+          {
+            "name": "Dispose task storage",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 23
+          },
+          {
+            "name": "Cross-tenant and cross-property enforcement",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 24
+          },
+          {
+            "name": "Real People provenance and RLS boundary tests",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 25
+          },
+          {
+            "name": "Related real property RLS regressions",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 26
+          },
+          {
+            "name": "Closed Risk revision regression",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 27
+          },
+          {
+            "name": "Migration Safety isolated rollback and ACL harness",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 28
+          },
+          {
+            "name": "Dispose only task-owned Migration Safety fixture",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 29
+          },
+          {
+            "name": "Deployment contract regressions without deployment",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 30
+          },
+          {
+            "name": "Production build only",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 31
+          },
+          {
+            "name": "Verify exact final source identity",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 32
+          },
+          {
+            "name": "Post Run actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 61
+          },
+          {
+            "name": "Post Run pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 62
+          },
+          {
+            "name": "Post Checkout validation control definition",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 63
+          },
+          {
+            "name": "Stop containers",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 64
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 65
+          }
+        ],
+        "url": "https://github.com/Satho82/beaconhs/actions/runs/38306431626/job/115001492204"
+      }
+    ],
+    "allGatesPassed": true,
+    "cleanSourceTree": true,
+    "finalSourceCommit": "937242e7e35806acab48c28c4163719b00c0f16d",
+    "finalSourceTree": "9912feac29a30b4b32d219b4cc21f80f1f57f7f7"
+  },
+  "limitations": [
+    "No authenticated browser/visual owner acceptance claimed.",
+    "CodeQL analysis success means analysis completed and uploaded; it is not a claim of zero repository alerts.",
+    "No persistent environment, database, deployment, image publication or governed-branch promotion performed."
+  ],
+  "deploymentBlockers": [
+    "Existing feature deployment entrypoint selects src/verify-prepared-risk.ts, a read-only 61-entry adoption verifier. It cannot apply 0062/0063 or accept a 63-entry ledger.",
+    "Recovery commit is not governed feature head and has no authoritative feature-branch image publication. Existing promotion gates correctly reject it.",
+    "Current persistent database ledger/schema/roles/ACLs were not inspected; a separately authorized deployment preflight is required."
+  ],
+  "ownerApprovalsRequired": [
+    "Authorize a disposable authenticated browser acceptance environment and synthetic role/property/tenant accounts; complete the separate People and Approvals matrices.",
+    "Approve People visual and workflow acceptance against approved originals, separately from security evidence.",
+    "Approve Approvals visual and end-to-end workflow acceptance against approved originals, separately from engineering gates.",
+    "Authorize separately scoped governed integration and deployment-path compatibility work; require current feature-head checks and immutable image evidence without bypasses.",
+    "Only after acceptance and path repair, authorize a separately scoped target-environment migration preflight and deployment decision; neither module is frozen by this report."
+  ],
+  "recordedAt": "2026-10-12 21:11:28 UTC",
+  "counts": {
+    "workspaceTypecheckTasks": 25,
+    "workspaceTestTasks": 23,
+    "workspaceVitestPassed": 2787,
+    "workspaceNodeTestsPassed": 35,
+    "workspaceOptInTestsSkipped": 1,
+    "skippedTestExplanation": "property-delegation.integration.test.ts is opt-in in the general suite; it was explicitly enabled and passed separately in step 24.",
+    "propertyDelegationIntegrationPassed": 1,
+    "approvalsLifecycleChecksPassed": 29,
+    "additionalConcurrencyNotificationReminderGroupsPassed": 5,
+    "peopleProvenanceGroupsPassed": 20,
+    "productionBuildTasks": 2
+  },
+  "security": {
+    "gitleaks": {
+      "status": "SUCCESS",
+      "scope": "Recovered source HEAD commit; 1 commit scanned with --log-opts=-1",
+      "result": "no leaks found",
+      "artifact": {
+        "id": 11773182568,
+        "node_id": "MDg6QXJ0aWZhY3QxMTc3MzE4MjU2OA==",
+        "name": "gitleaks-results.sarif",
+        "size_in_bytes": 7107,
+        "url": "https://api.github.com/repos/Satho82/beaconhs/actions/artifacts/11773182568",
+        "archive_download_url": "https://api.github.com/repos/Satho82/beaconhs/actions/artifacts/11773182568/zip",
+        "expired": false,
+        "digest": "sha256:294443c4a16acee2c7dd229dba377713458b718345a3d6d941781b0a3735122f",
+        "created_at": "2026-10-12T20:47:11Z",
+        "updated_at": "2026-10-12T20:47:11Z",
+        "expires_at": "2027-01-10T20:46:56Z",
+        "workflow_run": {
+          "id": 38306431626,
+          "repository_id": 1362482838,
+          "head_repository_id": 1362482838,
+          "head_branch": "recovery/uvanoo-v1.4-approvals-validation-20261012",
+          "head_sha": "9cc6c1c3b1cacf36df1d89fe93c4d8f948076642"
+        }
+      }
+    },
+    "codeql": {
+      "status": "SUCCESS",
+      "language": "javascript-typescript",
+      "suite": "security-extended",
+      "result": "Analysis uploaded and completed; no claim of zero repository alerts."
+    }
+  },
+  "nonBlockingBuildWarnings": [
+    "packages/sync/src/db-drivers.ts: dynamic dependency expression (two import traces)",
+    "bullmq child-processor.js: dynamic dependency expression",
+    "yargs apply-extends.js via Puppeteer: direct import.meta access unsupported"
+  ],
+  "logEvidence": [
+    "2026-10-12T20:58:11.3429269Z PASS Reproduces canonical mixed-role scope combination without changing global RBAC",
+    "2026-10-12T20:58:11.3525779Z PASS Mixed roles cannot configure Property B using Property A permission",
+    "2026-10-12T20:58:11.5974514Z PASS Same-assignment Property A permission succeeds",
+    "2026-10-12T20:58:11.6026189Z PASS Foreign property denied",
+    "2026-10-12T20:58:11.6053139Z PASS Selected unrelated role cannot borrow privileged role permission",
+    "2026-10-12T20:58:11.6110348Z PASS Unscoped override cannot elevate unrelated Property B role",
+    "2026-10-12T20:58:13.2718362Z PASS Actual collection SQL excludes B requests and workflows for mixed roles",
+    "2026-10-12T20:58:13.5137118Z PASS Unscoped read override cannot expose B collections or detail",
+    "2026-10-12T20:58:13.5290988Z PASS Read deny and suspended requester block collections and detail with stale context",
+    "2026-10-12T20:58:13.5304737Z PASS Forged foreign tenant context cannot read collections or detail",
+    "2026-10-12T20:58:13.5339415Z PASS User without configure permission cannot create workflows",
+    "2026-10-12T20:58:13.7411955Z PASS Request stages survive creation of another workflow version",
+    "2026-10-12T20:58:13.7454785Z PASS Suspended approver denied despite stale context",
+    "2026-10-12T20:58:13.7502367Z PASS Revoked property binding blocks assigned approver despite stale context",
+    "2026-10-12T20:58:13.7623360Z PASS Mixed-role read access cannot restore revoked decision authority",
+    "2026-10-12T20:58:13.7678196Z PASS Explicit deny still overrides same-property wildcard role grant",
+    "2026-10-12T20:58:13.7733122Z PASS Revoked permission denied despite stale context and remaining read role",
+    "2026-10-12T20:58:13.7744252Z PASS No denied operations produced approval decisions",
+    "2026-10-12T20:58:14.3959869Z PASS Submission retries preserve the same immutable request",
+    "2026-10-12T20:58:15.7425591Z PASS Approval persists a decision and immutable audit event; retries do not duplicate",
+    "2026-10-12T20:58:16.9421368Z PASS Rejection requires a reason and persists rejected state and evidence",
+    "2026-10-12T20:58:18.8300771Z PASS Sequential stages cannot be skipped or decided by the requester",
+    "2026-10-12T20:58:21.0776310Z PASS Production financial request persists exact amount and secure document; idempotent retry",
+    "2026-10-12T20:58:21.0924877Z PASS Production lists and document access preserve property and tenant isolation",
+    "2026-10-12T20:58:22.4865934Z PASS Additional documents require current requester access and persist once on retry",
+    "2026-10-12T20:58:24.3160275Z PASS Comments, more-information and resubmission preserve financial evidence and audit",
+    "2026-10-12T20:58:25.6010996Z PASS Delegation preserves original stages, rejects self/requester and stale assignment, and authorises delegate decision",
+    "2026-10-12T20:58:27.1033694Z PASS Cancellation is requester-only and terminal; notification effects are durable",
+    "2026-10-12T20:58:27.9996753Z PASS Financial role limits reject revoked configured roles before a decision",
+    "2026-10-12T20:58:28.0153867Z 29 checks passed; lifecycle fixture rolled back; no DDL or DEV access",
+    "2026-10-12T20:58:30.4403640Z PASS concurrent approve/reject: exactly one decision and idempotent winner retry",
+    "2026-10-12T20:58:32.9391659Z PASS concurrent delegation/decision serialization; stale authority cannot decide",
+    "2026-10-12T20:58:33.9949216Z PASS real notification/email queue fanout with stable retry IDs and no financial content",
+    "2026-10-12T20:58:34.1133062Z PASS notification dispatch rechecks revoked recipient authority",
+    "2026-10-12T20:58:34.3102333Z PASS automatic reminder scheduling and same-slot idempotence",
+    "2026-10-12T20:58:34.3103149Z Concurrency and notification fixtures committed only to disposable CI services; runner disposal removes all data",
+    "2026-10-12T20:58:37.4183891Z PASS: original hidden-assignment and unassigned-person regression, rolled back",
+    "2026-10-12T20:58:37.5513593Z PASS: unassigned, legacy, single-property, foreign-property, tenant-wide, cross-tenant, Training and PPE",
+    "2026-10-12T20:58:37.6525755Z PASS: property assignment creation and reassignment cannot claim a hidden Person",
+    "2026-10-12T20:58:37.6603028Z PASS: mixed assignments deny legacy; multi-property union preserves access",
+    "2026-10-12T20:58:37.6949145Z PASS: future, expired, inclusive start/end and open-ended assignment dates",
+    "2026-10-12T20:58:37.7749510Z PASS: empty, null, malformed, foreign and missing property provenance fail closed",
+    "2026-10-12T20:58:37.7970651Z PASS: non-object site metadata fails closed",
+    "2026-10-12T20:58:37.8345951Z PASS: SELECT/INSERT/UPDATE/DELETE, hidden assignment DML and tenant-qualified foreign keys",
+    "2026-10-12T20:58:37.8464583Z PASS: function owner/search_path/FORCE RLS/boolean contract and runtime privilege escalation denials",
+    "2026-10-12T20:58:37.8633647Z PASS: concurrent writer-first assignment creation: observed lock wait and fresh authorization",
+    "2026-10-12T20:58:37.8772184Z PASS: concurrent writer-first assignment reassignment: observed lock wait and fresh authorization",
+    "2026-10-12T20:58:37.8908178Z PASS: concurrent writer-first assignment deletion: observed lock wait and fresh authorization",
+    "2026-10-12T20:58:37.9008055Z PASS: concurrent writer-first assignment rollback: observed lock wait and fresh authorization",
+    "2026-10-12T20:58:37.9125301Z PASS: concurrent writer-first site remapping: observed lock wait and fresh authorization",
+    "2026-10-12T20:58:37.9256891Z PASS: concurrent writer-first property reassignment: observed lock wait and fresh authorization",
+    "2026-10-12T20:58:37.9364566Z PASS: concurrent writer-first property deletion: observed lock wait and fresh authorization",
+    "2026-10-12T20:58:37.9885558Z PASS: reader-first SELECT FOR UPDATE and mutation serialize; other tenant continues independently",
+    "2026-10-12T20:58:37.9915136Z PASS: fixed-snapshot isolation fails closed",
+    "2026-10-12T20:58:38.0244755Z PASS: stale legacy assignment deletion cannot erase newly committed hotel provenance",
+    "2026-10-12T20:58:38.0552832Z PASS: same-transaction site cascade removes authoritative assignments without stale eligibility",
+    "2026-10-12T20:58:38.0553585Z People provenance integration: 20 groups PASS",
+    "2026-10-12T20:59:04.7498339Z PASS safety_fresh: replay, exact 63-entry ledger, no-op, Risk privilege preservation",
+    "2026-10-12T20:59:14.2103535Z PASS existing prepared-Risk security predicate; injected application ACL drift detected and rolled back",
+    "2026-10-12T20:59:14.2190888Z PASS unchanged People 0057 provenance/property-isolation SQL regression",
+    "2026-10-12T20:59:14.3412858Z PASS canonical Approvals migration table/column privilege preservation",
+    "2026-10-12T20:59:14.7319899Z PASS backup SELECT, denied writes with read-only disabled, no escalation; column-ACL and role-membership drift rejected",
+    "2026-10-12T20:59:17.5690244Z PASS repository backup.sh and checksum-portable restore-verify.sh against disposable data",
+    "2026-10-12T20:59:26.1285880Z PASS old broad default grants removed before new objects are created",
+    "2026-10-12T20:59:26.5857171Z PASS safety_forward: replay, exact 63-entry ledger, no-op, Risk privilege preservation",
+    "2026-10-12T20:59:26.7560872Z PASS ledger insertion failure rolls back SQL; unchanged retry commits both",
+    "2026-10-12T20:59:26.7561534Z PASS failure rollback, previous commit survives, unchanged-SQL retry, duplicate/hash ledger rejection",
+    "2026-10-12T20:59:26.7697999Z PASS explicit zero-access and Approvals-style column privilege preservation",
+    "2026-10-12T20:59:26.8267015Z PASS concurrent connection exclusion and successor no-op",
+    "2026-10-12T21:00:11.8894491Z PASS complete migrate.ts CLI fresh using canonical 63-entry journal",
+    "2026-10-12T21:00:23.1437228Z PASS complete migrate.ts CLI no-op using canonical 63-entry journal",
+    "2026-10-12T21:00:34.8819031Z PASS complete migrate.ts CLI forward-58-to-63 using canonical 63-entry journal",
+    "2026-10-12T21:00:46.5560658Z PASS complete migrate.ts CLI forward-61-to-63 using canonical 63-entry journal",
+    "2026-10-12T21:00:46.5585128Z PASS existing 61 ledger IDs, hashes and timestamps preserved; canonical 0062 and additive 0063 added",
+    "2026-10-12T21:00:58.0673420Z PASS complete migrate.ts CLI forward-62-to-63 using canonical 63-entry journal",
+    "2026-10-12T21:00:58.0696757Z PASS existing 62 ledger identities preserved; only additive 0063 applied",
+    "2026-10-12T21:01:09.3751930Z PASS complete migrate.ts CLI existing-63-no-op using canonical 63-entry journal",
+    "2026-10-12T21:01:09.9462712Z PASS success path hides argv secret, preserves I/O, and removes header",
+    "2026-10-12T21:01:09.9601238Z PASS failure path preserves status and removes header",
+    "2026-10-12T21:01:09.9732920Z PASS interruption path preserves signal status and removes header",
+    "2026-10-12T21:01:09.9754756Z PASS line-break token fails closed",
+    "2026-10-12T21:01:10.0031396Z PASS success path hides token from argv/environment and removes temporary files",
+    "2026-10-12T21:01:10.0247358Z PASS curl failure is generic, fails closed, and removes temporary files",
+    "2026-10-12T21:01:10.0448096Z PASS invalid API payload fails closed without leaking the token",
+    "2026-10-12T21:01:10.0679894Z PASS stale workflow SHA fails closed",
+    "2026-10-12T21:01:10.0867892Z PASS interruption removes temporary files without leaking the token",
+    "2026-10-12T21:01:10.0968403Z PASS CR/LF tokens fail before curl without logging the token",
+    "2026-10-12T21:01:10.1017263Z PASS GitHub workflows cannot mutate repository contents",
+    "2026-10-12T21:01:12.9188130Z PASS candidate verifier success",
+    "2026-10-12T21:01:13.3082547Z PASS candidate verifier feature-plus-visual",
+    "2026-10-12T21:01:13.6958599Z PASS candidate verifier ambiguous-feature",
+    "2026-10-12T21:01:13.7631245Z PASS candidate verifier failed-feature",
+    "2026-10-12T21:01:13.8361246Z PASS candidate verifier incomplete-feature",
+    "2026-10-12T21:01:13.9049235Z PASS candidate verifier sha-mismatch",
+    "2026-10-12T21:01:13.9721967Z PASS candidate verifier visual-only",
+    "2026-10-12T21:01:14.0413175Z PASS candidate verifier truncated-runs",
+    "2026-10-12T21:01:14.3283196Z PASS candidate verifier digest-mismatch",
+    "2026-10-12T21:01:14.5136305Z PASS candidate verifier inspect-failure",
+    "2026-10-12T21:01:14.7540012Z PASS candidate verifier invalid-digest",
+    "2026-10-12T21:01:15.0457877Z PASS candidate verifier pull-failure",
+    "2026-10-12T21:01:15.4481620Z PASS candidate verifier wrong-revision",
+    "2026-10-12T21:01:15.8374158Z PASS candidate verifier wrong-version",
+    "2026-10-12T21:01:15.8436925Z PASS candidate verifier old-caller",
+    "2026-10-12T21:01:15.8496176Z PASS V1.4 candidate deployment is manual, DEV-only, digest-bound and writer-fenced",
+    "2026-10-12T21:09:50.8646394Z VALIDATED_RECOVERY_SHA=937242e7e35806acab48c28c4163719b00c0f16d",
+    "2026-10-12T21:09:50.8646842Z VALIDATED_RECOVERY_TREE=9912feac29a30b4b32d219b4cc21f80f1f57f7f7"
+  ]
+}

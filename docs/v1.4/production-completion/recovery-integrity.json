@@ -7,8 +7,8 @@
   "formalFreeze": false,
   "implementationUnchangedAfterRecovery": true,
   "validationRun": "https://github.com/Satho82/beaconhs/actions/runs/38306431626",
-  "validationStatus": "IN_PROGRESS",
-  "status": "RECOVERED_EXACT_TREE_VALIDATION_IN_PROGRESS",
+  "validationStatus": "SUCCESS",
+  "status": "RECOVERED_EXACT_TREE_ENGINEERING_VALIDATED_ACCEPTANCE_PENDING",
   "reviewCommit": "d21af517790e05edbf99f15139c02a3ebcd18cd5",
   "manifestBlob": "3dfa6c5fe1460f054545c2fabcb975818ee92348",
   "preparedEvidenceRun": 38300015941,
@@ -267,5 +267,22 @@
       "gitBlob": "31059b2c8ecfc9a0e69e37b3440c97d51ca01c27",
       "sha256": "f1e955d2830a8df6d5667f0597101fe095b38ae44800a3bcbbbdd78ba54a1df5"
     }
-  ]
+  ],
+  "finalCleanSourceTree": true,
+  "validationEvidenceFile": "docs/v1.4/production-completion/validation-evidence.json",
+  "migrationJournal": {
+    "originalEntries": 62,
+    "finalEntries": 63,
+    "prefixUnchanged": true,
+    "newEntries": [
+      {
+        "idx": 62,
+        "version": "7",
+        "when": 1791831600000,
+        "tag": "0063_approvals_production",
+        "breakpoints": true
+      }
+    ]
+  },
+  "recordedAt": "2026-10-12 21:11:28 UTC"
 }

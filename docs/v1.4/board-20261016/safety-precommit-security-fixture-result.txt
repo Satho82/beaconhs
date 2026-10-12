@@ -1,0 +1,124 @@
+Run 38275954738: original Safety source plus one-line internal export patch. People 20 provenance groups and property delegation passed. Related Action Plans SQL fixture stopped on Risk template family ownership mismatch before migration harness/build. This exposed obsolete fixture setup after canonical 0060; no policy or migration changed to obtain a pass. A separately preserved fixture-only patch is under targeted disposable database verification.
+
+##[group]Run pnpm --filter @beaconhs/web exec vitest run src/lib/property-delegation.integration.test.ts
+2026-10-12T16:26:00.6841952Z [36;1mpnpm --filter @beaconhs/web exec vitest run src/lib/property-delegation.integration.test.ts[0m
+2026-10-12T16:26:00.6904623Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-10-12T16:26:00.6904959Z env:
+2026-10-12T16:26:00.6905134Z   CI: true
+2026-10-12T16:26:00.6905325Z   NEXT_TELEMETRY_DISABLED: 1
+2026-10-12T16:26:00.6905563Z   TURBO_TELEMETRY_DISABLED: 1
+2026-10-12T16:26:00.6906035Z   DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:26:00.6906590Z   MIGRATION_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:26:00.6907084Z   SUPERADMIN_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:26:00.6907618Z   PEOPLE_PROVENANCE_TEST_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:26:00.6907989Z   DATABASE_OWNER_ROLE: beaconhs_owner
+2026-10-12T16:26:00.6908289Z   DATABASE_BACKUP_ROLE: beaconhs_backup
+2026-10-12T16:26:00.6908576Z   REDIS_URL: redis://localhost:6379
+2026-10-12T16:26:00.6908970Z   BETTER_AUTH_SECRET: module-validation-disposable-secret-not-production
+2026-10-12T16:26:00.6909517Z   ATTACHMENT_CAPABILITY_SECRET: module-validation-disposable-capability-secret
+2026-10-12T16:26:00.6910347Z   BETTER_AUTH_URL: http://localhost:3000
+2026-10-12T16:26:00.6910640Z   APP_URL: http://localhost:3000
+2026-10-12T16:26:00.6910938Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+2026-10-12T16:26:00.6911270Z   UVANOO_PROPERTY_DELEGATION_INTEGRATION: 1
+2026-10-12T16:26:00.6911536Z ##[endgroup]
+2026-10-12T16:26:01.3220586Z 
+2026-10-12T16:26:01.3222310Z [1m[30m[46m RUN [49m[39m[22m [36mv4.1.10 [39m[90m/home/runner/work/beaconhs/beaconhs/apps/web[39m
+2026-10-12T16:26:01.3222998Z 
+2026-10-12T16:26:03.8436173Z  [32m✓[39m src/lib/property-delegation.integration.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 188[2mms[22m[39m
+2026-10-12T16:26:03.8457391Z 
+2026-10-12T16:26:03.8462280Z [2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+2026-10-12T16:26:03.8463163Z [2m      Tests [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+2026-10-12T16:26:03.8463888Z [2m   Start at [22m 16:26:01
+2026-10-12T16:26:03.8464872Z [2m   Duration [22m 2.49s[2m (transform 850ms, setup 0ms, import 2.12s, tests 188ms, environment 0ms)[22m
+2026-10-12T16:26:03.8467654Z 
+2026-10-12T16:26:03.9141663Z ##[group]Run pnpm --filter @beaconhs/db test:people-provenance
+2026-10-12T16:26:03.9142156Z [36;1mpnpm --filter @beaconhs/db test:people-provenance[0m
+2026-10-12T16:26:03.9205680Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-10-12T16:26:03.9206025Z env:
+2026-10-12T16:26:03.9206206Z   CI: true
+2026-10-12T16:26:03.9206404Z   NEXT_TELEMETRY_DISABLED: 1
+2026-10-12T16:26:03.9206658Z   TURBO_TELEMETRY_DISABLED: 1
+2026-10-12T16:26:03.9207141Z   DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:26:03.9207708Z   MIGRATION_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:26:03.9208258Z   SUPERADMIN_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:26:03.9208815Z   PEOPLE_PROVENANCE_TEST_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:26:03.9209212Z   DATABASE_OWNER_ROLE: beaconhs_owner
+2026-10-12T16:26:03.9209490Z   DATABASE_BACKUP_ROLE: beaconhs_backup
+2026-10-12T16:26:03.9210155Z   REDIS_URL: redis://localhost:6379
+2026-10-12T16:26:03.9210582Z   BETTER_AUTH_SECRET: module-validation-disposable-secret-not-production
+2026-10-12T16:26:03.9211128Z   ATTACHMENT_CAPABILITY_SECRET: module-validation-disposable-capability-secret
+2026-10-12T16:26:03.9211573Z   BETTER_AUTH_URL: http://localhost:3000
+2026-10-12T16:26:03.9211855Z   APP_URL: http://localhost:3000
+2026-10-12T16:26:03.9212154Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+2026-10-12T16:26:03.9212479Z   UVANOO_PEOPLE_PROVENANCE_INTEGRATION: 1
+2026-10-12T16:26:03.9212746Z ##[endgroup]
+2026-10-12T16:26:04.2464367Z 
+2026-10-12T16:26:04.2465595Z > @beaconhs/db@0.1.0 test:people-provenance /home/runner/work/beaconhs/beaconhs/packages/db
+2026-10-12T16:26:04.2466346Z > tsx src/people-provenance.integration.ts
+2026-10-12T16:26:04.2466616Z 
+2026-10-12T16:26:04.5175362Z PASS: original hidden-assignment and unassigned-person regression, rolled back
+2026-10-12T16:26:04.6737700Z PASS: unassigned, legacy, single-property, foreign-property, tenant-wide, cross-tenant, Training and PPE
+2026-10-12T16:26:04.7997156Z PASS: property assignment creation and reassignment cannot claim a hidden Person
+2026-10-12T16:26:04.8090860Z PASS: mixed assignments deny legacy; multi-property union preserves access
+2026-10-12T16:26:04.8540654Z PASS: future, expired, inclusive start/end and open-ended assignment dates
+2026-10-12T16:26:04.9456262Z PASS: empty, null, malformed, foreign and missing property provenance fail closed
+2026-10-12T16:26:04.9732453Z PASS: non-object site metadata fails closed
+2026-10-12T16:26:05.0214133Z PASS: SELECT/INSERT/UPDATE/DELETE, hidden assignment DML and tenant-qualified foreign keys
+2026-10-12T16:26:05.0359073Z PASS: function owner/search_path/FORCE RLS/boolean contract and runtime privilege escalation denials
+2026-10-12T16:26:05.0632656Z PASS: concurrent writer-first assignment creation: observed lock wait and fresh authorization
+2026-10-12T16:26:05.0856306Z PASS: concurrent writer-first assignment reassignment: observed lock wait and fresh authorization
+2026-10-12T16:26:05.1053689Z PASS: concurrent writer-first assignment deletion: observed lock wait and fresh authorization
+2026-10-12T16:26:05.1182341Z PASS: concurrent writer-first assignment rollback: observed lock wait and fresh authorization
+2026-10-12T16:26:05.1322932Z PASS: concurrent writer-first site remapping: observed lock wait and fresh authorization
+2026-10-12T16:26:05.1511649Z PASS: concurrent writer-first property reassignment: observed lock wait and fresh authorization
+2026-10-12T16:26:05.1652759Z PASS: concurrent writer-first property deletion: observed lock wait and fresh authorization
+2026-10-12T16:26:05.2228505Z PASS: reader-first SELECT FOR UPDATE and mutation serialize; other tenant continues independently
+2026-10-12T16:26:05.2264475Z PASS: fixed-snapshot isolation fails closed
+2026-10-12T16:26:05.2630433Z PASS: stale legacy assignment deletion cannot erase newly committed hotel provenance
+2026-10-12T16:26:05.3002126Z PASS: same-transaction site cascade removes authoritative assignments without stale eligibility
+2026-10-12T16:26:05.3003190Z People provenance integration: 20 groups PASS
+2026-10-12T16:26:05.5171412Z ##[group]Run set -euo pipefail
+2026-10-12T16:26:05.5171743Z [36;1mset -euo pipefail[0m
+2026-10-12T16:26:05.5172665Z [36;1mfor fixture in action-property hospitality-handover-rls hospitality-metering-rls maintenance-evidence-rls incident-property-rls inspection-compliance-property-rls; do[0m
+2026-10-12T16:26:05.5173497Z [36;1m  if [ "$fixture" = action-property ]; then[0m
+2026-10-12T16:26:05.5174157Z [36;1m    pnpm --silent --filter @beaconhs/db run test:action-property-sql | psql -h localhost -U postgres -d beaconhs_test -X -v ON_ERROR_STOP=1[0m
+2026-10-12T16:26:05.5174797Z [36;1m  else[0m
+2026-10-12T16:26:05.5175258Z [36;1m    psql -h localhost -U postgres -d beaconhs_test -X -v ON_ERROR_STOP=1 < "packages/db/src/${fixture}.integration.sql"[0m
+2026-10-12T16:26:05.5175794Z [36;1m  fi[0m
+2026-10-12T16:26:05.5175976Z [36;1mdone[0m
+2026-10-12T16:26:05.5238957Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-10-12T16:26:05.5239301Z env:
+2026-10-12T16:26:05.5239508Z   CI: true
+2026-10-12T16:26:05.5239993Z   NEXT_TELEMETRY_DISABLED: 1
+2026-10-12T16:26:05.5240265Z   TURBO_TELEMETRY_DISABLED: 1
+2026-10-12T16:26:05.5240736Z   DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:26:05.5241288Z   MIGRATION_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:26:05.5241852Z   SUPERADMIN_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:26:05.5242392Z   PEOPLE_PROVENANCE_TEST_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:26:05.5242774Z   DATABASE_OWNER_ROLE: beaconhs_owner
+2026-10-12T16:26:05.5243053Z   DATABASE_BACKUP_ROLE: beaconhs_backup
+2026-10-12T16:26:05.5243341Z   REDIS_URL: redis://localhost:6379
+2026-10-12T16:26:05.5243743Z   BETTER_AUTH_SECRET: module-validation-disposable-secret-not-production
+2026-10-12T16:26:05.5244278Z   ATTACHMENT_CAPABILITY_SECRET: module-validation-disposable-capability-secret
+2026-10-12T16:26:05.5244709Z   BETTER_AUTH_URL: http://localhost:3000
+2026-10-12T16:26:05.5245038Z   APP_URL: http://localhost:3000
+2026-10-12T16:26:05.5245339Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+2026-10-12T16:26:05.5245668Z   PGPASSWORD: postgres
+2026-10-12T16:26:05.5245884Z ##[endgroup]
+2026-10-12T16:26:06.0445067Z BEGIN
+2026-10-12T16:26:06.0451341Z CREATE ROLE
+2026-10-12T16:26:06.0464278Z GRANT
+2026-10-12T16:26:06.0477067Z GRANT
+2026-10-12T16:26:06.0479154Z GRANT
+2026-10-12T16:26:06.0640158Z GRANT
+2026-10-12T16:26:06.0669012Z INSERT 0 2
+2026-10-12T16:26:06.0684018Z INSERT 0 2
+2026-10-12T16:26:06.0726906Z INSERT 0 2
+2026-10-12T16:26:06.0742310Z INSERT 0 1
+2026-10-12T16:26:06.0801385Z INSERT 0 2
+2026-10-12T16:26:06.0916348Z INSERT 0 3
+2026-10-12T16:26:06.0957965Z ERROR:  Risk template family ownership mismatch
+2026-10-12T16:26:06.0959345Z CONTEXT:  PL/pgSQL function public.risk_template_family_owner_guard() line 8 at RAISE
+2026-10-12T16:26:06.0981154Z ##[error]Process completed with exit code 3.
+2026-10-12T16:26:06.1041714Z ##[group]Run set -euo pipefail
+2026-10-12T16:26:06.1042038Z [36;1mset -euo 

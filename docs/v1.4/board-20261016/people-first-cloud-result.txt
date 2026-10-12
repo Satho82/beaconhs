@@ -1,0 +1,54 @@
+Exact People source 0a4a04ca13758b68068f9483a3c0816b741478d8
+Run 38271967825, job 114888154943.
+Selected log lines; full log retained in Actions.
+2026-10-12T15:47:55.2161599Z  Tasks:    25 successful, 25 total
+2026-10-12T15:49:03.1429254Z  Tasks:    1 successful, 1 total
+2026-10-12T15:49:25.9664155Z [2m Test Files [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+2026-10-12T15:49:25.9664727Z [2m      Tests [22m [1m[32m48 passed[39m[22m[90m (48)[39m
+2026-10-12T15:49:26.8163264Z [2m Test Files [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+2026-10-12T15:49:26.8164170Z [2m      Tests [22m [1m[32m6 passed[39m[22m[90m (6)[39m
+2026-10-12T15:49:27.6655374Z [2m Test Files [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+2026-10-12T15:49:27.6655924Z [2m      Tests [22m [1m[32m14 passed[39m[22m[90m (14)[39m
+2026-10-12T15:49:28.7768754Z [2m Test Files [22m [1m[32m4 passed[39m[22m[90m (4)[39m
+2026-10-12T15:49:28.7769291Z [2m      Tests [22m [1m[32m12 passed[39m[22m[90m (12)[39m
+2026-10-12T15:49:29.6650932Z [2m Test Files [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+2026-10-12T15:49:29.6651543Z [2m      Tests [22m [1m[32m6 passed[39m[22m[90m (6)[39m
+2026-10-12T15:49:31.8134035Z [2m Test Files [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+2026-10-12T15:49:31.8135093Z [2m      Tests [22m [1m[32m12 passed[39m[22m[90m (12)[39m
+2026-10-12T15:49:36.2621804Z [2m Test Files [22m [1m[32m14 passed[39m[22m[90m (14)[39m
+2026-10-12T15:49:36.2622356Z [2m      Tests [22m [1m[32m246 passed[39m[22m[90m (246)[39m
+2026-10-12T15:49:37.1529663Z [2m Test Files [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+2026-10-12T15:49:37.1530950Z [2m      Tests [22m [1m[32m4 passed[39m[22m[90m (4)[39m
+2026-10-12T15:49:56.5515768Z [2m Test Files [22m [1m[32m63 passed[39m[22m[90m (63)[39m
+2026-10-12T15:49:56.5516823Z [2m      Tests [22m [1m[32m312 passed[39m[22m[90m (312)[39m
+2026-10-12T15:50:02.1964866Z [2m Test Files [22m [1m[32m12 passed[39m[22m[90m (12)[39m
+2026-10-12T15:50:02.1965435Z [2m      Tests [22m [1m[32m57 passed[39m[22m[90m (57)[39m
+2026-10-12T15:50:04.9460753Z [2m Test Files [22m [1m[32m5 passed[39m[22m[90m (5)[39m
+2026-10-12T15:50:04.9461755Z [2m      Tests [22m [1m[32m15 passed[39m[22m[90m (15)[39m
+2026-10-12T15:50:07.5274962Z [2m Test Files [22m [1m[32m4 passed[39m[22m[90m (4)[39m
+2026-10-12T15:50:07.5275510Z [2m      Tests [22m [1m[32m19 passed[39m[22m[90m (19)[39m
+2026-10-12T15:50:08.5409066Z [2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+2026-10-12T15:50:08.5409616Z [2m      Tests [22m [1m[32m51 passed[39m[22m[90m (51)[39m
+2026-10-12T15:50:09.5143668Z [2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+2026-10-12T15:50:09.5144671Z [2m      Tests [22m [1m[32m21 passed[39m[22m[90m (21)[39m
+2026-10-12T15:50:14.0511266Z [2m Test Files [22m [1m[32m5 passed[39m[22m[90m (5)[39m
+2026-10-12T15:50:14.0511882Z [2m      Tests [22m [1m[32m16 passed[39m[22m[90m (16)[39m
+2026-10-12T15:50:33.0516296Z [2m Test Files [22m [1m[32m5 passed[39m[22m[90m (5)[39m
+2026-10-12T15:50:33.0517309Z [2m      Tests [22m [1m[32m18 passed[39m[22m[90m (18)[39m
+2026-10-12T15:50:38.7179558Z [2m Test Files [22m [1m[32m3 passed[39m[22m[90m (3)[39m
+2026-10-12T15:50:38.7180715Z [2m      Tests [22m [1m[32m10 passed[39m[22m[90m (10)[39m
+2026-10-12T15:50:48.3819971Z [2m Test Files [22m [1m[32m4 passed[39m[22m[90m (4)[39m
+2026-10-12T15:50:48.3821037Z [2m      Tests [22m [1m[32m26 passed[39m[22m[90m (26)[39m
+2026-10-12T15:52:03.7292016Z [2m Test Files [22m [1m[32m254 passed[39m[22m[2m | [22m[33m1 skipped[39m[90m (255)[39m
+2026-10-12T15:52:03.7292798Z [2m      Tests [22m [1m[32m1557 passed[39m[22m[2m | [22m[33m1 skipped[39m[90m (1558)[39m
+2026-10-12T15:52:11.5939846Z [2m Test Files [22m [1m[32m27 passed[39m[22m[90m (27)[39m
+2026-10-12T15:52:11.5940968Z [2m      Tests [22m [1m[32m96 passed[39m[22m[90m (96)[39m
+2026-10-12T15:52:11.5944036Z  Tasks:    23 successful, 23 total
+2026-10-12T15:52:15.0135450Z [31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+2026-10-12T15:52:15.0146703Z [31m[1mAssertionError[22m: expected Error: Failed query: SET LOCAL ROLE "beac… { …(2) } to be Error: rollback successful K0 fixture // Object.is equality[39m
+2026-10-12T15:52:15.0150816Z [31m+   "message": "Failed query: SET LOCAL ROLE \"beaconhs_app\"[39m
+2026-10-12T15:52:15.0214197Z [2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+2026-10-12T15:52:15.0215462Z [2m      Tests [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+2026-10-12T15:52:15.0256435Z ##[error]AssertionError: expected Error: Failed query: SET LOCAL ROLE "beac… { …(2) } to be Error: rollback successful K0 fixture // Object.is equality
++   "message": "Failed query: SET LOCAL ROLE \"beaconhs_app\"
+2026-10-12T15:52:15.5718895Z  2026-10-12 15:52:14.988 UTC [1065] ERROR:  permission denied to set role "beaconhs_app"

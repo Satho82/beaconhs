@@ -1,0 +1,34 @@
+name: Uvanoo production completion cloud preflight
+
+on:
+  push:
+    branches: [review/uvanoo-v1.4-production-completion-cloud-20261012]
+    paths: [.github/workflows/uvanoo-production-completion-preflight.yml]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: uvanoo-production-completion-isolated
+  cancel-in-progress: false
+
+jobs:
+  cloud-preflight:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          ref: c306bd6bbe0571eeca18a410c1ac08fe55c524b6
+          persist-credentials: false
+      - name: Verify cloud runner and unchanged source identity without repeating tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = Satho82/beaconhs
+          test "$GITHUB_REF" = refs/heads/review/uvanoo-v1.4-production-completion-cloud-20261012
+          test "$(git rev-parse HEAD)" = c306bd6bbe0571eeca18a410c1ac08fe55c524b6
+          test "$(git rev-parse HEAD^{tree})" = cfc536197c361962def84db347d1344924661f1d
+          test -z "$(git status --porcelain)"
+          docker version --format '{{.Server.Version}}'
+          echo 'Cloud execution available. No tests, migration, publication or deployment performed.'

@@ -1,0 +1,46 @@
+diff --git a/apps/web/package.json b/apps/web/package.json
+index fc0807c2..9a5fed26 100644
+--- a/apps/web/package.json
++++ b/apps/web/package.json
+@@ -13,7 +13,10 @@
+     "lint": "eslint .",
+     "typecheck": "tsc --noEmit",
+     "test": "vitest run --passWithNoTests",
+-    "clean": "rm -rf .next .turbo"
++    "clean": "rm -rf .next .turbo",
++    "preview:approvals": "tsx scripts/launch-approvals-preview.ts",
++    "test:approvals-batch01": "tsx scripts/verify-approvals-batch01.ts",
++    "test:approvals-property-authority": "tsx scripts/verify-approvals-property-authority.ts"
+   },
+   "dependencies": {
+     "@beaconhs/ai": "workspace:*",
+diff --git a/apps/web/src/lib/approvals/contracts.ts b/apps/web/src/lib/approvals/contracts.ts
+index 2242406a..28c11799 100644
+--- a/apps/web/src/lib/approvals/contracts.ts
++++ b/apps/web/src/lib/approvals/contracts.ts
+@@ -10,14 +10,14 @@ export const sourceModule = z.enum([
+   'people',
+   'tasks',
+ ])
+-export const sourceReference = z
++const sourceReference = z
+   .object({
+     module: sourceModule,
+     id: z.string().uuid(),
+     version: z.string().trim().min(1).max(200),
+   })
+   .strict()
+-export type ApprovalSource = z.infer<typeof sourceReference>
++type ApprovalSource = z.infer<typeof sourceReference>
+ export type ApprovalSourceModule = ApprovalSource['module']
+ 
+ /** Server-owned registry. Resolve the source inside the same tenant transaction.
+@@ -40,7 +40,7 @@ export type ApprovalAdapters = Readonly<
+   Partial<Record<ApprovalSourceModule, ApprovalSourceAdapter>>
+ >
+ 
+-export const stageInput = z
++const stageInput = z
+   .object({ name: z.string().trim().min(1).max(200), approverId: z.string().uuid() })
+   .strict()
+ export const workflowInput = z

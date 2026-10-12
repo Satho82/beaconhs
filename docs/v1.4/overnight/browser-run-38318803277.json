@@ -1,0 +1,504 @@
+{
+  "sourceCommit": "563fb0e9b79a838a5f394abaffb2f7dc743fc571",
+  "sourceTree": "324c50a60e2cb0639ba920488a150c6531968374",
+  "runtime": "production Next standalone; disposable hosted CI",
+  "checks": [
+    {
+      "name": "Authentication platform",
+      "status": "PASS",
+      "detail": {
+        "role": "platform",
+        "authentication": "real password UI and server session",
+        "propertyScope": [
+          "3fc9c084-7caf-5a72-8805-c6bc6fc51656",
+          "a8adb358-5b67-5ea2-b3d3-bcf5f7cfa378"
+        ]
+      }
+    },
+    {
+      "name": "Authentication cluster",
+      "status": "PASS",
+      "detail": {
+        "role": "cluster",
+        "authentication": "real password UI and server session",
+        "propertyScope": [
+          "3fc9c084-7caf-5a72-8805-c6bc6fc51656",
+          "a8adb358-5b67-5ea2-b3d3-bcf5f7cfa378"
+        ]
+      }
+    },
+    {
+      "name": "Authentication property",
+      "status": "PASS",
+      "detail": {
+        "role": "property",
+        "authentication": "real password UI and server session",
+        "propertyScope": [
+          "3fc9c084-7caf-5a72-8805-c6bc6fc51656"
+        ]
+      }
+    },
+    {
+      "name": "Authentication approver",
+      "status": "PASS",
+      "detail": {
+        "role": "approver",
+        "authentication": "real password UI and server session",
+        "propertyScope": [
+          "3fc9c084-7caf-5a72-8805-c6bc6fc51656",
+          "a8adb358-5b67-5ea2-b3d3-bcf5f7cfa378"
+        ]
+      }
+    },
+    {
+      "name": "Authentication requester",
+      "status": "PASS",
+      "detail": {
+        "role": "requester",
+        "authentication": "real password UI and server session",
+        "propertyScope": [
+          "3fc9c084-7caf-5a72-8805-c6bc6fc51656"
+        ]
+      }
+    },
+    {
+      "name": "Authentication restricted",
+      "status": "PASS",
+      "detail": {
+        "role": "restricted",
+        "authentication": "real password UI and server session",
+        "propertyScope": [
+          "a8adb358-5b67-5ea2-b3d3-bcf5f7cfa378"
+        ]
+      }
+    },
+    {
+      "name": "People Directory platform",
+      "status": "PASS",
+      "detail": {
+        "path": "/people"
+      }
+    },
+    {
+      "name": "Approvals navigation platform",
+      "status": "PASS",
+      "detail": {
+        "path": "/approvals"
+      }
+    },
+    {
+      "name": "People Directory cluster",
+      "status": "PASS",
+      "detail": {
+        "path": "/people"
+      }
+    },
+    {
+      "name": "Approvals navigation cluster",
+      "status": "PASS",
+      "detail": {
+        "path": "/approvals"
+      }
+    },
+    {
+      "name": "People Directory property",
+      "status": "PASS",
+      "detail": {
+        "path": "/people"
+      }
+    },
+    {
+      "name": "Approvals navigation property",
+      "status": "PASS",
+      "detail": {
+        "path": "/approvals"
+      }
+    },
+    {
+      "name": "People Directory approver",
+      "status": "PASS",
+      "detail": {
+        "path": "/people"
+      }
+    },
+    {
+      "name": "Approvals navigation approver",
+      "status": "PASS",
+      "detail": {
+        "path": "/approvals"
+      }
+    },
+    {
+      "name": "People Directory requester",
+      "status": "PASS",
+      "detail": {
+        "path": "/people"
+      }
+    },
+    {
+      "name": "Approvals navigation requester",
+      "status": "PASS",
+      "detail": {
+        "path": "/approvals"
+      }
+    },
+    {
+      "name": "People Directory restricted",
+      "status": "PASS",
+      "detail": {
+        "path": "/people"
+      }
+    },
+    {
+      "name": "Approvals navigation restricted",
+      "status": "PASS",
+      "detail": {
+        "path": "/approvals"
+      }
+    },
+    {
+      "name": "Cluster GM multi-property People profiles",
+      "status": "PASS"
+    },
+    {
+      "name": "Restricted People profile isolation",
+      "status": "PASS"
+    },
+    {
+      "name": "Configure two-stage approval and financial limits through UI",
+      "status": "PASS",
+      "detail": {
+        "workflowId": "242c0472-7d3c-4d04-9a86-809ee03a3328"
+      }
+    },
+    {
+      "name": "Financial request and PDF attachment through UI",
+      "status": "PASS",
+      "detail": {
+        "requestId": "21f95c10-1023-4495-947f-eb5fc2ac87ae"
+      }
+    },
+    {
+      "name": "Financial approval limit rejection through UI",
+      "status": "PASS"
+    },
+    {
+      "name": "Scoped attachment download",
+      "status": "PASS",
+      "detail": {
+        "status": 200,
+        "type": "application/pdf",
+        "size": 14671
+      }
+    },
+    {
+      "name": "Restricted property request isolation",
+      "status": "PASS",
+      "detail": {
+        "bodyExcerpt": " & Tasks\nMaintenance\nCompliance\nRisk\nIncidents\nAction Plans\nTraining\nPeople\nHandover\nMetering\nApprovals\nTenant Settings\nProperty\nThe Lincoln Suites\nDashboard\nMy Requests\nAwaiting My Approval\n\nApprovals could not be loaded. Check your current tenant, property access and module entitlement.\n\nTry again"
+      }
+    },
+    {
+      "name": "Comment and evidence history through UI",
+      "status": "PASS"
+    },
+    {
+      "name": "More information and requester resubmission through UI",
+      "status": "PASS"
+    },
+    {
+      "name": "Manual reminder and audit timeline through UI",
+      "status": "PASS"
+    },
+    {
+      "name": "Sequential two-stage decisions through UI",
+      "status": "PASS"
+    },
+    {
+      "name": "Requester cancellation through UI",
+      "status": "PASS"
+    },
+    {
+      "name": "Delegation preserves original approval history through UI",
+      "status": "PASS"
+    },
+    {
+      "name": "Approvals reporting and CSV export through browser session",
+      "status": "PASS",
+      "detail": {
+        "status": 200,
+        "type": "text/csv; charset=utf-8",
+        "rows": 5
+      }
+    },
+    {
+      "name": "Notifications page navigation",
+      "status": "PASS"
+    },
+    {
+      "name": "Mobile responsive navigation /people",
+      "status": "PASS",
+      "detail": {
+        "viewport": 390,
+        "document": 390,
+        "buttons": [
+          {
+            "label": "Collapse sidebar"
+          },
+          {
+            "label": "Dashboard"
+          },
+          {
+            "label": "Diary & Tasks"
+          },
+          {
+            "label": "Maintenance"
+          },
+          {
+            "label": "Compliance"
+          },
+          {
+            "label": "Risk"
+          },
+          {
+            "label": "Inspections"
+          },
+          {
+            "label": "Incidents"
+          },
+          {
+            "label": "Action Plans"
+          },
+          {
+            "label": "Training"
+          },
+          {
+            "label": "People"
+          },
+          {
+            "label": "Handover"
+          },
+          {
+            "label": "Assets & PPM"
+          },
+          {
+            "label": "Metering"
+          },
+          {
+            "label": "Reports"
+          },
+          {
+            "label": "Approvals"
+          },
+          {
+            "label": "Tenant Settings"
+          },
+          {
+            "label": ""
+          },
+          {
+            "label": ""
+          },
+          {
+            "label": ""
+          },
+          {
+            "label": "Open navigation"
+          },
+          {
+            "label": "Notifications"
+          },
+          {
+            "label": "Account menu"
+          },
+          {
+            "label": "All roles"
+          },
+          {
+            "label": "All Properties / Portfolio"
+          },
+          {
+            "label": "Status:Active"
+          },
+          {
+            "label": "Menu"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Mobile responsive navigation /approvals",
+      "status": "PASS",
+      "detail": {
+        "viewport": 390,
+        "document": 390,
+        "buttons": [
+          {
+            "label": "Collapse sidebar"
+          },
+          {
+            "label": "Dashboard"
+          },
+          {
+            "label": "Diary & Tasks"
+          },
+          {
+            "label": "Maintenance"
+          },
+          {
+            "label": "Compliance"
+          },
+          {
+            "label": "Risk"
+          },
+          {
+            "label": "Inspections"
+          },
+          {
+            "label": "Incidents"
+          },
+          {
+            "label": "Action Plans"
+          },
+          {
+            "label": "Training"
+          },
+          {
+            "label": "People"
+          },
+          {
+            "label": "Handover"
+          },
+          {
+            "label": "Assets & PPM"
+          },
+          {
+            "label": "Metering"
+          },
+          {
+            "label": "Reports"
+          },
+          {
+            "label": "Approvals"
+          },
+          {
+            "label": "Tenant Settings"
+          },
+          {
+            "label": ""
+          },
+          {
+            "label": ""
+          },
+          {
+            "label": ""
+          },
+          {
+            "label": "Open navigation"
+          },
+          {
+            "label": "Notifications"
+          },
+          {
+            "label": "Account menu"
+          },
+          {
+            "label": "All roles"
+          },
+          {
+            "label": "All Properties / Portfolio"
+          },
+          {
+            "label": "Status"
+          },
+          {
+            "label": "Property"
+          },
+          {
+            "label": "Apply filters"
+          },
+          {
+            "label": "Menu"
+          }
+        ]
+      }
+    }
+  ],
+  "screenshots": [
+    "platform-landing.png",
+    "cluster-landing.png",
+    "property-landing.png",
+    "approver-landing.png",
+    "requester-landing.png",
+    "restricted-landing.png",
+    "platform-people.png",
+    "platform-approvals.png",
+    "cluster-people.png",
+    "cluster-approvals.png",
+    "property-people.png",
+    "property-approvals.png",
+    "approver-people.png",
+    "approver-approvals.png",
+    "requester-people.png",
+    "requester-approvals.png",
+    "restricted-people.png",
+    "restricted-approvals.png",
+    "cluster-two-properties.png",
+    "restricted-foreign-person-denied.png",
+    "configured-workflow.png",
+    "financial-request.png",
+    "request-comment.png",
+    "request-audit.png",
+    "request-approved.png",
+    "delegated-decision.png",
+    "approval-reports.png",
+    "notifications.png",
+    "mobile-people.png",
+    "mobile-approvals.png"
+  ],
+  "gaps": [
+    "Property-assignment mutation and explicit desktop/mobile menu interaction remain outside this first matrix and must be completed separately; direct route navigation is not full menu acceptance.",
+    "Automatic reminder timing and actual recipient notification/email delivery are NOT VERIFIED by this browser run; preserved integration evidence is separate.",
+    "Screenshot capture is evidence, not an automatic visual-fidelity pass. Compare actual rendered UI with approved Light/Terra originals, teal/coral branding and menu hierarchy."
+  ],
+  "authenticationResponses": [
+    {
+      "role": "platform",
+      "attempt": 1,
+      "status": 200,
+      "retryAfter": null
+    },
+    {
+      "role": "cluster",
+      "attempt": 1,
+      "status": 200,
+      "retryAfter": null
+    },
+    {
+      "role": "property",
+      "attempt": 1,
+      "status": 200,
+      "retryAfter": null
+    },
+    {
+      "role": "approver",
+      "attempt": 1,
+      "status": 200,
+      "retryAfter": null
+    },
+    {
+      "role": "requester",
+      "attempt": 1,
+      "status": 200,
+      "retryAfter": null
+    },
+    {
+      "role": "restricted",
+      "attempt": 1,
+      "status": 200,
+      "retryAfter": null
+    }
+  ],
+  "runtimeErrors": [],
+  "status": "PARTIAL_BROWSER_EVIDENCE"
+}

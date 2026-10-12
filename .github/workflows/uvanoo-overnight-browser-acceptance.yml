@@ -1,5 +1,5 @@
-name: Uvanoo overnight authenticated acceptance
-# Diagnostic continuation: capture auth HTTP status and dismiss first-run tour through its UI.
+name: Uvanoo overnight focused acceptance
+# Focused remaining checks only; preserve successful 35-check browser run 38318803277.
 
 # Read-only control workflow validating exact immutable candidates in disposable services. This workflow
 # deliberately has no deploy, image, registry, SSH, or environment path.
@@ -99,7 +99,7 @@ jobs:
         run: |
           set -euo pipefail
           cp docs/v1.4/overnight/browser-seed.mts "$RUNNER_TEMP/browser-seed.mts"
-          cp docs/v1.4/overnight/browser-acceptance.mjs "$RUNNER_TEMP/browser-acceptance.mjs"
+          cp docs/v1.4/overnight/browser-focused-acceptance.mjs "$RUNNER_TEMP/browser-acceptance.mjs"
           cp docs/v1.4/overnight/tls-proxy.mjs "$RUNNER_TEMP/tls-proxy.mjs"
           git fetch --no-tags origin "$SOURCE_SHA" c306bd6bbe0571eeca18a410c1ac08fe55c524b6
           test "$(git ls-remote origin "refs/heads/$SOURCE_BRANCH" | cut -f1)" = "$SOURCE_SHA"

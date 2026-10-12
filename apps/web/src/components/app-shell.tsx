@@ -20,6 +20,7 @@ import { AppScrollReset } from './app-scroll-reset'
 import type { PlatformBranding } from '@/lib/platform-branding-config'
 import { HospitalityPropertySwitcher } from './hospitality-property-switcher'
 import { ModuleStrip } from './module-strip'
+import { Logo } from './brand-logo'
 
 type Ctx = {
   isSuperAdmin: boolean
@@ -31,6 +32,7 @@ type Ctx = {
 export function AppShell({
   ctx,
   platformBranding,
+  tenantBranding,
   account,
   groups,
   availableTenants,
@@ -47,6 +49,8 @@ export function AppShell({
 }: {
   ctx: Ctx
   platformBranding?: PlatformBranding
+  /** Optional tenant identity; platform identity remains at the top-left. */
+  tenantBranding?: { productName: string; logoUrl?: string }
   /** The real signed-in user's display name + email, shown in the account menu. */
   account: { name: string; email: string }
   // Resolved server-side from the module registry + the tenant's saved nav
@@ -127,6 +131,11 @@ export function AppShell({
               <GlobalSearch />
             </div>
             <div className="ml-auto flex shrink-0 items-center gap-1.5 text-sm sm:gap-3 md:ml-0">
+              {tenantBranding && (
+                <div className="hidden max-w-36 border-r border-slate-200 pr-3 sm:block">
+                  <Logo branding={tenantBranding} className="h-8 max-w-32 text-sm" />
+                </div>
+              )}
               <GeneratedValue value={canUseAssistant ? <AssistantLauncher /> : null} />
               <NotificationsBell unread={unreadCount} />
               <AccountMenu

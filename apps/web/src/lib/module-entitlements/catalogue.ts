@@ -9,6 +9,11 @@
  */
 export const MODULE_CATALOGUE = [
   {
+    key: 'approvals',
+    name: 'Approvals',
+    description: 'Shared property-scoped approval requests and sequential decisions.',
+  },
+  {
     key: 'hospitality.properties',
     name: 'Hospitality properties',
     description: 'Properties, buildings, floors, rooms, apartments, and room QR targets.',

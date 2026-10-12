@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "incremental": false, "types": ["node", "next/types/global"] },
+  "include": [
+    "src/app/preview/approvals/**/*.ts",
+    "src/app/preview/approvals/**/*.tsx",
+    "src/lib/approvals/preview*.ts",
+    "scripts/launch-approvals-preview.ts"
+  ]
+}

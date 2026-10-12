@@ -1,7 +1,17 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { fileURLToPath } from 'node:url'
 import { readMigrationFiles } from './migration-state'
 import { verifyPreparedRisk } from './verify-prepared-risk'
+
+// These tests exercise the historical 58-to-61 adoption contract. Later
+// migrations must neither change that fixture nor widen its live ledger gate.
+vi.mock('./migration-state', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('./migration-state')>()
+  return {
+    ...actual,
+    readMigrationFiles: vi.fn((folder: string) => actual.readMigrationFiles(folder).slice(0, 61)),
+  }
+})
 
 const ledger = readMigrationFiles(fileURLToPath(new URL('../drizzle', import.meta.url))).map(
   (e) => ({ hash: e.hash, created_at: e.createdAt }),
@@ -88,4 +98,17 @@ describe('read-only prepared DEV adoption gate', () => {
       await expect(verifyPreparedRisk(fixture(change).connections)).rejects.toThrow('rejected')
     },
   )
+})
+
+it('rejects a real later migration row instead of widening the exact-61 ledger gate', async () => {
+  const actual = await vi.importActual<typeof import('./migration-state')>('./migration-state')
+  const current = actual.readMigrationFiles(fileURLToPath(new URL('../drizzle', import.meta.url)))
+  expect(current).toHaveLength(62)
+  await expect(
+    verifyPreparedRisk(
+      fixture({
+        ledger: current.map((entry) => ({ hash: entry.hash, created_at: entry.createdAt })),
+      }).connections,
+    ),
+  ).rejects.toThrow('ledger')
 })

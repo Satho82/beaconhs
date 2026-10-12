@@ -1,5 +1,17 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { preparedRiskPlan } from './risk-prepared-plan'
+import { readMigrationFiles } from './migration-state'
+import { fileURLToPath } from 'node:url'
+
+// These tests exercise the historical 58-to-61 adoption contract. Later
+// migrations must neither change that fixture nor widen its live ledger gate.
+vi.mock('./migration-state', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('./migration-state')>()
+  return {
+    ...actual,
+    readMigrationFiles: vi.fn((folder: string) => actual.readMigrationFiles(folder).slice(0, 61)),
+  }
+})
 
 describe('offline governed Risk migration plan', () => {
   it('requires an explicit safe database identity', () => {
@@ -39,4 +51,12 @@ describe('offline governed Risk migration plan', () => {
     expect(plan).toContain('FORCE ROW LEVEL SECURITY')
     expect(plan).toContain('ordinary migrate.ts now consumes the canonical 61-entry journal')
   })
+})
+
+it('rejects the later canonical chain for the historical adoption plan', async () => {
+  const actual = await vi.importActual<typeof import('./migration-state')>('./migration-state')
+  const current = actual.readMigrationFiles(fileURLToPath(new URL('../drizzle', import.meta.url)))
+  expect(current).toHaveLength(62)
+  vi.mocked(readMigrationFiles).mockReturnValueOnce(current)
+  expect(() => preparedRiskPlan('isolated_test')).toThrow('Expected canonical 0061')
 })

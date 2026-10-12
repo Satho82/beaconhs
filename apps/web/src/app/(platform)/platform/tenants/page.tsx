@@ -49,8 +49,6 @@ export default async function AdminTenantsPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
-  const translateHospitality = await getGeneratedTranslations()
-
   const tGeneratedValue = await getGeneratedValueTranslations()
   const tGenerated = await getGeneratedTranslations()
   const { userId } = await requirePlatformOperator()
@@ -147,9 +145,21 @@ export default async function AdminTenantsPage({
             paramKey="status"
             label={tGenerated('m_0b9da892d6faf0')}
             options={[
-              { value: 'active', label: 'Active', count: statusCounts.active ?? 0 },
-              { value: 'suspended', label: 'Suspended', count: statusCounts.suspended ?? 0 },
-              { value: 'archived', label: 'Archived', count: statusCounts.archived ?? 0 },
+              {
+                value: 'active',
+                label: 'Active',
+                count: statusCounts.active ?? 0,
+              },
+              {
+                value: 'suspended',
+                label: 'Suspended',
+                count: statusCounts.suspended ?? 0,
+              },
+              {
+                value: 'archived',
+                label: 'Archived',
+                count: statusCounts.archived ?? 0,
+              },
             ]}
           />
         </TableToolbar>
@@ -198,7 +208,9 @@ export default async function AdminTenantsPage({
                     value={rows.map(({ tenant, memberCount, peopleCount, incidentCount }) => (
                       <TableRow key={tenant.id}>
                         <TableCell className="font-medium">
-                          <GeneratedValue value={tenant.name} />
+                          <Link className="hover:underline" href={`/platform/tenants/${tenant.id}`}>
+                            <GeneratedValue value={tenant.name} />
+                          </Link>
                         </TableCell>
                         <TableCell className="font-mono text-xs">
                           <GeneratedValue value={tenant.slug} />
@@ -231,9 +243,9 @@ export default async function AdminTenantsPage({
                                       <GeneratedText id="m_1583ec793bd336" />
                                     </Button>
                                   </form>
-                                  <Link href={`/platform/tenants/${tenant.id}/entitlements`}>
+                                  <Link href={`/platform/tenants/${tenant.id}`}>
                                     <Button type="button" size="sm" variant="outline">
-                                      {translateHospitality('m_03abc46dafbce6')}
+                                      <GeneratedText id="m_107ab58c3c38bc" />
                                     </Button>
                                   </Link>
                                 </div>

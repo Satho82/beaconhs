@@ -2,6 +2,8 @@ import { randomUUID } from 'node:crypto'
 import { notFound } from 'next/navigation'
 import { getGeneratedValueTranslations } from '@/i18n/generated.server'
 import { resolveGuestRoomTarget } from '@/lib/hospitality/guest-maintenance'
+import { getPlatformBranding } from '@/lib/platform-branding-config'
+import { PRODUCT_NAME } from '@/lib/brand'
 import { GuestReportForm } from './guest-report-form'
 
 export const dynamic = 'force-dynamic'
@@ -13,19 +15,31 @@ export default async function GuestMaintenancePage({
 }) {
   const translateValue = await getGeneratedValueTranslations()
   const { token } = await params
-  const target = await resolveGuestRoomTarget(token)
+  const [target, branding] = await Promise.all([
+    resolveGuestRoomTarget(token),
+    getPlatformBranding(),
+  ])
   if (!target) notFound()
   return (
     <main className="min-h-dvh bg-slate-50 px-4 py-8 text-slate-950 sm:py-12">
       <div className="mx-auto max-w-xl">
         <header className="mb-6 text-center">
-          <p className="text-sm font-semibold tracking-[0.18em] text-[#0b6978] uppercase">
-            {translateValue('Uvanoo Guest Services')}
-          </p>
+          {branding.logoUrl ? (
+            <img
+              src={branding.logoUrl}
+              alt={branding.productName || PRODUCT_NAME}
+              className="mx-auto mb-5 h-10 max-w-48 object-contain"
+            />
+          ) : (
+            <p className="text-sm font-semibold tracking-[0.18em] text-[#0b6978] uppercase">
+              {branding.productName || PRODUCT_NAME}
+            </p>
+          )}
           <h1 className="mt-2 text-3xl font-semibold">{translateValue('Report a room issue')}</h1>
           <p className="mt-2 text-slate-600">
             {target.propertyName} · {translateValue('Room')} {target.roomName || target.roomCode}
           </p>
+          <p className="mt-3 text-sm text-slate-600">{translateValue('Tell us what happened')}</p>
         </header>
         <section className="rounded-2xl border bg-white p-5 shadow-sm sm:p-7">
           <GuestReportForm token={token} submissionId={randomUUID()} />

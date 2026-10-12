@@ -4,9 +4,18 @@ import {
   savePlatformBranding,
   type PlatformBranding,
 } from '@beaconhs/auth/platform-branding'
+import { platformBrandAssetUrl } from './platform-brand-asset-url'
 
-export { getRuntimePlatformBranding as getPlatformBranding, savePlatformBranding }
+export { savePlatformBranding }
 export type { PlatformBranding }
+
+export async function getPlatformBranding(): Promise<PlatformBranding> {
+  const branding = await getRuntimePlatformBranding()
+  return {
+    ...branding,
+    logoUrl: platformBrandAssetUrl('logo', branding.logoKey) ?? branding.logoUrl,
+  }
+}
 
 /**
  * Next prerenders the root error shell during `next build`. Platform branding is
@@ -15,5 +24,5 @@ export type { PlatformBranding }
  */
 export async function getRootPlatformBranding(): Promise<PlatformBranding> {
   if (process.env.NEXT_PHASE === PHASE_PRODUCTION_BUILD) return {}
-  return getRuntimePlatformBranding()
+  return getPlatformBranding()
 }

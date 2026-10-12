@@ -1,0 +1,25 @@
+Run https://github.com/Satho82/beaconhs/actions/runs/38271967825
+
+Migration Safety 6892670fd33e0fe12a1862bb822b451cd1bf7b44
+> knip --treat-config-hints-as-errors
+2026-10-12T15:48:46.7041591Z 
+2026-10-12T15:48:57.7143932Z [93m[4mUnused exported types[24m[39m (1)
+2026-10-12T15:48:57.7155500Z ExecutableMigration  type  packages/db/src/migration-execution.ts:8:13
+2026-10-12T15:48:57.8104926Z  ELIFECYCLE  Command failed with exit code 1.
+2026-10-12T15:48:57.8297382Z ##[error]Process completed with exit code 1.
+2026-10-12T15:48:57.8359311Z 
+Approvals fed0709f79922d003aefbdb6674e5b92270bdeea
+> knip --treat-config-hints-as-errors
+2026-10-12T15:49:01.9492350Z 
+2026-10-12T15:49:13.0706661Z [93m[4mUnused files[24m[39m (3)
+2026-10-12T15:49:13.0728006Z apps/web/scripts/launch-approvals-preview.ts           
+2026-10-12T15:49:13.0729299Z apps/web/scripts/verify-approvals-batch01.ts           
+2026-10-12T15:49:13.0730945Z apps/web/scripts/verify-approvals-property-authority.ts
+2026-10-12T15:49:13.0732172Z [93m[4mUnused exports[24m[39m (2)
+2026-10-12T15:49:13.0733225Z sourceReference  apps/web/src/lib/approvals/contracts.ts:13:14
+2026-10-12T15:49:13.0734375Z stageInput       apps/web/src/lib/approvals/contracts.ts:43:14
+2026-10-12T15:49:13.0735552Z [93m[4mUnused exported types[24m[39m (1)
+2026-10-12T15:49:13.0736677Z ApprovalSource  type  apps/web/src/lib/approvals/contracts.ts:20:13
+2026-10-12T15:49:13.1698342Z  ELIFECYCLE  Command failed with exit code 1.
+2026-10-12T15:49:13.1896907Z ##[error]Process completed with exit code 1.
+2026-10-12T15:49:13.1985231Z 

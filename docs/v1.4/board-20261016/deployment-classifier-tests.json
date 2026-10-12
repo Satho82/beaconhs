@@ -1,0 +1,30 @@
+{
+  "source_sha": "4bde1df87aa60a4a96c6318af8d53052a2430490",
+  "tests": [
+    {
+      "case": "workflow-only",
+      "passed": true,
+      "deploy_eligible": false
+    },
+    {
+      "case": "application",
+      "passed": true,
+      "deploy_eligible": true
+    },
+    {
+      "case": "first-push",
+      "passed": true,
+      "deploy_eligible": false
+    },
+    {
+      "case": "invalid",
+      "passed": true,
+      "deploy_eligible": false
+    },
+    {
+      "case": "reverse-history",
+      "passed": true,
+      "deploy_eligible": false
+    }
+  ]
+}

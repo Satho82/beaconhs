@@ -34,7 +34,7 @@ describe('retired Hazard Assessments module', () => {
   })
 
   it('keeps historical HazID storage intact', () => {
-    const migrations = resolve(import.meta.dirname, '../../../../packages/db/drizzle/prepared')
+    const migrations = resolve(import.meta.dirname, '../../../../packages/db/drizzle')
     for (const name of [
       '0059_risk_template_draft_state.sql',
       '0060_risk_template_families_manual_assessments.sql',

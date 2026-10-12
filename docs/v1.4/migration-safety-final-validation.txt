@@ -1,0 +1,257 @@
+UVANOO V1.4 — MIGRATION SAFETY FINAL VALIDATION
+Date: 2026-10-12. Local timezone: Europe/London.
+Decision: READY FOR OWNER-AUTHORISED ISOLATED COMMIT, with recorded warnings/coverage limitations.
+No commit, push, merge, rebase, CI dispatch, deployment or module freeze performed.
+
+A. Candidate and reproducibility correction
+Worktree: /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety
+Branch: chore/v1.4-migration-safety
+HEAD and final read-only GitHub governed V1.4 reference:
+6976a851c18e879df1813bb7c18729d6da5ab846
+No remote chore/v1.4-migration-safety branch was returned by git ls-remote.
+
+The harness previously read ../../../../approvals/packages/db/proposals/approvals-batch01.sql.
+It now reads a repository-local test-only fixture. Its SHA-256 is asserted before Docker or database operations:
+9d7e47851e1ddf38335826fe0160099e8839d542d18505f141f36653da8c7780
+Fixture bytes are identical to the protected approved proposal; no SQL rewriting.
+A unit regression pins that hash and excludes the former sibling reference.
+The fixture is unnumbered and is NOT in the production migration journal.
+The real harness passed with this local fixture. No fresh clone/commit was created: the candidate remains uncommitted as required. A future clean checkout must include the complete candidate manifest, including this fixture, the existing ledger fixture, runner helpers and canonical SQL moves.
+
+B. Exact files changed by this task
+Implementation/test delta:
+- packages/db/src/migration-safety.integration.ts
+- packages/db/src/migration-safety-fixture.test.ts (new)
+- packages/db/src/test/approvals-security-contract.fixture.sql (new)
+Evidence:
+- docs/v1.4/migration-safety-postgres-final.txt (new)
+- docs/v1.4/migration-safety-workspace-tests-final.txt (new)
+- docs/v1.4/migration-safety-build-final.txt (new)
+- docs/v1.4/migration-safety-final-validation.txt (this report, new)
+All earlier migration-safety changes were preserved.
+No lockfile, root package/Turbo configuration, existing migration SQL, shared RBAC/RLS policy or protected module worktree edits by this task.
+Generated ignored build/cache files are normal validation artifacts. Next.js also added a root-params.d.ts import to the previously clean tracked apps/web/next-env.d.ts during the build. That single generated line was removed afterward, restoring its exact HEAD/pre-validation bytes. It is not part of the candidate. The successful build regenerates this standard Next output when executed; standalone typecheck passed on the original content.
+
+C. Commands and final workspace results
+Run from the worktree root. Runtime: Node 24.20.0; pnpm 10.30.3.
+Persistent database URL variables were removed from workspace test/typecheck/build processes; no local .env existed.
+No dependencies upgraded; lockfile unchanged.
+
+1. pnpm format:check
+   PASS, exit 0. Run again after formatting the new fixture regression test.
+   Initial focused Prettier check found wrapping in that new test only; corrected with:
+   pnpm exec prettier --write packages/db/src/migration-safety-fixture.test.ts
+   No unrelated formatting edits.
+
+2. env -u DATABASE_URL -u SUPERADMIN_DATABASE_URL -u MIGRATION_DATABASE_URL -u CYCAS_TEST_DATABASE_URL -u REDIS_URL TURBO_FORCE=true pnpm typecheck
+   PASS, exit 0, 25/25 tasks, 0 cache hits, 21m14.639s.
+   Includes worker and web; no TypeScript failures remain in this execution.
+
+3. pnpm lint
+   PASS, exit 0, 1/1 configured lint task, 0 cache hits.
+   Four pre-existing @next/next/no-img-element warnings:
+   platform/branding/page.tsx lines 119,138; guest/maintenance/[token]/page.tsx line28; components/brand-logo.tsx line247.
+   No errors or suppressions.
+   Additional focused check:
+   apps/web/node_modules/.bin/eslint --config apps/web/eslint.config.mjs packages/db/src/migration-safety.integration.ts packages/db/src/migration-safety-fixture.test.ts --max-warnings 0
+   PASS, exit0. Root invocation prints React-version detection fallback, not a lint-rule failure.
+
+4. Initial:
+   env -u DATABASE_URL -u SUPERADMIN_DATABASE_URL -u MIGRATION_DATABASE_URL -u CYCAS_TEST_DATABASE_URL -u REDIS_URL TURBO_FORCE=true pnpm test
+   FAIL, exit1: local SMTP listener denied by sandbox (EPERM); i18n test timeout under concurrent load. Turbo cancelled unfinished tasks.
+   First retry with local listener permission and --concurrency=1:
+   FAIL, exit1: web native-dependencies.test.ts PNG test and forms/form-response-parent-lock-contract.test.ts inventory test exceeded unchanged 5000ms limits.
+   SMTP and i18n passed on that retry.
+   Final full rerun:
+   env -u DATABASE_URL -u SUPERADMIN_DATABASE_URL -u MIGRATION_DATABASE_URL -u CYCAS_TEST_DATABASE_URL -u REDIS_URL VITEST_MAX_WORKERS=2 TURBO_FORCE=true pnpm test --concurrency=1 --env-mode=loose
+   PASS, exit0, 23/23 package tasks, 0 cache hits, 8m31.345s.
+   2760 passed, 2 existing opt-in tests skipped.
+   DB: 71 files /361 tests passed. Web:274 files /1686 tests passed;1 skipped. Worker:27 files /96 tests passed.
+   Vitest's existing VITEST_MAX_WORKERS support was verified in its installed runtime. env-mode=loose passes that concurrency setting without tracked Turbo edits.
+   No timeout, assertion, test selection, skip condition or validation configuration was weakened.
+   Existing skips (NOT claimed as executed):
+   packages/auth/src/cycas-board.integration.test.ts
+   apps/web/src/lib/property-delegation.integration.test.ts
+   Full final output: migration-safety-workspace-tests-final.txt.
+
+5. Initial:
+   env -u DATABASE_URL -u SUPERADMIN_DATABASE_URL -u MIGRATION_DATABASE_URL -u CYCAS_TEST_DATABASE_URL -u REDIS_URL TURBO_FORCE=true pnpm build
+   FAIL, exit1: Next.js worker exhausted default ~4GB V8 heap; SIGABRT. Worker build passed.
+   Final:
+   env -u DATABASE_URL -u SUPERADMIN_DATABASE_URL -u MIGRATION_DATABASE_URL -u CYCAS_TEST_DATABASE_URL -u REDIS_URL NODE_OPTIONS=--max-old-space-size=6144 TURBO_FORCE=true pnpm build --concurrency=1
+   PASS, exit0, 2/2 tasks, 0 cache hits, 27m1.795s.
+   Uses existing CI bounded heap policy (.github/workflows/ci.yml), not a source/config change.
+   Next compilation, separate build-time TypeScript, page-data collection,9 static pages, trace collection and worker bundle completed.
+   Warnings retained: dynamic import expressions in existing sync/db-drivers and BullMQ child processor; import.meta handling in Puppeteer/Yargs; worker bundle size indicator.
+   The local sync/jobs/forms-pdf/Next configuration files implicated are unchanged from HEAD.
+   These are not newly resolved runtime-compatibility claims; targeted packaged integration smoke tests remain appropriate at governed release review.
+   No Gzip MaxListeners warning occurred in captured final harness/build/test output; absence is not proof that the historical warning is universally resolved.
+   Full failed and successful build output: migration-safety-build-final.txt.
+
+6. git diff --check
+   PASS. The sole tracked generated change, next-env.d.ts, was restored to its verified original bytes after build. No unexpected changes remain.
+
+D. Disposable PostgreSQL 16
+Creation command:
+docker run --detach --rm --name uvanoo-migration-safety-20261012 --label uvanoo.task=migration-safety --network none --memory 768m --cpus 2 --tmpfs /var/lib/postgresql/data:rw -e POSTGRES_HOST_AUTH_METHOD=trust -e POSTGRES_DB=safety_admin postgres:16-alpine
+No host database volume or published port. Harness verifies image, label, tmpfs and network isolation before using a loopback Docker-exec bridge.
+Execution:
+pnpm --filter @beaconhs/db exec tsx src/migration-safety.integration.ts
+PASS, exit0; PostgreSQL16.15.
+- Fresh canonical61 replay and exact ledger.
+- 58-to-61 forward replay; old broad default grants removed.
+- Already-applied61 no-op with unchanged migration ledger.
+- SQL failure rollback, previous committed migrations preserved.
+- Ledger-insert failure rolls back that migration's SQL; identical retry succeeds.
+- Duplicate/hash-drift ledger rejection.
+- Concurrent session advisory-lock exclusion and successor no-op.
+- Risk versions SELECT/INSERT retained; UPDATE/DELETE/TRUNCATE remain denied for application/maintenance roles.
+- Existing Risk security predicate accepts correct ACL; detects deliberately injected ACL drift; rollback restores it.
+- Unchanged People0057 property-provenance/isolation SQL regression.
+- Full hash-pinned Approvals security contract table/column ACL preservation.
+- Explicit zero-access and narrow column ACLs are not broadened.
+- Canonical backup role SELECT; UPDATE/DELETE/TRUNCATE denied even with read-only setting disabled.
+- Backup membership and column-write drift rejected; escalation denied.
+- Actual repository backup.sh and restore-verify.sh, dump checksum and restore completed.
+- Complete migrate.ts CLI fresh, no-op,58-to-61 and existing61 no-op; exact identities rechecked each time.
+Full output: migration-safety-postgres-final.txt.
+Cleanup: docker stop uvanoo-migration-safety-20261012
+Completed. --rm/tmpfs disposed only this container and synthetic test data. Existing preview/other containers not touched.
+
+E. Integrity and governed compatibility
+Final git ls-remote confirmed governed HEAD equals candidate base6976a851c18e879df1813bb7c18729d6da5ab846.
+No rebase/merge needed against that exact current reference.
+61 source SQL buffers compared byte-for-byte to HEAD originals (prepared/ paths for0059–0061).
+All61 source hashes/timestamps/order matched the independently recorded DEV ledger fixture.
+First58 journal entries deep-equal HEAD; Risk entries retain idx58–60,version7,breakpoints=true and original recorded timestamps.
+No migration-number reservation, no new journal changes by this task.
+All39 protected Approvals candidate SHA-256 values and expanded Git status matched ../../outputs/dependency-recovery-after.json before/after validation.
+No People/Risk/Approvals worktree edits or persistent database access.
+Compatibility is with recorded DEV evidence, not newly queried live parity.
+Risk hashes:
+0059 049a5465885f59b8a3d582d20ccb8e3f742b79c0133718a8ec8c1e506e53ff4b timestamp1791542400002
+0060 870037015142f7764bf0ea1645a65a8152097ae1e14caba28f5096761953915d timestamp1791542400003
+0061 967e01c579434a1230124f1659ac451bd4834a46106d27261a7e2fc61e4ba602 timestamp1791542400004
+(The authoritative exact hashes for all61 appear below.)
+
+F. Remaining limitations and approvals
+No remaining failed mandatory local gate in this final run.
+Uncommitted candidate must include all fixtures/helpers/canonical moves; committing only tracked diff is insufficient.
+Two pre-existing opt-in integrations were not run; do not equate this checkpoint with full platform RBAC validation.
+Existing lint/build warnings remain visible; packaged optional-driver/PDF/worker smoke checks should be included in separately authorised governed integration.
+The historical Gzip warning is not declared fixed by this fixture correction.
+No DEV access; deployment-time drift and release validation still require separate authority.
+Do not promote the older sibling migration-reconciliation proposal alongside this canonicalisation.
+Do not infer an Approvals migration0062 reservation or module freeze.
+Owner approval required for isolated commit; separate approval for governed integration, CI dispatch, push or any live migration/deployment.
+Recommendation: approve one complete isolated migration-safety candidate after reviewing this manifest/evidence. Revalidate against governed HEAD if it moves. This is commit readiness, NOT deployment or module-freeze approval.
+
+G. Complete candidate file manifest before these final report/build-evidence additions
+Status / SHA-256 / path. Deleted prepared SQL has identical canonical replacement.
+ M c4982b19690f960d6263ca030f007034fc8a70d3bea0ecb7ba915d9f9ccabeae apps/web/src/lib/legacy-hazid-retirement.test.ts
+ M 4def31f1fa7714e148ee33ae3c76f9cfccdbed8e5816dbaf94a06be45c1d1b36 packages/db/drizzle/meta/_journal.json
+ D (deleted; see canonical SQL identity) packages/db/drizzle/prepared/0059_risk_template_draft_state.sql
+ D (deleted; see canonical SQL identity) packages/db/drizzle/prepared/0060_risk_template_families_manual_assessments.sql
+ D (deleted; see canonical SQL identity) packages/db/drizzle/prepared/0061_risk_assessment_revisions_archive_signoffs.sql
+ M ac0cb11df16b8584e12992c587517432d4ca587deb545f2d20da84391c755398 packages/db/src/migrate.ts
+ M 8e6dad31c04cb972c130bd918a541819049058bcee2b622e28860dde6efbd375 packages/db/src/production-cutover-integrity.test.ts
+ M 4b8c0a5679118d3037d096f36c46a1efafb5b0e787959bb63c9ce656d854ce96 packages/db/src/risk-0059-runner.test.ts
+ M 2084bcb3e5e00bc7ce9d7b2e3c8e9c03cff97b1c7aaf890465e46eb20665add8 packages/db/src/risk-0059-runner.ts
+ M 13fc3849bc825103152c3c7d4dd89d66febfe47efa8a82ebafa5ba7ef3270827 packages/db/src/risk-migration-preparation.test.ts
+ M f830e376c25c7607e3f573b98333ab2cbbeb9713aa3a68876f07db8777b6e8db packages/db/src/risk-prepared-plan.test.ts
+ M d7832a70fcad7e0fee2ad909efc3c2a0aaf6b28d0c2042a7aac03f71061f53c8 packages/db/src/risk-prepared-plan.ts
+ M 4a9d77afbd672b6cd5404df88c963a9480e74ff8addee32dd31d850f3f6ca9b0 packages/db/src/verify-prepared-risk.test.ts
+ M 384f47572590dca50109be7b9e0d08682dd4f6c6379b6c039ec12815c7339dc1 packages/db/src/verify-prepared-risk.ts
+ M 20587a23c2265f583f1969f294568f486a1ff0605daa0c35004fc5be96007b55 scripts/cluster/restore-verify.sh
+?? 1f7e0bf16714b4fcf61e92a904a6ddbd9d4a4be2a6fe06a42e2eda06515eba2b docs/v1.4/migration-canonicalisation-checkpoint.txt
+?? 56d3c8f43fb37c89b5b08dd103c50967e3e43283ca49a259e6d468e4ba363cf3 docs/v1.4/migration-safety-backup-review.txt
+?? c7b7b0adb952271ee863dc7035d777172c788c77ddf9a3fcc502c444b6eb0be7 docs/v1.4/migration-safety-postgres-final.txt
+?? 38ae20f5384bfd7f4f9ba0f33abe0b22aa0b24ccab1fb597a97edc3374441fcb docs/v1.4/migration-safety-workspace-tests-final.txt
+?? 049a5465885f59b8a3d582d20ccb8e3f742b79c0133718a8ec8c1e506e53ff4b packages/db/drizzle/0059_risk_template_draft_state.sql
+?? 870037015142f7764bf0ea1645a65a8152097ae1e14caba28f5096761953915d packages/db/drizzle/0060_risk_template_families_manual_assessments.sql
+?? 967e01c579434a1230124f1659ac451bd4834a46106d27261a7e2fc61e4ba602 packages/db/drizzle/0061_risk_assessment_revisions_archive_signoffs.sql
+?? 9c30f9b7417459f0a37366aae6719c54435c19b57104ac45372d8b73f115b1f9 packages/db/src/migration-canonicalisation.test.ts
+?? 2bf7d51498e2ddde8ed5e4f83ca569f19f43997e3823ba88a7ef5355528dd2d4 packages/db/src/migration-connection.ts
+?? a9b936500bc14f92e5b4d152521ec35aef222817c03a38a1ef3e65b8392a8c30 packages/db/src/migration-execution.ts
+?? 312b31c3fa7cd33f91f72fe024673be69c767adfad1ba8997479784a55e0e673 packages/db/src/migration-privileges.ts
+?? 1e96cddfc8c9738f34167847fd5fffe76b9466b6a564c87c01a90597853d1be4 packages/db/src/migration-safety-fixture.test.ts
+?? 51b9894d02cbb77cfe94932baee55b3c0c302abb68166b297c395710689b4f19 packages/db/src/migration-safety.integration.ts
+?? 9d7e47851e1ddf38335826fe0160099e8839d542d18505f141f36653da8c7780 packages/db/src/test/approvals-security-contract.fixture.sql
+?? ad1651ce04dfe54ca2617912b2ad5020b357fb02667522fbfdc122bbfa416a7c packages/db/src/test/recorded-dev-migration-ledger.json
+Also added by this reporting step:
+?? docs/v1.4/migration-safety-build-final.txt
+?? docs/v1.4/migration-safety-final-validation.txt
+32 Git-status paths total:12 modified,3 deleted,17 untracked. Nothing staged.
+Report does not include its own recursive content hash.
+
+H. All61 canonical migration identities
+idx | journal timestamp | SHA-256 | tag
+0 | 1782427425950 | c7805b1e91d63af9c134c229e2da098d7dbb489436113f3399412ac8aee62b74 | 0000_init
+1 | 1783884000000 | 1fd10132c7e72f95bce032679100e26bd48294ba14e2ebd2bff0bb62d4a9d736 | 0001_migration_cutover
+2 | 1783884001000 | 8105875c4fc7ba0987366c253303e5796d74124e64d0b4ece5a76a4a9a08b80a | 0002_drop_retired_plugin_tables
+3 | 1783885836249 | 2190c407479a5fc9b71999a18ffe38716299bff6563a066a7088e4af7b0defc9 | 0003_converge_dev_schema
+4 | 1783897386441 | 9c94d1b93d2043bd3956930013a2b7960b48308cd8586d66076294a63f08ade8 | 0004_flawless_boomer
+5 | 1783956236047 | b0bb2e7e6b0fd5a2b5330efa6eb910424f6dd499bfce215fbc3772d4bb7f1437 | 0005_production_cutover
+6 | 1784091600000 | a49be807d684ccdd4bfb3c389ba20cf35263b23d49afe8cf4cd7fa3d45c8e12d | 0006_tenant_language_policy
+7 | 1784206236857 | 5e07ece86a13422bec9b4acfec321875807d72a21e257fe626070f1339a3185e | 0007_compliance_scan_toggle
+8 | 1784221200000 | 3640454edf2e8e1713ba032bae27fb819ad73f1490e6610ed7f01bae178e5900 | 0008_hazid_review_conditions_signatures
+9 | 1784232101074 | 9f35febd646c9f75ff6ff2ea8de2b00cc566df4c892638bba6eb3bd53e39eb40 | 0009_early_longshot
+10 | 1784232727486 | 56eb034d4566d1152aaa062b0e240af1d968339a819df4cf18b2fd44d4ce0f81 | 0010_lush_sue_storm
+11 | 1784240387164 | adde52737da23803621010a73d7e4c853ac399005c590dbcdcdb62a89fb96d75 | 0011_calm_talkback
+12 | 1784240420220 | f0abc44ca2cf6b94e50321e1efb0d232315e3c2aa8702e661617b247aad912e3 | 0012_orange_violations
+13 | 1784241846171 | d77f2dab633e266347c4d3ccbfc6c2176c27d92e45fd985eac81074727b27f6d | 0013_remarkable_mimic
+14 | 1784242858332 | f1562f935682b0832a61706eb049e959d66ad32008b59fb1c61bdf8838dba4b8 | 0014_military_major_mapleleaf
+15 | 1784244464695 | 1fafdce1cc1d6369ffc3e4145e502d684a6813b5e08912652358f05c5ef41ce9 | 0015_deep_scalphunter
+16 | 1784732220958 | c11459ca200757c6aac16f80c49222767de204931bab57fb75492978451a7be8 | 0016_smiling_thunderbolts
+17 | 1784734189756 | ed2062e33d348e4717276631f37a1c35e95fe76fb7cf79212a23e88017c5ea7b | 0017_wakeful_jackal
+18 | 1784736000000 | 4e9d314f71ebd1ddfa71f8e306d1d62d6e5875a824e2eb1cc76a197f007dcfeb | 0018_training_report_parity
+19 | 1784739600000 | a81ef531d56281c839c82ad38ab75df68429a60b0ec381cf3a9cc6297cbd1c22 | 0019_report_parity_cutover
+20 | 1784814783386 | 5cda57a168164597499b5c59a72843d07d06520bf34210b92933e6cdce567c40 | 0020_inspection_location_storage
+21 | 1784824177552 | d2505918196e91179fec0c771ae88799ec785e2fc4b04c2cdd7066548368bd6a | 0021_training_assessment_history
+22 | 1784827071367 | 95768d6f7415c464296554b5c6628662169a6a60f6d323e5b50ce53d495a6876 | 0022_hazid_submit_trigger_cutover
+23 | 1784829151470 | 8f485ce856f4440ae076e763f04047866fe04d3ea9f51d8b408cb26f750e65c5 | 0023_gorgeous_sheva_callister
+24 | 1784829998995 | d2bf2c3bd04356d1990ec2caf6bdca990983baa779f94656d6506433ba62a793 | 0024_flawless_la_nuit
+25 | 1784831400000 | 07cb2309ecec5555ecd6edb14e01c13973bd0d49a390d959160d7d00d0745628 | 0025_unify_builder_photo_fields
+26 | 1784835600000 | b9ceced563a63c9d5bdc402a41381c08f1a137cae866a50e06090d67a6d321c1 | 0026_order_frontline_photos
+27 | 1784894400000 | 1484b1e92ab41a29e21e386042deab847bddf6858920cca52e57db3211019314 | 0027_report_portrait_cutover
+28 | 1784916000000 | fa46f4a55d9148167ef96122fcd0e4bf7da3273c3df58635fcf39fae5e3dd360 | 0028_generalize_monitored_sessions
+29 | 1785940083986 | a382781c3dbe0815bdd897b5836070e1ae8de047f4412760bc12327a72307527 | 0029_faulty_thunderball
+30 | 1785954317000 | cf19c0cc97dfa983b79a6aa021a8258444f082d98a632a91c7b4874650c2c5fb | 0030_unify_hazid_app_locations
+31 | 1785954317001 | e901f06be8f63c3d64f7bfc906b0218fbfbe0dc7421ae9dae7a73ca64229f6f3 | 0031_hazid_optional_risk_ratings
+32 | 1785954317002 | 5f1dd84c6c25573332d316365ac519c6f6de2bac8071fa9db2356d4eb63ac1c7 | 0032_ppe_status_lifecycle
+33 | 1787331600000 | e47a24ab7ca5a4f00f5805c4a7ae6411e3b7497993c9bfe25dc4e223dfe668e7 | 0034_compliance_group_audience_ppe_report
+34 | 1787926800000 | f71a68b371d2502f69693e60355e6afd7ec1614eed478b573ba360958694b407 | 0035_journal_analysis_runs
+35 | 1788220800000 | ae571d41963083af044ac500ad77ebd7a323638ce30423881d8b8eb7cc5d4215 | 0036_training_report_wallet_cutover
+36 | 1789045551344 | 19aede92b7ffd2a0611980dc4e7c593f65c0b4a3f6aa7d5981116792dc21b837 | 0037_platform_branding
+37 | 1789070400000 | 585c2b6676be835954e33df83eb42b771e3a43a83bd792a193fe2e546922b4bc | 0038_uvanoo_hospitality_foundation
+38 | 1789156800000 | 339550e8a44059d9fd8017b544714298429f4c109be8038f70be80d085831cc0 | 0039_uvanoo_maintenance_issue_lifecycle
+39 | 1789243200000 | d524165e7446d5f5a92e0602f4e6a6aa88c51b702628ea9059bd940af0ee70ae | 0040_uvanoo_operational_diary_completion
+40 | 1789329600000 | 6fa86a90bea620fdc3471b5f2067b095acd877320ac7d185e8c68d418d0c3f15 | 0041_uvanoo_operational_task_lifecycle
+41 | 1789416000000 | 098dc80cab4ee29ec62894c73d548fb886160e00d1a65f053f302ba64d3551fd | 0042_uvanoo_guest_room_reporting
+42 | 1789502400000 | 4ffdb1941223a24ee976a0975e2ecf96ad7ee5fcaac968225c8d49841fda4619 | 0043_hospitality_issue_sources
+43 | 1790071200000 | 1defc6d79d24f864413755ab0e7e1d9cda48db4cfe949a8f028e32cf6d08e762 | 0044_risk_assessment_foundation
+44 | 1790157600000 | 5bfee2f617a0c655e2089ae286eddc416b31c8299ac3000d834c95400af85089 | 0045_risk_review_lifecycle
+45 | 1790244000000 | a1e9fa632fb3d2170a23a525b81a0e0d8ff78aeb127270739b6ed4bd7bbcac47 | 0046_risk_signoff_snapshot
+46 | 1790330400000 | 33bdae588056d33ed74ff5b66970a0d7a274a321e98b9ade514e4fae09864460 | 0047_hospitality_handover
+47 | 1790416800000 | acadfd230c1a4b77f27e105dbb4e010068b9b1538bf08e5c5f46ad5e3741e328 | 0048_hospitality_metering
+48 | 1790503200000 | 2af03ac4a28aab4d630ef275a54d6ed120dcd00be0438bc448ffa339d41b5d5e | 0049_maintenance_issue_evidence
+49 | 1790589600000 | 595a1a5f3c265a0a6fbd7fd66681e93330c316aec306a96ec70dd89a95547153 | 0050_report_property_context
+50 | 1790676000000 | 5c261632089f0d3460c90435eea4369db14a766fbdd209fd0d5c8c1c8d496656 | 0051_platform_audit
+51 | 1790762400000 | 4d9782da378e88f618d4aa5fe4b391786567849dc3c28e5fe5e3f6432141f8fd | 0052_user_identity_lifecycle
+52 | 1790848800000 | 7b2e3208f49a12cf939e5d3081d9063d89a7eed288c338add87ad74f2db98e42 | 0053_property_scope_repair
+53 | 1790935200000 | ef406dd4383a96cb5d63a5f29b0170092bb7a9cc3ebf1fc277a71489429e4d97 | 0054_v14_configuration_tenant_defaults
+54 | 1791021600000 | 8c380be9c161935924594cc7b3695792c79643e9150f1235c2dfbba3ba25564b | 0055_v14_configuration_governance_lifecycle
+55 | 1791108000000 | 6018cd1ebbeb4ec92412872892d0054485e72231f73add7c797826ef96ae1969 | 0056_v14_governed_bulk_imports
+56 | 1791542400000 | fd7d15ac8a34a251e4f72e3b4aaa5ee35cb08628ee6dfb8ea084fc91e6e3d7dd | 0057_people_property_provenance
+57 | 1791542400001 | fb1fcab4f5cea69815c83a85d8ac4d696e8ae4486ae3d730a512b2f39fe7d4f4 | 0058_platform_regional_defaults
+58 | 1791542400002 | 049a5465885f59b8a3d582d20ccb8e3f742b79c0133718a8ec8c1e506e53ff4b | 0059_risk_template_draft_state
+59 | 1791542400003 | 870037015142f7764bf0ea1645a65a8152097ae1e14caba28f5096761953915d | 0060_risk_template_families_manual_assessments
+60 | 1791542400004 | 967e01c579434a1230124f1659ac451bd4834a46106d27261a7e2fc61e4ba602 | 0061_risk_assessment_revisions_archive_signoffs
+
+Review checklist
+[done] Local pinned fixture removes sibling source dependency.
+[done] Five workspace gates completed with final successful exit codes.
+[done] DisposablePG16 migration/security/backup/locking suite passed.
+[done] 61 migration identities and39 Approvals candidate files preserved.
+[pending owner approval] Isolated commit and separate governed integration.
+[not authorised/performed] Push, merge, deployment, persistent DB mutation, module freeze.

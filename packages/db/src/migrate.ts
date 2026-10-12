@@ -1,4 +1,6 @@
-import { migrate } from 'drizzle-orm/postgres-js/migrator'
+import { executePendingMigrations, loadMigrationBodies } from './migration-execution'
+import { prepareMigrationPrivileges, grantUnmanagedObjects } from './migration-privileges'
+import { pinnedMigrationDatabase, type MigrationDatabase } from './migration-connection'
 import { drizzle } from 'drizzle-orm/postgres-js'
 import postgres from 'postgres'
 import { sql } from 'drizzle-orm'
@@ -14,8 +16,6 @@ import {
   validateMigrationState,
   type MigrationTrackerRow,
 } from './migration-state'
-
-type MigrationDatabase = ReturnType<typeof drizzle>
 
 const MIGRATIONS_FOLDER = fileURLToPath(new URL('../drizzle', import.meta.url))
 const MIGRATION_FILES = readMigrationFiles(MIGRATIONS_FOLDER)
@@ -344,23 +344,11 @@ async function applyRuntimeGrants(
       `REVOKE CREATE ON SCHEMA public FROM PUBLIC, ${runtime}, ${maintenance}`,
       `REVOKE CREATE ON SCHEMA public FROM ${backup}`,
       `GRANT USAGE ON SCHEMA public TO ${runtime}, ${maintenance}, ${backup}`,
-      `REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA public FROM ${runtime}, ${maintenance}`,
-      `GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO ${runtime}, ${maintenance}`,
-      `REVOKE ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public FROM ${runtime}, ${maintenance}`,
-      `GRANT USAGE, SELECT, UPDATE ON ALL SEQUENCES IN SCHEMA public TO ${runtime}, ${maintenance}`,
-      `REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA public FROM ${backup}`,
-      `GRANT SELECT ON ALL TABLES IN SCHEMA public TO ${backup}`,
-      `REVOKE ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public FROM ${backup}`,
-      `GRANT SELECT ON ALL SEQUENCES IN SCHEMA public TO ${backup}`,
       `GRANT USAGE ON SCHEMA drizzle TO ${backup}`,
       `REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA drizzle FROM ${backup}`,
       `GRANT SELECT ON ALL TABLES IN SCHEMA drizzle TO ${backup}`,
       `REVOKE ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA drizzle FROM ${backup}`,
       `GRANT SELECT ON ALL SEQUENCES IN SCHEMA drizzle TO ${backup}`,
-      `ALTER DEFAULT PRIVILEGES FOR ROLE ${owner} IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO ${runtime}, ${maintenance}`,
-      `ALTER DEFAULT PRIVILEGES FOR ROLE ${owner} IN SCHEMA public GRANT USAGE, SELECT, UPDATE ON SEQUENCES TO ${runtime}, ${maintenance}`,
-      `ALTER DEFAULT PRIVILEGES FOR ROLE ${owner} IN SCHEMA public GRANT SELECT ON TABLES TO ${backup}`,
-      `ALTER DEFAULT PRIVILEGES FOR ROLE ${owner} IN SCHEMA public GRANT SELECT ON SEQUENCES TO ${backup}`,
       `ALTER DEFAULT PRIVILEGES FOR ROLE ${owner} IN SCHEMA drizzle GRANT SELECT ON TABLES TO ${backup}`,
       `ALTER DEFAULT PRIVILEGES FOR ROLE ${owner} IN SCHEMA drizzle GRANT SELECT ON SEQUENCES TO ${backup}`,
     ]) {
@@ -370,6 +358,7 @@ async function applyRuntimeGrants(
   console.log(
     `✔ Least-privilege grants applied (runtime ${runtimeRole}; maintenance ${maintenanceRole}; backup ${backupRole})`,
   )
+  await grantUnmanagedObjects(db, ownerRole, runtimeRole, maintenanceRole, backupRole)
 }
 
 async function applyRlsPolicies(db: MigrationDatabase) {
@@ -428,6 +417,8 @@ async function main() {
 
   const migrationClient = postgres(migrationUrl, {
     max: 1,
+    idle_timeout: 0,
+    max_lifetime: 0,
     prepare: false,
     // Idempotent policy/view installation deliberately uses DROP ... IF EXISTS
     // across hundreds of objects. PostgreSQL emits one NOTICE for every absent
@@ -438,7 +429,9 @@ async function main() {
   })
   const runtimeClient = postgres(runtimeUrl, { max: 1, prepare: false })
   const maintenanceClient = postgres(maintenanceUrl, { max: 1, prepare: false })
-  const migrationDb = drizzle(migrationClient)
+  // Keep SET ROLE and the advisory lock on one reserved physical connection.
+  const reserved = await migrationClient.reserve()
+  const migrationDb = pinnedMigrationDatabase(reserved)
   const runtimeDb = drizzle(runtimeClient)
   const maintenanceDb = drizzle(maintenanceClient)
   let lockAcquired = false
@@ -459,7 +452,18 @@ async function main() {
     await verifyMigrationTracker(migrationDb, false)
 
     console.log('▶ Running drizzle migrations…')
-    await migrate(migrationDb, { migrationsFolder: MIGRATIONS_FOLDER })
+    await prepareMigrationPrivileges(
+      migrationDb,
+      ownerRole,
+      roles.runtimeRole,
+      roles.maintenanceRole,
+      roles.backupRole,
+    )
+    await executePendingMigrations(
+      migrationDb,
+      loadMigrationBodies(MIGRATIONS_FOLDER, MIGRATION_FILES),
+      { allowLegacyBefore: MIGRATION_CUTOVER_AT },
+    )
     await verifyMigrationTracker(migrationDb, true)
 
     console.log('▶ Applying RLS policies…')
@@ -496,6 +500,13 @@ async function main() {
 
     console.log('▶ Applying reporting views…')
     await applyReportingViews(migrationDb)
+    await grantUnmanagedObjects(
+      migrationDb,
+      ownerRole,
+      roles.runtimeRole,
+      roles.maintenanceRole,
+      roles.backupRole,
+    )
   } finally {
     if (lockAcquired) {
       try {
@@ -506,6 +517,7 @@ async function main() {
         console.warn('Migration advisory lock will be released when the connection closes', error)
       }
     }
+    reserved.release()
     await Promise.all([migrationClient.end(), runtimeClient.end(), maintenanceClient.end()])
   }
 }

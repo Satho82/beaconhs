@@ -1,0 +1,180 @@
+UVANOO V1.4 — MIGRATION SAFETY BACKUP ACL REVIEW
+Date: 2026-10-12 (Europe/London)
+Status: BACKUP POLICY RESOLVED; ISOLATED VALIDATION PASSED; NOT PROMOTION-READY
+Branch: chore/v1.4-migration-safety
+Worktree: /Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety
+HEAD: 6976a851c18e879df1813bb7c18729d6da5ab846
+No commit, push, merge, deployment, CI dispatch or module freeze.
+
+A. AUTHORITATIVE BACKUP POLICY
+scripts/cluster/provision.sql:
+- lines 16, 53–59: beaconhs_backup LOGIN NOINHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION BYPASSRLS.
+- lines 65–78: remove runtime/owner role memberships from backup.
+- lines 87, 99, 113–139: CONNECT, schema USAGE, SELECT on public tables/sequences; equivalent ledger read grants and future-object defaults.
+- line 161: default_transaction_read_only=on.
+packages/db/src/migrate.ts: DATABASE_BACKUP_ROLE defaults to beaconhs_backup; role preflight requires distinct non-owner, non-superuser, BYPASSRLS backup identity.
+scripts/cluster/backup.sh: authenticates backup role, verifies read-only default, pg_dump --no-owner --no-privileges --serializable-deferrable; archive TOC/checksum/manifest validation.
+scripts/cluster/restore-verify.sh: restoration is performed by a separate administrator into a new disposable database, under the NOLOGIN owner. The backup login needs no restore/write/admin permissions.
+
+B. EXACT CORRECTION
+packages/db/src/migration-privileges.ts:
+- Separate platform-wide backup SELECT from application baseline ACL grants.
+- grantBackupReadAccess validates canonical role attributes, read-only default and absence of role memberships.
+- Rejects existing effective table/column write permissions, grant options, and sequence USAGE/UPDATE rather than silently repairing drift.
+- Grants only SELECT, without grant option, to the backup role on owner-owned public tables/partitions/views/materialized views/sequences.
+- Covers risk_assessment_versions, risk_template_families and future module objects after migration, regardless of application ACL management.
+- Application ACLs remain conservative and independent; Risk revokes and Approvals column restrictions remain intact.
+- This is the existing complete-backup policy, not a grant of application or workflow privileges.
+- Existing CONNECT/schema USAGE remain provided by canonical provisioning/runner. ETL/ledger policy unchanged.
+
+scripts/cluster/restore-verify.sh:
+- Change sha256sum --check to equivalent portable sha256sum -c.
+- Real Alpine restore drill exposed BusyBox incompatibility with --check.
+- No checksum check removed or bypassed.
+
+packages/db/src/migration-safety.integration.ts:
+- Extend isolated harness for backup-role connections, direct denial tests with read-only disabled, membership/column-permission drift injection, actual backup/restore scripts, existing Risk verifier security predicate, full migrate.ts CLI fresh/no-op/ahead-ledger rejection.
+- All URLs are explicitly constructed for this harness's disposable fixture.
+
+Incremental source/script hashes:
+312b31c3fa7cd33f91f72fe024673be69c767adfad1ba8997479784a55e0e673 packages/db/src/migration-privileges.ts
+2e6fee2080a494c7b58d60673ba35a890e39cf46b9d42dc6e2cfc443ee97abe4 packages/db/src/migration-safety.integration.ts
+20587a23c2265f583f1969f294568f486a1ff0605daa0c35004fc5be96007b55 scripts/cluster/restore-verify.sh
+This report is the only additional documentation file.
+Earlier uncommitted migration runner/connection/execution changes are preserved.
+
+C. DISPOSABLE POSTGRESQL
+PostgreSQL 16.15, postgres:16-alpine.
+Final fixture ID: 76a58397ae455cdaf96650a4f1bb96b74eb4969f40f4f9b491a8dc03d301dc78.
+Container creation:
+docker run --detach --rm --name uvanoo-migration-safety-20261012 --label uvanoo.task=migration-safety --network none --memory 768m --cpus 2 --tmpfs /var/lib/postgresql/data:rw -e POSTGRES_HOST_AUTH_METHOD=trust -e POSTGRES_DB=safety_admin postgres:16-alpine
+No published ports, no host data volumes, no external network.
+Harness checks image, label, network and tmpfs metadata before connecting.
+Only synthetic fixture databases/data and backup artifacts.
+Container stopped/removed after capture; its tmpfs data and synthetic archives discarded. No other container or service modified.
+
+D. FINAL INTEGRATION COMMAND AND COMPLETE OUTPUT
+pnpm --filter @beaconhs/db exec tsx src/migration-safety.integration.ts
+Exit: 0
+PostgreSQL: PostgreSQL 16.15 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit
+PASS safety_fresh: replay, exact 61-entry ledger, no-op, Risk privilege preservation
+PASS existing prepared-Risk security predicate; injected application ACL drift detected and rolled back
+PASS unchanged People 0057 provenance/property-isolation SQL regression
+Approvals proposal SHA256: 9d7e47851e1ddf38335826fe0160099e8839d542d18505f141f36653da8c7780
+PASS actual unnumbered Approvals proposal table/column privilege preservation
+PASS backup SELECT, denied writes with read-only disabled, no escalation; column-ACL and role-membership drift rejected
+Creating consistent logical backup…
+Backup verified: /tmp/safety-backups/beaconhs-20261012T134424Z.dump
+ beaconhs-20261012T134424Z.dump: OK
+Restore verified; disposable database will be removed: beaconhs_restore_20261012134425_107
+PASS repository backup.sh and checksum-portable restore-verify.sh against disposable data
+PASS old broad default grants removed before new objects are created
+PASS safety_forward: replay, exact 61-entry ledger, no-op, Risk privilege preservation
+PASS ledger insertion failure rolls back SQL; unchanged retry commits both
+PASS failure rollback, previous commit survives, unchanged-SQL retry, duplicate/hash ledger rejection
+PASS explicit zero-access and Approvals-style column privilege preservation
+PASS concurrent connection exclusion and successor no-op
+✔ Database role preflight passed (beaconhs_migrator → beaconhs_owner; runtime beaconhs_app; maintenance beaconhs_super; backup beaconhs_backup)
+▶ Validating migration ledger…
+  Fresh database detected; the full migration journal will run
+▶ Running drizzle migrations…
+  Migration ledger valid: 58 applied, 0 pending, 0 historical
+▶ Applying RLS policies…
+✔ RLS applied atomically (218 tables)
+▶ Applying least-privilege runtime grants…
+✔ Least-privilege grants applied (runtime beaconhs_app; maintenance beaconhs_super; backup beaconhs_backup)
+▶ Verifying security data invariants…
+✔ Kiosk PIN hash invariant verified
+  Risk Library installation deferred until prepared migrations are approved
+▶ Converging role permissions…
+✔ Built-in role permissions backfilled
+▶ Applying planner statistics targets…
+✔ Statistics applied (32 targets)
+▶ Applying reporting views…
+✔ Views applied atomically (10 statements)
+PASS complete migrate.ts CLI fresh using unchanged 58-entry journal
+✔ Database role preflight passed (beaconhs_migrator → beaconhs_owner; runtime beaconhs_app; maintenance beaconhs_super; backup beaconhs_backup)
+▶ Validating migration ledger…
+  Migration ledger valid: 58 applied, 0 pending, 0 historical
+▶ Running drizzle migrations…
+  Migration ledger valid: 58 applied, 0 pending, 0 historical
+▶ Applying RLS policies…
+✔ RLS applied atomically (218 tables)
+▶ Applying least-privilege runtime grants…
+✔ Least-privilege grants applied (runtime beaconhs_app; maintenance beaconhs_super; backup beaconhs_backup)
+▶ Verifying security data invariants…
+✔ Kiosk PIN hash invariant verified
+  Risk Library installation deferred until prepared migrations are approved
+▶ Converging role permissions…
+✔ Built-in role permissions backfilled
+▶ Applying planner statistics targets…
+✔ Statistics applied (32 targets)
+▶ Applying reporting views…
+✔ Views applied atomically (10 statements)
+PASS complete migrate.ts CLI no-op using unchanged 58-entry journal
+✔ Database role preflight passed (beaconhs_migrator → beaconhs_owner; runtime beaconhs_app; maintenance beaconhs_super; backup beaconhs_backup)
+▶ Validating migration ledger…
+Error: Migration tracker is ahead of this checkout (1791542400004 > 1791542400001)
+    at validateMigrationState (/Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/packages/db/src/migration-state.ts:77:11)
+    at verifyMigrationTracker (/Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/packages/db/src/migrate.ts:59:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async main (/Users/antoc/Documents/Codex/2026-10-11/referenced-chatgpt-conversation-this-is-an-3/work/migration-safety/packages/db/src/migrate.ts:452:5)
+PASS complete migrate.ts CLI ahead-ledger-rejection using unchanged 58-entry journal
+
+
+OTHER VALIDATION
+pnpm --filter @beaconhs/db test
+Exit 0; 69 test files, 359 tests passed.
+Includes migration-state, forward-migration guard, RLS, prepared Risk plan and verifier drift regressions.
+
+pnpm --filter @beaconhs/db typecheck
+Exit 0.
+
+apps/web/node_modules/.bin/eslint --config apps/web/eslint.config.mjs packages/db/src/migration-privileges.ts packages/db/src/migration-safety.integration.ts --max-warnings 0
+Exit 0; no lint violations.
+Existing web lint configuration emitted React-version detection fallback warning from repository root; not a migration runtime warning.
+
+pnpm exec prettier --check packages/db/src/migrate.ts packages/db/src/migration-connection.ts packages/db/src/migration-execution.ts packages/db/src/migration-privileges.ts packages/db/src/migration-safety.integration.ts
+All matched files use Prettier code style.
+sh -n scripts/cluster/restore-verify.sh: passed.
+git diff --check: passed.
+
+Intermediate test failure:
+The first real restore attempt failed because Alpine BusyBox rejects sha256sum --check.
+After replacing it with -c, the final actual restore passed checksum, pg_restore, ownership, FK and manifest verification.
+The final ahead-ledger error is intentional and asserted: the child CLI exited 1 and the integration suite passed.
+
+PRESERVATION
+39 Approvals candidate SHA256 hashes match the prior recorded manifest; complete Approvals Git status unchanged.
+88 tracked migration-directory files match HEAD byte-for-byte, including every SQL file, snapshot and journal.
+Therefore applied SQL hashes and journal/prepared migration timestamps remain unchanged.
+No People, Approvals or Risk worktree edits.
+No application RBAC/RLS source changes.
+No persistent database access, no DEV access or live schema parity claim.
+No migration journal edit, applied SQL edit or 0062 reservation.
+
+E. REMAINING CANONICALISATION BLOCKERS
+Source journal remains 58 entries; Risk 0059–0061 remain prepared.
+61-file fresh/forward/no-op replay is validated by the test's in-memory sequence, without rewriting source history.
+Actual migrate.ts CLI successfully ran twice using the canonical 58-entry journal.
+Actual migrate.ts CLI refused the 61-entry fixture ledger with:
+Migration tracker is ahead of this checkout (1791542400004 > 1791542400001).
+Independent live ledger reconciliation and authorised source canonicalisation remain required; no bypass is proposed.
+
+F. READINESS / VALIDATION LIMITS
+Backup ACL decision and local runner validation are complete and ready for controller code review.
+NOT ready for governed promotion or deployment while canonicalisation remains unresolved.
+The complete CLI's optional Risk-library path cannot be exercised through the ordinary journal against 61 entries until canonicalisation is approved; the guard correctly prevents it.
+The existing prepared-Risk security predicate was executed unchanged against disposable PostgreSQL and rejected injected runtime UPDATE drift.
+The complete live-adoption verifier was NOT pointed at DEV or spoofed: it hard-codes live database identity and inventory. Its unit tests and its security predicate were tested instead.
+People 0057 rollback SQL regression passed; this is not a claim that every People module/browser workflow was rerun.
+Approvals proposal was consumed read-only; table and column ACL preservation passed.
+Backup archive uses --no-privileges; restore needs the normal separately governed privilege/RLS application phase before application use. The restore drill is not authorisation to run that phase on a persistent database.
+Existing provision scripts still contain broad defaults; independently rerunning provisioning after security migrations requires governed review.
+
+G. OWNER APPROVALS REQUIRED
+No further backup-role identity/SELECT-policy choice is needed: authoritative repository policy establishes it.
+Owner review/acceptance of the isolated backup grant helper, drift guard and checksum portability correction.
+Separate authorisation for independently evidenced migration journal canonicalisation.
+Separate authorisation for eventual commit/push/merge and combined release/persistent database execution.
+No module is frozen. STOPPED AFTER REPORTING.

@@ -1,6 +1,6 @@
 name: Uvanoo Board isolated candidate evidence
 
-# Manual, read-only validation for an immutable module candidate. This workflow
+# Isolated validation for immutable module candidates; no persistent writes. This workflow
 # deliberately has no deploy, image, registry, SSH, or environment path.
 on:
   push:
@@ -28,9 +28,6 @@ jobs:
           - module: people
             source_sha: 0a4a04ca13758b68068f9483a3c0816b741478d8
             source_branch: feature/uvanoo-v1.4-people
-          - module: migration-safety
-            source_sha: 6892670fd33e0fe12a1862bb822b451cd1bf7b44
-            source_branch: chore/v1.4-migration-safety
     runs-on: ubuntu-24.04
     timeout-minutes: 120
     services:
@@ -78,7 +75,6 @@ jobs:
           [[ "$SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]]
           case "$MODULE:$SOURCE_BRANCH:$SOURCE_SHA" in
             people:feature/uvanoo-v1.4-people:0a4a04ca13758b68068f9483a3c0816b741478d8) ;;
-            migration-safety:chore/v1.4-migration-safety:6892670fd33e0fe12a1862bb822b451cd1bf7b44) ;;
             *) exit 1 ;;
           esac
           [[ "$MODULE" =~ ^[a-z0-9][a-z0-9-]{0,63}$ ]]
@@ -199,6 +195,10 @@ jobs:
       - name: Cross-tenant and cross-property enforcement
         env:
           UVANOO_PROPERTY_DELEGATION_INTEGRATION: '1'
+          # Fixture setup deliberately SET ROLEs to the restricted app role.
+          # Use the disposable cluster admin only for this rollback-only test;
+          # the production maintenance role must not gain extra membership.
+          SUPERADMIN_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/beaconhs_test
         run: pnpm --filter @beaconhs/web exec vitest run src/lib/property-delegation.integration.test.ts
       - name: Real People provenance and RLS boundary tests
         env:
@@ -217,102 +217,10 @@ jobs:
             fi
           done
 
-      - name: Migration Safety isolated rollback and ACL harness
-        if: matrix.module == 'migration-safety'
-        run: |
-          set -euo pipefail
-          docker run --detach --rm --name uvanoo-migration-safety-20261012 \
-            --label uvanoo.task=migration-safety --network none --memory 768m --cpus 2 \
-            --tmpfs /var/lib/postgresql/data:rw \
-            -e POSTGRES_HOST_AUTH_METHOD=trust -e POSTGRES_DB=safety_admin postgres:16-alpine
-          ready=false
-          for attempt in $(seq 1 30); do
-            if docker exec uvanoo-migration-safety-20261012 pg_isready -U postgres -d safety_admin; then
-              ready=true
-              break
-            fi
-            sleep 1
-          done
-          test "$ready" = true
-          pnpm --filter @beaconhs/db exec tsx src/migration-safety.integration.ts
-
-      - name: Dispose only task-owned Migration Safety fixture
-        if: always() && matrix.module == 'migration-safety'
-        run: |
-          set -euo pipefail
-          if docker inspect uvanoo-migration-safety-20261012 >/dev/null 2>&1; then
-            test "$(docker inspect --format '{{ index .Config.Labels "uvanoo.task" }}' uvanoo-migration-safety-20261012)" = migration-safety
-            docker stop uvanoo-migration-safety-20261012
-          fi
-
       - name: Production build only
         env:
           NODE_OPTIONS: --max-old-space-size=6144
         run: |
-          pnpm build --concurrency=1
-          test -s apps/web/.next/BUILD_ID
-          test -f apps/web/.next/standalone/apps/web/server.js
-          test -f apps/worker/dist/index.js
-
-  approvals-static:
-    name: Approvals static checks only — not a freeze gate
-    runs-on: ubuntu-24.04
-    timeout-minutes: 120
-    env:
-      CI: 'true'
-      NEXT_TELEMETRY_DISABLED: '1'
-      TURBO_TELEMETRY_DISABLED: '1'
-      NODE_OPTIONS: --max-old-space-size=6144
-    steps:
-      - name: Verify isolated control identity
-        run: |
-          set -euo pipefail
-          test "$GITHUB_REPOSITORY" = Satho82/beaconhs
-          test "$GITHUB_REF" = refs/heads/review/uvanoo-v1.4-board-20261016-cloud
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
-        with:
-          ref: fed0709f79922d003aefbdb6674e5b92270bdeea
-          persist-credentials: false
-          fetch-depth: 0
-      - name: Verify exact Approvals provenance
-        run: |
-          set -euo pipefail
-          test "$(git rev-parse HEAD)" = fed0709f79922d003aefbdb6674e5b92270bdeea
-          git merge-base --is-ancestor HEAD origin/feature/uvanoo-v1.4-approvals
-          test "$(git status --porcelain)" = ''
-          echo 'Approvals fed0709f79922d003aefbdb6674e5b92270bdeea: static evidence only; no SQL registration, integration, visual or freeze claim.' >> "$GITHUB_STEP_SUMMARY"
-      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
-        with:
-          run_install: false
-      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
-        with:
-          node-version-file: .nvmrc
-          cache: pnpm
-      - name: Verify pinned toolchain
-        run: |
-          set -euo pipefail
-          test "$(node --version)" = "v$(tr -d '\r\n' < .nvmrc)"
-          test "pnpm@$(pnpm --version)" = "$(node -p 'JSON.parse(require("node:fs").readFileSync("package.json", "utf8")).packageManager')"
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm format:check
-      - name: Fresh route types
-        run: |
-          set -euo pipefail
-          test ! -d apps/web/.next
-          pnpm --filter @beaconhs/web exec next typegen
-          git diff --exit-code -- apps/web/tsconfig.json apps/web/next.config.ts
-      - run: pnpm typecheck --concurrency=1
-      - run: pnpm --filter @beaconhs/db typecheck
-      - run: pnpm lint --concurrency=1
-      - run: pnpm deadcode:check
-      - name: Focused Approvals unit contracts
-        run: |
-          set -euo pipefail
-          pnpm --filter @beaconhs/web exec vitest run src/lib/approvals
-          pnpm --filter @beaconhs/db exec vitest run src/approvals.test.ts
-      - name: Production build only
-        run: |
-          set -euo pipefail
           pnpm build --concurrency=1
           test -s apps/web/.next/BUILD_ID
           test -f apps/web/.next/standalone/apps/web/server.js

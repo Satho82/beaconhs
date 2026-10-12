@@ -144,3 +144,5 @@ jobs:
             test "$(docker inspect --format '{{ index .Config.Labels "uvanoo.task" }}' approvals-disposable-storage)" = approvals-production
             docker stop approvals-disposable-storage
           fi
+
+# Validate corrected additive activity guard.

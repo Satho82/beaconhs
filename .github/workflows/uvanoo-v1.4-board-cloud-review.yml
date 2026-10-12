@@ -1,6 +1,6 @@
 name: Uvanoo Board isolated candidate evidence
 
-# Isolated validation for immutable module candidates; no persistent writes. This workflow
+# Read-only control workflow validating exact immutable candidates in disposable services. This workflow
 # deliberately has no deploy, image, registry, SSH, or environment path.
 on:
   push:
@@ -28,6 +28,9 @@ jobs:
           - module: people
             source_sha: 0a4a04ca13758b68068f9483a3c0816b741478d8
             source_branch: feature/uvanoo-v1.4-people
+          - module: migration-safety
+            source_sha: befe7efc807230862ac1cbd42ab957e1e298e7f1
+            source_branch: fix/uvanoo-v1.4-migration-safety-cloud-gates
     runs-on: ubuntu-24.04
     timeout-minutes: 120
     services:
@@ -75,6 +78,7 @@ jobs:
           [[ "$SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]]
           case "$MODULE:$SOURCE_BRANCH:$SOURCE_SHA" in
             people:feature/uvanoo-v1.4-people:0a4a04ca13758b68068f9483a3c0816b741478d8) ;;
+            migration-safety:fix/uvanoo-v1.4-migration-safety-cloud-gates:befe7efc807230862ac1cbd42ab957e1e298e7f1) ;;
             *) exit 1 ;;
           esac
           [[ "$MODULE" =~ ^[a-z0-9][a-z0-9-]{0,63}$ ]]
@@ -217,10 +221,52 @@ jobs:
             fi
           done
 
+      - name: Closed Risk revision regression
+        if: matrix.module == 'migration-safety'
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d beaconhs_test -X -v ON_ERROR_STOP=1 < packages/db/src/risk-revisions-rls.integration.sql
+
+      - name: Migration Safety isolated rollback and ACL harness
+        if: matrix.module == 'migration-safety'
+        run: |
+          set -euo pipefail
+          docker pull postgres:16-alpine@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777
+          docker tag postgres:16-alpine@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777 postgres:16-alpine
+          docker run --detach --rm --name uvanoo-migration-safety-20261012 \
+            --label uvanoo.task=migration-safety --network none --memory 768m --cpus 2 \
+            --tmpfs /var/lib/postgresql/data:rw \
+            -e POSTGRES_HOST_AUTH_METHOD=trust -e POSTGRES_DB=safety_admin postgres:16-alpine
+          ready=false
+          for attempt in $(seq 1 30); do
+            if docker exec uvanoo-migration-safety-20261012 pg_isready -U postgres -d safety_admin; then
+              ready=true
+              break
+            fi
+            sleep 1
+          done
+          test "$ready" = true
+          pnpm --filter @beaconhs/db exec tsx src/migration-safety.integration.ts
+
+      - name: Dispose only task-owned Migration Safety fixture
+        if: always() && matrix.module == 'migration-safety'
+        run: |
+          set -euo pipefail
+          if docker inspect uvanoo-migration-safety-20261012 >/dev/null 2>&1; then
+            test "$(docker inspect --format '{{ index .Config.Labels "uvanoo.task" }}' uvanoo-migration-safety-20261012)" = migration-safety
+            docker stop uvanoo-migration-safety-20261012
+          fi
+
+      - name: Deployment contract regressions without deployment
+        run: scripts/ci/v1.4-dev-candidate-deploy-contract.test.sh
+
       - name: Production build only
         env:
-          NODE_OPTIONS: --max-old-space-size=6144
+          NODE_OPTIONS: --max-old-space-size=8192
         run: |
+          set -euo pipefail
+          memory_kib="$(awk '/^MemTotal:/ {print $2}' /proc/meminfo)"
+          test "$memory_kib" -ge 12000000
           pnpm build --concurrency=1
           test -s apps/web/.next/BUILD_ID
           test -f apps/web/.next/standalone/apps/web/server.js

@@ -114,6 +114,42 @@ jobs:
         run: |
           git fetch --no-tags origin 937242e7e35806acab48c28c4163719b00c0f16d
           pnpm --filter @beaconhs/db exec tsx src/dev-migration-gate.integration.ts
+      - name: People provenance and Risk SQL regressions
+        env:
+          PGPASSWORD: postgres
+          PEOPLE_PROVENANCE_TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/beaconhs_test
+        run: |
+          pnpm --filter @beaconhs/db exec tsx src/people-provenance.integration.ts
+          psql -h localhost -U postgres -d beaconhs_test -X -v ON_ERROR_STOP=1 < packages/db/src/risk-revisions-rls.integration.sql
+      - name: Migration Safety isolated rollback and ACL harness
+        run: |
+          set -euo pipefail
+          docker pull postgres:16-alpine@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777
+          docker tag postgres:16-alpine@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777 postgres:16-alpine
+          docker run --detach --rm --name uvanoo-migration-safety-20261012 \
+            --label uvanoo.task=migration-safety --network none --memory 768m --cpus 2 \
+            --tmpfs /var/lib/postgresql/data:rw \
+            -e POSTGRES_HOST_AUTH_METHOD=trust -e POSTGRES_DB=safety_admin postgres:16-alpine
+          ready=false
+          for attempt in $(seq 1 30); do
+            if docker exec uvanoo-migration-safety-20261012 pg_isready -U postgres -d safety_admin; then
+              ready=true
+              break
+            fi
+            sleep 1
+          done
+          test "$ready" = true
+          pnpm --filter @beaconhs/db exec tsx src/migration-safety.integration.ts
+
+      - name: Dispose only task-owned Migration Safety fixture
+        if: always()
+        run: |
+          set -euo pipefail
+          if docker inspect uvanoo-migration-safety-20261012 >/dev/null 2>&1; then
+            test "$(docker inspect --format '{{ index .Config.Labels "uvanoo.task" }}' uvanoo-migration-safety-20261012)" = migration-safety
+            docker stop uvanoo-migration-safety-20261012
+          fi
+
       - run: pnpm test
       - name: Record validated formatted proposal bytes
         if: always()

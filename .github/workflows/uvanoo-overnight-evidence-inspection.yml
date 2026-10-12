@@ -1,0 +1,41 @@
+name: Uvanoo overnight evidence inspection
+on:
+  push:
+    branches: [review/uvanoo-v1.4-overnight-release-20261012]
+    paths: [.github/workflows/uvanoo-overnight-evidence-inspection.yml]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          ref: 563fb0e9b79a838a5f394abaffb2f7dc743fc571
+          persist-credentials: false
+      - name: Retrieve immutable browser evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh api /repos/Satho82/beaconhs/actions/artifacts/11777304370/zip > "$RUNNER_TEMP/evidence.zip"
+          echo "53216f123aba0ce2ccd2af669fc69efd75bf6b28914e96679fbd3dd60ddc8e32  $RUNNER_TEMP/evidence.zip" | sha256sum --check -
+          unzip -q "$RUNNER_TEMP/evidence.zip" -d "$RUNNER_TEMP/evidence"
+      - name: Render inspection thumbnails from original captured pixels
+        run: |
+          set -euo pipefail
+          python3 -m pip install --disable-pip-version-check pillow==11.3.0
+          python3 - <<'PY'
+          import os,pathlib,base64,io
+          from PIL import Image
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'evidence'
+          files=[('reference-approvals',pathlib.Path('docs/v1.4/batch01/visual-checkpoint/references/Uvanoo Approvals Module Dashboard (1).png'))]
+          files += [(name,root/(name+'.png')) for name in ['cluster-approvals','cluster-people','mobile-people','mobile-approvals']]
+          for name,path in files:
+              img=Image.open(path).convert('RGB'); original=img.size; img.thumbnail((1100,1800))
+              out=io.BytesIO(); img.save(out,format='JPEG',quality=82)
+              print('INSPECTION_IMAGE '+name+' '+base64.b64encode(out.getvalue()).decode())
+              print('INSPECTION_PROVENANCE '+name+' original='+str(original)+' thumbnail='+str(img.size))
+          PY

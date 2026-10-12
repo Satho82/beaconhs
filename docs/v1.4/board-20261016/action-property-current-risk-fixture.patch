@@ -1,0 +1,29 @@
+diff --git a/packages/db/src/action-property-rls.integration.sql b/packages/db/src/action-property-rls.integration.sql
+index bf5d6e27..b86a513e 100644
+--- a/packages/db/src/action-property-rls.integration.sql
++++ b/packages/db/src/action-property-rls.integration.sql
+@@ -22,10 +22,20 @@ INSERT INTO hospitality_properties (id,tenant_id,name,code,timezone) VALUES
+ ('20000000-0000-4000-8000-000000000001','10000000-0000-4000-8000-000000000001','Fenchurch','F','Europe/London'),
+ ('20000000-0000-4000-8000-000000000002','10000000-0000-4000-8000-000000000001','Lincoln','L','Europe/London'),
+ ('20000000-0000-4000-8000-000000000003','10000000-0000-4000-8000-000000000002','Other tenant','O','Europe/London');
+-INSERT INTO risk_templates (id,owner_key,scope,title,category,description,version) VALUES
+-('50000000-0000-4000-8000-000000000001','00000000-0000-0000-0000-000000000000','platform','G0 risk','general','Fixture','1.0');
+-INSERT INTO risk_assessments (id,tenant_id,property_id,template_owner_key,template_id,adopted_template_version,adopted_template_snapshot,reference,title,creator_tenant_user_id,assessor_tenant_user_id,assessment_date) VALUES
+-('50000000-0000-4000-8000-000000000002','10000000-0000-4000-8000-000000000001','20000000-0000-4000-8000-000000000002','00000000-0000-0000-0000-000000000000','50000000-0000-4000-8000-000000000001','1.0','{"version":"1.0"}','G0-RA','Lincoln risk','30000000-0000-4000-8000-000000000002','30000000-0000-4000-8000-000000000002',current_date);
++-- Current Risk contract (0060+): a manual fixture carries its own valid matrix.
++-- This changes setup only; all action/property authorization assertions remain below.
++WITH fixture_matrix(value) AS (
++SELECT jsonb_build_object('schemaVersion',1,'modelKey','uvanoo-5x5-v1','size',5,
++ 'axes',jsonb_build_object('severity',jsonb_build_object('values',jsonb_build_array('1','2','3','4','5')),
++                         'likelihood',jsonb_build_object('values',jsonb_build_array('1','2','3','4','5'))),
++ 'cells',jsonb_object_agg((s-1)::text||':'||(l-1)::text,jsonb_build_object('score',s*l,
++   'label',CASE WHEN s*l<=4 THEN 'Low' WHEN s*l<=9 THEN 'Medium' WHEN s*l<=16 THEN 'High' ELSE 'Critical' END,
++   'color',CASE WHEN s*l<=4 THEN '#10b981' WHEN s*l<=9 THEN '#f59e0b' WHEN s*l<=16 THEN '#f97316' ELSE '#dc2626' END)))
++FROM generate_series(1,5) s CROSS JOIN generate_series(1,5) l
++)
++INSERT INTO risk_assessments (id,tenant_id,property_id,source_kind,assessment_category,matrix_snapshot,reference,title,creator_tenant_user_id,assessor_tenant_user_id,assessment_date)
++SELECT '50000000-0000-4000-8000-000000000002','10000000-0000-4000-8000-000000000001','20000000-0000-4000-8000-000000000002','manual','general',fixture_matrix.value,'G0-RA','Lincoln risk','30000000-0000-4000-8000-000000000002','30000000-0000-4000-8000-000000000002',current_date
++FROM fixture_matrix;
+ INSERT INTO risk_hazards (id,tenant_id,assessment_id,hazard_description,harm_description,initial_likelihood,initial_severity,initial_score,controls,residual_likelihood,residual_severity,residual_score) VALUES
+ ('50000000-0000-4000-8000-000000000003','10000000-0000-4000-8000-000000000001','50000000-0000-4000-8000-000000000002','Slip','Fall',5,5,25,'Dry floor',1,2,2);
+ INSERT INTO corrective_actions (id,tenant_id,reference,title,metadata,source_entity_type,source_entity_id) VALUES

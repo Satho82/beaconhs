@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { readFile,writeFile,mkdir } from 'node:fs/promises'
 import { createRequire } from 'node:module'
 const root=process.env.GITHUB_WORKSPACE, out=process.env.RUNNER_TEMP+'/dual-evidence'
-if(process.env.GITHUB_ACTIONS!=='true'||process.env.APP_URL!=='http://localhost:3000')throw Error('Disposable browser boundary required')
+if(process.env.GITHUB_ACTIONS!=='true'||process.env.APP_URL!=='https://localhost:3443')throw Error('Disposable browser boundary required')
 await mkdir(out,{recursive:true})
 const fixture=JSON.parse(await readFile(process.env.RUNNER_TEMP+'/dual-accounts.json','utf8'))
 const req=createRequire(root+'/packages/forms-pdf/package.json')
@@ -12,7 +12,7 @@ const report={sourceCommit:'563fb0e9b79a838a5f394abaffb2f7dc743fc571',sourceTree
 const pages={}
 async function record(name,fn){try{const detail=await fn();report.checks.push({name,status:'PASS',detail});console.log('BROWSER_PASS '+name)}catch(e){report.checks.push({name,status:'FAIL',error:String(e.message).slice(0,1000)});console.log('BROWSER_FAIL '+name+': '+String(e.message).slice(0,400))}}
 async function shot(p,name){const path=out+'/'+name+'.png';await p.screenshot({path,fullPage:true});report.screenshots.push(name+'.png')}
-async function go(p,path){const r=await p.goto('http://localhost:3000'+path,{waitUntil:'networkidle2',timeout:60000});assert(r&&r.status()<500,'Server error at '+path);assert(!new URL(p.url()).pathname.startsWith('/login'),'Unauthenticated redirect');const text=await p.$eval('body',x=>x.innerText);assert(!/Application error:|Unable to load approvals/i.test(text),'Application error at '+path);return text}
+async function go(p,path){const r=await p.goto('https://localhost:3443'+path,{waitUntil:'networkidle2',timeout:60000});assert(r&&r.status()<500,'Server error at '+path);assert(!new URL(p.url()).pathname.startsWith('/login'),'Unauthenticated redirect');const text=await p.$eval('body',x=>x.innerText);assert(!/Application error:|Unable to load approvals/i.test(text),'Application error at '+path);return text}
 async function type(p,name,value){const q='[name="'+name+'"]';await p.waitForSelector(q);await p.$eval(q,x=>{x.value=''});await p.type(q,String(value))}
 async function select(p,name,value){await p.select('select[name="'+name+'"]',String(value))}
 async function button(p,text){const h=await p.$$('button');for(const b of h){if((await b.evaluate(x=>x.textContent.trim()))===text){await b.click();return}}throw Error('Button missing: '+text)}
@@ -30,7 +30,7 @@ try{
  for(const [role,a] of Object.entries(fixture.accounts)){
   await record('Authentication '+role,async()=>{
    const c=await browser.createBrowserContext(),p=await c.newPage();pages[role]=p
-   await p.goto('http://localhost:3000/login',{waitUntil:'networkidle2'})
+   await p.goto('https://localhost:3443/login',{waitUntil:'networkidle2'})
    await p.type('#email',a.email);await p.type('#password',a.password)
    const response=p.waitForResponse(r=>r.url().includes('/api/auth/sign-in/email')&&r.request().method()==='POST')
    await p.click('button[type="submit"]');assert((await response).ok(),'Password authentication rejected')

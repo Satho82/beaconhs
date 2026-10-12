@@ -158,3 +158,18 @@ No source candidate is frozen. No governed/shared branch, persistent database, D
 - Repository AGENTS.md rule 8 requires full gates before committing source outside governed cadence. Accordingly the proposed fixes remain preserved patches until all applicable precommit checks pass; correction branches still point at their original source SHAs.
 
 All remaining Board flows and release preflight remain unaccepted. No deployment approval is requested before those concrete prerequisites exist.
+
+
+## Promoted isolated correction and successful cloud proofs
+The earlier checkpoints are retained chronologically; these results supersede pending statuses above.
+
+- Both builds passed in run 38277089799 using the existing governed Full Release heap of 8192 MiB, on a verified 16373452 KiB hosted runner. People remained at its original SHA. Safety used the pinned internal-type patch. Standalone web BUILD_ID/server.js and worker dist/index.js assertions passed. See cloud-build-proof.txt.
+- The inherited PR #5 build budget of 6144 MiB was too small for these cold builds. This was corrected only in isolated controls; main/PR #5 were not changed.
+- Safety run 38275954738 passed all 20 real People provenance groups but exposed obsolete Action Plans synthetic setup after Risk 0060. The additional action-property-current-risk-fixture.patch creates a valid manual Risk assessment matrix. From the risk_hazards insertion through final rollback, all fixture content and denial assertions are byte-identical: SHA256 985719ef444388864c58cc0f958712d5a65db63ff968326a9f8080840e421bd4.
+- Targeted database run 38277765802 **passed**: six property/RLS fixtures, closed Risk revision regression, all Migration Safety replay/CLI/concurrency/rollback/ACL/backup tests, unchanged People 0057 SQL and the pinned unnumbered Approvals privilege fixture. PostgreSQL was 16.14 from the explicit image digest; prior recorded 16.15 evidence was not misrepresented as this run. See migration-safety-cloud-database-proof.txt.
+- Corrected Safety source was then published only to fix/uvanoo-v1.4-migration-safety-cloud-gates as **befe7efc807230862ac1cbd42ab957e1e298e7f1**, parent 6892670fd33e0fe12a1862bb822b451cd1bf7b44, tree cac8f1184b7852629aab49e77f49a693abd0e350.
+- Draft **PR #8** https://github.com/Satho82/beaconhs/pull/8 targets chore/v1.4-migration-safety, not governed/main. Exactly two files changed: internal exported type and synthetic SQL fixture setup. No migration body, journal, RLS or Risk runtime change.
+- Fresh all-in-one exact-source run **38278704970**, control 71a1ab819c7030a5205821b7e6d7fc9d4a4bef9f, validates unchanged People and corrected Safety through all gates including deployment-contract regressions. It is still running; no freeze or release claim.
+- Original Approvals property-authority proof **38279023873**, control ae01d309e13c79c2e6f6e0431ae9198cff09c5f2, is running against a canonical, disposable fixture reconstructed from exact Safety source. The original Approvals guard/assertions remain unchanged. No DEV metadata is invented; this does not replace the missing full Batch01 captured-contract evidence.
+
+People still needs authenticated visual acceptance and combined-candidate regression before Board freeze. Approvals still fails full localization coverage and lacks production adapters/migration registration; its proposed dead-code patch remains uncommitted. Remaining Board module gaps and fresh exact-release preflight remain open. No PR was merged, no shared source branch was mutated, and no persistent DEV/database/staging/production action occurred.

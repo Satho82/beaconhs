@@ -155,6 +155,10 @@ export const userPermissionOverridesRelations = relations(userPermissionOverride
 
 // Catalogue of built-in permission keys (consumed by UI permission picker).
 export const PERMISSION_CATALOGUE = [
+  'approvals.read',
+  'approvals.submit',
+  'approvals.decide',
+  'approvals.configure',
   // Forms
   'forms.template.read',
   'forms.template.create',

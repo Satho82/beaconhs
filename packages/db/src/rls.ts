@@ -183,6 +183,25 @@ DROP POLICY IF EXISTS tenant_write_insert ON ${table};
 DROP POLICY IF EXISTS tenant_write_update ON ${table};
 DROP POLICY IF EXISTS tenant_write_delete ON ${table};`
 
+  if (
+    [
+      'approval_workflows',
+      'approval_requests',
+      'approval_stages',
+      'approval_decisions',
+      'approval_events',
+    ].includes(table)
+  ) {
+    return `${reset}
+CREATE POLICY tenant_isolation ON ${table} USING (
+  tenant_id = ${TENANT_ID_SQL}
+  AND EXISTS (SELECT 1 FROM hospitality_properties p
+    WHERE p.tenant_id=${table}.tenant_id AND p.id=${table}.property_id AND p.deleted_at IS NULL)
+  AND (${ACTION_SCOPE_MODE_SQL}='tenant' OR
+    (${ACTION_SCOPE_MODE_SQL}='property' AND ${ACTION_PROPERTY_IDS_SQL} ? property_id::text))
+);`
+  }
+
   // report_definitions deliberately contains both globally readable built-ins
   // (tenant_id IS NULL) and tenant-owned custom reports. Global rows must be
   // selectable through ordinary tenant joins, but runtime roles must never be
@@ -373,6 +392,11 @@ CREATE POLICY tenant_isolation ON ${table}
 // The Better-Auth tables (user, session, account, verification) are global and
 // not in this list.
 export const TENANT_SCOPED_TABLES = [
+  'approval_workflows',
+  'approval_requests',
+  'approval_stages',
+  'approval_decisions',
+  'approval_events',
   'risk_template_families',
   'risk_assessment_versions',
   'risk_templates',

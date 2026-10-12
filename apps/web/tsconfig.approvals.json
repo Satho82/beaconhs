@@ -1,0 +1,5 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "incremental": false, "types": ["node"] },
+  "include": ["src/lib/approvals/**/*.ts", "scripts/verify-approvals-batch01.ts"]
+}

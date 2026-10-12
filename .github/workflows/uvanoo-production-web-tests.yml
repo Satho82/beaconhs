@@ -58,6 +58,8 @@ jobs:
           PY
       - name: Web regressions
         run: pnpm --filter @beaconhs/web exec vitest run src/lib/download-audit-prefetch-contract.test.ts src/lib/dynamic-uuid-route-guards.test.ts src/lib/approvals
+      - name: Scheduled registry regression
+        run: pnpm --filter @beaconhs/jobs test
       - name: Preserve normalized draft source for exact candidate creation
         if: always()
         run: |

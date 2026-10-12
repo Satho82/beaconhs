@@ -10,6 +10,7 @@ const translations:Record<string,[string,string]>={"Stage":["Etapa","Étape"],"n
 translations['Upload Document']=['Subir documento','Importer un document']
 translations['Configured workflows']=['Flujos configurados','Circuits configurés']
 translations['Search workflows']=['Buscar flujos','Rechercher des circuits']
+translations['Current approver']=['Aprobador actual','Approbateur actuel']
 const sources=new Set<string>(Object.keys(translations))
 const attrs=new Set(['actionLabel','alt','aria-label','buttonLabel','cancelLabel','description','label','loadingLabel','message','placeholder','title','tooltip'])
 for(const path of Object.keys(draft.files).filter(p=>p.endsWith('.tsx'))) {

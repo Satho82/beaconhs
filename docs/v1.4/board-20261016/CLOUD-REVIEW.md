@@ -112,3 +112,22 @@ Only then request explicit authorisation naming that exact DEV release. Staging 
 - Keep People and Approvals marked NOT FROZEN until complete exact-SHA evidence exists.
 - Execute the board scenarios on disposable infrastructure before proposing persistent DEV.
 - Recheck the exact combined candidate, rollback and data preservation before requesting release authorisation.
+
+## Cloud execution checkpoint
+An additional isolated workflow was subsequently created on the review branch only:
+- Workflow control commit: 18cf3bf139ea3610b31c2355abd6bd6f9bee8962.
+- Workflow: .github/workflows/uvanoo-v1.4-board-cloud-review.yml.
+- Run: https://github.com/Satho82/beaconhs/actions/runs/38271967825.
+- Fixed-SHA People and Migration Safety full validation jobs use disposable PostgreSQL/Redis.
+- Migration Safety includes its existing network-none/tmpfs Docker regression harness.
+- Approvals has explicitly partial static/unit/build evidence only; no migration, production-adapter or visual acceptance claim.
+- Trigger is restricted to the review branch and this workflow path; no manual dispatch or merge was needed.
+- Permissions are contents: read. No secrets, environment, image-publication or deployment job.
+- YAML, fixed matrix identities and shell syntax were checked before publication. Run is in progress at this checkpoint; no pass or freeze is claimed.
+
+This supplements existing gates and does not register PR #5 on main, merge PR #6, or replace mandatory release acceptance.
+The earlier no-dispatch limitation remains true for the connector; the branch-specific push trigger supplied a safe supplemental execution path.
+
+PR #6's exact classifier script also passed five independent synthetic Git-history cases: workflow-only, application change, first push, malformed range and reverse history. See deployment-classifier-tests.json.
+
+Additional Approvals reproducibility blocker: verify-approvals-batch01.ts expects named Docker container uvanoo-approvals-reconcile-20261012 and APPROVALS_DEV_CONTRACTS pointing to external captured DEV metadata. No such file was recovered from these 37 committed changes. Do not fabricate the metadata or remove fixture safety checks. A reproducible cloud fixture/contract setup is required.

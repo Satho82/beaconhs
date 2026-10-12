@@ -1,0 +1,146 @@
+name: Uvanoo production disposable database checks
+on:
+  push:
+    branches: [review/uvanoo-v1.4-production-completion-cloud-20261012]
+    paths: [.github/workflows/uvanoo-production-database.yml]
+permissions:
+  contents: read
+concurrency:
+  group: uvanoo-production-database
+  cancel-in-progress: false
+jobs:
+  database:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    services:
+      postgres:
+        image: postgres:16-alpine@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: beaconhs_test
+        ports: ['127.0.0.1:5432:5432']
+        options: >-
+          --health-cmd="pg_isready -U postgres -d beaconhs_test"
+          --health-interval=5s --health-timeout=5s --health-retries=10
+      redis:
+        image: redis:7-alpine@sha256:6ab0b6e7381779332f97b8ca76193e45b0756f38d4c0dcda72dbb3c32061ab99
+        ports: ['127.0.0.1:6379:6379']
+        options: >-
+          --health-cmd="redis-cli ping" --health-interval=5s --health-timeout=5s --health-retries=10
+    env:
+      R2_ENDPOINT: http://localhost:9000
+      R2_ACCESS_KEY_ID: beaconhs
+      R2_SECRET_ACCESS_KEY: beaconhs-dev-secret
+      R2_BUCKET: approvals-disposable
+      CI: 'true'
+      NEXT_TELEMETRY_DISABLED: '1'
+      TURBO_TELEMETRY_DISABLED: '1'
+      DATABASE_URL: postgresql://beaconhs_app:beaconhs_app@localhost:5432/beaconhs_test
+      MIGRATION_DATABASE_URL: postgresql://beaconhs_migrator:beaconhs_migrator@localhost:5432/beaconhs_test
+      SUPERADMIN_DATABASE_URL: postgresql://beaconhs_super:beaconhs_super@localhost:5432/beaconhs_test
+      PEOPLE_PROVENANCE_TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/beaconhs_test
+      DATABASE_OWNER_ROLE: beaconhs_owner
+      DATABASE_BACKUP_ROLE: beaconhs_backup
+      REDIS_URL: redis://localhost:6379
+      BETTER_AUTH_SECRET: module-validation-disposable-secret-not-production
+      ATTACHMENT_CAPABILITY_SECRET: module-validation-disposable-capability-secret
+      BETTER_AUTH_URL: http://localhost:3000
+      APP_URL: http://localhost:3000
+
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with: { persist-credentials: false, fetch-depth: 0 }
+      - name: Apply isolated source checkpoint
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF" = refs/heads/review/uvanoo-v1.4-production-completion-cloud-20261012
+          cp docs/v1.4/production-completion/source-draft.json /tmp/draft.json
+          git checkout --detach c306bd6bbe0571eeca18a410c1ac08fe55c524b6
+          python3 - <<'PY'
+          import json,pathlib
+          d=json.load(open('/tmp/draft.json'))
+          assert d['base']=='c306bd6bbe0571eeca18a410c1ac08fe55c524b6'
+          for p,c in d['files'].items():
+              assert p.startswith(('apps/','packages/','docs/')) and '..' not in pathlib.PurePosixPath(p).parts
+              target=pathlib.Path(p);target.parent.mkdir(parents=True,exist_ok=True);target.write_text(c)
+          PY
+          git diff --exit-code -- 'packages/db/drizzle/00[0-5]*.sql' 'packages/db/drizzle/006[0-2]*.sql' 'apps/web/src/lib/people' 'apps/web/src/app/(app)/people' 'apps/web/src/lib/risk'
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with: { node-version-file: .nvmrc, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - name: Provision disposable database roles
+        env:
+          PGPASSWORD: postgres
+        run: |
+          set -euo pipefail
+          psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 <<'SQL'
+          CREATE ROLE beaconhs_owner NOLOGIN NOSUPERUSER NOBYPASSRLS;
+          CREATE ROLE beaconhs_migrator LOGIN NOINHERIT NOSUPERUSER NOBYPASSRLS PASSWORD 'beaconhs_migrator';
+          CREATE ROLE beaconhs_app LOGIN NOINHERIT NOSUPERUSER NOBYPASSRLS PASSWORD 'beaconhs_app';
+          CREATE ROLE beaconhs_super LOGIN NOINHERIT NOSUPERUSER BYPASSRLS PASSWORD 'beaconhs_super';
+          CREATE ROLE beaconhs_backup LOGIN NOINHERIT NOSUPERUSER BYPASSRLS PASSWORD 'beaconhs_backup';
+          ALTER ROLE beaconhs_backup SET default_transaction_read_only = 'on';
+          GRANT beaconhs_owner TO beaconhs_migrator;
+          ALTER DATABASE beaconhs_test OWNER TO beaconhs_owner;
+          REVOKE ALL ON DATABASE beaconhs_test FROM PUBLIC;
+          GRANT CONNECT ON DATABASE beaconhs_test TO beaconhs_migrator, beaconhs_app, beaconhs_super, beaconhs_backup;
+          \connect beaconhs_test
+          ALTER SCHEMA public OWNER TO beaconhs_owner;
+          REVOKE ALL ON SCHEMA public FROM PUBLIC;
+          SQL
+
+
+      - name: Fresh migration and idempotence
+        run: |
+          pnpm --filter @beaconhs/db exec tsx src/migrate.ts
+          pnpm --filter @beaconhs/db exec tsx src/migrate.ts
+      - name: Disposable private storage
+        run: |
+          docker run --detach --rm --name approvals-disposable-storage --label uvanoo.task=approvals-production -p 127.0.0.1:9000:9000 --tmpfs /data:rw -e MINIO_ROOT_USER=beaconhs -e MINIO_ROOT_PASSWORD=beaconhs-dev-secret minio/minio:latest server /data
+          docker inspect --format '{{.Image}}' approvals-disposable-storage
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://localhost:9000/minio/health/live; then break; fi
+            sleep 1
+          done
+          curl --fail --silent http://localhost:9000/minio/health/live
+      - name: Production lifecycle and financial security integration
+        run: pnpm --filter @beaconhs/web exec tsx scripts/verify-approvals-production.ts
+      - name: Migration Safety isolated rollback and ACL harness
+        run: |
+          set -euo pipefail
+          docker pull postgres:16-alpine@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777
+          docker tag postgres:16-alpine@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777 postgres:16-alpine
+          docker run --detach --rm --name uvanoo-migration-safety-20261012 \
+            --label uvanoo.task=migration-safety --network none --memory 768m --cpus 2 \
+            --tmpfs /var/lib/postgresql/data:rw \
+            -e POSTGRES_HOST_AUTH_METHOD=trust -e POSTGRES_DB=safety_admin postgres:16-alpine
+          ready=false
+          for attempt in $(seq 1 30); do
+            if docker exec uvanoo-migration-safety-20261012 pg_isready -U postgres -d safety_admin; then
+              ready=true
+              break
+            fi
+            sleep 1
+          done
+          test "$ready" = true
+          pnpm --filter @beaconhs/db exec tsx src/migration-safety.integration.ts
+
+      - name: Dispose only task-owned Migration Safety fixture
+        if: always()
+        run: |
+          set -euo pipefail
+          if docker inspect uvanoo-migration-safety-20261012 >/dev/null 2>&1; then
+            test "$(docker inspect --format '{{ index .Config.Labels "uvanoo.task" }}' uvanoo-migration-safety-20261012)" = migration-safety
+            docker stop uvanoo-migration-safety-20261012
+          fi
+
+
+      - name: Dispose task storage
+        if: always()
+        run: |
+          if docker inspect approvals-disposable-storage >/dev/null 2>&1; then
+            test "$(docker inspect --format '{{ index .Config.Labels "uvanoo.task" }}' approvals-disposable-storage)" = approvals-production
+            docker stop approvals-disposable-storage
+          fi

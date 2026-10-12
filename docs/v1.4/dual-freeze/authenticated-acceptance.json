@@ -1,0 +1,355 @@
+{
+  "repository": "Satho82/beaconhs",
+  "recordedAt": "2026-10-12 21:43:54 UTC",
+  "sourceCommit": "937242e7e35806acab48c28c4163719b00c0f16d",
+  "sourceTree": "9912feac29a30b4b32d219b4cc21f80f1f57f7f7",
+  "status": "NOT VERIFIED",
+  "acceptanceGate": "BLOCKED",
+  "browserChecksExecuted": 0,
+  "screenshotsProduced": 0,
+  "environment": {
+    "type": "Disposable GitHub-hosted CI",
+    "persistentDatabaseAccess": false,
+    "publicDeployment": false,
+    "macDependency": false,
+    "postgres": "16; disposable loopback service",
+    "storage": "Pinned MinIO built from source; disposable loopback service",
+    "redis": "7; disposable loopback service"
+  },
+  "fixtures": {
+    "status": "CREATED_SUCCESSFULLY",
+    "roles": [
+      "Platform Super Admin",
+      "Cluster General Manager",
+      "Property Manager",
+      "Approver",
+      "Requester",
+      "Restricted Property User"
+    ],
+    "properties": [
+      "One Fifty Fenchurch",
+      "The Lincoln Suites"
+    ],
+    "syntheticOnly": true,
+    "credentialsLogged": false,
+    "credentialsPublished": false,
+    "runnerDisposed": true
+  },
+  "attempts": [
+    {
+      "run": 38310021554,
+      "job": 115013172144,
+      "url": "https://github.com/Satho82/beaconhs/actions/runs/38310021554",
+      "result": "FAILURE_BEFORE_BROWSER",
+      "failedStep": "Prepare disposable synthetic accounts and hotel fixtures",
+      "exitCode": 254,
+      "cause": "ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL: Command \"tsx\" not found in @beaconhs/auth",
+      "correctionCommit": "8a1c79e9c2232667d901fd63fa2d8829d3526dfc",
+      "correction": "Use existing @beaconhs/db TypeScript runner; accepted application source untouched."
+    },
+    {
+      "run": 38310507071,
+      "job": 115014793624,
+      "url": "https://github.com/Satho82/beaconhs/actions/runs/38310507071",
+      "controlCommit": "8a1c79e9c2232667d901fd63fa2d8829d3526dfc",
+      "result": "FAILURE_BEFORE_BROWSER",
+      "fixtures": "PASS",
+      "productionRuntimeBuild": "PASS",
+      "failedStep": "Start exact production application on loopback",
+      "exitCode": 1,
+      "start": "2026-10-12T21:39:13Z",
+      "failure": "2026-10-12T21:41:16Z",
+      "observation": "No successful http://localhost:3000/login readiness response was observed during 60 attempts at 2-second intervals; no Chrome version was emitted and the browser step was skipped.",
+      "rootCause": "NOT DETERMINED. Server output was redirected to a runner-local file and not retained in the uploaded artifact. This does not establish whether the failure is startup, HTTP rendering, configuration, or another runtime problem.",
+      "browserStep": "SKIPPED",
+      "cleanSourceAndMigrationHashChecks": "PASS",
+      "jobs": [
+        {
+          "id": 115014793624,
+          "name": "Authenticated People and Approvals on unchanged accepted source (migration-safety, 937242e7e35806...",
+          "status": "completed",
+          "conclusion": "failure",
+          "run_id": 38310507071,
+          "logs_url": null,
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1
+            },
+            {
+              "name": "Initialize containers",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2
+            },
+            {
+              "name": "Verify control branch and immutable input shape",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3
+            },
+            {
+              "name": "Checkout validation control definition",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4
+            },
+            {
+              "name": "Verify source branch provenance and checkout exact candidate",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5
+            },
+            {
+              "name": "Run pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6
+            },
+            {
+              "name": "Run actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 7
+            },
+            {
+              "name": "Verify pinned toolchain and disposable service boundaries",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 8
+            },
+            {
+              "name": "Frozen dependency install",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 9
+            },
+            {
+              "name": "Provision disposable database roles",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 10
+            },
+            {
+              "name": "Validate migration journal and apply migrations",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 11
+            },
+            {
+              "name": "Build pinned disposable storage from official source",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 12
+            },
+            {
+              "name": "Prepare disposable synthetic accounts and hotel fixtures",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 13
+            },
+            {
+              "name": "Build runtime for browser acceptance (not a repeated release gate)",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 14
+            },
+            {
+              "name": "Start exact production application on loopback",
+              "status": "completed",
+              "conclusion": "failure",
+              "number": 15
+            },
+            {
+              "name": "Authenticated browser acceptance",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 16
+            },
+            {
+              "name": "Capture immutable migration and source evidence",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 17
+            },
+            {
+              "name": "Publish browser evidence only",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 18
+            },
+            {
+              "name": "Dispose task application",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 19
+            },
+            {
+              "name": "Dispose task storage",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 20
+            },
+            {
+              "name": "Post Run actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 37
+            },
+            {
+              "name": "Post Run pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 38
+            },
+            {
+              "name": "Post Checkout validation control definition",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 39
+            },
+            {
+              "name": "Stop containers",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 40
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 41
+            }
+          ]
+        }
+      ],
+      "artifact": {
+        "id": 11774294907,
+        "node_id": "MDg6QXJ0aWZhY3QxMTc3NDI5NDkwNw==",
+        "name": "uvanoo-dual-authenticated-acceptance",
+        "size_in_bytes": 3771,
+        "url": "https://api.github.com/repos/Satho82/beaconhs/actions/artifacts/11774294907",
+        "archive_download_url": "https://api.github.com/repos/Satho82/beaconhs/actions/artifacts/11774294907/zip",
+        "expired": false,
+        "digest": "sha256:29758bcdce102efa317ec409c4126b31ed6af5d6ddc7089b4c47d371b483ea85",
+        "created_at": "2026-10-12T21:41:17Z",
+        "updated_at": "2026-10-12T21:41:17Z",
+        "expires_at": "2027-01-10T21:25:11Z",
+        "workflow_run": {
+          "id": 38310507071,
+          "repository_id": 1362482838,
+          "head_repository_id": 1362482838,
+          "head_branch": "freeze/uvanoo-v1.4-people-approvals-20261012",
+          "head_sha": "8a1c79e9c2232667d901fd63fa2d8829d3526dfc"
+        }
+      },
+      "artifactContents": "source-identity.txt and migration-hashes.txt only; despite its name, this artifact contains no authenticated screenshots or browser pass evidence."
+    }
+  ],
+  "requiredChecks": [
+    {
+      "id": 1,
+      "name": "Authentication and navigation",
+      "status": "NOT VERIFIED",
+      "reason": "Authenticated browser step did not execute"
+    },
+    {
+      "id": 2,
+      "name": "People Directory and profiles",
+      "status": "NOT VERIFIED",
+      "reason": "Authenticated browser step did not execute"
+    },
+    {
+      "id": 3,
+      "name": "Property assignments and role scopes",
+      "status": "NOT VERIFIED",
+      "reason": "Authenticated browser step did not execute"
+    },
+    {
+      "id": 4,
+      "name": "Cluster GM multi-property access",
+      "status": "NOT VERIFIED",
+      "reason": "Authenticated browser step did not execute"
+    },
+    {
+      "id": 5,
+      "name": "Restricted-user property isolation",
+      "status": "NOT VERIFIED",
+      "reason": "Authenticated browser step did not execute"
+    },
+    {
+      "id": 6,
+      "name": "Approvals dashboard and request creation",
+      "status": "NOT VERIFIED",
+      "reason": "Authenticated browser step did not execute"
+    },
+    {
+      "id": 7,
+      "name": "Financial requests and attachments",
+      "status": "NOT VERIFIED",
+      "reason": "Authenticated browser step did not execute"
+    },
+    {
+      "id": 8,
+      "name": "Multi-stage approvals and decisions",
+      "status": "NOT VERIFIED",
+      "reason": "Authenticated browser step did not execute"
+    },
+    {
+      "id": 9,
+      "name": "Delegation and approval limits",
+      "status": "NOT VERIFIED",
+      "reason": "Authenticated browser step did not execute"
+    },
+    {
+      "id": 10,
+      "name": "Comments, cancellation and information requests",
+      "status": "NOT VERIFIED",
+      "reason": "Authenticated browser step did not execute"
+    },
+    {
+      "id": 11,
+      "name": "Notifications, reminders and audit history",
+      "status": "NOT VERIFIED",
+      "reason": "Authenticated browser step did not execute"
+    },
+    {
+      "id": 12,
+      "name": "Reporting and exports",
+      "status": "NOT VERIFIED",
+      "reason": "Authenticated browser step did not execute"
+    },
+    {
+      "id": 13,
+      "name": "Mobile-responsive navigation",
+      "status": "NOT VERIFIED",
+      "reason": "Authenticated browser step did not execute"
+    },
+    {
+      "id": 14,
+      "name": "Uvanoo Light/Terra design fidelity",
+      "status": "NOT VERIFIED",
+      "reason": "Authenticated browser step did not execute"
+    },
+    {
+      "id": 15,
+      "name": "Teal/coral colours, menus and submenu structure",
+      "status": "NOT VERIFIED",
+      "reason": "Authenticated browser step did not execute"
+    }
+  ],
+  "notSubstituted": [
+    "Passing unit/integration/security tests are preserved separately and are not browser acceptance evidence.",
+    "Owner acceptance is recorded as supplied; it does not fabricate executed authentication or visual comparison.",
+    "Fixture creation is not successful user sign-in."
+  ],
+  "requiredFollowup": [
+    "Capture sanitized startup stderr and exact readiness HTTP status in disposable infrastructure, then diagnose the runtime readiness failure.",
+    "Do not modify the accepted source to force a pass. Seek narrowly scoped source-remediation authority if source changes are required.",
+    "Once a genuine authenticated runtime is available, complete all 15 checks and retain browser outcomes, screenshots and source identities.",
+    "Exercise real queued recipient notification delivery and reminders with disposable delivery sinks; do not treat inbox navigation alone as delivery verification.",
+    "Compare actual rendered desktop/tablet/mobile screens with approved Light/Terra references and menu specifications."
+  ]
+}

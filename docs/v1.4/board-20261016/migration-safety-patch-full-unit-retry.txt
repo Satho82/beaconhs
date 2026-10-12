@@ -1,0 +1,381 @@
+Cloud executor; base 6892670fd33e0fe12a1862bb822b451cd1bf7b44 plus adjacent migration-safety-deadcode-fix.patch.
+Node 24.18.0; pnpm 10.30.3; @sparticuz/chromium 153.0.0 (Chromium 153.0.8010.0) provisioned outside repository.
+Command: PUPPETEER_EXECUTABLE_PATH=/tmp/chromium VITEST_MAX_WORKERS=2 NODE_OPTIONS=--max-old-space-size=3072 pnpm test --concurrency=1 --env-mode=loose
+Exit: 0. 2725 passed; 2 opt-in integration tests skipped. No real PostgreSQL proof from this executor run.
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> beaconhs@0.1.0 test /workspace/scratch/2fcebbc84689/beaconhs
+> turbo run test --concurrency=1 --env-mode=loose
+
+• turbo 2.10.5
+
+   • Packages in scope: @beaconhs/ai, @beaconhs/analytics, @beaconhs/audit, @beaconhs/auth, @beaconhs/compliance, @beaconhs/crypto, @beaconhs/db, @beaconhs/design-studio, @beaconhs/email-render, @beaconhs/emails, @beaconhs/events, @beaconhs/forms-core, @beaconhs/forms-pdf, @beaconhs/i18n, @beaconhs/integrations, @beaconhs/jobs, @beaconhs/office, @beaconhs/reports, @beaconhs/sms, @beaconhs/storage, @beaconhs/sync, @beaconhs/tenant, @beaconhs/ui, @beaconhs/web, @beaconhs/worker
+   • Running test in 25 packages
+   • Remote caching disabled
+
+@beaconhs/email-render:test: cache miss, executing e2f15291a87df49c
+@beaconhs/email-render:test: 
+@beaconhs/email-render:test: > @beaconhs/email-render@0.1.0 test /workspace/scratch/2fcebbc84689/beaconhs/packages/email-render
+@beaconhs/email-render:test: > vitest run
+@beaconhs/email-render:test: 
+@beaconhs/email-render:test: 
+@beaconhs/email-render:test:  RUN  v4.1.10 /workspace/scratch/2fcebbc84689/beaconhs/packages/email-render
+@beaconhs/email-render:test: 
+@beaconhs/email-render:test: 
+@beaconhs/email-render:test:  Test Files  2 passed (2)
+@beaconhs/email-render:test:       Tests  48 passed (48)
+@beaconhs/email-render:test:    Start at  18:07:36
+@beaconhs/email-render:test:    Duration  907ms (transform 182ms, setup 0ms, import 806ms, tests 79ms, environment 0ms)
+@beaconhs/email-render:test: 
+@beaconhs/office:test: cache miss, executing d7bd6704b0faed87
+@beaconhs/office:test: 
+@beaconhs/office:test: > @beaconhs/office@0.1.0 test /workspace/scratch/2fcebbc84689/beaconhs/packages/office
+@beaconhs/office:test: > vitest run
+@beaconhs/office:test: 
+@beaconhs/office:test: 
+@beaconhs/office:test:  RUN  v4.1.10 /workspace/scratch/2fcebbc84689/beaconhs/packages/office
+@beaconhs/office:test: 
+@beaconhs/office:test: 
+@beaconhs/office:test:  Test Files  2 passed (2)
+@beaconhs/office:test:       Tests  14 passed (14)
+@beaconhs/office:test:    Start at  18:07:38
+@beaconhs/office:test:    Duration  211ms (transform 53ms, setup 0ms, import 86ms, tests 11ms, environment 0ms)
+@beaconhs/office:test: 
+@beaconhs/storage:test: cache miss, executing 8095b1c1041727d3
+@beaconhs/storage:test: 
+@beaconhs/storage:test: > @beaconhs/storage@0.1.0 test /workspace/scratch/2fcebbc84689/beaconhs/packages/storage
+@beaconhs/storage:test: > vitest run
+@beaconhs/storage:test: 
+@beaconhs/storage:test: 
+@beaconhs/storage:test:  RUN  v4.1.10 /workspace/scratch/2fcebbc84689/beaconhs/packages/storage
+@beaconhs/storage:test: 
+@beaconhs/storage:test: 
+@beaconhs/storage:test:  Test Files  4 passed (4)
+@beaconhs/storage:test:       Tests  12 passed (12)
+@beaconhs/storage:test:    Start at  18:07:39
+@beaconhs/storage:test:    Duration  476ms (transform 123ms, setup 0ms, import 320ms, tests 18ms, environment 0ms)
+@beaconhs/storage:test: 
+@beaconhs/i18n:test: cache miss, executing df46682306f3f83e
+@beaconhs/i18n:test: 
+@beaconhs/i18n:test: > @beaconhs/i18n@0.1.0 test /workspace/scratch/2fcebbc84689/beaconhs/packages/i18n
+@beaconhs/i18n:test: > vitest run
+@beaconhs/i18n:test: 
+@beaconhs/i18n:test: 
+@beaconhs/i18n:test:  RUN  v4.1.10 /workspace/scratch/2fcebbc84689/beaconhs/packages/i18n
+@beaconhs/i18n:test: 
+@beaconhs/i18n:test: 
+@beaconhs/i18n:test:  Test Files  2 passed (2)
+@beaconhs/i18n:test:       Tests  12 passed (12)
+@beaconhs/i18n:test:    Start at  18:07:40
+@beaconhs/i18n:test:    Duration  1.55s (transform 886ms, setup 0ms, import 1.16s, tests 312ms, environment 0ms)
+@beaconhs/i18n:test: 
+@beaconhs/design-studio:test: cache miss, executing 4fad5bd4271929ae
+@beaconhs/design-studio:test: 
+@beaconhs/design-studio:test: > @beaconhs/design-studio@0.1.0 test /workspace/scratch/2fcebbc84689/beaconhs/packages/design-studio
+@beaconhs/design-studio:test: > vitest run
+@beaconhs/design-studio:test: 
+@beaconhs/design-studio:test: 
+@beaconhs/design-studio:test:  RUN  v4.1.10 /workspace/scratch/2fcebbc84689/beaconhs/packages/design-studio
+@beaconhs/design-studio:test: 
+@beaconhs/design-studio:test: 
+@beaconhs/design-studio:test:  Test Files  2 passed (2)
+@beaconhs/design-studio:test:       Tests  6 passed (6)
+@beaconhs/design-studio:test:    Start at  18:07:43
+@beaconhs/design-studio:test:    Duration  209ms (transform 47ms, setup 0ms, import 70ms, tests 7ms, environment 0ms)
+@beaconhs/design-studio:test: 
+@beaconhs/crypto:test: cache miss, executing 6c050bc96243c3b8
+@beaconhs/crypto:test: 
+@beaconhs/crypto:test: > @beaconhs/crypto@0.1.0 test /workspace/scratch/2fcebbc84689/beaconhs/packages/crypto
+@beaconhs/crypto:test: > vitest run
+@beaconhs/crypto:test: 
+@beaconhs/crypto:test: 
+@beaconhs/crypto:test:  RUN  v4.1.10 /workspace/scratch/2fcebbc84689/beaconhs/packages/crypto
+@beaconhs/crypto:test: 
+@beaconhs/crypto:test: 
+@beaconhs/crypto:test:  Test Files  2 passed (2)
+@beaconhs/crypto:test:       Tests  6 passed (6)
+@beaconhs/crypto:test:    Start at  18:07:44
+@beaconhs/crypto:test:    Duration  200ms (transform 43ms, setup 0ms, import 67ms, tests 11ms, environment 0ms)
+@beaconhs/crypto:test: 
+@beaconhs/ui:test: cache miss, executing a62f33fa3405510c
+@beaconhs/ui:test: 
+@beaconhs/ui:test: > @beaconhs/ui@0.1.0 test /workspace/scratch/2fcebbc84689/beaconhs/packages/ui
+@beaconhs/ui:test: > vitest run
+@beaconhs/ui:test: 
+@beaconhs/ui:test: 
+@beaconhs/ui:test:  RUN  v4.1.10 /workspace/scratch/2fcebbc84689/beaconhs/packages/ui
+@beaconhs/ui:test: 
+@beaconhs/ui:test: 
+@beaconhs/ui:test:  Test Files  2 passed (2)
+@beaconhs/ui:test:       Tests  4 passed (4)
+@beaconhs/ui:test:    Start at  18:07:45
+@beaconhs/ui:test:    Duration  195ms (transform 56ms, setup 0ms, import 93ms, tests 8ms, environment 0ms)
+@beaconhs/ui:test: 
+@beaconhs/forms-core:test: cache miss, executing fd2a3bed2f5b6028
+@beaconhs/forms-core:test: 
+@beaconhs/forms-core:test: > @beaconhs/forms-core@0.1.0 test /workspace/scratch/2fcebbc84689/beaconhs/packages/forms-core
+@beaconhs/forms-core:test: > vitest run
+@beaconhs/forms-core:test: 
+@beaconhs/forms-core:test: 
+@beaconhs/forms-core:test:  RUN  v4.1.10 /workspace/scratch/2fcebbc84689/beaconhs/packages/forms-core
+@beaconhs/forms-core:test: 
+@beaconhs/forms-core:test: 
+@beaconhs/forms-core:test:  Test Files  14 passed (14)
+@beaconhs/forms-core:test:       Tests  246 passed (246)
+@beaconhs/forms-core:test:    Start at  18:07:45
+@beaconhs/forms-core:test:    Duration  3.33s (transform 432ms, setup 0ms, import 4.05s, tests 385ms, environment 1ms)
+@beaconhs/forms-core:test: 
+@beaconhs/db:test: cache miss, executing bc0a93a575170540
+@beaconhs/db:test: 
+@beaconhs/db:test: > @beaconhs/db@0.1.0 test /workspace/scratch/2fcebbc84689/beaconhs/packages/db
+@beaconhs/db:test: > vitest run
+@beaconhs/db:test: 
+@beaconhs/db:test: 
+@beaconhs/db:test:  RUN  v4.1.10 /workspace/scratch/2fcebbc84689/beaconhs/packages/db
+@beaconhs/db:test: 
+@beaconhs/db:test: 
+@beaconhs/db:test:  Test Files  71 passed (71)
+@beaconhs/db:test:       Tests  361 passed (361)
+@beaconhs/db:test:    Start at  18:07:50
+@beaconhs/db:test:    Duration  19.59s (transform 2.13s, setup 0ms, import 26.45s, tests 2.62s, environment 6ms)
+@beaconhs/db:test: 
+@beaconhs/compliance:test: cache miss, executing 31bb2321b0f65e2c
+@beaconhs/compliance:test: 
+@beaconhs/compliance:test: > @beaconhs/compliance@0.1.0 test /workspace/scratch/2fcebbc84689/beaconhs/packages/compliance
+@beaconhs/compliance:test: > vitest run
+@beaconhs/compliance:test: 
+@beaconhs/compliance:test: 
+@beaconhs/compliance:test:  RUN  v4.1.10 /workspace/scratch/2fcebbc84689/beaconhs/packages/compliance
+@beaconhs/compliance:test: 
+@beaconhs/compliance:test: 
+@beaconhs/compliance:test:  Test Files  12 passed (12)
+@beaconhs/compliance:test:       Tests  57 passed (57)
+@beaconhs/compliance:test:    Start at  18:08:10
+@beaconhs/compliance:test:    Duration  5.17s (transform 1.84s, setup 0ms, import 7.37s, tests 339ms, environment 1ms)
+@beaconhs/compliance:test: 
+@beaconhs/reports:test: cache miss, executing ea05a4d60780f09c
+@beaconhs/reports:test: 
+@beaconhs/reports:test: > @beaconhs/reports@0.1.0 test /workspace/scratch/2fcebbc84689/beaconhs/packages/reports
+@beaconhs/reports:test: > vitest run
+@beaconhs/reports:test: 
+@beaconhs/reports:test: 
+@beaconhs/reports:test:  RUN  v4.1.10 /workspace/scratch/2fcebbc84689/beaconhs/packages/reports
+@beaconhs/reports:test: 
+@beaconhs/reports:test: 
+@beaconhs/reports:test:  Test Files  5 passed (5)
+@beaconhs/reports:test:       Tests  15 passed (15)
+@beaconhs/reports:test:    Start at  18:08:16
+@beaconhs/reports:test:    Duration  1.34s (transform 712ms, setup 0ms, import 1.31s, tests 29ms, environment 0ms)
+@beaconhs/reports:test: 
+@beaconhs/sync:test: cache miss, executing 2033b13445633552
+@beaconhs/sync:test: 
+@beaconhs/sync:test: > @beaconhs/sync@0.1.0 test /workspace/scratch/2fcebbc84689/beaconhs/packages/sync
+@beaconhs/sync:test: > node --import tsx --test src/*.test.ts
+@beaconhs/sync:test: 
+@beaconhs/sync:test: ✔ public IP policy rejects local, private, special, mapped, and documentation ranges (5.819407ms)
+@beaconhs/sync:test: ✔ hostname normalization rejects URL-shaped and malformed database hosts (0.711167ms)
+@beaconhs/sync:test: ✔ DNS policy rejects a hostname if any answer is non-public (8.227322ms)
+@beaconhs/sync:test: ✔ every DNS resolution is revalidated so a rebinding answer fails closed (0.350286ms)
+@beaconhs/sync:test: ✔ outbound configuration and redirect policy reject unsafe request metadata (2.328158ms)
+@beaconhs/sync:test: ✔ secure fetch rejects unsafe schemes, credentials, normalized private literals, and hop headers (1.825828ms)
+@beaconhs/sync:test: ✔ an abort signal interrupts an in-flight DNS resolution (0.417194ms)
+@beaconhs/sync:test: ✔ database connections reject private hosts and unencrypted credentials before loading a driver (0.52926ms)
+@beaconhs/sync:test: ✔ snapshot archive policy fails closed for processing failures and empty entities (0.328313ms)
+@beaconhs/sync:test: ▶ people sync convergence policy
+@beaconhs/sync:test:   ✔ does not treat an unchanged source hash as proof the target is unchanged (0.728152ms)
+@beaconhs/sync:test:   ✔ protects differing manual rows during first natural-key adoption (0.164352ms)
+@beaconhs/sync:test:   ✔ repairs provenance without conflicting when the visible manual title matches (0.166164ms)
+@beaconhs/sync:test:   ✔ conflicts only when manual-wins target edits overlap a changed source (0.117693ms)
+@beaconhs/sync:test: ✔ people sync convergence policy (2.30255ms)
+@beaconhs/sync:test: ▶ people sync canonical title cutover
+@beaconhs/sync:test:   ✔ reads the primary title relationship instead of the retired people column (0.744917ms)
+@beaconhs/sync:test:   ✔ tracks source ownership without deleting co-owned manual titles (0.218021ms)
+@beaconhs/sync:test:   ✔ checks target convergence instead of trusting rowHash alone (0.160727ms)
+@beaconhs/sync:test:   ✔ uses the last persisted sync result as the manual-wins drift baseline (0.144933ms)
+@beaconhs/sync:test:   ✔ does not overwrite a differing manual person during natural-key adoption (0.137512ms)
+@beaconhs/sync:test:   ✔ serializes title ownership changes through the parent person (0.14268ms)
+@beaconhs/sync:test:   ✔ normalizes source display text before resolving the unique catalogue key (0.101029ms)
+@beaconhs/sync:test: ✔ people sync canonical title cutover (2.635951ms)
+@beaconhs/sync:test: ℹ tests 20
+@beaconhs/sync:test: ℹ suites 2
+@beaconhs/sync:test: ℹ pass 20
+@beaconhs/sync:test: ℹ fail 0
+@beaconhs/sync:test: ℹ cancelled 0
+@beaconhs/sync:test: ℹ skipped 0
+@beaconhs/sync:test: ℹ todo 0
+@beaconhs/sync:test: ℹ duration_ms 164.691969
+@beaconhs/emails:test: cache miss, executing eb93a59f54ccf77c
+@beaconhs/emails:test: 
+@beaconhs/emails:test: > @beaconhs/emails@0.1.0 test /workspace/scratch/2fcebbc84689/beaconhs/packages/emails
+@beaconhs/emails:test: > vitest run
+@beaconhs/emails:test: 
+@beaconhs/emails:test: 
+@beaconhs/emails:test:  RUN  v4.1.10 /workspace/scratch/2fcebbc84689/beaconhs/packages/emails
+@beaconhs/emails:test: 
+@beaconhs/emails:test: 
+@beaconhs/emails:test:  Test Files  2 passed (2)
+@beaconhs/emails:test:       Tests  53 passed (53)
+@beaconhs/emails:test:    Start at  18:08:18
+@beaconhs/emails:test:    Duration  368ms (transform 213ms, setup 0ms, import 264ms, tests 150ms, environment 0ms)
+@beaconhs/emails:test: 
+@beaconhs/jobs:test: cache miss, executing 4a8ae7bf10f7fa1a
+@beaconhs/jobs:test: 
+@beaconhs/jobs:test: > @beaconhs/jobs@0.1.0 test /workspace/scratch/2fcebbc84689/beaconhs/packages/jobs
+@beaconhs/jobs:test: > vitest run
+@beaconhs/jobs:test: 
+@beaconhs/jobs:test: 
+@beaconhs/jobs:test:  RUN  v4.1.10 /workspace/scratch/2fcebbc84689/beaconhs/packages/jobs
+@beaconhs/jobs:test: 
+@beaconhs/jobs:test: 
+@beaconhs/jobs:test:  Test Files  4 passed (4)
+@beaconhs/jobs:test:       Tests  19 passed (19)
+@beaconhs/jobs:test:    Start at  18:08:19
+@beaconhs/jobs:test:    Duration  611ms (transform 234ms, setup 0ms, import 340ms, tests 250ms, environment 0ms)
+@beaconhs/jobs:test: 
+@beaconhs/ai:test: cache miss, executing fc83f16409c0ffc0
+@beaconhs/ai:test: 
+@beaconhs/ai:test: > @beaconhs/ai@0.1.0 test /workspace/scratch/2fcebbc84689/beaconhs/packages/ai
+@beaconhs/ai:test: > node --import tsx --test src/*.test.ts
+@beaconhs/ai:test: 
+@beaconhs/ai:test: ✔ AI provider validation accepts catalogue entries only, never inherited object keys (0.725228ms)
+@beaconhs/ai:test: ✔ AI base URL validation accepts only canonical public HTTPS overrides (2.124968ms)
+@beaconhs/ai:test: ✔ AI provider transport rejects unsafe endpoints before opening a socket (2.458289ms)
+@beaconhs/ai:test: ✔ extractJsonObject reads fenced and raw objects (1.830865ms)
+@beaconhs/ai:test: ✔ coerceJournalAnalysis maps the OpenRouter/Kimi field names onto the stored schema (3.771302ms)
+@beaconhs/ai:test: ▶ AI vision request bounds
+@beaconhs/ai:test:   ✔ accepts bounded storage bytes (0.902689ms)
+@beaconhs/ai:test:   ✔ rejects empty, excessive-count, and individually oversized images (0.546685ms)
+@beaconhs/ai:test:   ✔ rejects aggregate base64-expansion risk and oversized prompts (0.267484ms)
+@beaconhs/ai:test: ✔ AI vision request bounds (2.796677ms)
+@beaconhs/ai:test: ℹ tests 8
+@beaconhs/ai:test: ℹ suites 1
+@beaconhs/ai:test: ℹ pass 8
+@beaconhs/ai:test: ℹ fail 0
+@beaconhs/ai:test: ℹ cancelled 0
+@beaconhs/ai:test: ℹ skipped 0
+@beaconhs/ai:test: ℹ todo 0
+@beaconhs/ai:test: ℹ duration_ms 628.822003
+@beaconhs/sms:test: cache miss, executing 9fc45c59ef5e4850
+@beaconhs/sms:test: 
+@beaconhs/sms:test: > @beaconhs/sms@0.1.0 test /workspace/scratch/2fcebbc84689/beaconhs/packages/sms
+@beaconhs/sms:test: > vitest run
+@beaconhs/sms:test: 
+@beaconhs/sms:test: 
+@beaconhs/sms:test:  RUN  v4.1.10 /workspace/scratch/2fcebbc84689/beaconhs/packages/sms
+@beaconhs/sms:test: 
+@beaconhs/sms:test: 
+@beaconhs/sms:test:  Test Files  1 passed (1)
+@beaconhs/sms:test:       Tests  21 passed (21)
+@beaconhs/sms:test:    Start at  18:08:22
+@beaconhs/sms:test:    Duration  279ms (transform 84ms, setup 0ms, import 106ms, tests 17ms, environment 0ms)
+@beaconhs/sms:test: 
+@beaconhs/analytics:test: cache miss, executing 0ffea2cd52d370dc
+@beaconhs/analytics:test: 
+@beaconhs/analytics:test: > @beaconhs/analytics@0.1.0 test /workspace/scratch/2fcebbc84689/beaconhs/packages/analytics
+@beaconhs/analytics:test: > vitest run
+@beaconhs/analytics:test: 
+@beaconhs/analytics:test: 
+@beaconhs/analytics:test:  RUN  v4.1.10 /workspace/scratch/2fcebbc84689/beaconhs/packages/analytics
+@beaconhs/analytics:test: 
+@beaconhs/analytics:test: 
+@beaconhs/analytics:test:  Test Files  5 passed (5)
+@beaconhs/analytics:test:       Tests  16 passed (16)
+@beaconhs/analytics:test:    Start at  18:08:23
+@beaconhs/analytics:test:    Duration  3.76s (transform 1.75s, setup 0ms, import 5.89s, tests 165ms, environment 1ms)
+@beaconhs/analytics:test: 
+@beaconhs/forms-pdf:test: cache miss, executing dbb16a15b46562bf
+@beaconhs/forms-pdf:test: 
+@beaconhs/forms-pdf:test: > @beaconhs/forms-pdf@0.1.0 test /workspace/scratch/2fcebbc84689/beaconhs/packages/forms-pdf
+@beaconhs/forms-pdf:test: > vitest run --no-file-parallelism
+@beaconhs/forms-pdf:test: 
+@beaconhs/forms-pdf:test: 
+@beaconhs/forms-pdf:test:  RUN  v4.1.10 /workspace/scratch/2fcebbc84689/beaconhs/packages/forms-pdf
+@beaconhs/forms-pdf:test: 
+@beaconhs/forms-pdf:test: 
+@beaconhs/forms-pdf:test:  Test Files  5 passed (5)
+@beaconhs/forms-pdf:test:       Tests  18 passed (18)
+@beaconhs/forms-pdf:test:    Start at  18:08:28
+@beaconhs/forms-pdf:test:    Duration  4.72s (transform 2.24s, setup 0ms, import 6.75s, tests 901ms, environment 1ms)
+@beaconhs/forms-pdf:test: 
+@beaconhs/auth:test: cache miss, executing 151218bcf30d0936
+@beaconhs/auth:test: 
+@beaconhs/auth:test: > @beaconhs/auth@0.1.0 test /workspace/scratch/2fcebbc84689/beaconhs/packages/auth
+@beaconhs/auth:test: > vitest run
+@beaconhs/auth:test: 
+@beaconhs/auth:test: 
+@beaconhs/auth:test:  RUN  v4.1.10 /workspace/scratch/2fcebbc84689/beaconhs/packages/auth
+@beaconhs/auth:test: 
+@beaconhs/auth:test: 
+@beaconhs/auth:test:  Test Files  3 passed | 1 skipped (4)
+@beaconhs/auth:test:       Tests  25 passed | 1 skipped (26)
+@beaconhs/auth:test:    Start at  18:08:33
+@beaconhs/auth:test:    Duration  390ms (transform 106ms, setup 0ms, import 146ms, tests 62ms, environment 0ms)
+@beaconhs/auth:test: 
+@beaconhs/integrations:test: cache miss, executing 4565ac21a109b96f
+@beaconhs/integrations:test: 
+@beaconhs/integrations:test: > @beaconhs/integrations@0.1.0 test /workspace/scratch/2fcebbc84689/beaconhs/packages/integrations
+@beaconhs/integrations:test: > node --import tsx --test src/*.test.ts
+@beaconhs/integrations:test: 
+@beaconhs/integrations:test: ✔ PMS room states normalize behind a vendor-neutral boundary (0.665299ms)
+@beaconhs/integrations:test: ✔ PMS room identity is stable and rejects unsafe identifiers (0.457344ms)
+@beaconhs/integrations:test: ✔ email destination sanitizes authored markup and cannot promote record values to HTML (14.470202ms)
+@beaconhs/integrations:test: ✔ HTTP destination connectivity checks reject non-HTTPS and private targets without egress (1.53544ms)
+@beaconhs/integrations:test: ✔ HTTP destination resumes a known partial attempt without replaying successful items (0.98491ms)
+@beaconhs/integrations:test: ✔ partial ledger refs remain retryable and only completed refs satisfy send-once (0.265ms)
+@beaconhs/integrations:test: ✔ SQL destination requires an identity column before it can connect or insert (0.424185ms)
+@beaconhs/integrations:test: ℹ tests 7
+@beaconhs/integrations:test: ℹ suites 0
+@beaconhs/integrations:test: ℹ pass 7
+@beaconhs/integrations:test: ℹ fail 0
+@beaconhs/integrations:test: ℹ cancelled 0
+@beaconhs/integrations:test: ℹ skipped 0
+@beaconhs/integrations:test: ℹ todo 0
+@beaconhs/integrations:test: ℹ duration_ms 2675.769729
+@beaconhs/events:test: cache miss, executing 724a3d861663d02c
+@beaconhs/events:test: 
+@beaconhs/events:test: > @beaconhs/events@0.1.0 test /workspace/scratch/2fcebbc84689/beaconhs/packages/events
+@beaconhs/events:test: > vitest run
+@beaconhs/events:test: 
+@beaconhs/events:test: 
+@beaconhs/events:test:  RUN  v4.1.10 /workspace/scratch/2fcebbc84689/beaconhs/packages/events
+@beaconhs/events:test: 
+@beaconhs/events:test: 
+@beaconhs/events:test:  Test Files  3 passed (3)
+@beaconhs/events:test:       Tests  10 passed (10)
+@beaconhs/events:test:    Start at  18:08:37
+@beaconhs/events:test:    Duration  1.82s (transform 676ms, setup 0ms, import 2.38s, tests 22ms, environment 0ms)
+@beaconhs/events:test: 
+@beaconhs/worker:test: cache miss, executing 59a3a93d6e61af06
+@beaconhs/worker:test: 
+@beaconhs/worker:test: > @beaconhs/worker@0.1.0 test /workspace/scratch/2fcebbc84689/beaconhs/apps/worker
+@beaconhs/worker:test: > vitest run
+@beaconhs/worker:test: 
+@beaconhs/worker:test: 
+@beaconhs/worker:test:  RUN  v4.1.10 /workspace/scratch/2fcebbc84689/beaconhs/apps/worker
+@beaconhs/worker:test: 
+@beaconhs/worker:test: 
+@beaconhs/worker:test:  Test Files  27 passed (27)
+@beaconhs/worker:test:       Tests  96 passed (96)
+@beaconhs/worker:test:    Start at  18:08:40
+@beaconhs/worker:test:    Duration  6.71s (transform 2.17s, setup 0ms, import 8.37s, tests 745ms, environment 2ms)
+@beaconhs/worker:test: 
+@beaconhs/web:test: cache miss, executing 031a349123fea333
+@beaconhs/web:test: 
+@beaconhs/web:test: > @beaconhs/web@0.1.0 test /workspace/scratch/2fcebbc84689/beaconhs/apps/web
+@beaconhs/web:test: > vitest run --passWithNoTests
+@beaconhs/web:test: 
+@beaconhs/web:test: 
+@beaconhs/web:test:  RUN  v4.1.10 /workspace/scratch/2fcebbc84689/beaconhs/apps/web
+@beaconhs/web:test: 
+@beaconhs/web:test: 
+@beaconhs/web:test:  Test Files  274 passed | 1 skipped (275)
+@beaconhs/web:test:       Tests  1686 passed | 1 skipped (1687)
+@beaconhs/web:test:    Start at  18:08:47
+@beaconhs/web:test:    Duration  84.27s (transform 7.88s, setup 0ms, import 113.51s, tests 8.18s, environment 5.91s)
+@beaconhs/web:test: 
+
+ Tasks:    23 successful, 23 total
+Cached:    0 cached, 23 total
+  Time:    2m35.741s 
+

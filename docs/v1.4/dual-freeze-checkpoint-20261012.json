@@ -1,0 +1,379 @@
+{
+  "status": "combined_validation_success_modules_not_frozen",
+  "recovered_at": "2026-10-12",
+  "repository": "Satho82/beaconhs",
+  "run": {
+    "id": 38290116395,
+    "job": 114947905130,
+    "url": "https://github.com/Satho82/beaconhs/actions/runs/38290116395",
+    "attempt": 1,
+    "conclusion": "success",
+    "completed_at": "2026-10-12T18:45:26Z",
+    "control_sha": "f34dfd215999eaa8c32876232118e25b919cf86d",
+    "production_build": "success; web BUILD_ID, standalone server and worker bundle verified",
+    "final_source_identity": "success; clean tracked/index/untracked source"
+  },
+  "candidate": {
+    "sha": "c306bd6bbe0571eeca18a410c1ac08fe55c524b6",
+    "tree": "cfc536197c361962def84db347d1344924661f1d",
+    "parent": "d18f635a41f092e9e86aa6f53518f9c28992b0d2",
+    "publication": "GitHub commit exists. Recovery branch created from this exact candidate; checkpoint commit adds only this evidence file. No image publication or deployment by recovered workflow.",
+    "checkpoint_branch": "recovery/uvanoo-v1.4-dual-freeze-checkpoint-20261012"
+  },
+  "control_branch_head_observed": "3c7d017e1c34f92493f5912d9fd32b02179d75cf",
+  "governed_head_observed": "d18f635a41f092e9e86aa6f53518f9c28992b0d2",
+  "migration_evidence": "62 canonical entries ending 0062_approvals_batch01; fresh, 58-to-62, 61-to-62 and no-op passed. Original 61 ledger IDs, hashes and timestamps preserved. Rollback, concurrent exclusion, ACL/column permissions, backup and restore verified in disposable databases.",
+  "people": {
+    "frozen": false,
+    "remaining": [
+      "Authenticated visual acceptance against approved design",
+      "Owner freeze acceptance"
+    ],
+    "combined_regression": "passed"
+  },
+  "approvals": {
+    "frozen": false,
+    "remaining": [
+      "Authenticated production overview/My/Team/All/create/detail/review/configuration/reporting routes; candidate currently exposes preview Approvals routes",
+      "Server-owned production source adapters and persisted financial request/document data",
+      "Delegation with immutable audit and race protection; preserve 0062 via additive forward migration",
+      "Approved request-more-information/cancellation/comments/documents, category/amount/role limits and reporting/export behavior",
+      "Production security/functional and authenticated browser/visual acceptance at completed implementation SHA",
+      "Captured-contract acceptance and owner freeze acceptance"
+    ],
+    "contract": "https://github.com/Satho82/beaconhs/blob/3c7d017e1c34f92493f5912d9fd32b02179d75cf/docs/v1.4/board-20261016/PRODUCTION-INTEGRATION-CONTRACT.json"
+  },
+  "release_limitations": [
+    "Green isolated control run is not production feature completion or authoritative image publication",
+    "Existing exact-61 DEV migration guard requires separately reviewed forward-migration support; no guard bypassed",
+    "No fresh live DEV identity/ledger, protected-data checksums or live backup/restore evidence obtained in this recovery"
+  ],
+  "actions": "Evidence-only GitHub reads and dedicated checkpoint branch/file. No CI dispatch/rerun, tests repeated, development, merge, rebase, deployment, DEV/persistent database or Risk changes.",
+  "steps": [
+    {
+      "name": "Set up job",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 1
+    },
+    {
+      "name": "Initialize containers",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 2
+    },
+    {
+      "name": "Verify control branch and immutable input shape",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 3
+    },
+    {
+      "name": "Checkout validation control definition",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 4
+    },
+    {
+      "name": "Verify source branch provenance and checkout exact candidate",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 5
+    },
+    {
+      "name": "Run pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 6
+    },
+    {
+      "name": "Run actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 7
+    },
+    {
+      "name": "Verify pinned toolchain and disposable service boundaries",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 8
+    },
+    {
+      "name": "Frozen dependency install",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 9
+    },
+    {
+      "name": "Focused Approvals and localization regression gates",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 10
+    },
+    {
+      "name": "Provision disposable database roles",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 11
+    },
+    {
+      "name": "Formatting",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 12
+    },
+    {
+      "name": "Fresh route types",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 13
+    },
+    {
+      "name": "Typecheck",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 14
+    },
+    {
+      "name": "Database typecheck",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 15
+    },
+    {
+      "name": "Lint",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 16
+    },
+    {
+      "name": "Dead-code gate",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 17
+    },
+    {
+      "name": "Validate migration journal and apply migrations",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 18
+    },
+    {
+      "name": "Prove migration idempotence",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 19
+    },
+    {
+      "name": "Unit and regression tests",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 20
+    },
+    {
+      "name": "Approvals lifecycle audit and property authority on canonical 62 migrations",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 21
+    },
+    {
+      "name": "Cross-tenant and cross-property enforcement",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 22
+    },
+    {
+      "name": "Real People provenance and RLS boundary tests",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 23
+    },
+    {
+      "name": "Related real property RLS regressions",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 24
+    },
+    {
+      "name": "Closed Risk revision regression",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 25
+    },
+    {
+      "name": "Migration Safety isolated rollback and ACL harness",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 26
+    },
+    {
+      "name": "Dispose only task-owned Migration Safety fixture",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 27
+    },
+    {
+      "name": "Deployment contract regressions without deployment",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 28
+    },
+    {
+      "name": "Production build only",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 29
+    },
+    {
+      "name": "Verify exact final source identity",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 30
+    },
+    {
+      "name": "Post Run actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 57
+    },
+    {
+      "name": "Post Run pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 58
+    },
+    {
+      "name": "Post Checkout validation control definition",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 59
+    },
+    {
+      "name": "Stop containers",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 60
+    },
+    {
+      "name": "Complete job",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 61
+    }
+  ],
+  "log_evidence": [
+    "2026-10-12T18:20:27.1280160Z  Test Files  6 passed (6)",
+    "2026-10-12T18:20:27.1281339Z       Tests  43 passed (43)",
+    "2026-10-12T18:20:29.0734630Z  Test Files  2 passed (2)",
+    "2026-10-12T18:20:29.0736551Z       Tests  7 passed (7)",
+    "2026-10-12T18:20:30.0233088Z  Test Files  1 passed (1)",
+    "2026-10-12T18:20:30.0233903Z       Tests  12 passed (12)",
+    "2026-10-12T18:20:31.0593091Z  Test Files  1 passed (1)",
+    "2026-10-12T18:20:31.0594094Z       Tests  14 passed (14)",
+    "2026-10-12T18:27:01.2230299Z  Tasks:    25 successful, 25 total",
+    "2026-10-12T18:28:09.7972069Z  Tasks:    1 successful, 1 total",
+    "2026-10-12T18:28:21.4195172Z migration-journal-ok: 62 entries; terminal=0062_approvals_batch01",
+    "2026-10-12T18:28:34.0456266Z  Test Files  2 passed (2)",
+    "2026-10-12T18:28:34.0457384Z       Tests  12 passed (12)",
+    "2026-10-12T18:28:35.1443818Z  Test Files  4 passed (4)",
+    "2026-10-12T18:28:35.1444993Z       Tests  12 passed (12)",
+    "2026-10-12T18:28:35.9818746Z  Test Files  2 passed (2)",
+    "2026-10-12T18:28:35.9819373Z       Tests  6 passed (6)",
+    "2026-10-12T18:28:36.8557311Z  Test Files  2 passed (2)",
+    "2026-10-12T18:28:36.8558052Z       Tests  14 passed (14)",
+    "2026-10-12T18:28:37.7150723Z  Test Files  2 passed (2)",
+    "2026-10-12T18:28:37.7151252Z       Tests  6 passed (6)",
+    "2026-10-12T18:28:39.3288442Z  Test Files  2 passed (2)",
+    "2026-10-12T18:28:39.3289365Z       Tests  48 passed (48)",
+    "2026-10-12T18:28:40.2073297Z  Test Files  2 passed (2)",
+    "2026-10-12T18:28:40.2074229Z       Tests  4 passed (4)",
+    "2026-10-12T18:28:44.4446974Z  Test Files  14 passed (14)",
+    "2026-10-12T18:28:44.4447502Z       Tests  246 passed (246)",
+    "2026-10-12T18:29:05.6212179Z  Test Files  72 passed (72)",
+    "2026-10-12T18:29:05.6212722Z       Tests  368 passed (368)",
+    "2026-10-12T18:29:08.3152026Z  Test Files  5 passed (5)",
+    "2026-10-12T18:29:08.3153006Z       Tests  15 passed (15)",
+    "2026-10-12T18:29:14.0547589Z  Test Files  12 passed (12)",
+    "2026-10-12T18:29:14.0548135Z       Tests  57 passed (57)",
+    "2026-10-12T18:29:14.9694864Z  Test Files  1 passed (1)",
+    "2026-10-12T18:29:14.9695481Z       Tests  21 passed (21)",
+    "2026-10-12T18:29:17.2637567Z  Test Files  2 passed (2)",
+    "2026-10-12T18:29:17.2638636Z       Tests  53 passed (53)",
+    "2026-10-12T18:29:18.5073292Z  Test Files  4 passed (4)",
+    "2026-10-12T18:29:18.5074278Z       Tests  19 passed (19)",
+    "2026-10-12T18:29:36.8807662Z  Test Files  5 passed (5)",
+    "2026-10-12T18:29:36.8808188Z       Tests  18 passed (18)",
+    "2026-10-12T18:29:41.1297187Z  Test Files  5 passed (5)",
+    "2026-10-12T18:29:41.1298239Z       Tests  16 passed (16)",
+    "2026-10-12T18:29:43.7516068Z  Test Files  3 passed (3)",
+    "2026-10-12T18:29:43.7516626Z       Tests  10 passed (10)",
+    "2026-10-12T18:29:53.5138709Z  Test Files  4 passed (4)",
+    "2026-10-12T18:29:53.5139346Z       Tests  26 passed (26)",
+    "2026-10-12T18:30:03.9691062Z  Test Files  27 passed (27)",
+    "2026-10-12T18:30:03.9691574Z       Tests  98 passed (98)",
+    "2026-10-12T18:31:28.6856807Z  Test Files  279 passed | 1 skipped (280)",
+    "2026-10-12T18:31:28.6857547Z       Tests  1732 passed | 1 skipped (1733)",
+    "2026-10-12T18:31:28.6859711Z  Tasks:    23 successful, 23 total",
+    "2026-10-12T18:31:31.7296617Z PASS Reproduces canonical mixed-role scope combination without changing global RBAC",
+    "2026-10-12T18:31:31.7423180Z PASS Mixed roles cannot configure Property B using Property A permission",
+    "2026-10-12T18:31:32.0648122Z PASS Same-assignment Property A permission succeeds",
+    "2026-10-12T18:31:32.0706549Z PASS Foreign property denied",
+    "2026-10-12T18:31:32.0744554Z PASS Selected unrelated role cannot borrow privileged role permission",
+    "2026-10-12T18:31:32.0816792Z PASS Unscoped override cannot elevate unrelated Property B role",
+    "2026-10-12T18:31:34.1993861Z PASS Actual collection SQL excludes B requests and workflows for mixed roles",
+    "2026-10-12T18:31:34.4767089Z PASS Unscoped read override cannot expose B collections or detail",
+    "2026-10-12T18:31:34.4935114Z PASS Read deny and suspended requester block collections and detail with stale context",
+    "2026-10-12T18:31:34.4951291Z PASS Forged foreign tenant context cannot read collections or detail",
+    "2026-10-12T18:31:34.4989419Z PASS User without configure permission cannot create workflows",
+    "2026-10-12T18:31:34.7775999Z PASS Request stages survive creation of another workflow version",
+    "2026-10-12T18:31:34.7830197Z PASS Suspended approver denied despite stale context",
+    "2026-10-12T18:31:34.7889506Z PASS Revoked property binding blocks assigned approver despite stale context",
+    "2026-10-12T18:31:34.8040122Z PASS Mixed-role read access cannot restore revoked decision authority",
+    "2026-10-12T18:31:34.8111814Z PASS Explicit deny still overrides same-property wildcard role grant",
+    "2026-10-12T18:31:34.8177674Z PASS Revoked permission denied despite stale context and remaining read role",
+    "2026-10-12T18:31:34.8188040Z PASS No denied operations produced approval decisions",
+    "2026-10-12T18:31:35.6124281Z PASS Submission retries preserve the same immutable request",
+    "2026-10-12T18:31:37.4440315Z PASS Approval persists a decision and immutable audit event; retries do not duplicate",
+    "2026-10-12T18:31:39.0445641Z PASS Rejection requires a reason and persists rejected state and evidence",
+    "2026-10-12T18:31:41.5769205Z PASS Sequential stages cannot be skipped or decided by the requester",
+    "2026-10-12T18:31:44.7794361Z  Test Files  1 passed (1)",
+    "2026-10-12T18:31:44.7795491Z       Tests  1 passed (1)",
+    "2026-10-12T18:32:20.4433908Z PASS safety_fresh: replay, exact 62-entry ledger, no-op, Risk privilege preservation",
+    "2026-10-12T18:32:29.7107354Z PASS existing prepared-Risk security predicate; injected application ACL drift detected and rolled back",
+    "2026-10-12T18:32:29.7220591Z PASS unchanged People 0057 provenance/property-isolation SQL regression",
+    "2026-10-12T18:32:29.8910814Z PASS canonical Approvals migration table/column privilege preservation",
+    "2026-10-12T18:32:30.5033471Z PASS backup SELECT, denied writes with read-only disabled, no escalation; column-ACL and role-membership drift rejected",
+    "2026-10-12T18:32:34.0664425Z PASS repository backup.sh and checksum-portable restore-verify.sh against disposable data",
+    "2026-10-12T18:32:43.9693823Z PASS old broad default grants removed before new objects are created",
+    "2026-10-12T18:32:44.4792393Z PASS safety_forward: replay, exact 62-entry ledger, no-op, Risk privilege preservation",
+    "2026-10-12T18:32:44.6740142Z PASS ledger insertion failure rolls back SQL; unchanged retry commits both",
+    "2026-10-12T18:32:44.6741242Z PASS failure rollback, previous commit survives, unchanged-SQL retry, duplicate/hash ledger rejection",
+    "2026-10-12T18:32:44.6917004Z PASS explicit zero-access and Approvals-style column privilege preservation",
+    "2026-10-12T18:32:44.8000979Z PASS concurrent connection exclusion and successor no-op",
+    "2026-10-12T18:33:25.5017455Z PASS complete migrate.ts CLI fresh using canonical 62-entry journal",
+    "2026-10-12T18:33:37.2417782Z PASS complete migrate.ts CLI no-op using canonical 62-entry journal",
+    "2026-10-12T18:33:49.2134021Z PASS complete migrate.ts CLI forward-58-to-62 using canonical 62-entry journal",
+    "2026-10-12T18:34:01.1849002Z PASS complete migrate.ts CLI forward-61-to-62 using canonical 62-entry journal",
+    "2026-10-12T18:34:01.1882170Z PASS existing 61 ledger IDs, hashes and timestamps preserved; exactly one canonical migration added",
+    "2026-10-12T18:34:12.9071324Z PASS complete migrate.ts CLI existing-62-no-op using canonical 62-entry journal",
+    "2026-10-12T18:34:16.1808452Z PASS candidate verifier success",
+    "2026-10-12T18:34:16.6867455Z PASS candidate verifier feature-plus-visual",
+    "2026-10-12T18:34:17.1898299Z PASS candidate verifier ambiguous-feature",
+    "2026-10-12T18:34:17.2780501Z PASS candidate verifier failed-feature",
+    "2026-10-12T18:34:17.3666700Z PASS candidate verifier incomplete-feature",
+    "2026-10-12T18:34:17.4548557Z PASS candidate verifier sha-mismatch",
+    "2026-10-12T18:34:17.5554656Z PASS candidate verifier visual-only",
+    "2026-10-12T18:34:17.6473021Z PASS candidate verifier truncated-runs",
+    "2026-10-12T18:34:18.0239613Z PASS candidate verifier digest-mismatch",
+    "2026-10-12T18:34:18.2617058Z PASS candidate verifier inspect-failure",
+    "2026-10-12T18:34:18.5707734Z PASS candidate verifier invalid-digest",
+    "2026-10-12T18:34:18.9457504Z PASS candidate verifier pull-failure",
+    "2026-10-12T18:34:19.4544092Z PASS candidate verifier wrong-revision",
+    "2026-10-12T18:34:19.9595227Z PASS candidate verifier wrong-version",
+    "2026-10-12T18:34:19.9664521Z PASS candidate verifier old-caller",
+    "2026-10-12T18:34:19.9730300Z PASS V1.4 candidate deployment is manual, DEV-only, digest-bound and writer-fenced",
+    "2026-10-12T18:45:01.6301504Z  Tasks:    2 successful, 2 total",
+    "2026-10-12T18:45:04.6492792Z VALIDATED_COMBINED_SHA=c306bd6bbe0571eeca18a410c1ac08fe55c524b6",
+    "2026-10-12T18:45:04.6493751Z VALIDATED_COMBINED_TREE=cfc536197c361962def84db347d1344924661f1d"
+  ]
+}

@@ -147,3 +147,14 @@ The People fixture correction is scoped to the isolated property-delegation step
 Executor limitations and retries: the initial full test run lacked Chromium. An isolated npm installation of @sparticuz/chromium@153.0.0 supplies Chromium 153.0.8010.0 without repository dependency changes; all 18 PDF tests then pass unchanged. First build hit the executor memory limit (cgroup OOM kill); a smaller Node heap retry is pending. Neither infrastructure failure is represented as a pass.
 
 No source candidate is frozen. No governed/shared branch, persistent database, DEV release, staging or production was changed.
+
+
+## Second checkpoint: broader tests expose additional Approvals blockers
+- Patched Migration Safety full unit retry: **2760 passed, 2 opt-in integration tests skipped**, all 23 task exits green. See migration-safety-patch-full-unit-retry.txt. Skips are not real database proof.
+- Patched Approvals full unit retry: **2795 passed, 3 failed, 2 opt-in integration tests skipped**. All three failures are unchanged i18n coverage gates: 129 untranslated JSX/attribute occurrences plus missing option/programmatic catalogue entries. See approvals-i18n-gate-failures.txt. This is a substantial preview localization gap, not solved by the internal-export/script-registration patch; no translations or exclusions were fabricated.
+- People source remains unchanged. Corrected disposable-fixture workflow control c3143c6431842169ea269718fda9c34ef491c2a6 runs at https://github.com/Satho82/beaconhs/actions/runs/38275388373; still pending final result.
+- Migration Safety precommit control 94e306e05ff69d07bea723461b57ab4897ef39e6 runs at https://github.com/Satho82/beaconhs/actions/runs/38275954738. It checks out original Safety SHA and applies only the preserved patch, pinned SHA256 5bb5528b3bd9f11b6e66e5fe8c77567f925529fdafed9a90664952718e654ffa, then runs all checks and disposable database regressions. This is precommit tree evidence, not an immutable source release or freeze.
+- The additional executor build retry at 3072 MB failed V8 heap allocation. A 4608 MB attempt remains pending; the initial 6144 MB attempt hit the 8 GiB executor cgroup limit. Hosted validation supplies an independent environment, without weakening build or test gates.
+- Repository AGENTS.md rule 8 requires full gates before committing source outside governed cadence. Accordingly the proposed fixes remain preserved patches until all applicable precommit checks pass; correction branches still point at their original source SHAs.
+
+All remaining Board flows and release preflight remain unaccepted. No deployment approval is requested before those concrete prerequisites exist.

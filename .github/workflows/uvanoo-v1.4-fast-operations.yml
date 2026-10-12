@@ -173,6 +173,26 @@ jobs:
           fs.writeFileSync(process.env.RUNNER_TEMP + '/operations-paths.json', JSON.stringify(paths))
           NODE
 
+      - name: Include the exact Next-generated declaration in the bounded proposal
+        run: |
+          set -euo pipefail
+
+          node - <<'NODE'
+          const fs=require('node:fs'),{execFileSync}=require('node:child_process')
+          const path='apps/web/next-env.d.ts'
+          const original=execFileSync('git',['hash-object','--',path],{encoding:'utf8'}).trim()
+          if(original!=='9edff1c7cacb3bfac9a1eadcf6f51eaa99565e38') throw new Error('Unexpected Next type baseline')
+          const content=fs.readFileSync(path,'utf8').replace('import "./.next/types/routes.d.ts";','import "./.next/types/routes.d.ts";\nimport "./.next/types/root-params.d.ts";')
+          fs.writeFileSync(path,content)
+          console.log('NEXT_TYPES_BLOB '+execFileSync('git',['hash-object','--',path],{encoding:'utf8'}).trim())
+          const manifest=process.env.RUNNER_TEMP+'/operations-paths.json'
+          const paths=JSON.parse(fs.readFileSync(manifest,'utf8'))
+          paths.push(path)
+          fs.writeFileSync(manifest,JSON.stringify(paths))
+          fs.writeFileSync(process.env.RUNNER_TEMP+'/operations-expected.json',JSON.stringify(Object.fromEntries(paths.map(path=>[path,execFileSync('git',['hash-object','--',path],{encoding:'utf8'}).trim()]))))
+          console.log('RECOVERY_SOURCE '+JSON.stringify({path,content}))
+          NODE
+
       - name: Focused recurrence and localization regressions
         run: |
           set -euo pipefail
@@ -341,6 +361,14 @@ jobs:
           if (unexpected.length) {
             console.log(execFileSync('git',['diff','--',...unexpected],{encoding:'utf8'}))
             throw new Error('Unexpected changed source: '+unexpected.join(', '))
+          }
+          const expected=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+'/operations-expected.json','utf8'))
+          const drift=paths.filter(path=>execFileSync('git',['hash-object','--',path],{encoding:'utf8'}).trim()!==expected[path])
+          const untracked=execFileSync('git',['ls-files','--others','--exclude-standard','-z'],{encoding:'utf8'}).split('\0').filter(Boolean)
+          if(drift.length || untracked.length) throw new Error('Source drift: '+JSON.stringify({drift,untracked}))
+          for(const path of paths) {
+            console.log('VALIDATED_BLOB '+JSON.stringify({path,blob:expected[path]}))
+            if(!path.startsWith('packages/i18n/')) console.log('VALIDATED_SOURCE '+JSON.stringify({path,content:fs.readFileSync(path,'utf8')}))
           }
           execFileSync('git', ['add', '--', ...paths])
           const tree = execFileSync('git', ['write-tree'], {encoding: 'utf8'}).trim()

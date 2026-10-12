@@ -131,3 +131,19 @@ The earlier no-dispatch limitation remains true for the connector; the branch-sp
 PR #6's exact classifier script also passed five independent synthetic Git-history cases: workflow-only, application change, first push, malformed range and reverse history. See deployment-classifier-tests.json.
 
 Additional Approvals reproducibility blocker: verify-approvals-batch01.ts expects named Docker container uvanoo-approvals-reconcile-20261012 and APPROVALS_DEV_CONTRACTS pointing to external captured DEV metadata. No such file was recovered from these 37 committed changes. Do not fabricate the metadata or remove fixture safety checks. A reproducible cloud fixture/contract setup is required.
+
+
+## First isolated run results and safe corrections under validation
+Run 38271967825 completed **failure**. This preserves blockers rather than weakening gates:
+- People: format, fresh route types, full 25-task typecheck (including worker), database typecheck, lint, dead-code, fresh migrations, migration idempotence and unit/regression tests passed. Explicit property-delegation integration then failed because the fixture maintenance login cannot SET ROLE beaconhs_app. Later provenance/SQL/build steps did not run.
+- Migration Safety: format/typecheck/database typecheck/lint passed; dead-code rejected the unused exported ExecutableMigration type. Later gates did not run.
+- Approvals: format/full typecheck/database typecheck/lint passed; dead-code rejected three unregistered verification/preview script files and unused contract exports. The earlier worker-typecheck concern did not reproduce on this exact source.
+- See first-cloud-gate-failures.txt and people-first-cloud-result.txt for evidence.
+
+Minimal pending corrections are preserved as migration-safety-deadcode-fix.patch and approvals-deadcode-fix.patch. They make internal types/schemas private and register the existing Approvals scripts as executable package commands; no ignores, SQL, RLS or service behavior changes. On both corrected cloud trees, formatting, full typecheck, lint and dead-code pass. Full tests/build remain in progress and source corrections are not committed or frozen.
+
+The People fixture correction is scoped to the isolated property-delegation step: use the disposable PostgreSQL cluster admin for setup/SET ROLE, while preserving all restricted-app assertions. Do not grant role membership to the production maintenance role or change application RLS.
+
+Executor limitations and retries: the initial full test run lacked Chromium. An isolated npm installation of @sparticuz/chromium@153.0.0 supplies Chromium 153.0.8010.0 without repository dependency changes; all 18 PDF tests then pass unchanged. First build hit the executor memory limit (cgroup OOM kill); a smaller Node heap retry is pending. Neither infrastructure failure is represented as a pass.
+
+No source candidate is frozen. No governed/shared branch, persistent database, DEV release, staging or production was changed.

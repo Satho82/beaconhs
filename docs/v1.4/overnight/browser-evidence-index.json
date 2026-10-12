@@ -1,0 +1,202 @@
+{
+  "sourceCommit": "563fb0e9b79a838a5f394abaffb2f7dc743fc571",
+  "sourceTree": "324c50a60e2cb0639ba920488a150c6531968374",
+  "authoritativeReleaseRun": 38313918871,
+  "core": {
+    "run": 38318803277,
+    "job": 115041711515,
+    "status": "PASS",
+    "checks": 35,
+    "screenshots": 30,
+    "report": "browser-run-38318803277.json"
+  },
+  "desktopMenu": {
+    "run": 38319543537,
+    "status": "PASS for two desktop checks; overall run failed other checks",
+    "report": "browser-run-38319543537.json"
+  },
+  "financial": {
+    "run": 38320245029,
+    "job": 115046376497,
+    "status": "PASS for qualified financial step; overall run failed separate harness step",
+    "report": "browser-financial-run-38320245029.json"
+  },
+  "remainingFocused": {
+    "run": 38320812403,
+    "job": 115048184594,
+    "status": "PASS",
+    "checks": 6,
+    "includes": [
+      "three necessary fixture logins",
+      "two real mobile menu navigation checks",
+      "property reassignment, same-session isolation, restoration and audit"
+    ],
+    "report": "browser-run-38320812403.json"
+  },
+  "preservedFailures": [
+    {
+      "run": 38310507071,
+      "source": "937242e7e35806acab48c28c4163719b00c0f16d",
+      "reason": "Prior /login readiness failure; no server log retained; browser skipped"
+    },
+    {
+      "run": 38316469229,
+      "reason": "Production HTTPS guard rejected disposable HTTP origin; browser skipped"
+    },
+    {
+      "run": 38318154918,
+      "reason": "Burst login rejections without HTTP-status capture; tour-obscured control and premature screenshots"
+    },
+    {
+      "run": 38319543537,
+      "reason": "Focused harness selected scope-type dropdown and raced mobile drawer"
+    },
+    {
+      "run": 38320245029,
+      "reason": "Controller string replacement reduced collection queries to single-element queries; independent financial step passed"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": 11777472922,
+      "name": "uvanoo-overnight-browser-acceptance",
+      "size_in_bytes": 4647,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/actions/artifacts/11777472922",
+      "archive_download_url": "https://api.github.com/repos/Satho82/beaconhs/actions/artifacts/11777472922/zip",
+      "expired": false,
+      "created_at": "2026-10-12T22:40:17Z",
+      "expires_at": "2027-01-10T22:24:26Z",
+      "updated_at": "2026-10-12T22:40:17Z",
+      "digest": "sha256:287f2e8855cea88e4fd04804d06e57c2171aa957f993d556bb6ad8ae48f86ffc",
+      "workflow_run": {
+        "id": 38316469229,
+        "repository_id": 1362482838,
+        "head_repository_id": 1362482838,
+        "head_branch": "review/uvanoo-v1.4-overnight-release-20261012",
+        "head_sha": "b1a38c82e184a2497596dbf69a415cb41a03fc4e"
+      }
+    },
+    {
+      "id": 11777452571,
+      "name": "overnight-runtime-563fb0e9b79a838a5f394abaffb2f7dc743fc571",
+      "size_in_bytes": 117410071,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/actions/artifacts/11777452571",
+      "archive_download_url": "https://api.github.com/repos/Satho82/beaconhs/actions/artifacts/11777452571/zip",
+      "expired": false,
+      "created_at": "2026-10-12T22:38:13Z",
+      "expires_at": "2026-10-19T22:38:08Z",
+      "updated_at": "2026-10-12T22:38:13Z",
+      "digest": "sha256:e06c24932c70792504d2e489f7ee439ce2f7ce51e289aee5f63282faed8c17d9",
+      "workflow_run": {
+        "id": 38316469229,
+        "repository_id": 1362482838,
+        "head_repository_id": 1362482838,
+        "head_branch": "review/uvanoo-v1.4-overnight-release-20261012",
+        "head_sha": "b1a38c82e184a2497596dbf69a415cb41a03fc4e"
+      }
+    },
+    {
+      "id": 11777304370,
+      "name": "uvanoo-overnight-browser-acceptance",
+      "size_in_bytes": 785091,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/actions/artifacts/11777304370",
+      "archive_download_url": "https://api.github.com/repos/Satho82/beaconhs/actions/artifacts/11777304370/zip",
+      "expired": false,
+      "created_at": "2026-10-12T22:46:42Z",
+      "expires_at": "2027-01-10T22:42:12Z",
+      "updated_at": "2026-10-12T22:46:42Z",
+      "digest": "sha256:53216f123aba0ce2ccd2af669fc69efd75bf6b28914e96679fbd3dd60ddc8e32",
+      "workflow_run": {
+        "id": 38318154918,
+        "repository_id": 1362482838,
+        "head_repository_id": 1362482838,
+        "head_branch": "review/uvanoo-v1.4-overnight-release-20261012",
+        "head_sha": "7e0cc462ac07633a49b9f7badf917ec246702643"
+      }
+    },
+    {
+      "id": 11777954723,
+      "name": "uvanoo-overnight-browser-acceptance",
+      "size_in_bytes": 4133290,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/actions/artifacts/11777954723",
+      "archive_download_url": "https://api.github.com/repos/Satho82/beaconhs/actions/artifacts/11777954723/zip",
+      "expired": false,
+      "created_at": "2026-10-12T22:56:21Z",
+      "expires_at": "2027-01-10T22:49:10Z",
+      "updated_at": "2026-10-12T22:56:21Z",
+      "digest": "sha256:5d1c96dfa2d043a0ebaca8c6cc07f7a4ad338b8823cf1801415bd115dca1593c",
+      "workflow_run": {
+        "id": 38318803277,
+        "repository_id": 1362482838,
+        "head_repository_id": 1362482838,
+        "head_branch": "review/uvanoo-v1.4-overnight-release-20261012",
+        "head_sha": "bd95386cdd0eb1e5524f7ef4cbda6a2af81e4adb"
+      }
+    },
+    {
+      "id": 11778551270,
+      "name": "uvanoo-overnight-browser-acceptance",
+      "size_in_bytes": 1275503,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/actions/artifacts/11778551270",
+      "archive_download_url": "https://api.github.com/repos/Satho82/beaconhs/actions/artifacts/11778551270/zip",
+      "expired": false,
+      "created_at": "2026-10-12T23:02:15Z",
+      "expires_at": "2027-01-10T22:57:18Z",
+      "updated_at": "2026-10-12T23:02:15Z",
+      "digest": "sha256:81a92fbeaad5bedaef441e0aec570b14452e1c025f45e67091935bb736837c58",
+      "workflow_run": {
+        "id": 38319543537,
+        "repository_id": 1362482838,
+        "head_repository_id": 1362482838,
+        "head_branch": "review/uvanoo-v1.4-overnight-release-20261012",
+        "head_sha": "e9c1151670b41f475126cd94acbab628b64b8093"
+      }
+    },
+    {
+      "id": 11778208038,
+      "name": "uvanoo-overnight-browser-acceptance",
+      "size_in_bytes": 1482638,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/actions/artifacts/11778208038",
+      "archive_download_url": "https://api.github.com/repos/Satho82/beaconhs/actions/artifacts/11778208038/zip",
+      "expired": false,
+      "created_at": "2026-10-12T23:09:41Z",
+      "expires_at": "2027-01-10T23:05:02Z",
+      "updated_at": "2026-10-12T23:09:41Z",
+      "digest": "sha256:696ec6476c945eebf9552a87a00e48488ab8ab6af679611580379b9b1e23d1a7",
+      "workflow_run": {
+        "id": 38320245029,
+        "repository_id": 1362482838,
+        "head_repository_id": 1362482838,
+        "head_branch": "review/uvanoo-v1.4-overnight-release-20261012",
+        "head_sha": "eb9d08b447c845fd2fefdfc722850eab236be701"
+      }
+    },
+    {
+      "id": 11778358853,
+      "name": "uvanoo-overnight-browser-acceptance",
+      "size_in_bytes": 431165,
+      "url": "https://api.github.com/repos/Satho82/beaconhs/actions/artifacts/11778358853",
+      "archive_download_url": "https://api.github.com/repos/Satho82/beaconhs/actions/artifacts/11778358853/zip",
+      "expired": false,
+      "created_at": "2026-10-12T23:16:44Z",
+      "expires_at": "2027-01-10T23:11:27Z",
+      "updated_at": "2026-10-12T23:16:44Z",
+      "digest": "sha256:ce7b68ddda81d2a79cb79843334f2d267665698284fad18939ac9ed21cafe4cf",
+      "workflow_run": {
+        "id": 38320812403,
+        "repository_id": 1362482838,
+        "head_repository_id": 1362482838,
+        "head_branch": "review/uvanoo-v1.4-overnight-release-20261012",
+        "head_sha": "e7a436cc72f1ecc36b49c1dadf3586f05e1b0d52"
+      }
+    }
+  ],
+  "runtimeChanges": "None; all corrections confined to cloud test harness/environment",
+  "unchangedSuccessfulTests": "Full release validation, core browser, desktop navigation and qualified financial checks reused after passing. Later executions only necessary fixture setup and unresolved focused checks.",
+  "limits": [
+    "No live DEV browser acceptance",
+    "Automatic reminder timing and actual recipient email/notification delivery not verified by browser; integration evidence is separate",
+    "Original People pixel/Option 2 comparison and exact release branding configuration remain unverified",
+    "Browser matrix is scoped, not an exhaustive proof of every module action"
+  ]
+}

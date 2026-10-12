@@ -1,0 +1,330 @@
+{
+  "schemaVersion": 1,
+  "sourceCommit": "563fb0e9b79a838a5f394abaffb2f7dc743fc571",
+  "sourceTree": "324c50a60e2cb0639ba920488a150c6531968374",
+  "governedHead": "d18f635a41f092e9e86aa6f53518f9c28992b0d2",
+  "ownerAcceptanceDate": "2026-10-12",
+  "status": "ACCEPTED — FREEZE PENDING",
+  "frozen": false,
+  "modules": {
+    "People": "people-freeze-manifest.json",
+    "Approvals": "approvals-freeze-manifest.json"
+  },
+  "protectedRiskFiles": [
+    {
+      "path": "apps/web/src/app/(app)/hazard-assessments/_risk-scale.ts",
+      "gitBlob": "7828f29a45fe3ab7237507c56deb6ac24d551e0e",
+      "baselineBlob": "7828f29a45fe3ab7237507c56deb6ac24d551e0e",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/hazard-assessments/_risk.tsx",
+      "gitBlob": "4faa7c3108343e2369dd5069b85bf983990375dd",
+      "baselineBlob": "4faa7c3108343e2369dd5069b85bf983990375dd",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/hazard-assessments/risk-matrix/_actions.ts",
+      "gitBlob": "1f66519751d89f9363f39a1bada89c8ada29ef98",
+      "baselineBlob": "1f66519751d89f9363f39a1bada89c8ada29ef98",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/hazard-assessments/risk-matrix/_editor.tsx",
+      "gitBlob": "68f5199d744eb76c110ba605cdd543df329ef7f4",
+      "baselineBlob": "68f5199d744eb76c110ba605cdd543df329ef7f4",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/hazard-assessments/risk-matrix/_policy.ts",
+      "gitBlob": "8fc5303f226f580b3af9bd7b79aa703099ad0bd6",
+      "baselineBlob": "8fc5303f226f580b3af9bd7b79aa703099ad0bd6",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/hazard-assessments/risk-matrix/page.tsx",
+      "gitBlob": "2532e010641f368b5614e24ac201929b971e3226",
+      "baselineBlob": "2532e010641f368b5614e24ac201929b971e3226",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/risk/actions.ts",
+      "gitBlob": "468358889182aa44f0da11e4bfc9457bed06a134",
+      "baselineBlob": "468358889182aa44f0da11e4bfc9457bed06a134",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/risk/assessments/[assessmentId]/assessment-editor.tsx",
+      "gitBlob": "c4674a7aa9e0c8cc5f98b06e48ac8e17c011666b",
+      "baselineBlob": "c4674a7aa9e0c8cc5f98b06e48ac8e17c011666b",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/risk/assessments/[assessmentId]/lifecycle-panel.tsx",
+      "gitBlob": "f035000501a40ff55ceae1b3b61005b5d10442c2",
+      "baselineBlob": "f035000501a40ff55ceae1b3b61005b5d10442c2",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/risk/assessments/[assessmentId]/page.tsx",
+      "gitBlob": "d7eec4872463fc84b71d3275ff0be744e2a77ed1",
+      "baselineBlob": "d7eec4872463fc84b71d3275ff0be744e2a77ed1",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/risk/assessments/[assessmentId]/pdf/route.ts",
+      "gitBlob": "090b2e0b6c9de7e98a9717dd81159e7b5d0a358c",
+      "baselineBlob": "090b2e0b6c9de7e98a9717dd81159e7b5d0a358c",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/risk/assessments/[assessmentId]/people-at-risk-field.tsx",
+      "gitBlob": "35573efdb7be5e361141c06d8966c3bc19bc07f3",
+      "baselineBlob": "35573efdb7be5e361141c06d8966c3bc19bc07f3",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/risk/assessments/[assessmentId]/revision-controls.tsx",
+      "gitBlob": "8210b354f830e59569fbded0edddf32f79c7ac07",
+      "baselineBlob": "8210b354f830e59569fbded0edddf32f79c7ac07",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/risk/available-templates.tsx",
+      "gitBlob": "cbb1c4bc50e9d6b35f118cfd1c8b48260178f1ca",
+      "baselineBlob": "cbb1c4bc50e9d6b35f118cfd1c8b48260178f1ca",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/risk/create-manual-assessment.tsx",
+      "gitBlob": "05494fe0c570ddab547801d805e97d697b708357",
+      "baselineBlob": "05494fe0c570ddab547801d805e97d697b708357",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/risk/export.csv/route.ts",
+      "gitBlob": "ad0a55cb5d9c673aac4ca764e5361d05bf592a2a",
+      "baselineBlob": "ad0a55cb5d9c673aac4ca764e5361d05bf592a2a",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/risk/library/export.csv/route.ts",
+      "gitBlob": "fc5561c6122402668b3848a233f56e6440ed3316",
+      "baselineBlob": "fc5561c6122402668b3848a233f56e6440ed3316",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/risk/page.tsx",
+      "gitBlob": "f406808300e97c4dd8022d0ac773d26a11346c74",
+      "baselineBlob": "f406808300e97c4dd8022d0ac773d26a11346c74",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/risk/register/pdf/route.ts",
+      "gitBlob": "dc55c2fcd20238d5b8ae2c2e121dd6eccae8818d",
+      "baselineBlob": "dc55c2fcd20238d5b8ae2c2e121dd6eccae8818d",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/risk/review-schedule/page.tsx",
+      "gitBlob": "d9185c2eb824f4c563c5981a058970d692988a47",
+      "baselineBlob": "d9185c2eb824f4c563c5981a058970d692988a47",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/risk/review-schedule/schedule-review-picker.tsx",
+      "gitBlob": "edc004a142d4d9342dfd574a8bba2e13611dea57",
+      "baselineBlob": "edc004a142d4d9342dfd574a8bba2e13611dea57",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/risk/risk-schema-notice.tsx",
+      "gitBlob": "b330ecb10e876f024b11e8625bc671b2dccfca04",
+      "baselineBlob": "b330ecb10e876f024b11e8625bc671b2dccfca04",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/risk/risk-view-tabs.tsx",
+      "gitBlob": "f4277ed94bf8cd2b4b7da6fd4eaff5cf1e1a32df",
+      "baselineBlob": "f4277ed94bf8cd2b4b7da6fd4eaff5cf1e1a32df",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/risk/save-tenant-template.tsx",
+      "gitBlob": "5de92e78d438bb4489dbdf374706c92a704ee393",
+      "baselineBlob": "5de92e78d438bb4489dbdf374706c92a704ee393",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/risk/templates/[templateId]/adoption-panel.tsx",
+      "gitBlob": "a9e2ac150c37a6262b90102787a49923f338464b",
+      "baselineBlob": "a9e2ac150c37a6262b90102787a49923f338464b",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/risk/templates/[templateId]/page.tsx",
+      "gitBlob": "34170074e91d053f129841f19715db9c778969e9",
+      "baselineBlob": "34170074e91d053f129841f19715db9c778969e9",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/risk/templates/[templateId]/template-draft-editor.tsx",
+      "gitBlob": "ea8d9d7a78d706ba87e5c8f1afc3f3fe6b52002d",
+      "baselineBlob": "ea8d9d7a78d706ba87e5c8f1afc3f3fe6b52002d",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/components/risk-matrix.tsx",
+      "gitBlob": "490217f0abe5ed8dc6b93ccad97f00e8ca1882c3",
+      "baselineBlob": "490217f0abe5ed8dc6b93ccad97f00e8ca1882c3",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/risk-assessment-matrix.ts",
+      "gitBlob": "def6f38dcb0bd0fb1fbd36885b5e5932386a06a7",
+      "baselineBlob": "def6f38dcb0bd0fb1fbd36885b5e5932386a06a7",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/risk-assessments.ts",
+      "gitBlob": "7d7fa5ec2ecdcc8ed88c926f43b6fbf9b73e6c02",
+      "baselineBlob": "7d7fa5ec2ecdcc8ed88c926f43b6fbf9b73e6c02",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/risk-export-response.ts",
+      "gitBlob": "d35b44da762245b7224c7e0b7f728ac5cc4dc269",
+      "baselineBlob": "d35b44da762245b7224c7e0b7f728ac5cc4dc269",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/risk-hazard-edit.ts",
+      "gitBlob": "2648f7cfb0d5a17fc1ee3553119270d82c5bc202",
+      "baselineBlob": "2648f7cfb0d5a17fc1ee3553119270d82c5bc202",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/risk-library-views.ts",
+      "gitBlob": "8cc52916f135e7b5f5fe26902c1638bfb9083fe4",
+      "baselineBlob": "8cc52916f135e7b5f5fe26902c1638bfb9083fe4",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/risk-lifecycle.ts",
+      "gitBlob": "196e76bd99ac3a4b9a13c79c63f07f058eb90038",
+      "baselineBlob": "196e76bd99ac3a4b9a13c79c63f07f058eb90038",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/risk-pdf-response.ts",
+      "gitBlob": "f8fddebfd9be634f236390900f2855fa33df5f5c",
+      "baselineBlob": "f8fddebfd9be634f236390900f2855fa33df5f5c",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/risk-reporting.ts",
+      "gitBlob": "d03456fe89521116757dc53a63bc9d8c96bedea1",
+      "baselineBlob": "d03456fe89521116757dc53a63bc9d8c96bedea1",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/risk-review-schedule.ts",
+      "gitBlob": "589f68778b81801fff1763e5b6238a2f8ca14cd4",
+      "baselineBlob": "589f68778b81801fff1763e5b6238a2f8ca14cd4",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/risk-revisions.ts",
+      "gitBlob": "70c6ab7f276dba1b0b1e10df19d4680f41ebb40f",
+      "baselineBlob": "70c6ab7f276dba1b0b1e10df19d4680f41ebb40f",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/risk-schema-readiness.ts",
+      "gitBlob": "b6883d74d7b653fc65d0544e2c050be496f51877",
+      "baselineBlob": "b6883d74d7b653fc65d0544e2c050be496f51877",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/risk-tenant-templates.ts",
+      "gitBlob": "2fe40aac5cb7a6cdb413c363410ad5479afe2bae",
+      "baselineBlob": "2fe40aac5cb7a6cdb413c363410ad5479afe2bae",
+      "unchanged": true
+    },
+    {
+      "path": "apps/worker/src/lib/risk-review-scanner.ts",
+      "gitBlob": "da540f04f3df987eeae49488b73dc2192c6965ac",
+      "baselineBlob": "da540f04f3df987eeae49488b73dc2192c6965ac",
+      "unchanged": true
+    },
+    {
+      "path": "packages/db/src/risk-0059-runner.ts",
+      "gitBlob": "6bf3f383c0412132a1af2a4618c3043dc22cd7cc",
+      "baselineBlob": "6bf3f383c0412132a1af2a4618c3043dc22cd7cc",
+      "unchanged": true
+    },
+    {
+      "path": "packages/db/src/risk-catalogue.json",
+      "gitBlob": "e7c743026616ef34c3cef79e8329cef0e024926a",
+      "baselineBlob": "e7c743026616ef34c3cef79e8329cef0e024926a",
+      "unchanged": true
+    },
+    {
+      "path": "packages/db/src/risk-catalogue.ts",
+      "gitBlob": "3cacfe6e109c840dbd5edeaf776d79dd9198f4ea",
+      "baselineBlob": "3cacfe6e109c840dbd5edeaf776d79dd9198f4ea",
+      "unchanged": true
+    },
+    {
+      "path": "packages/db/src/risk-library-install.ts",
+      "gitBlob": "367a20aaf586ccdddbf308d57e03b508aae7900a",
+      "baselineBlob": "367a20aaf586ccdddbf308d57e03b508aae7900a",
+      "unchanged": true
+    },
+    {
+      "path": "packages/db/src/risk-library.ts",
+      "gitBlob": "afd25440f47745fb636b4c9e810ab437b7240625",
+      "baselineBlob": "afd25440f47745fb636b4c9e810ab437b7240625",
+      "unchanged": true
+    },
+    {
+      "path": "packages/db/src/risk-matrix.ts",
+      "gitBlob": "7bf42a66e65ef07f89828bb3a5450aa43ae1b0ee",
+      "baselineBlob": "7bf42a66e65ef07f89828bb3a5450aa43ae1b0ee",
+      "unchanged": true
+    },
+    {
+      "path": "packages/db/src/risk-migration-readiness.ts",
+      "gitBlob": "e7861897b93c0e6fa84790bfae420288ff1b631a",
+      "baselineBlob": "e7861897b93c0e6fa84790bfae420288ff1b631a",
+      "unchanged": true
+    },
+    {
+      "path": "packages/db/src/schema/risk.ts",
+      "gitBlob": "b5c4782b8eca23cea50fe17e35879318e0033e0d",
+      "baselineBlob": "b5c4782b8eca23cea50fe17e35879318e0033e0d",
+      "unchanged": true
+    }
+  ],
+  "canonicalMigrations": "migration-identity-manifest.json",
+  "governedIntegrationPR": "https://github.com/Satho82/beaconhs/pull/9",
+  "prState": "OPEN DRAFT; mergeable/clean at inspection; not merged",
+  "devReadiness": "PREFLIGHT PREPARED; LIVE COMPATIBILITY AND DEPLOYMENT BLOCKED",
+  "boundaries": {
+    "liveVps": "NOT VERIFIED — connector offline; supplied infrastructure facts retained separately",
+    "externalCloudWorkers": "NOT VERIFIED — Codex task inventory tool returned MCP error; GitHub Actions inventory was inspected",
+    "governedMerge": "NOT EXECUTED — draft PR9 only",
+    "deployment": "NOT EXECUTED — no DEV/staging/production changes",
+    "persistentWrites": "NONE",
+    "sourceRuntimeChanges": "NONE",
+    "scanChanges": "NONE",
+    "forcePush": "NONE"
+  },
+  "remainingOwnerDecisions": [
+    "Resolve exact visual-reference/branding evidence or explicitly disposition the documented visual limitations before formal freeze",
+    "Approve PR9 merge at exact head 563fb0e9b79a838a5f394abaffb2f7dc743fc571 after rechecking unchanged base",
+    "Separately approve authoritative DEV dataset and queue reconciliation, writer-fenced window, exact post-merge image, encrypted backup/verified restore manifest digest, endpoint corrections, migration/deployment and rollback scope"
+  ],
+  "noRoutineReapproval": "Already authorized isolated engineering and evidence publication completed without requiring new permission.",
+  "evidenceIdentity": "Use this file's containing Git commit and tree as immutable manifest-publication identity; product source identity above is separate."
+}

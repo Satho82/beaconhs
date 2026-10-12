@@ -1,33 +1,29 @@
 {
-  "phase": "Awaiting disposable browser runtime and startup diagnosis",
-  "candidate": "563fb0e9b79a838a5f394abaffb2f7dc743fc571",
-  "tree": "324c50a60e2cb0639ba920488a150c6531968374",
+  "sourceCommit": "563fb0e9b79a838a5f394abaffb2f7dc743fc571",
+  "sourceTree": "324c50a60e2cb0639ba920488a150c6531968374",
   "reviewBranch": "review/uvanoo-v1.4-overnight-release-20261012",
-  "browserRun": 38316469229,
-  "browserJob": 115034175286,
-  "browserControlSha": "b1a38c82e184a2497596dbf69a415cb41a03fc4e",
-  "preservedGreenRun": 38313918871,
+  "parentCheckpoint": "e7a436cc72f1ecc36b49c1dadf3586f05e1b0d52",
+  "status": "AUTHORIZED ISOLATED WORK COMPLETE; VISUAL FREEZE AND LIVE DEV BLOCKERS REMAIN",
+  "coreRun": 38318803277,
+  "focusedRun": 38320812403,
+  "financialEvidenceRun": 38320245029,
+  "authoritativeReleaseRun": 38313918871,
   "pr": 9,
-  "security": "Three exact false positives reconciled; raw failed scan retained",
-  "completed": [
-    "source recovery",
-    "owner acceptance preservation",
-    "protected source/migration identities",
-    "security reconciliation",
-    "18-group platform handover",
-    "draft governed PR",
-    "DEV recovery and read-only inspection plans"
-  ],
-  "pending": [
-    "startup diagnosis",
-    "authenticated browser matrix",
-    "visual comparison",
-    "final freeze manifests"
-  ],
-  "restrictions": [
-    "no accepted runtime changes",
-    "no governed merge",
-    "no persistent changes",
-    "no deployment"
-  ]
+  "freeze": {
+    "People": "ACCEPTED — FREEZE PENDING",
+    "Approvals": "ACCEPTED — FREEZE PENDING"
+  },
+  "activeGithubActionsAtCloseout": [],
+  "externalWorkerInventory": "NOT VERIFIED — tool failed",
+  "nextAction": "Review FINAL-REPORT.md and combined-freeze-manifest.json; no deployment or governed merge authorized",
+  "boundaries": {
+    "liveVps": "NOT VERIFIED — connector offline; supplied infrastructure facts retained separately",
+    "externalCloudWorkers": "NOT VERIFIED — Codex task inventory tool returned MCP error; GitHub Actions inventory was inspected",
+    "governedMerge": "NOT EXECUTED — draft PR9 only",
+    "deployment": "NOT EXECUTED — no DEV/staging/production changes",
+    "persistentWrites": "NONE",
+    "sourceRuntimeChanges": "NONE",
+    "scanChanges": "NONE",
+    "forcePush": "NONE"
+  }
 }

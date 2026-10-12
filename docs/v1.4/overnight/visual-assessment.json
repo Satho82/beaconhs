@@ -1,0 +1,72 @@
+{
+  "observedAt": "2026-10-12",
+  "sourceCommit": "563fb0e9b79a838a5f394abaffb2f7dc743fc571",
+  "sourceTree": "324c50a60e2cb0639ba920488a150c6531968374",
+  "inspectedApprovalsReference": {
+    "path": "docs/v1.4/batch01/visual-checkpoint/references/Uvanoo Approvals Module Dashboard (1).png",
+    "gitBlob": "c02632138e4f58703e57a84c8318b017b1eb715d",
+    "inspectionRun": 38318857984,
+    "pixelsInspected": true
+  },
+  "actualBrowser": {
+    "run": 38318803277,
+    "artifact": 11777954723,
+    "inspectionRun": 38319543588,
+    "imagesInspected": [
+      "cluster-approvals",
+      "cluster-people",
+      "mobile-people",
+      "mobile-approvals",
+      "financial-request",
+      "request-approved",
+      "configured-workflow"
+    ]
+  },
+  "findings": [
+    {
+      "status": "VERIFIED",
+      "claim": "Captured application uses light sidebar/content surfaces, navy text/icons, teal controls and coral active navigation, consistent with the recovered design language."
+    },
+    {
+      "status": "VERIFIED",
+      "claim": "Mobile People becomes stacked cards and Approvals wraps its subnavigation. The document width assertions passed at 390px; horizontal module strip remains scrollable."
+    },
+    {
+      "status": "PARTIAL",
+      "claim": "Approvals reference is a composite explanatory design sheet; actual app separates dashboard, configuration, request detail and reporting into routes. This is a qualitative comparison, not pixel/layout equivalence."
+    },
+    {
+      "status": "NOT VERIFIED",
+      "claim": "Fixture uses default Uvanoo Portal text branding. Exact approved logo/tenant branding asset rendering has not been demonstrated with the accepted production branding configuration."
+    },
+    {
+      "status": "VERIFIED",
+      "claim": "Qualified financial regression in 38320245029 confirms the ambiguous selector first matched META. Corrected harness entry persisted supplier/description separately; resulting detail screenshot was visually inspected. No product rendering defect identified."
+    },
+    {
+      "status": "NOT VERIFIED",
+      "claim": "People reference files were located and text read, but returned image pointers were not inspectable pixels in the cloud-only tool path. No substitute was generated."
+    },
+    {
+      "status": "NOT VERIFIED",
+      "claim": "Exact approved User Accounts Option 2 image was not resolved by the bounded title search."
+    }
+  ],
+  "peopleReferences": [
+    {
+      "name": "Uvanoo People Module UI Overview (1).png",
+      "sizeBytes": 2250807,
+      "createdAt": "2026-10-12T08:27:22.095411Z",
+      "access": "metadata and OCR read; pixels NOT VERIFIED"
+    },
+    {
+      "name": "Uvanoo People Directory Dashboard(1).png",
+      "sizeBytes": 1399914,
+      "createdAt": "2026-10-11T12:45:37.844962Z",
+      "access": "metadata and OCR read; pixels NOT VERIFIED"
+    }
+  ],
+  "ownerAcceptance": "12 October 2026 preserved; not revoked or replaced by this evidence audit",
+  "decision": "No automatic full visual-fidelity pass. Original-comparison and branding gaps remain explicit freeze evidence blockers.",
+  "runtimeChanges": false
+}

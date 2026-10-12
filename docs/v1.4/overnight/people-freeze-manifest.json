@@ -1,0 +1,340 @@
+{
+  "schemaVersion": 1,
+  "sourceCommit": "563fb0e9b79a838a5f394abaffb2f7dc743fc571",
+  "sourceTree": "324c50a60e2cb0639ba920488a150c6531968374",
+  "ownerAcceptance": {
+    "date": "2026-10-12",
+    "decision": "ACCEPTED",
+    "preserved": true,
+    "originalEvidence": "owner-acceptance-original.json",
+    "currentAuthority": "Explicit owner instruction for this controller"
+  },
+  "freezeStatus": "ACCEPTED — FREEZE PENDING",
+  "frozen": false,
+  "technicalValidation": "technical-validation.json",
+  "authoritativeRun": 38313918871,
+  "browserEvidence": "browser-evidence-index.json",
+  "security": "RECONCILED — EXACTLY THREE FALSE POSITIVES; raw failed scans preserved",
+  "securityEvidence": "security-reconciliation.json",
+  "migrations": "migration-identity-manifest.json",
+  "visualEvidence": "visual-assessment.json",
+  "changesToAcceptedRuntime": false,
+  "module": "People V1.4",
+  "protectedFiles": [
+    {
+      "path": "apps/web/src/app/(app)/hospitality/risk/assessments/[assessmentId]/people-at-risk-field.tsx",
+      "gitBlob": "35573efdb7be5e361141c06d8966c3bc19bc07f3",
+      "baselineBlob": "35573efdb7be5e361141c06d8966c3bc19bc07f3",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/[id]/_files-drawers.tsx",
+      "gitBlob": "aaf12d0ba1d7075b63f701a72804d42e5da0d765",
+      "baselineBlob": "aaf12d0ba1d7075b63f701a72804d42e5da0d765",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/[id]/badge/print/route.ts",
+      "gitBlob": "ee3f08007e1508d7396b7f5eb31f252fbb98629b",
+      "baselineBlob": "ee3f08007e1508d7396b7f5eb31f252fbb98629b",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/[id]/badge/route.ts",
+      "gitBlob": "21bc549c7b2e48f7ca9b414cb8ec910d66b0bc7a",
+      "baselineBlob": "21bc549c7b2e48f7ca9b414cb8ec910d66b0bc7a",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/[id]/loading.tsx",
+      "gitBlob": "2df8ed7e8b9c8ebb2ba54f34585998cae3667ddf",
+      "baselineBlob": "2df8ed7e8b9c8ebb2ba54f34585998cae3667ddf",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/[id]/page.tsx",
+      "gitBlob": "b2e5a9a8b753ab0c0c2338f5e318f56888d97634",
+      "baselineBlob": "b2e5a9a8b753ab0c0c2338f5e318f56888d97634",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/_actions/bulk.ts",
+      "gitBlob": "2c0970eb1450a2c5a041965bcec8216417b5a3e5",
+      "baselineBlob": "2c0970eb1450a2c5a041965bcec8216417b5a3e5",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/_actions/departments.ts",
+      "gitBlob": "4ef7e524ca304c21ef832a472b15a129f7000b14",
+      "baselineBlob": "4ef7e524ca304c21ef832a472b15a129f7000b14",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/_actions/files.ts",
+      "gitBlob": "a6b19d4fa785e2f26416b23d9ecda5013c3b88ce",
+      "baselineBlob": "a6b19d4fa785e2f26416b23d9ecda5013c3b88ce",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/_actions/groups.ts",
+      "gitBlob": "07a3bb58c89ae3333727e86d44f11fc690321fdc",
+      "baselineBlob": "07a3bb58c89ae3333727e86d44f11fc690321fdc",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/_actions/titles.ts",
+      "gitBlob": "82254f2d2146db8e99d7874b8589a2f072df7c84",
+      "baselineBlob": "82254f2d2146db8e99d7874b8589a2f072df7c84",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/_actions/workforce.ts",
+      "gitBlob": "9c47607cc4b9fd5822087b5be6b5714ca5124a25",
+      "baselineBlob": "9c47607cc4b9fd5822087b5be6b5714ca5124a25",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/_bulk-bar.tsx",
+      "gitBlob": "aa68a5a2a81135acccd9e828a4f927f813202563",
+      "baselineBlob": "aa68a5a2a81135acccd9e828a4f927f813202563",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/_components/member-picker.tsx",
+      "gitBlob": "37dd50667e5391ba3c2ceb8571236f005843a364",
+      "baselineBlob": "37dd50667e5391ba3c2ceb8571236f005843a364",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/_components/name-taxonomy-list.tsx",
+      "gitBlob": "ce6748cb5036399cce111a03ecae0ed85beeec04",
+      "baselineBlob": "ce6748cb5036399cce111a03ecae0ed85beeec04",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/_components/people-sub-nav.tsx",
+      "gitBlob": "93aa0f1a5849551c997617cefe7cd032ef966d2f",
+      "baselineBlob": "93aa0f1a5849551c997617cefe7cd032ef966d2f",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/_lib/person-access.ts",
+      "gitBlob": "2dd949d68c28fdd077696b8e30ad17ff4a74002c",
+      "baselineBlob": "2dd949d68c28fdd077696b8e30ad17ff4a74002c",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/_primary-title-directory-contract.test.ts",
+      "gitBlob": "a3c7f72c33b119acee8831348edc1731ce684c43",
+      "baselineBlob": "a3c7f72c33b119acee8831348edc1731ce684c43",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/_records-table.tsx",
+      "gitBlob": "2cd9fe4671fc3a1b3b121bbc4f6df61f865a77b4",
+      "baselineBlob": "2cd9fe4671fc3a1b3b121bbc4f6df61f865a77b4",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/badges/design/_actions.ts",
+      "gitBlob": "0f36e68201e5975dcd9d3643d1110c7145d6f283",
+      "baselineBlob": "0f36e68201e5975dcd9d3643d1110c7145d6f283",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/badges/design/_studio.tsx",
+      "gitBlob": "617a7f52ad240036325983d7b6a6abd4656ffca6",
+      "baselineBlob": "617a7f52ad240036325983d7b6a6abd4656ffca6",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/badges/design/page.tsx",
+      "gitBlob": "478c5804c885b4926d88532a0dc346e01f9146d9",
+      "baselineBlob": "478c5804c885b4926d88532a0dc346e01f9146d9",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/crews/page.tsx",
+      "gitBlob": "0fb5fdd0b730a28f34bf56aec8d25cb582a90a87",
+      "baselineBlob": "0fb5fdd0b730a28f34bf56aec8d25cb582a90a87",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/custom-fields/page.tsx",
+      "gitBlob": "af37b7b58100a9bab0cf8b5d5b3de09472e3fcf7",
+      "baselineBlob": "af37b7b58100a9bab0cf8b5d5b3de09472e3fcf7",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/departments/_drawers.tsx",
+      "gitBlob": "f294fa42e0d3afe561eccb139e21d3cd2ccb6407",
+      "baselineBlob": "f294fa42e0d3afe561eccb139e21d3cd2ccb6407",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/departments/page.tsx",
+      "gitBlob": "c3261eae178485757c483715176900680325be26",
+      "baselineBlob": "c3261eae178485757c483715176900680325be26",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/export.csv/route.ts",
+      "gitBlob": "bfe83c385bd08516e90602df24a47be67f5d38e2",
+      "baselineBlob": "bfe83c385bd08516e90602df24a47be67f5d38e2",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/groups/[id]/page.tsx",
+      "gitBlob": "6ce2539eede605d593c80aaadf22604bb921446a",
+      "baselineBlob": "6ce2539eede605d593c80aaadf22604bb921446a",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/groups/page.tsx",
+      "gitBlob": "a6436dbd22856c52d7855c9291040a6769278fa3",
+      "baselineBlob": "a6436dbd22856c52d7855c9291040a6769278fa3",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/loading.tsx",
+      "gitBlob": "bca12ec341c5909f04c0643d46361a381b266c83",
+      "baselineBlob": "bca12ec341c5909f04c0643d46361a381b266c83",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/manage/page.tsx",
+      "gitBlob": "f6d7d3fc470ef37c1f736bc6303fa90a16870a9c",
+      "baselineBlob": "f6d7d3fc470ef37c1f736bc6303fa90a16870a9c",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/new/page.tsx",
+      "gitBlob": "34cd32f03df9a164177bdce992e23c284cdd5698",
+      "baselineBlob": "34cd32f03df9a164177bdce992e23c284cdd5698",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/org-chart/_tree-node.tsx",
+      "gitBlob": "00a5752f45425ce5b43d4777b7f0d86e15c0b02d",
+      "baselineBlob": "00a5752f45425ce5b43d4777b7f0d86e15c0b02d",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/org-chart/page.tsx",
+      "gitBlob": "323389c756ab316d8f0a8c1cf909a6d788af8535",
+      "baselineBlob": "323389c756ab316d8f0a8c1cf909a6d788af8535",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/page.tsx",
+      "gitBlob": "c03d86c3e6c89eabab708dbe0386c8dc790b3b04",
+      "baselineBlob": "c03d86c3e6c89eabab708dbe0386c8dc790b3b04",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/titles/[id]/page.tsx",
+      "gitBlob": "49e5dc506155f75caa759688c01915ce626ccea3",
+      "baselineBlob": "49e5dc506155f75caa759688c01915ce626ccea3",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/titles/[id]/pdf/page.tsx",
+      "gitBlob": "76dca88b6f21581b1a37ea67abc26faf63b75a54",
+      "baselineBlob": "76dca88b6f21581b1a37ea67abc26faf63b75a54",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/titles/[id]/tasks/page.tsx",
+      "gitBlob": "4b5b3dd9d46cc1476138be098804852343e0a6ea",
+      "baselineBlob": "4b5b3dd9d46cc1476138be098804852343e0a6ea",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/titles/new/page.tsx",
+      "gitBlob": "c828cf8950f52aaf2b57a371c577e3feecefc7cd",
+      "baselineBlob": "c828cf8950f52aaf2b57a371c577e3feecefc7cd",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/titles/page.tsx",
+      "gitBlob": "c6baf8de0afac1408cf010c4f09f96ccc445dd26",
+      "baselineBlob": "c6baf8de0afac1408cf010c4f09f96ccc445dd26",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/people/trades/page.tsx",
+      "gitBlob": "c03c9c1101135fcf3daaef3a35b63ab21ceaf34e",
+      "baselineBlob": "c03c9c1101135fcf3daaef3a35b63ab21ceaf34e",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/imports/people-references.server.ts",
+      "gitBlob": "cc42bfe928c4061422aba3e4274f7e2dd3974a4a",
+      "baselineBlob": "cc42bfe928c4061422aba3e4274f7e2dd3974a4a",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/imports/people.test.ts",
+      "gitBlob": "b2258f14eae65bf3257a49a41bad36c87d664db8",
+      "baselineBlob": "b2258f14eae65bf3257a49a41bad36c87d664db8",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/imports/people.ts",
+      "gitBlob": "73ee8095bb50e0f17f630aa9b2c56f30b5fcb696",
+      "baselineBlob": "73ee8095bb50e0f17f630aa9b2c56f30b5fcb696",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/people-sync.ts",
+      "gitBlob": "2b93d598dab777ba881ad5f837205745fb501ff0",
+      "baselineBlob": "2b93d598dab777ba881ad5f837205745fb501ff0",
+      "unchanged": true
+    },
+    {
+      "path": "packages/db/src/people-org-relational-integrity.test.ts",
+      "gitBlob": "e7e1e966ac12f52ea075f62d249327a165433768",
+      "baselineBlob": "e7e1e966ac12f52ea075f62d249327a165433768",
+      "unchanged": true
+    },
+    {
+      "path": "packages/db/src/people-property-provenance.integration.sql",
+      "gitBlob": "301e5f8ee8ae868862f0e3c1f4313c7cafb000c4",
+      "baselineBlob": "301e5f8ee8ae868862f0e3c1f4313c7cafb000c4",
+      "unchanged": true
+    },
+    {
+      "path": "packages/db/src/people-provenance.integration.ts",
+      "gitBlob": "627b13ebb23374fb939c7551c98dc818bf9c3080",
+      "baselineBlob": "627b13ebb23374fb939c7551c98dc818bf9c3080",
+      "unchanged": true
+    },
+    {
+      "path": "packages/db/src/schema/people-groups.ts",
+      "gitBlob": "794d0c489ef43e0db01b8ab2781a48d25df7959f",
+      "baselineBlob": "794d0c489ef43e0db01b8ab2781a48d25df7959f",
+      "unchanged": true
+    },
+    {
+      "path": "packages/db/src/schema/people-titles.ts",
+      "gitBlob": "4fae068b62fd814489c71399bcfd37bd7965dd32",
+      "baselineBlob": "4fae068b62fd814489c71399bcfd37bd7965dd32",
+      "unchanged": true
+    }
+  ],
+  "verifiedBrowser": [
+    "six-role authentication and directory access",
+    "multi-property profiles",
+    "restricted cross-property denial",
+    "desktop and mobile menu interaction",
+    "real property-role assignment change and restoration",
+    "same-session authority revocation/grant",
+    "assignment audit history"
+  ],
+  "freezeBlockers": [
+    "People original images were located and OCR read, but original pixels were unavailable for direct comparison through the cloud-only access path",
+    "Exact approved User Accounts Option 2 reference unresolved",
+    "Exact approved platform/tenant logo and branding configuration not represented by default synthetic fixture"
+  ],
+  "releaseNote": "Owner functional acceptance remains valid. This manifest makes no new frozen or complete visual-fidelity claim."
+}

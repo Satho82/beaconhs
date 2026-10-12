@@ -1,0 +1,41 @@
+{
+  "sourceCommit": "563fb0e9b79a838a5f394abaffb2f7dc743fc571",
+  "sourceTree": "324c50a60e2cb0639ba920488a150c6531968374",
+  "derivation": "Actual captured PNG pixels converted by Pillow11.3.0 to aspect-preserving JPEG thumbnails <=1100x1800 at quality82; no generated or reconstructed UI.",
+  "images": [
+    {
+      "path": "docs/v1.4/overnight/screenshots/mobile-settled-people.jpg",
+      "gitBlob": "80a6005dab1a8c176c01f95e61f1a5cdb556d660",
+      "browserRun": 38320812403,
+      "artifact": 11778358853,
+      "originalZipSha256": "ce7b68ddda81d2a79cb79843334f2d267665698284fad18939ac9ed21cafe4cf"
+    },
+    {
+      "path": "docs/v1.4/overnight/screenshots/mobile-settled-approvals.jpg",
+      "gitBlob": "f0208866eec808a2c8e3e056b4f0781296a1a2ac",
+      "browserRun": 38320812403,
+      "artifact": 11778358853,
+      "originalZipSha256": "ce7b68ddda81d2a79cb79843334f2d267665698284fad18939ac9ed21cafe4cf"
+    },
+    {
+      "path": "docs/v1.4/overnight/screenshots/property-assignment-restored.jpg",
+      "gitBlob": "248a15cd8e7eee5bb696208f84da8b11331a2eea",
+      "browserRun": 38320812403,
+      "artifact": 11778358853,
+      "originalZipSha256": "ce7b68ddda81d2a79cb79843334f2d267665698284fad18939ac9ed21cafe4cf"
+    },
+    {
+      "path": "docs/v1.4/overnight/screenshots/property-assignment-audit.jpg",
+      "gitBlob": "33e8590d8b21616a9e27686ce9f6a58f67e65bbd",
+      "browserRun": 38320812403,
+      "artifact": 11778358853,
+      "originalZipSha256": "ce7b68ddda81d2a79cb79843334f2d267665698284fad18939ac9ed21cafe4cf"
+    }
+  ],
+  "financialImage": {
+    "path": "qualified-financial-detail.jpg",
+    "run": 38320245029,
+    "artifact": 11778208038,
+    "originalZipSha256": "696ec6476c945eebf9552a87a00e48488ab8ab6af679611580379b9b1e23d1a7"
+  }
+}

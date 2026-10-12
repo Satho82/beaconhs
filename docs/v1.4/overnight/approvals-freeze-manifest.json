@@ -1,0 +1,561 @@
+{
+  "schemaVersion": 1,
+  "sourceCommit": "563fb0e9b79a838a5f394abaffb2f7dc743fc571",
+  "sourceTree": "324c50a60e2cb0639ba920488a150c6531968374",
+  "ownerAcceptance": {
+    "date": "2026-10-12",
+    "decision": "ACCEPTED",
+    "preserved": true,
+    "originalEvidence": "owner-acceptance-original.json",
+    "currentAuthority": "Explicit owner instruction for this controller"
+  },
+  "freezeStatus": "ACCEPTED — FREEZE PENDING",
+  "frozen": false,
+  "technicalValidation": "technical-validation.json",
+  "authoritativeRun": 38313918871,
+  "browserEvidence": "browser-evidence-index.json",
+  "security": "RECONCILED — EXACTLY THREE FALSE POSITIVES; raw failed scans preserved",
+  "securityEvidence": "security-reconciliation.json",
+  "migrations": "migration-identity-manifest.json",
+  "visualEvidence": "visual-assessment.json",
+  "changesToAcceptedRuntime": false,
+  "module": "Approvals V1.4",
+  "acceptedSource": "937242e7e35806acab48c28c4163719b00c0f16d",
+  "acceptedDeltaBlobs": [
+    {
+      "path": "apps/web/next-env.d.ts",
+      "acceptedBlob": "ce4e94a6b10f160ee021fe18939af160d2927dcf",
+      "candidateBlob": "ce4e94a6b10f160ee021fe18939af160d2927dcf",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/package.json",
+      "acceptedBlob": "dbe88335c0174b8852253595ccc2c19a672b2481",
+      "candidateBlob": "dbe88335c0174b8852253595ccc2c19a672b2481",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/scripts/launch-approvals-preview.ts",
+      "acceptedBlob": "7da29adcc64ed1383c9c36a6ace00ab796875632",
+      "candidateBlob": "7da29adcc64ed1383c9c36a6ace00ab796875632",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/scripts/verify-approvals-batch01.ts",
+      "acceptedBlob": "2aabe4249db848411977eb61241e87cf63cd7418",
+      "candidateBlob": "2aabe4249db848411977eb61241e87cf63cd7418",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/scripts/verify-approvals-production.ts",
+      "acceptedBlob": "2a36950e8890b0be750c679bf7fc69522cf5766b",
+      "candidateBlob": "2a36950e8890b0be750c679bf7fc69522cf5766b",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/scripts/verify-approvals-property-authority.ts",
+      "acceptedBlob": "18abfdf6b78ab571b31c9fb0f4323f49b2473124",
+      "candidateBlob": "18abfdf6b78ab571b31c9fb0f4323f49b2473124",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/approvals/[[...screen]]/page.tsx",
+      "acceptedBlob": "40bf5ffb5b308f54b42d3716e5b629cc2da1c9ab",
+      "candidateBlob": "40bf5ffb5b308f54b42d3716e5b629cc2da1c9ab",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/approvals/_form.tsx",
+      "acceptedBlob": "29df56282771c3c110e664a3158d836c50b3fcc0",
+      "candidateBlob": "29df56282771c3c110e664a3158d836c50b3fcc0",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/approvals/error.tsx",
+      "acceptedBlob": "fe727338b46c135f5a35c70392fb9f1e82973f2a",
+      "candidateBlob": "fe727338b46c135f5a35c70392fb9f1e82973f2a",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/approvals/export.csv/route.ts",
+      "acceptedBlob": "4a6fd7ba3152af8fafdc10173141c5117908143d",
+      "candidateBlob": "4a6fd7ba3152af8fafdc10173141c5117908143d",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/approvals/layout.tsx",
+      "acceptedBlob": "039be4e3ccfe03ecaecd693f75df45d4af1a9ce0",
+      "candidateBlob": "039be4e3ccfe03ecaecd693f75df45d4af1a9ce0",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/approvals/loading.tsx",
+      "acceptedBlob": "a2dbac698ccd0b209807bef759378c537606bcba",
+      "candidateBlob": "a2dbac698ccd0b209807bef759378c537606bcba",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/approvals/requests/[id]/documents/[documentId]/route.ts",
+      "acceptedBlob": "bc3cdfe7409c723ee12f350fb0866fbdd22db48c",
+      "candidateBlob": "bc3cdfe7409c723ee12f350fb0866fbdd22db48c",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/approvals/requests/[id]/page.tsx",
+      "acceptedBlob": "8e0ff804619da94c3efe3ea31b02c86b50940079",
+      "candidateBlob": "8e0ff804619da94c3efe3ea31b02c86b50940079",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/properties/[propertyId]/diary/actions.ts",
+      "acceptedBlob": "a6ea734b02a0cee93a1d92738b4568e914a7d5dd",
+      "candidateBlob": "a6ea734b02a0cee93a1d92738b4568e914a7d5dd",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/properties/[propertyId]/diary/page.tsx",
+      "acceptedBlob": "b8fed82456dec3b2cf7a3ab56a201c6d56a1a960",
+      "candidateBlob": "b8fed82456dec3b2cf7a3ab56a201c6d56a1a960",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/(app)/hospitality/properties/[propertyId]/diary/templates/[scheduleId]/page.tsx",
+      "acceptedBlob": "466e54b5fb696a6ed64718b332b9891d3cfc6e62",
+      "candidateBlob": "466e54b5fb696a6ed64718b332b9891d3cfc6e62",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/api/approvals/route.ts",
+      "acceptedBlob": "ff508a6ecd988ebb5fd3789d451948bb83ccc5f0",
+      "candidateBlob": "ff508a6ecd988ebb5fd3789d451948bb83ccc5f0",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/preview/approvals/[[...screen]]/page.tsx",
+      "acceptedBlob": "95c2077f201ccc7f993f728786c62c8c9ec96e72",
+      "candidateBlob": "95c2077f201ccc7f993f728786c62c8c9ec96e72",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/preview/approvals/actions.ts",
+      "acceptedBlob": "904b5f8bc655e37e96b30684c68a952fbce666a0",
+      "candidateBlob": "904b5f8bc655e37e96b30684c68a952fbce666a0",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/preview/approvals/login/page.tsx",
+      "acceptedBlob": "f0142ad3257a7739c11a33f8cd7d6107d51f2dfa",
+      "candidateBlob": "f0142ad3257a7739c11a33f8cd7d6107d51f2dfa",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/preview/approvals/preview.client.tsx",
+      "acceptedBlob": "38073e1e55fcb08f6a1e519ae9bf0585e06c58cb",
+      "candidateBlob": "38073e1e55fcb08f6a1e519ae9bf0585e06c58cb",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/preview/approvals/preview.css",
+      "acceptedBlob": "8fdebc799755a373aa2d2a6e4996e55ef4ed1a4a",
+      "candidateBlob": "8fdebc799755a373aa2d2a6e4996e55ef4ed1a4a",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/app/preview/approvals/session/route.ts",
+      "acceptedBlob": "f7f4b715ec87e1056f04ec8cf4b92ed29321a47e",
+      "candidateBlob": "f7f4b715ec87e1056f04ec8cf4b92ed29321a47e",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/components/app-shell.tsx",
+      "acceptedBlob": "3b304fe2f1588c3e7cdc9b3457caafb777387519",
+      "candidateBlob": "3b304fe2f1588c3e7cdc9b3457caafb777387519",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/approvals/contracts.test.ts",
+      "acceptedBlob": "dac3523f2b24ba412da25720cd8683bf8eb726c0",
+      "candidateBlob": "dac3523f2b24ba412da25720cd8683bf8eb726c0",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/approvals/contracts.ts",
+      "acceptedBlob": "e41cc57b3578784bedaaf89a021d15ab23b44f33",
+      "candidateBlob": "e41cc57b3578784bedaaf89a021d15ab23b44f33",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/approvals/preview-fixtures.ts",
+      "acceptedBlob": "340f952968fd74f7f87b380744bacd5d35dcd5dd",
+      "candidateBlob": "340f952968fd74f7f87b380744bacd5d35dcd5dd",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/approvals/preview-guard.test.ts",
+      "acceptedBlob": "f70140677021c4248608e6eca82becaea1a77388",
+      "candidateBlob": "f70140677021c4248608e6eca82becaea1a77388",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/approvals/preview-guard.ts",
+      "acceptedBlob": "dc6c83ea40b5d1077a34f535e073e73e0ecf7bb6",
+      "candidateBlob": "dc6c83ea40b5d1077a34f535e073e73e0ecf7bb6",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/approvals/preview-queries.ts",
+      "acceptedBlob": "7ec3dad49abcbc6fe4877c2d25f17ee107244af0",
+      "candidateBlob": "7ec3dad49abcbc6fe4877c2d25f17ee107244af0",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/approvals/preview-server.ts",
+      "acceptedBlob": "9c1fb4407a7d34ea7aae15b98f0cae01193711d9",
+      "candidateBlob": "9c1fb4407a7d34ea7aae15b98f0cae01193711d9",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/approvals/preview-session.test.ts",
+      "acceptedBlob": "4bacd23fe0c3802cabe524d3d2483a2afb98da40",
+      "candidateBlob": "4bacd23fe0c3802cabe524d3d2483a2afb98da40",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/approvals/preview-session.ts",
+      "acceptedBlob": "77bcf6d787067dcc909a76a5fa6984670818586c",
+      "candidateBlob": "77bcf6d787067dcc909a76a5fa6984670818586c",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/approvals/preview-submission.test.ts",
+      "acceptedBlob": "e81ade7e981c94489d048347f8caf291304b5cc2",
+      "candidateBlob": "e81ade7e981c94489d048347f8caf291304b5cc2",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/approvals/preview-submission.ts",
+      "acceptedBlob": "5e055afa97baba9053c345420738ee53212349df",
+      "candidateBlob": "5e055afa97baba9053c345420738ee53212349df",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/approvals/production-contracts.test.ts",
+      "acceptedBlob": "6c049f2ae7912c113e494fd6a100310874576147",
+      "candidateBlob": "6c049f2ae7912c113e494fd6a100310874576147",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/approvals/production-contracts.ts",
+      "acceptedBlob": "7b8fc0270de68a0911fe4fece748843894beb9f4",
+      "candidateBlob": "7b8fc0270de68a0911fe4fece748843894beb9f4",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/approvals/production.ts",
+      "acceptedBlob": "fa2e326087699ffa5cb34e6cddd38bae56a489d7",
+      "candidateBlob": "fa2e326087699ffa5cb34e6cddd38bae56a489d7",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/approvals/property-authority.test.ts",
+      "acceptedBlob": "db0bf65401e1140ebc92b708c3ea310e6c4cbd58",
+      "candidateBlob": "db0bf65401e1140ebc92b708c3ea310e6c4cbd58",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/approvals/property-authority.ts",
+      "acceptedBlob": "a213bf748da1897a5b496110a3704faedea2ea66",
+      "candidateBlob": "a213bf748da1897a5b496110a3704faedea2ea66",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/approvals/service.ts",
+      "acceptedBlob": "d2a2024edf6bab57fe7e7c595214a5c80eeeb54a",
+      "candidateBlob": "d2a2024edf6bab57fe7e7c595214a5c80eeeb54a",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/hospitality/diary-rules.ts",
+      "acceptedBlob": "21007a9305ed64076b11c0693d9ef6483958b7f3",
+      "candidateBlob": "21007a9305ed64076b11c0693d9ef6483958b7f3",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/hospitality/diary.test.ts",
+      "acceptedBlob": "cf99dc404802ce50e4fb8811b71e447fd1610f89",
+      "candidateBlob": "cf99dc404802ce50e4fb8811b71e447fd1610f89",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/manual/content/approvals-preview.ts",
+      "acceptedBlob": "29e7390922f46e52ac54ac5aa429e01eb43018af",
+      "candidateBlob": "29e7390922f46e52ac54ac5aa429e01eb43018af",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/manual/content/approvals.ts",
+      "acceptedBlob": "4447dc8d486b8085e693bd8022dae5b896d85d61",
+      "candidateBlob": "4447dc8d486b8085e693bd8022dae5b896d85d61",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/manual/content/hospitality.ts",
+      "acceptedBlob": "4f7a8e98fdd664a46d5561fd96172f7c6dc3610d",
+      "candidateBlob": "4f7a8e98fdd664a46d5561fd96172f7c6dc3610d",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/manual/registry.ts",
+      "acceptedBlob": "b5384b6810572b07653c9caa8b3020100cc9b74f",
+      "candidateBlob": "b5384b6810572b07653c9caa8b3020100cc9b74f",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/module-entitlements/catalogue.ts",
+      "acceptedBlob": "2257ce01123ad081c3460574966cd908375b687e",
+      "candidateBlob": "2257ce01123ad081c3460574966cd908375b687e",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/nav/approvals-preview.ts",
+      "acceptedBlob": "810f4ff83a3786fdcb5928fc600b27994376e683",
+      "candidateBlob": "810f4ff83a3786fdcb5928fc600b27994376e683",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/nav/approved-structure.ts",
+      "acceptedBlob": "bb250f1f187d13a27f781007b9e3633746c9456b",
+      "candidateBlob": "bb250f1f187d13a27f781007b9e3633746c9456b",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/nav/entitlements.ts",
+      "acceptedBlob": "ea3a50270a583e5f76fee679768ddd0b49160b62",
+      "candidateBlob": "ea3a50270a583e5f76fee679768ddd0b49160b62",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/nav/registry.ts",
+      "acceptedBlob": "e52b9da3632133dcaeb9e49bce88bf36f27c6866",
+      "candidateBlob": "e52b9da3632133dcaeb9e49bce88bf36f27c6866",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/permissions-meta.ts",
+      "acceptedBlob": "f3551293f97e8422b03437eecb543ebda71b415a",
+      "candidateBlob": "f3551293f97e8422b03437eecb543ebda71b415a",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/src/lib/walkthroughs/registry.ts",
+      "acceptedBlob": "079378488f094ae70751ba103e13d3e7b3d5bc43",
+      "candidateBlob": "079378488f094ae70751ba103e13d3e7b3d5bc43",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/tsconfig.approvals-preview.json",
+      "acceptedBlob": "59c82193231ed91e3aa9350f9a482ce49d96de2a",
+      "candidateBlob": "59c82193231ed91e3aa9350f9a482ce49d96de2a",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/tsconfig.approvals-security.json",
+      "acceptedBlob": "5ef8845723f771c77b466f1b874c7b836be500e6",
+      "candidateBlob": "5ef8845723f771c77b466f1b874c7b836be500e6",
+      "unchanged": true
+    },
+    {
+      "path": "apps/web/tsconfig.approvals.json",
+      "acceptedBlob": "8ba929978895eedc2fef6bb2435c60d98c1b7ded",
+      "candidateBlob": "8ba929978895eedc2fef6bb2435c60d98c1b7ded",
+      "unchanged": true
+    },
+    {
+      "path": "apps/worker/src/lib/approval-reminders.ts",
+      "acceptedBlob": "296e68e103849a6c33a59f38f9b5c4912771f9f6",
+      "candidateBlob": "296e68e103849a6c33a59f38f9b5c4912771f9f6",
+      "unchanged": true
+    },
+    {
+      "path": "apps/worker/src/lib/operational-task-schedule.test.ts",
+      "acceptedBlob": "e96d6bc9edf1c3d33e94023874286000f75d5526",
+      "candidateBlob": "e96d6bc9edf1c3d33e94023874286000f75d5526",
+      "unchanged": true
+    },
+    {
+      "path": "apps/worker/src/workers/scheduled.ts",
+      "acceptedBlob": "30233adcd1d18f7f9aebd0e73cd4e98b173c5ac3",
+      "candidateBlob": "30233adcd1d18f7f9aebd0e73cd4e98b173c5ac3",
+      "unchanged": true
+    },
+    {
+      "path": "packages/db/drizzle/0062_approvals_batch01.sql",
+      "acceptedBlob": "77cd4a402e3e8a32acf25b1dedb36f97cb130dff",
+      "candidateBlob": "77cd4a402e3e8a32acf25b1dedb36f97cb130dff",
+      "unchanged": true
+    },
+    {
+      "path": "packages/db/drizzle/0063_approvals_production.sql",
+      "acceptedBlob": "000d76e52c965c6487707f20cd4a7f1c13436e3d",
+      "candidateBlob": "000d76e52c965c6487707f20cd4a7f1c13436e3d",
+      "unchanged": true
+    },
+    {
+      "path": "packages/db/drizzle/meta/_journal.json",
+      "acceptedBlob": "ff41b91201dcf0f26487c204e7d00135c82efcbd",
+      "candidateBlob": "ff41b91201dcf0f26487c204e7d00135c82efcbd",
+      "unchanged": true
+    },
+    {
+      "path": "packages/db/proposals/approvals-batch01.sql",
+      "acceptedBlob": "53839559d77311234b730e9dff16a513afbeecc4",
+      "candidateBlob": "53839559d77311234b730e9dff16a513afbeecc4",
+      "unchanged": true
+    },
+    {
+      "path": "packages/db/src/approvals.test.ts",
+      "acceptedBlob": "8b1ae94ddd22268ca7b9d89cc29abe0eaf850853",
+      "candidateBlob": "8b1ae94ddd22268ca7b9d89cc29abe0eaf850853",
+      "unchanged": true
+    },
+    {
+      "path": "packages/db/src/migration-canonicalisation.test.ts",
+      "acceptedBlob": "a50d034daabeea6327e1914cacf81c93adac0d26",
+      "candidateBlob": "a50d034daabeea6327e1914cacf81c93adac0d26",
+      "unchanged": true
+    },
+    {
+      "path": "packages/db/src/migration-safety.integration.ts",
+      "acceptedBlob": "2e90a2f6d4283877292b2c610f98f4a634a8a910",
+      "candidateBlob": "2e90a2f6d4283877292b2c610f98f4a634a8a910",
+      "unchanged": true
+    },
+    {
+      "path": "packages/db/src/production-cutover-integrity.test.ts",
+      "acceptedBlob": "70bf6a3e1503dfb304d508570dc2e1cc89f3ab48",
+      "candidateBlob": "70bf6a3e1503dfb304d508570dc2e1cc89f3ab48",
+      "unchanged": true
+    },
+    {
+      "path": "packages/db/src/risk-prepared-plan.test.ts",
+      "acceptedBlob": "66f0fefc144a5681f8d59ddba58444c37e51f0da",
+      "candidateBlob": "66f0fefc144a5681f8d59ddba58444c37e51f0da",
+      "unchanged": true
+    },
+    {
+      "path": "packages/db/src/rls.ts",
+      "acceptedBlob": "15053e884ab330130495059b91585ea8d96098cc",
+      "candidateBlob": "15053e884ab330130495059b91585ea8d96098cc",
+      "unchanged": true
+    },
+    {
+      "path": "packages/db/src/schema/approvals.ts",
+      "acceptedBlob": "2f62c60a77ccb7414024658ebcb884e554f7395e",
+      "candidateBlob": "2f62c60a77ccb7414024658ebcb884e554f7395e",
+      "unchanged": true
+    },
+    {
+      "path": "packages/db/src/schema/domain-events.ts",
+      "acceptedBlob": "3912f1376e82fc0780a205af05ba5fca463cc518",
+      "candidateBlob": "3912f1376e82fc0780a205af05ba5fca463cc518",
+      "unchanged": true
+    },
+    {
+      "path": "packages/db/src/schema/iam.ts",
+      "acceptedBlob": "c2e3b306f2035bac33c1c2fddf524c9c8adb5736",
+      "candidateBlob": "c2e3b306f2035bac33c1c2fddf524c9c8adb5736",
+      "unchanged": true
+    },
+    {
+      "path": "packages/db/src/schema/index.ts",
+      "acceptedBlob": "bf72f7a42fd3be7d0eb095f56366f2cf0d9b7b37",
+      "candidateBlob": "bf72f7a42fd3be7d0eb095f56366f2cf0d9b7b37",
+      "unchanged": true
+    },
+    {
+      "path": "packages/db/src/tenant-relational-integrity.test.ts",
+      "acceptedBlob": "e59855b252ad275bf2f5968c6b92bf635925aa22",
+      "candidateBlob": "e59855b252ad275bf2f5968c6b92bf635925aa22",
+      "unchanged": true
+    },
+    {
+      "path": "packages/db/src/verify-prepared-risk.test.ts",
+      "acceptedBlob": "b5fec19421919f440b6ce9359b10abe840faf2c5",
+      "candidateBlob": "b5fec19421919f440b6ce9359b10abe840faf2c5",
+      "unchanged": true
+    },
+    {
+      "path": "packages/events/src/approvals.ts",
+      "acceptedBlob": "523d9998e0abe1cb19dc14e4584fdcecf458a9e3",
+      "candidateBlob": "523d9998e0abe1cb19dc14e4584fdcecf458a9e3",
+      "unchanged": true
+    },
+    {
+      "path": "packages/events/src/index.ts",
+      "acceptedBlob": "a8257b1bec30414a9ba0ede03e6cdee5fc5f2247",
+      "candidateBlob": "a8257b1bec30414a9ba0ede03e6cdee5fc5f2247",
+      "unchanged": true
+    },
+    {
+      "path": "packages/events/src/outbox.ts",
+      "acceptedBlob": "733f6942308ee3551c16ab9806d1684b92268814",
+      "candidateBlob": "733f6942308ee3551c16ab9806d1684b92268814",
+      "unchanged": true
+    },
+    {
+      "path": "packages/i18n/src/messages/en.json",
+      "acceptedBlob": "ad72a3d8d32d5399ddb29041500078a6057562ed",
+      "candidateBlob": "ad72a3d8d32d5399ddb29041500078a6057562ed",
+      "unchanged": true
+    },
+    {
+      "path": "packages/i18n/src/messages/es.json",
+      "acceptedBlob": "44325c23dd4a3b7864b415626c10b8b897ee2819",
+      "candidateBlob": "44325c23dd4a3b7864b415626c10b8b897ee2819",
+      "unchanged": true
+    },
+    {
+      "path": "packages/i18n/src/messages/fr.json",
+      "acceptedBlob": "e998e94d711c85cc39ae1f06a1e53bdeb522ee0a",
+      "candidateBlob": "e998e94d711c85cc39ae1f06a1e53bdeb522ee0a",
+      "unchanged": true
+    },
+    {
+      "path": "packages/jobs/src/lazy-runtime.test.ts",
+      "acceptedBlob": "e3da9f74c2d8531d956481dc332fda48cd49b2fa",
+      "candidateBlob": "e3da9f74c2d8531d956481dc332fda48cd49b2fa",
+      "unchanged": true
+    },
+    {
+      "path": "packages/jobs/src/queues/scheduled.ts",
+      "acceptedBlob": "31059b2c8ecfc9a0e69e37b3440c97d51ca01c27",
+      "candidateBlob": "31059b2c8ecfc9a0e69e37b3440c97d51ca01c27",
+      "unchanged": true
+    }
+  ],
+  "verifiedBrowser": [
+    "six-role navigation",
+    "workflow configuration and two sequential approval stages",
+    "financial amount/limit enforcement",
+    "qualified supplier/description/category persistence",
+    "PDF upload and scoped download",
+    "restricted foreign request denial",
+    "comments and audit",
+    "information request/resubmission",
+    "manual reminder",
+    "approval decisions",
+    "cancellation",
+    "delegation with original history",
+    "reporting and CSV export",
+    "desktop/mobile menu interaction"
+  ],
+  "freezeBlockers": [
+    "Exact approved platform/tenant branding assets were not exercised; synthetic fixture renders default text branding",
+    "Only qualitative comparison with composite Approvals design reference completed; full approved visual mapping remains unresolved"
+  ],
+  "evidenceLimits": [
+    "Browser did not verify automatic reminder timing or actual recipient email/notification delivery; preserved integration tests cover separate technical behaviour",
+    "No claimed pixel/layout equivalence to the composite reference"
+  ],
+  "releaseNote": "Owner functional acceptance remains valid. No accepted runtime change is proposed by this controller."
+}

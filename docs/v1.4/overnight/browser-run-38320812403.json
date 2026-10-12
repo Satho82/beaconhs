@@ -1,0 +1,57 @@
+{
+  "sourceCommit": "563fb0e9b79a838a5f394abaffb2f7dc743fc571",
+  "sourceTree": "324c50a60e2cb0639ba920488a150c6531968374",
+  "scope": "Additional property reassignment and real menu navigation; no repeat release gates",
+  "checks": [
+    {
+      "name": "Focused fixture authentication platform",
+      "status": "PASS"
+    },
+    {
+      "name": "Focused fixture authentication cluster",
+      "status": "PASS"
+    },
+    {
+      "name": "Focused fixture authentication restricted",
+      "status": "PASS"
+    },
+    {
+      "name": "Mobile actual menu navigation People",
+      "status": "PASS",
+      "detail": {
+        "viewport": 390,
+        "document": 390
+      }
+    },
+    {
+      "name": "Mobile actual menu navigation Approvals",
+      "status": "PASS",
+      "detail": {
+        "viewport": 390,
+        "document": 390
+      }
+    },
+    {
+      "name": "Property reassignment, live-session isolation and restoration through UI",
+      "status": "PASS",
+      "detail": {
+        "from": "The Lincoln Suites",
+        "to": "One Fifty Fenchurch",
+        "restored": true,
+        "sameAuthenticatedRestrictedSession": true
+      }
+    }
+  ],
+  "screenshots": [
+    "mobile-settled-people.png",
+    "mobile-settled-approvals.png",
+    "reassigned-property-isolation.png",
+    "property-assignment-restored.png",
+    "property-assignment-audit.png"
+  ],
+  "runtimeErrors": [],
+  "gaps": [
+    "People original references located; pixel comparison NOT VERIFIED because available cloud reader returned text/asset pointers. Screenshots require visual review."
+  ],
+  "status": "FOCUSED_CHECKS_PASS"
+}

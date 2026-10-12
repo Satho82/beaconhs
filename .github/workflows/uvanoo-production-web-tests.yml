@@ -75,3 +75,5 @@ jobs:
           printf 'DRAFT_SOURCE_TREE=%s\n' "$(git write-tree)"
 
 # Final audit call and workflow configuration list.
+
+# Resolve member display names and current delegated assignment.

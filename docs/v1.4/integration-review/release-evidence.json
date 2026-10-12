@@ -1,0 +1,100 @@
+{
+  "governed": {
+    "sha": "d18f635a41f092e9e86aa6f53518f9c28992b0d2",
+    "tree": "cac8f1184b7852629aab49e77f49a693abd0e350"
+  },
+  "approvals": {
+    "sha": "937242e7e35806acab48c28c4163719b00c0f16d",
+    "tree": "9912feac29a30b4b32d219b4cc21f80f1f57f7f7"
+  },
+  "devGate": {
+    "sha": "ba3f87000b7d2ace82ee74aa1585a91e4237c0af",
+    "tree": "ccc96eee2803ec9fd6d17444a0d4bd667a848411"
+  },
+  "candidate": {
+    "sha": "563fb0e9b79a838a5f394abaffb2f7dc743fc571",
+    "tree": "324c50a60e2cb0639ba920488a150c6531968374",
+    "branch": "integration/uvanoo-v1.4-approvals-dev-gate-20261012"
+  },
+  "initialUnion": {
+    "sha": "6f7048965e8136aaf4067555e93fc048ef2cecb5",
+    "tree": "d6e5e7c195342cf67c2749f474b6a23c54ad7afb"
+  },
+  "releaseRun": 38313918871,
+  "snapshotRun": 38314349634,
+  "fixtureCorrection": "Construct historical 58/61 with governed runner/RLS, 62 with canonical batch01 runner/RLS, then restore combined source for forward execution and security checks.",
+  "noDirectFileOverlaps": true,
+  "canonical63SqlAndJournalPreserved": true,
+  "peopleAndRiskRuntimeUnchanged": true,
+  "securityTriage": [
+    {
+      "file": "apps/web/src/lib/property-delegation.integration.test.ts",
+      "line": 89,
+      "classification": "Synthetic role key; not a credential",
+      "unchangedFromBase": true
+    },
+    {
+      "file": "docs/UVANOO_V12_INTEGRATION.md",
+      "line": 28,
+      "classification": "Documentation table prose; apparent generic-api-key false positive",
+      "unchangedFromBase": true
+    },
+    {
+      "file": "docs/v1.4/V1.4_ARCHITECTURE_DECISIONS.md",
+      "line": 141,
+      "classification": "Documentation table prose; apparent generic-api-key false positive",
+      "unchangedFromBase": true
+    }
+  ],
+  "liveDatabaseInspected": false,
+  "imagePublished": false,
+  "governedModified": false,
+  "deployed": false,
+  "validation": {
+    "run": 38313918871,
+    "controlSha": "4e6095032db739ade1fdc43ca9d46a7e2a1b9803",
+    "conclusion": "success",
+    "postgres": "16.14",
+    "dbTests": 392,
+    "webTests": 1738,
+    "webSkipped": 1,
+    "workspaceTasks": 23,
+    "productionBuildTasks": 2,
+    "approvalsLifecycleChecks": 29,
+    "paths": [
+      "58->63",
+      "61->63",
+      "62->63",
+      "63->63"
+    ],
+    "checks": [
+      "format",
+      "typecheck",
+      "lint",
+      "deadcode",
+      "unit",
+      "production build web and worker",
+      "deployment contracts",
+      "People provenance",
+      "Risk SQL",
+      "property isolation",
+      "backup/restore",
+      "atomic rollback",
+      "migration locking",
+      "Gitleaks incremental",
+      "CodeQL security-extended"
+    ]
+  },
+  "supplementalScan": {
+    "run": 38314349634,
+    "conclusion": "failure",
+    "findings": 3,
+    "triage": "Reviewed locations contain non-secret synthetic role key and documentation prose. No suppression or bypass applied; scan-policy reconciliation remains open."
+  },
+  "browser": {
+    "priorRun": 38310507071,
+    "source": "937242e7e35806acab48c28c4163719b00c0f16d",
+    "status": "Application startup/readiness failed; browser acceptance skipped. Underlying app log was not included in available evidence. Combined candidate browser acceptance not performed."
+  },
+  "status": "Engineering validation passed; release acceptance pending browser proof, supplemental scanner reconciliation and live DEV preflight."
+}

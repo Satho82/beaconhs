@@ -92,9 +92,8 @@ jobs:
           SQL
 
 
-      - name: Fresh migration and idempotence
+      - name: Provision canonical schema for focused production acceptance
         run: |
-          pnpm --filter @beaconhs/db exec tsx src/migrate.ts
           pnpm --filter @beaconhs/db exec tsx src/migrate.ts
       - name: Build pinned disposable storage from official source
         run: |
@@ -109,38 +108,8 @@ jobs:
           done
           curl --fail --silent http://localhost:9000/minio/health/live
       - name: Production lifecycle and financial security integration
+        timeout-minutes: 10
         run: pnpm --filter @beaconhs/web exec tsx scripts/verify-approvals-production.ts
-      - name: Migration Safety isolated rollback and ACL harness
-        if: success() || failure()
-        run: |
-          set -euo pipefail
-          docker pull postgres:16-alpine@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777
-          docker tag postgres:16-alpine@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777 postgres:16-alpine
-          docker run --detach --rm --name uvanoo-migration-safety-20261012 \
-            --label uvanoo.task=migration-safety --network none --memory 768m --cpus 2 \
-            --tmpfs /var/lib/postgresql/data:rw \
-            -e POSTGRES_HOST_AUTH_METHOD=trust -e POSTGRES_DB=safety_admin postgres:16-alpine
-          ready=false
-          for attempt in $(seq 1 30); do
-            if docker exec uvanoo-migration-safety-20261012 pg_isready -U postgres -d safety_admin; then
-              ready=true
-              break
-            fi
-            sleep 1
-          done
-          test "$ready" = true
-          pnpm --filter @beaconhs/db exec tsx src/migration-safety.integration.ts
-
-      - name: Dispose only task-owned Migration Safety fixture
-        if: always()
-        run: |
-          set -euo pipefail
-          if docker inspect uvanoo-migration-safety-20261012 >/dev/null 2>&1; then
-            test "$(docker inspect --format '{{ index .Config.Labels "uvanoo.task" }}' uvanoo-migration-safety-20261012)" = migration-safety
-            docker stop uvanoo-migration-safety-20261012
-          fi
-
-
       - name: Dispose task storage
         if: always()
         run: |

@@ -47,7 +47,7 @@ for(const path of Object.keys(draft.files).filter(p=>p.endsWith('.tsx'))) {
   visit(file)
   const client=source.startsWith("'use client'")
   if(usesTranslator) {
-    for(const n of file.statements)if(ts.isFunctionDeclaration(n)&&n.body&&n.body.getText(file).includes('<')) {
+    for(const n of file.statements)if(ts.isFunctionDeclaration(n)&&n.body&&edits.some(e=>e.start>n.body!.getStart(file)&&e.end<n.body!.end&&e.text.includes('tGeneratedValue('))) {
       if(!client&&!n.modifiers?.some(m=>m.kind===ts.SyntaxKind.AsyncKeyword))edits.push({start:n.getStart(file),end:n.getStart(file),text:''})
       edits.push({start:n.body.getStart(file)+1,end:n.body.getStart(file)+1,text:client?'\nconst tGeneratedValue=useGeneratedValueTranslations()\n':'\nconst tGeneratedValue=await getGeneratedValueTranslations()\n'})
     }

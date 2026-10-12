@@ -1,0 +1,48 @@
+{
+  "candidateSha": "563fb0e9b79a838a5f394abaffb2f7dc743fc571",
+  "candidateTree": "324c50a60e2cb0639ba920488a150c6531968374",
+  "rawFailedRuns": [
+    38314216302,
+    38314349634
+  ],
+  "rawStatus": "FAILED, preserved",
+  "reviewStatus": "RECONCILED_FALSE_POSITIVES",
+  "scope": "Exactly three generic-api-key findings in immutable unchanged governed-source blobs; no scanner configuration changes or suppression.",
+  "findings": [
+    {
+      "file": "apps/web/src/lib/property-delegation.integration.test.ts",
+      "line": 89,
+      "classification": "Synthetic role key; not a credential",
+      "unchangedFromBase": true,
+      "rule": "generic-api-key",
+      "gitBlob": "b7df48dfbfdcb7d1e397861dc201ba5f6089e902",
+      "disposition": "NOT_A_SECRET",
+      "rationale": "The flagged key is a synthetic database RBAC role identifier in a disposable property-delegation test; it is not used for authentication or external access."
+    },
+    {
+      "file": "docs/UVANOO_V12_INTEGRATION.md",
+      "line": 28,
+      "classification": "Documentation table prose; apparent generic-api-key false positive",
+      "unchangedFromBase": true,
+      "rule": "generic-api-key",
+      "gitBlob": "df070dd07c3c4b87dfbc9d91284b415a9ac4060a",
+      "disposition": "NOT_A_SECRET",
+      "rationale": "The flagged location is a Markdown requirements/architecture table row containing ordinary product prose, with no credential assignment or authentication use."
+    },
+    {
+      "file": "docs/v1.4/V1.4_ARCHITECTURE_DECISIONS.md",
+      "line": 141,
+      "classification": "Documentation table prose; apparent generic-api-key false positive",
+      "unchangedFromBase": true,
+      "rule": "generic-api-key",
+      "gitBlob": "e6afb779500d37f13a68046c019d58ee931e3be9",
+      "disposition": "NOT_A_SECRET",
+      "rationale": "The flagged location is a Markdown requirements/architecture table row containing ordinary product prose, with no credential assignment or authentication use."
+    }
+  ],
+  "limits": [
+    "Reconciliation is specific to these blobs, locations and findings; any changed/new finding reopens review.",
+    "Raw scan remains failed; do not represent it as green.",
+    "No genuine credential was identified in these three findings; this is not proof that all repository history is secret-free."
+  ]
+}

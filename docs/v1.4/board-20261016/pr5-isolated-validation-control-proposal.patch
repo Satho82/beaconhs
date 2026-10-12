@@ -1,0 +1,31 @@
+--- a/.github/workflows/uvanoo-v1.4-module-validation.yml
++++ b/.github/workflows/uvanoo-v1.4-module-validation.yml
+@@ -79,13 +79,17 @@
+           test "$GITHUB_REPOSITORY" = 'Satho82/beaconhs'
+           test "$GITHUB_REF" = 'refs/heads/feature/uvanoo-v1.4-ci-validation'
+           [[ "$SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]]
+-          [[ "$SOURCE_BRANCH" =~ ^feature/uvanoo-v1\.4-[a-z0-9-]+$ ]]
++          case "$SOURCE_BRANCH" in
++            chore/v1.4-migration-safety|fix/uvanoo-v1.4-migration-safety-cloud-gates)
++              test "$MODULE" = migration-safety ;;
++            *) [[ "$SOURCE_BRANCH" =~ ^feature/uvanoo-v1\.4-[a-z0-9-]+$ ]] ;;
++          esac
+           [[ "$MODULE" =~ ^[a-z0-9][a-z0-9-]{0,63}$ ]]
+ 
+       - name: Checkout validation control definition
+         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+         with:
+-          ref: feature/uvanoo-v1.4-ci-validation
++          ref: ${{ github.sha }}
+           persist-credentials: false
+           fetch-depth: 1
+ 
+@@ -198,6 +202,8 @@
+       - name: Cross-tenant and cross-property enforcement
+         env:
+           UVANOO_PROPERTY_DELEGATION_INTEGRATION: '1'
++          # Fixture setup must SET ROLE; assertions still use the restricted app role.
++          SUPERADMIN_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/beaconhs_test
+         run: pnpm --filter @beaconhs/web exec vitest run src/lib/property-delegation.integration.test.ts
+       - name: Real People provenance and RLS boundary tests
+         env:

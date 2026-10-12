@@ -116,3 +116,5 @@ jobs:
           if test -f /tmp/uvanoo-storage.pid; then
             kill "$(cat /tmp/uvanoo-storage.pid)" || true
           fi
+
+# Retry identity references the original audited document, not timestamp ordering.

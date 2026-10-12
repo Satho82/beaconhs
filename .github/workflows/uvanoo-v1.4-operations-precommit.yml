@@ -1,0 +1,329 @@
+name: Uvanoo Operations recurrence precommit validation
+
+# Read-only control workflow validating exact immutable candidates in disposable services. This workflow
+# deliberately has no deploy, image, registry, SSH, or environment path.
+on:
+  push:
+    branches: [review/uvanoo-v1.4-board-20261016-cloud]
+    paths: [.github/workflows/uvanoo-v1.4-operations-precommit.yml]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: uvanoo-operations-precommit-${{ github.sha }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  validate:
+    name: Full isolated checks — quarterly and yearly proposal
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - module: migration-safety
+            source_sha: befe7efc807230862ac1cbd42ab957e1e298e7f1
+            source_branch: fix/uvanoo-v1.4-migration-safety-cloud-gates
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    services:
+      postgres:
+        image: postgres:16-alpine@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: beaconhs_test
+        ports: ['127.0.0.1:5432:5432']
+        options: >-
+          --health-cmd="pg_isready -U postgres -d beaconhs_test"
+          --health-interval=5s --health-timeout=5s --health-retries=10
+      redis:
+        image: redis:7-alpine@sha256:6ab0b6e7381779332f97b8ca76193e45b0756f38d4c0dcda72dbb3c32061ab99
+        ports: ['127.0.0.1:6379:6379']
+        options: >-
+          --health-cmd="redis-cli ping" --health-interval=5s --health-timeout=5s --health-retries=10
+    env:
+      CI: 'true'
+      NEXT_TELEMETRY_DISABLED: '1'
+      TURBO_TELEMETRY_DISABLED: '1'
+      DATABASE_URL: postgresql://beaconhs_app:beaconhs_app@localhost:5432/beaconhs_test
+      MIGRATION_DATABASE_URL: postgresql://beaconhs_migrator:beaconhs_migrator@localhost:5432/beaconhs_test
+      SUPERADMIN_DATABASE_URL: postgresql://beaconhs_super:beaconhs_super@localhost:5432/beaconhs_test
+      PEOPLE_PROVENANCE_TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/beaconhs_test
+      DATABASE_OWNER_ROLE: beaconhs_owner
+      DATABASE_BACKUP_ROLE: beaconhs_backup
+      REDIS_URL: redis://localhost:6379
+      BETTER_AUTH_SECRET: module-validation-disposable-secret-not-production
+      ATTACHMENT_CAPABILITY_SECRET: module-validation-disposable-capability-secret
+      BETTER_AUTH_URL: http://localhost:3000
+      APP_URL: http://localhost:3000
+
+    steps:
+      - name: Verify control branch and immutable input shape
+        env:
+          SOURCE_SHA: ${{ matrix.source_sha }}
+          SOURCE_BRANCH: ${{ matrix.source_branch }}
+          MODULE: ${{ matrix.module }}
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = 'Satho82/beaconhs'
+          test "$GITHUB_REF" = 'refs/heads/review/uvanoo-v1.4-board-20261016-cloud'
+          [[ "$SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]]
+          case "$MODULE:$SOURCE_BRANCH:$SOURCE_SHA" in
+            migration-safety:fix/uvanoo-v1.4-migration-safety-cloud-gates:befe7efc807230862ac1cbd42ab957e1e298e7f1) ;;
+            *) exit 1 ;;
+          esac
+          [[ "$MODULE" =~ ^[a-z0-9][a-z0-9-]{0,63}$ ]]
+
+      - name: Checkout validation control definition
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Verify source branch provenance and checkout exact candidate
+        env:
+          SOURCE_SHA: ${{ matrix.source_sha }}
+          SOURCE_BRANCH: ${{ matrix.source_branch }}
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin "refs/heads/${SOURCE_BRANCH}:refs/remotes/origin/module-validation-source"
+          git cat-file -e "${SOURCE_SHA}^{commit}"
+          git merge-base --is-ancestor "$SOURCE_SHA" origin/module-validation-source
+          git checkout --detach "$SOURCE_SHA"
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          test "$(git status --porcelain)" = ''
+          printf 'candidate_sha=%s\nsource_branch=%s\n' "$SOURCE_SHA" "$SOURCE_BRANCH" >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6
+        with:
+          run_install: false
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Verify pinned toolchain and disposable service boundaries
+        run: |
+          set -euo pipefail
+          test "$(node --version)" = "v$(tr -d '\r\n' < .nvmrc)"
+          test "pnpm@$(pnpm --version)" = "$(node -p 'JSON.parse(require("node:fs").readFileSync("package.json", "utf8")).packageManager')"
+          python3 - <<'PY'
+          import os
+          from urllib.parse import urlparse
+          expected = {
+              'DATABASE_URL': 'beaconhs_app',
+              'MIGRATION_DATABASE_URL': 'beaconhs_migrator',
+              'SUPERADMIN_DATABASE_URL': 'beaconhs_super',
+              'PEOPLE_PROVENANCE_TEST_DATABASE_URL': 'postgres',
+          }
+          for name, user in expected.items():
+              value = urlparse(os.environ[name])
+              if (value.scheme, value.hostname, value.port, value.path, value.username, value.query) != (
+                  'postgresql', 'localhost', 5432, '/beaconhs_test', user, ''):
+                  raise SystemExit('Rejected database boundary: ' + name)
+          if os.environ['REDIS_URL'] != 'redis://localhost:6379':
+              raise SystemExit('Rejected Redis boundary')
+          PY
+
+      - name: Frozen dependency install
+        run: pnpm install --frozen-lockfile
+
+      - name: Apply bounded Operations proposal without promoting source
+        run: |
+          set -euo pipefail
+          git show "$GITHUB_SHA:.github/recovery/operations-recurrence-proposal.json" > "$RUNNER_TEMP/operations-proposal.json"
+          node - <<'NODE'
+          const fs = require('node:fs')
+          const { execFileSync } = require('node:child_process')
+          const proposal = JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP + '/operations-proposal.json', 'utf8'))
+          const head = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim()
+          if (proposal.base !== head) throw new Error('Wrong proposal base')
+          const allowed = new Set(["apps/web/src/lib/hospitality/diary-rules.ts","apps/web/src/app/(app)/hospitality/properties/[propertyId]/diary/actions.ts","apps/web/src/app/(app)/hospitality/properties/[propertyId]/diary/page.tsx","apps/web/src/app/(app)/hospitality/properties/[propertyId]/diary/templates/[scheduleId]/page.tsx","apps/web/src/lib/hospitality/diary.test.ts","apps/worker/src/lib/operational-task-schedule.test.ts","apps/web/src/lib/manual/content/hospitality.ts"])
+          if (proposal.files.length !== allowed.size) throw new Error('Unexpected proposal manifest')
+          for (const item of proposal.files) {
+            if (!allowed.delete(item.path)) throw new Error('Unexpected or duplicate path')
+            const hash = execFileSync('git', ['hash-object', '--', item.path], { encoding: 'utf8' }).trim()
+            if (hash !== item.expected_blob) throw new Error('Source blob drift: ' + item.path)
+            fs.writeFileSync(item.path, item.content)
+          }
+          const paths = proposal.files.map(item => item.path)
+          for (const locale of ['en', 'es', 'fr']) {
+            const path = 'packages/i18n/src/messages/' + locale + '.json'
+            const catalog = JSON.parse(fs.readFileSync(path, 'utf8'))
+            for (const [key, value] of Object.entries(proposal.catalogs[locale])) {
+              if (!/^m_[a-f0-9]{14}$/.test(key) || typeof value !== 'string') throw new Error('Invalid message')
+              if (catalog.Generated[key] !== undefined) throw new Error('Existing catalog key would be overwritten')
+              catalog.Generated[key] = value
+            }
+            fs.writeFileSync(path, JSON.stringify(catalog, null, 2) + '\n')
+            paths.push(path)
+          }
+          execFileSync('pnpm', ['exec', 'prettier', '--write', ...paths], { stdio: 'inherit' })
+          for (const path of paths) {
+            const blob = execFileSync('git', ['hash-object', '--', path], { encoding: 'utf8' }).trim()
+            console.log('RECOVERY_BLOB ' + JSON.stringify({path, blob}))
+            if (!path.startsWith('packages/i18n/')) console.log('RECOVERY_SOURCE ' + JSON.stringify({path, content: fs.readFileSync(path, 'utf8')}))
+          }
+          fs.writeFileSync(process.env.RUNNER_TEMP + '/operations-paths.json', JSON.stringify(paths))
+          NODE
+
+      - name: Focused recurrence and localization regressions
+        run: |
+          set -euo pipefail
+          pnpm --filter @beaconhs/web exec vitest run src/lib/hospitality/diary.test.ts src/i18n/i18n-coverage.test.ts
+          pnpm --filter @beaconhs/worker exec vitest run src/lib/operational-task-schedule.test.ts
+
+      - name: Provision disposable database roles
+        env:
+          PGPASSWORD: postgres
+        run: |
+          set -euo pipefail
+          psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 <<'SQL'
+          CREATE ROLE beaconhs_owner NOLOGIN NOSUPERUSER NOBYPASSRLS;
+          CREATE ROLE beaconhs_migrator LOGIN NOINHERIT NOSUPERUSER NOBYPASSRLS PASSWORD 'beaconhs_migrator';
+          CREATE ROLE beaconhs_app LOGIN NOINHERIT NOSUPERUSER NOBYPASSRLS PASSWORD 'beaconhs_app';
+          CREATE ROLE beaconhs_super LOGIN NOINHERIT NOSUPERUSER BYPASSRLS PASSWORD 'beaconhs_super';
+          CREATE ROLE beaconhs_backup LOGIN NOINHERIT NOSUPERUSER BYPASSRLS PASSWORD 'beaconhs_backup';
+          ALTER ROLE beaconhs_backup SET default_transaction_read_only = 'on';
+          GRANT beaconhs_owner TO beaconhs_migrator;
+          ALTER DATABASE beaconhs_test OWNER TO beaconhs_owner;
+          REVOKE ALL ON DATABASE beaconhs_test FROM PUBLIC;
+          GRANT CONNECT ON DATABASE beaconhs_test TO beaconhs_migrator, beaconhs_app, beaconhs_super, beaconhs_backup;
+          \connect beaconhs_test
+          ALTER SCHEMA public OWNER TO beaconhs_owner;
+          REVOKE ALL ON SCHEMA public FROM PUBLIC;
+          SQL
+
+      - name: Formatting
+        run: pnpm format:check
+      - name: Fresh route types
+        run: |
+          set -euo pipefail
+          test ! -d apps/web/.next
+          pnpm --filter @beaconhs/web exec next typegen
+          git diff --exit-code -- apps/web/tsconfig.json apps/web/next.config.ts
+      - name: Typecheck
+        run: pnpm typecheck --concurrency=1
+      - name: Database typecheck
+        run: pnpm --filter @beaconhs/db typecheck
+      - name: Lint
+        run: pnpm lint --concurrency=1
+      - name: Dead-code gate
+        env:
+          NODE_OPTIONS: --max-old-space-size=6144
+        run: pnpm deadcode:check
+
+      - name: Validate migration journal and apply migrations
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs = require('node:fs')
+          const journal = JSON.parse(fs.readFileSync('packages/db/drizzle/meta/_journal.json', 'utf8'))
+          const tags = journal.entries.map((entry) => entry.tag)
+          if (new Set(tags).size !== tags.length || !tags.every((tag) => /^\d{4}_[a-z0-9_]+$/.test(tag))) {
+            throw new Error('Invalid or duplicate migration journal entries')
+          }
+          console.log(`migration-journal-ok: ${tags.length} entries; terminal=${tags.at(-1)}`)
+          NODE
+          pnpm --filter @beaconhs/db exec tsx src/migrate.ts
+      - name: Prove migration idempotence
+        run: pnpm --filter @beaconhs/db exec tsx src/migrate.ts
+
+      - name: Unit and regression tests
+        run: pnpm test --concurrency=1
+      - name: Cross-tenant and cross-property enforcement
+        env:
+          UVANOO_PROPERTY_DELEGATION_INTEGRATION: '1'
+          # Fixture setup deliberately SET ROLEs to the restricted app role.
+          # Use the disposable cluster admin only for this rollback-only test;
+          # the production maintenance role must not gain extra membership.
+          SUPERADMIN_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/beaconhs_test
+        run: pnpm --filter @beaconhs/web exec vitest run src/lib/property-delegation.integration.test.ts
+      - name: Real People provenance and RLS boundary tests
+        env:
+          UVANOO_PEOPLE_PROVENANCE_INTEGRATION: '1'
+        run: pnpm --filter @beaconhs/db test:people-provenance
+      - name: Related real property RLS regressions
+        env:
+          PGPASSWORD: postgres
+        run: |
+          set -euo pipefail
+          for fixture in action-property hospitality-handover-rls hospitality-metering-rls maintenance-evidence-rls incident-property-rls inspection-compliance-property-rls; do
+            if [ "$fixture" = action-property ]; then
+              pnpm --silent --filter @beaconhs/db run test:action-property-sql | psql -h localhost -U postgres -d beaconhs_test -X -v ON_ERROR_STOP=1
+            else
+              psql -h localhost -U postgres -d beaconhs_test -X -v ON_ERROR_STOP=1 < "packages/db/src/${fixture}.integration.sql"
+            fi
+          done
+
+      - name: Closed Risk revision regression
+        if: matrix.module == 'migration-safety'
+        env:
+          PGPASSWORD: postgres
+        run: psql -h localhost -U postgres -d beaconhs_test -X -v ON_ERROR_STOP=1 < packages/db/src/risk-revisions-rls.integration.sql
+
+      - name: Migration Safety isolated rollback and ACL harness
+        if: matrix.module == 'migration-safety'
+        run: |
+          set -euo pipefail
+          docker pull postgres:16-alpine@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777
+          docker tag postgres:16-alpine@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777 postgres:16-alpine
+          docker run --detach --rm --name uvanoo-migration-safety-20261012 \
+            --label uvanoo.task=migration-safety --network none --memory 768m --cpus 2 \
+            --tmpfs /var/lib/postgresql/data:rw \
+            -e POSTGRES_HOST_AUTH_METHOD=trust -e POSTGRES_DB=safety_admin postgres:16-alpine
+          ready=false
+          for attempt in $(seq 1 30); do
+            if docker exec uvanoo-migration-safety-20261012 pg_isready -U postgres -d safety_admin; then
+              ready=true
+              break
+            fi
+            sleep 1
+          done
+          test "$ready" = true
+          pnpm --filter @beaconhs/db exec tsx src/migration-safety.integration.ts
+
+      - name: Dispose only task-owned Migration Safety fixture
+        if: always() && matrix.module == 'migration-safety'
+        run: |
+          set -euo pipefail
+          if docker inspect uvanoo-migration-safety-20261012 >/dev/null 2>&1; then
+            test "$(docker inspect --format '{{ index .Config.Labels "uvanoo.task" }}' uvanoo-migration-safety-20261012)" = migration-safety
+            docker stop uvanoo-migration-safety-20261012
+          fi
+
+      - name: Deployment contract regressions without deployment
+        run: scripts/ci/v1.4-dev-candidate-deploy-contract.test.sh
+
+      - name: Production build only
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
+        run: |
+          set -euo pipefail
+          memory_kib="$(awk '/^MemTotal:/ {print $2}' /proc/meminfo)"
+          test "$memory_kib" -ge 12000000
+          pnpm build --concurrency=1
+          test -s apps/web/.next/BUILD_ID
+          test -f apps/web/.next/standalone/apps/web/server.js
+          test -f apps/worker/dist/index.js
+
+      - name: Record validated source tree without committing or deploying
+        run: |
+          set -euo pipefail
+          node - <<'NODE'
+          const fs = require('node:fs')
+          const {execFileSync} = require('node:child_process')
+          const paths = JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP + '/operations-paths.json', 'utf8'))
+          const changed = execFileSync('git', ['diff', '--name-only'], {encoding: 'utf8'}).trim().split('\n').filter(Boolean)
+          if (changed.some(path => !paths.includes(path))) throw new Error('Unexpected changed source')
+          execFileSync('git', ['add', '--', ...paths])
+          const tree = execFileSync('git', ['write-tree'], {encoding: 'utf8'}).trim()
+          console.log('RECOVERY_VALIDATED_TREE ' + tree)
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, '\nValidated precommit tree: ' + tree + '\nNo source promotion or deployment.\n')
+          NODE

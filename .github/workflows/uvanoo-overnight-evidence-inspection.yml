@@ -20,8 +20,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          gh api /repos/Satho82/beaconhs/actions/artifacts/11777954723/zip > "$RUNNER_TEMP/evidence.zip"
-          echo "5d1c96dfa2d043a0ebaca8c6cc07f7a4ad338b8823cf1801415bd115dca1593c  $RUNNER_TEMP/evidence.zip" | sha256sum --check -
+          gh api /repos/Satho82/beaconhs/actions/artifacts/11778551270/zip > "$RUNNER_TEMP/evidence.zip"
+          echo "81a92fbeaad5bedaef441e0aec570b14452e1c025f45e67091935bb736837c58  $RUNNER_TEMP/evidence.zip" | sha256sum --check -
           unzip -q "$RUNNER_TEMP/evidence.zip" -d "$RUNNER_TEMP/evidence"
       - name: Render inspection thumbnails from original captured pixels
         run: |
@@ -32,7 +32,7 @@ jobs:
           from PIL import Image
           root=pathlib.Path(os.environ['RUNNER_TEMP'])/'evidence'
           files=[('reference-approvals',pathlib.Path('docs/v1.4/batch01/visual-checkpoint/references/Uvanoo Approvals Module Dashboard (1).png'))]
-          files += [(name,root/(name+'.png')) for name in ['cluster-approvals','cluster-people','mobile-people','mobile-approvals','financial-request','request-approved','configured-workflow']]
+          files += [(name,root/(name+'.png')) for name in ['failure-6-cluster','failure-8-platform','desktop-settled-people']]
           for name,path in files:
               img=Image.open(path).convert('RGB'); original=img.size; img.thumbnail((1100,1800))
               out=io.BytesIO(); img.save(out,format='JPEG',quality=82)

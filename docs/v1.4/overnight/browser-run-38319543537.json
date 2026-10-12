@@ -1,0 +1,59 @@
+{
+  "sourceCommit": "563fb0e9b79a838a5f394abaffb2f7dc743fc571",
+  "sourceTree": "324c50a60e2cb0639ba920488a150c6531968374",
+  "scope": "Additional property reassignment and real menu navigation; no repeat release gates",
+  "checks": [
+    {
+      "name": "Focused fixture authentication platform",
+      "status": "PASS"
+    },
+    {
+      "name": "Focused fixture authentication cluster",
+      "status": "PASS"
+    },
+    {
+      "name": "Focused fixture authentication restricted",
+      "status": "PASS"
+    },
+    {
+      "name": "Desktop actual menu navigation People",
+      "status": "PASS",
+      "detail": {
+        "viewport": 1440,
+        "document": 1440
+      }
+    },
+    {
+      "name": "Desktop actual menu navigation Approvals",
+      "status": "PASS",
+      "detail": {
+        "viewport": 1440,
+        "document": 1440
+      }
+    },
+    {
+      "name": "Mobile actual menu navigation People",
+      "status": "FAIL",
+      "error": "Waiting failed: 15000ms exceeded"
+    },
+    {
+      "name": "Mobile actual menu navigation Approvals",
+      "status": "FAIL",
+      "error": "Waiting failed: 15000ms exceeded"
+    },
+    {
+      "name": "Property reassignment, live-session isolation and restoration through UI",
+      "status": "FAIL",
+      "error": "Visible control missing: One Fifty Fenchurch"
+    }
+  ],
+  "screenshots": [
+    "desktop-settled-people.png",
+    "desktop-settled-approvals.png"
+  ],
+  "runtimeErrors": [],
+  "gaps": [
+    "Original People mock-up comparison remains NOT VERIFIED until the approved People original is recovered. Screenshots require visual review."
+  ],
+  "status": "ACCEPTANCE_GAPS"
+}

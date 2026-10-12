@@ -2,11 +2,11 @@
   "repository": "Satho82/beaconhs",
   "reviewDate": "2026-10-12",
   "boardDate": "2026-10-16",
-  "status": "validation_checkpoint_not_board_release",
+  "status": "authorised_cloud_continuation_not_board_release",
   "authoritative": {
-    "governed": "6976a851c18e879df1813bb7c18729d6da5ab846",
+    "governed": "d18f635a41f092e9e86aa6f53518f9c28992b0d2",
     "main": "665cf958cb5886eeeaad4f94448504108bcb9bd5",
-    "migrationSafety": "6892670fd33e0fe12a1862bb822b451cd1bf7b44",
+    "migrationSafety": "befe7efc807230862ac1cbd42ab957e1e298e7f1",
     "people": "0a4a04ca13758b68068f9483a3c0816b741478d8",
     "approvals": "fed0709f79922d003aefbdb6674e5b92270bdeea"
   },
@@ -27,8 +27,16 @@
       "precommitDatabaseRun": 38277765802,
       "precommitBuildRun": 38277089799,
       "exactSourceRun": 38278704970,
-      "exactSourceRunStatus": "in_progress",
-      "frozen": false
+      "exactSourceRunStatus": "success",
+      "frozen": false,
+      "integrationPullRequest": 7,
+      "integrationMerge": "d18f635a41f092e9e86aa6f53518f9c28992b0d2",
+      "integrationTree": "cac8f1184b7852629aab49e77f49a693abd0e350",
+      "governedFastDevRun": 38281825816,
+      "governedFastDevStatus": "success",
+      "governedFullReleaseRun": 38281825733,
+      "governedFullReleaseStatus": "in_progress",
+      "all61SqlBodiesPreserved": true
     },
     "people": {
       "sha": "0a4a04ca13758b68068f9483a3c0816b741478d8",
@@ -38,7 +46,7 @@
       "buildRun": 38277089799,
       "buildPassed": true,
       "exactSourceRun": 38278704970,
-      "exactSourceRunStatus": "in_progress",
+      "exactSourceRunStatus": "success",
       "frozen": false,
       "remaining": [
         "authenticated visual acceptance",
@@ -59,13 +67,27 @@
       },
       "frozen": false,
       "remaining": [
-        "dead-code correction not promoted while full gates fail",
-        "129 untranslated JSX/attribute occurrences and missing catalog entries",
-        "captured DEV contract required by separate full Batch01 script",
-        "canonical migration registration",
-        "production routes and source adapters",
-        "authenticated functional and visual acceptance"
-      ]
+        "Full validation and source promotion of localization/dead-code correction plus canonical migration registration",
+        "Captured DEV contract required by separate full Batch01 script",
+        "Production routes and source adapters",
+        "Authenticated functional and visual acceptance"
+      ],
+      "localizationProposalRun": 38282493823,
+      "localizationProposalStatus": "failure",
+      "localizationFocusedChecks": "passed",
+      "failure": "Canonical migration/RLS installation: approval_workflows does not exist",
+      "registrationProposalRun": 38283560133,
+      "registrationProposalControl": "eb18ce86e14a1b6aaf62922c339c7b846b538b8e",
+      "registrationProposalStatus": "in_progress"
+    },
+    "operationsRecurrence": {
+      "status": "precommit_proposal",
+      "sourceBase": "befe7efc807230862ac1cbd42ab957e1e298e7f1",
+      "workflowControl": "03c540813d76a83c342abcd080e6f51ac59e9257",
+      "run": 38281652878,
+      "runStatus": "in_progress",
+      "focusedChecks": "passed",
+      "frozen": false
     }
   },
   "controls": {
@@ -79,7 +101,7 @@
     "supplementalCorrectedBuildHeapMiB": 8192
   },
   "release": {
-    "mergeAuthorized": false,
+    "mergeAuthorized": true,
     "devReleaseAuthorized": false,
     "persistentDevChanged": false,
     "sharedDatabaseChanged": false,
@@ -91,8 +113,26 @@
       "fresh read-only runtime and migration ledger identity",
       "protected-data inventory and checksums",
       "verified backup and restore rehearsal",
-      "data-preserving rollback plan and writer fencing",
-      "explicit authorization for that exact DEV release"
-    ]
+      "data-preserving rollback plan and writer fencing"
+    ],
+    "authorization": "Owner authorised cloud continuation, governed integration and release preparation; no deployment while security/data gates remain unmet.",
+    "cloudVpsConnector": "offline"
+  },
+  "demo": {
+    "run": 38282657644,
+    "overallConclusion": "failure",
+    "seedJob": 114923418950,
+    "seedJobConclusion": "success",
+    "rollbackOnlyScenariosPassed": 14,
+    "authenticatedLogins": 19,
+    "properties": [
+      "One Fifty Fenchurch",
+      "The Lincoln Suites"
+    ],
+    "boardAnchorDryRun": "2026-10-16T12:00:00.000Z",
+    "liveReadinessJob": 114923419199,
+    "liveReadinessConclusion": "failure",
+    "liveReadinessHttpStatus": 401,
+    "persistentDevSeeded": false
   }
 }

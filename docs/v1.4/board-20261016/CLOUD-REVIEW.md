@@ -1,3 +1,5 @@
+> Current continuation status: see [EMERGENCY-CONTINUATION.md](./EMERGENCY-CONTINUATION.md) and [CANDIDATE-STATUS.json](./CANDIDATE-STATUS.json). The chronological review below preserves historical facts and authorization boundaries; later verified checkpoints supersede earlier pending states.
+
 # Uvanoo V1.4 — cloud Board readiness review
 Board: Friday 16 October 2026. Review date: 12 October 2026.
 Status: REVIEW CHECKPOINT — NOT FROZEN, NOT RELEASE APPROVED.

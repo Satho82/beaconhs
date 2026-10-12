@@ -1,0 +1,2666 @@
+Successful isolated database proof: run 38277765802, control fa3e8ad044a03b9af2add540ba3773d7ce3efc9f.
+Original source 6892670fd33e0fe12a1862bb822b451cd1bf7b44 plus preserved internal-export patch and current-Risk synthetic fixture patch. This is patched-tree evidence, not a frozen source commit or DEV backup evidence.
+
+{
+  "jobs": [
+    {
+      "id": 114907330242,
+      "name": "Isolated database regressions — pinned Safety patches (migration-safety, 6892670fd33e0fe12a1862...",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 38277765802,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Initialize containers",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Verify control branch and immutable input shape",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Checkout validation control definition",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Verify source branch provenance and checkout exact candidate",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Apply and verify preserved precommit correction",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Apply current-schema synthetic fixture correction",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "Run pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8
+        },
+        {
+          "name": "Run actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "Verify pinned toolchain and disposable service boundaries",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Frozen dependency install",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        },
+        {
+          "name": "Provision disposable database roles",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12
+        },
+        {
+          "name": "Validate migration journal and apply migrations",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13
+        },
+        {
+          "name": "Prove migration idempotence",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 14
+        },
+        {
+          "name": "Related real property RLS regressions",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 15
+        },
+        {
+          "name": "Migration Safety isolated rollback and ACL harness",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 16
+        },
+        {
+          "name": "Dispose only task-owned Migration Safety fixture",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 17
+        },
+        {
+          "name": "Post Run actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 31
+        },
+        {
+          "name": "Post Run pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 32
+        },
+        {
+          "name": "Post Checkout validation control definition",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 33
+        },
+        {
+          "name": "Stop containers",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 34
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 35
+        }
+      ]
+    }
+  ]
+}\n
+﻿2026-10-12T16:29:41.4475834Z Current runner version: '2.337.0'
+2026-10-12T16:29:41.4499617Z ##[group]Runner Image Provisioner
+2026-10-12T16:29:41.4500505Z Hosted Compute Agent
+2026-10-12T16:29:41.4501170Z Version: 20261002.596
+2026-10-12T16:29:41.4501780Z Commit: c3d12f3313a95f25162a1503be624f3b0617f8c0
+2026-10-12T16:29:41.4502522Z Build Date: 2026-10-02T22:28:27Z
+2026-10-12T16:29:41.4503271Z Worker ID: {dc9ccd34-92cc-43a1-aa4c-b8e3e172d0bb}
+2026-10-12T16:29:41.4503961Z Region: westus3
+2026-10-12T16:29:41.4504534Z Cloud: Azure
+2026-10-12T16:29:41.4505057Z ##[endgroup]
+2026-10-12T16:29:41.4506335Z ##[group]Operating System
+2026-10-12T16:29:41.4506971Z Ubuntu
+2026-10-12T16:29:41.4507491Z 24.04.5
+2026-10-12T16:29:41.4508015Z LTS
+2026-10-12T16:29:41.4508523Z ##[endgroup]
+2026-10-12T16:29:41.4509050Z ##[group]Runner Image
+2026-10-12T16:29:41.4509990Z Image: ubuntu-24.04
+2026-10-12T16:29:41.4510571Z Version: 20261004.327.1
+2026-10-12T16:29:41.4511806Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261004.327/images/ubuntu/Ubuntu2404-Readme.md
+2026-10-12T16:29:41.4513226Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261004.327
+2026-10-12T16:29:41.4514250Z ##[endgroup]
+2026-10-12T16:29:41.4515286Z ##[group]GITHUB_TOKEN Permissions
+2026-10-12T16:29:41.4517673Z Contents: read
+2026-10-12T16:29:41.4518332Z Metadata: read
+2026-10-12T16:29:41.4518943Z ##[endgroup]
+2026-10-12T16:29:41.4521135Z Secret source: Actions
+2026-10-12T16:29:41.4522075Z Cache mode: write
+2026-10-12T16:29:41.4522729Z Prepare workflow directory
+2026-10-12T16:29:41.4948672Z Prepare all required actions
+2026-10-12T16:29:41.4997186Z Getting action download info
+2026-10-12T16:29:41.8207188Z Download action repository 'actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0' (SHA:9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0)
+2026-10-12T16:29:41.9329954Z Download action repository 'pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271' (SHA:0ebf47130e4866e96fce0953f49152a61190b271)
+2026-10-12T16:29:42.4370328Z Download action repository 'actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e' (SHA:48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e)
+2026-10-12T16:29:42.6812631Z Complete job name: Isolated database regressions — pinned Safety patches (migration-safety, 6892670fd33e0fe12a1862...
+2026-10-12T16:29:42.7307189Z ##[group]Checking docker version
+2026-10-12T16:29:42.7319905Z ##[command]/usr/bin/docker version --format '{{.Server.APIVersion}}'
+2026-10-12T16:29:43.7778114Z '1.48'
+2026-10-12T16:29:43.7791560Z Docker daemon API version: '1.48'
+2026-10-12T16:29:43.7793935Z ##[command]/usr/bin/docker version --format '{{.Client.APIVersion}}'
+2026-10-12T16:29:43.7980439Z '1.48'
+2026-10-12T16:29:43.7993087Z Docker client API version: '1.48'
+2026-10-12T16:29:43.7999813Z ##[endgroup]
+2026-10-12T16:29:43.8002762Z ##[group]Clean up resources from previous jobs
+2026-10-12T16:29:43.8008645Z ##[command]/usr/bin/docker ps --all --quiet --no-trunc --filter "label=aa3037"
+2026-10-12T16:29:43.8241107Z ##[command]/usr/bin/docker network prune --force --filter "label=aa3037"
+2026-10-12T16:29:43.8378483Z ##[endgroup]
+2026-10-12T16:29:43.8380231Z ##[group]Create local container network
+2026-10-12T16:29:43.8392266Z ##[command]/usr/bin/docker network create --label aa3037 github_network_5cf34ae7c21e4692946131636cadfb7d
+2026-10-12T16:29:43.8911603Z bee7a1845f87f0873fb874dc9ef9723a24f11ae4d9fafe0c32029e016bdf9aaa
+2026-10-12T16:29:43.8931724Z ##[endgroup]
+2026-10-12T16:29:43.8963924Z ##[group]Starting postgres service container
+2026-10-12T16:29:43.8988101Z ##[command]/usr/bin/docker pull postgres:16-alpine@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777
+2026-10-12T16:29:44.5719279Z docker.io/library/postgres@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777: Pulling from library/postgres
+2026-10-12T16:29:44.8117757Z 55afa1ecc21d: Already exists
+2026-10-12T16:29:44.8278345Z 0749aef11dca: Pulling fs layer
+2026-10-12T16:29:44.8280337Z 2d3064b8615b: Pulling fs layer
+2026-10-12T16:29:44.8281032Z ef6ab46d98b2: Pulling fs layer
+2026-10-12T16:29:44.8281990Z 689a434e3a86: Pulling fs layer
+2026-10-12T16:29:44.8282444Z 2f537278bc74: Pulling fs layer
+2026-10-12T16:29:44.8282938Z 4096c457dc0d: Pulling fs layer
+2026-10-12T16:29:44.8283381Z c86ab38aa6db: Pulling fs layer
+2026-10-12T16:29:44.8283923Z 713473b5b92b: Pulling fs layer
+2026-10-12T16:29:44.8284495Z 7af924000309: Pulling fs layer
+2026-10-12T16:29:44.8285143Z cc7fa208b8a7: Pulling fs layer
+2026-10-12T16:29:44.8285791Z 2f537278bc74: Waiting
+2026-10-12T16:29:44.8286344Z 4096c457dc0d: Waiting
+2026-10-12T16:29:44.8286838Z c86ab38aa6db: Waiting
+2026-10-12T16:29:44.8287477Z 713473b5b92b: Waiting
+2026-10-12T16:29:44.8288034Z 7af924000309: Waiting
+2026-10-12T16:29:44.8288404Z cc7fa208b8a7: Waiting
+2026-10-12T16:29:44.8288949Z 689a434e3a86: Waiting
+2026-10-12T16:29:45.0127730Z 2d3064b8615b: Download complete
+2026-10-12T16:29:45.0254799Z ef6ab46d98b2: Verifying Checksum
+2026-10-12T16:29:45.0255749Z ef6ab46d98b2: Download complete
+2026-10-12T16:29:45.0956856Z 0749aef11dca: Pull complete
+2026-10-12T16:29:45.1561425Z 2d3064b8615b: Pull complete
+2026-10-12T16:29:45.1726995Z ef6ab46d98b2: Pull complete
+2026-10-12T16:29:45.1895493Z 689a434e3a86: Download complete
+2026-10-12T16:29:45.1920283Z 4096c457dc0d: Verifying Checksum
+2026-10-12T16:29:45.1922589Z 4096c457dc0d: Download complete
+2026-10-12T16:29:45.2024140Z 689a434e3a86: Pull complete
+2026-10-12T16:29:45.3658282Z 713473b5b92b: Verifying Checksum
+2026-10-12T16:29:45.3669865Z 713473b5b92b: Download complete
+2026-10-12T16:29:45.3670683Z c86ab38aa6db: Verifying Checksum
+2026-10-12T16:29:45.3671668Z c86ab38aa6db: Download complete
+2026-10-12T16:29:45.4610532Z 2f537278bc74: Download complete
+2026-10-12T16:29:45.5400430Z 7af924000309: Download complete
+2026-10-12T16:29:45.5489012Z cc7fa208b8a7: Verifying Checksum
+2026-10-12T16:29:45.5490786Z cc7fa208b8a7: Download complete
+2026-10-12T16:29:48.9841476Z 2f537278bc74: Pull complete
+2026-10-12T16:29:48.9956409Z 4096c457dc0d: Pull complete
+2026-10-12T16:29:49.0068086Z c86ab38aa6db: Pull complete
+2026-10-12T16:29:49.0196700Z 713473b5b92b: Pull complete
+2026-10-12T16:29:49.0283411Z 7af924000309: Pull complete
+2026-10-12T16:29:49.0375154Z cc7fa208b8a7: Pull complete
+2026-10-12T16:29:49.0416083Z Digest: sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777
+2026-10-12T16:29:49.0422850Z Status: Downloaded newer image for postgres@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777
+2026-10-12T16:29:49.0435485Z docker.io/library/postgres:16-alpine@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777
+2026-10-12T16:29:49.0500719Z ##[command]/usr/bin/docker create --name 7f04e4e434f2414dafb8cd9598a33a2f_postgres16alpinesha25657c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777_5387ec --label aa3037 --network github_network_5cf34ae7c21e4692946131636cadfb7d --network-alias postgres -p 127.0.0.1:5432:5432 --health-cmd="pg_isready -U postgres -d beaconhs_test" --health-interval=5s --health-timeout=5s --health-retries=10 -e "POSTGRES_USER=postgres" -e "POSTGRES_PASSWORD=postgres" -e "POSTGRES_DB=beaconhs_test" -e GITHUB_ACTIONS=true -e CI=true postgres:16-alpine@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777
+2026-10-12T16:29:49.0761482Z a25cb4782fee63e76bea559aa92685af483354908fb073a6b356cd291f9f59e1
+2026-10-12T16:29:49.0779615Z ##[command]/usr/bin/docker start a25cb4782fee63e76bea559aa92685af483354908fb073a6b356cd291f9f59e1
+2026-10-12T16:29:49.7266839Z a25cb4782fee63e76bea559aa92685af483354908fb073a6b356cd291f9f59e1
+2026-10-12T16:29:49.7281077Z ##[command]/usr/bin/docker ps --all --filter id=a25cb4782fee63e76bea559aa92685af483354908fb073a6b356cd291f9f59e1 --filter status=running --no-trunc --format "{{.ID}} {{.Status}}"
+2026-10-12T16:29:49.7411313Z a25cb4782fee63e76bea559aa92685af483354908fb073a6b356cd291f9f59e1 Up Less than a second (health: starting)
+2026-10-12T16:29:49.7427149Z ##[command]/usr/bin/docker port a25cb4782fee63e76bea559aa92685af483354908fb073a6b356cd291f9f59e1
+2026-10-12T16:29:49.7560479Z 5432/tcp -> 127.0.0.1:5432
+2026-10-12T16:29:49.7600820Z ##[endgroup]
+2026-10-12T16:29:49.7602737Z ##[group]Starting redis service container
+2026-10-12T16:29:49.7604378Z ##[command]/usr/bin/docker pull redis:7-alpine@sha256:6ab0b6e7381779332f97b8ca76193e45b0756f38d4c0dcda72dbb3c32061ab99
+2026-10-12T16:29:50.3017479Z docker.io/library/redis@sha256:6ab0b6e7381779332f97b8ca76193e45b0756f38d4c0dcda72dbb3c32061ab99: Pulling from library/redis
+2026-10-12T16:29:50.5716075Z 897d797d2723: Pulling fs layer
+2026-10-12T16:29:50.5716825Z c14c7509f545: Pulling fs layer
+2026-10-12T16:29:50.5731975Z f546396032e0: Pulling fs layer
+2026-10-12T16:29:50.5732868Z a300455a02bb: Pulling fs layer
+2026-10-12T16:29:50.5733434Z 941ebb020cf0: Pulling fs layer
+2026-10-12T16:29:50.5734074Z 4f4fb700ef54: Pulling fs layer
+2026-10-12T16:29:50.5734653Z 677c7c5aa821: Pulling fs layer
+2026-10-12T16:29:50.5735247Z a300455a02bb: Waiting
+2026-10-12T16:29:50.5735746Z 941ebb020cf0: Waiting
+2026-10-12T16:29:50.5736196Z 4f4fb700ef54: Waiting
+2026-10-12T16:29:50.5736804Z 677c7c5aa821: Waiting
+2026-10-12T16:29:50.7527348Z c14c7509f545: Verifying Checksum
+2026-10-12T16:29:50.7624543Z c14c7509f545: Download complete
+2026-10-12T16:29:50.7625237Z f546396032e0: Download complete
+2026-10-12T16:29:50.7693098Z 897d797d2723: Verifying Checksum
+2026-10-12T16:29:50.7693931Z 897d797d2723: Download complete
+2026-10-12T16:29:50.9455657Z 941ebb020cf0: Verifying Checksum
+2026-10-12T16:29:50.9457240Z 941ebb020cf0: Download complete
+2026-10-12T16:29:50.9497900Z 4f4fb700ef54: Verifying Checksum
+2026-10-12T16:29:50.9498877Z 4f4fb700ef54: Download complete
+2026-10-12T16:29:50.9625508Z a300455a02bb: Verifying Checksum
+2026-10-12T16:29:50.9626278Z a300455a02bb: Download complete
+2026-10-12T16:29:51.0426935Z 897d797d2723: Pull complete
+2026-10-12T16:29:51.1274059Z 677c7c5aa821: Verifying Checksum
+2026-10-12T16:29:51.1274629Z 677c7c5aa821: Download complete
+2026-10-12T16:29:51.1880383Z c14c7509f545: Pull complete
+2026-10-12T16:29:51.3081242Z f546396032e0: Pull complete
+2026-10-12T16:29:51.6524360Z a300455a02bb: Pull complete
+2026-10-12T16:29:51.6628070Z 941ebb020cf0: Pull complete
+2026-10-12T16:29:51.6733398Z 4f4fb700ef54: Pull complete
+2026-10-12T16:29:51.6822493Z 677c7c5aa821: Pull complete
+2026-10-12T16:29:51.6862927Z Digest: sha256:6ab0b6e7381779332f97b8ca76193e45b0756f38d4c0dcda72dbb3c32061ab99
+2026-10-12T16:29:51.6870326Z Status: Downloaded newer image for redis@sha256:6ab0b6e7381779332f97b8ca76193e45b0756f38d4c0dcda72dbb3c32061ab99
+2026-10-12T16:29:51.6879865Z docker.io/library/redis:7-alpine@sha256:6ab0b6e7381779332f97b8ca76193e45b0756f38d4c0dcda72dbb3c32061ab99
+2026-10-12T16:29:51.6901548Z ##[command]/usr/bin/docker create --name f92387714d034069a3e2934b9ff5a51f_redis7alpinesha2566ab0b6e7381779332f97b8ca76193e45b0756f38d4c0dcda72dbb3c32061ab99_1fe96f --label aa3037 --network github_network_5cf34ae7c21e4692946131636cadfb7d --network-alias redis -p 127.0.0.1:6379:6379 --health-cmd="redis-cli ping" --health-interval=5s --health-timeout=5s --health-retries=10 -e GITHUB_ACTIONS=true -e CI=true redis:7-alpine@sha256:6ab0b6e7381779332f97b8ca76193e45b0756f38d4c0dcda72dbb3c32061ab99
+2026-10-12T16:29:51.7124521Z 81d7806ed24fa5952bd18cd7bc6cc67cb82a99c6a1049d24312223b80427c456
+2026-10-12T16:29:51.7133766Z ##[command]/usr/bin/docker start 81d7806ed24fa5952bd18cd7bc6cc67cb82a99c6a1049d24312223b80427c456
+2026-10-12T16:29:51.8353356Z 81d7806ed24fa5952bd18cd7bc6cc67cb82a99c6a1049d24312223b80427c456
+2026-10-12T16:29:51.8365349Z ##[command]/usr/bin/docker ps --all --filter id=81d7806ed24fa5952bd18cd7bc6cc67cb82a99c6a1049d24312223b80427c456 --filter status=running --no-trunc --format "{{.ID}} {{.Status}}"
+2026-10-12T16:29:51.8504673Z 81d7806ed24fa5952bd18cd7bc6cc67cb82a99c6a1049d24312223b80427c456 Up Less than a second (health: starting)
+2026-10-12T16:29:51.8512626Z ##[command]/usr/bin/docker port 81d7806ed24fa5952bd18cd7bc6cc67cb82a99c6a1049d24312223b80427c456
+2026-10-12T16:29:51.8634196Z 6379/tcp -> 127.0.0.1:6379
+2026-10-12T16:29:51.8643669Z ##[endgroup]
+2026-10-12T16:29:51.8654986Z ##[group]Waiting for all services to be ready
+2026-10-12T16:29:51.8669627Z ##[command]/usr/bin/docker inspect --format="{{if .Config.Healthcheck}}{{print .State.Health.Status}}{{end}}" a25cb4782fee63e76bea559aa92685af483354908fb073a6b356cd291f9f59e1
+2026-10-12T16:29:51.8792636Z starting
+2026-10-12T16:29:51.8808372Z postgres service is starting, waiting 2 seconds before checking again.
+2026-10-12T16:29:53.8810973Z ##[command]/usr/bin/docker inspect --format="{{if .Config.Healthcheck}}{{print .State.Health.Status}}{{end}}" a25cb4782fee63e76bea559aa92685af483354908fb073a6b356cd291f9f59e1
+2026-10-12T16:29:53.8947633Z starting
+2026-10-12T16:29:53.8958116Z postgres service is starting, waiting 4 seconds before checking again.
+2026-10-12T16:29:58.0582092Z ##[command]/usr/bin/docker inspect --format="{{if .Config.Healthcheck}}{{print .State.Health.Status}}{{end}}" a25cb4782fee63e76bea559aa92685af483354908fb073a6b356cd291f9f59e1
+2026-10-12T16:29:58.0713313Z healthy
+2026-10-12T16:29:58.0726271Z postgres service is healthy.
+2026-10-12T16:29:58.0727211Z ##[command]/usr/bin/docker inspect --format="{{if .Config.Healthcheck}}{{print .State.Health.Status}}{{end}}" 81d7806ed24fa5952bd18cd7bc6cc67cb82a99c6a1049d24312223b80427c456
+2026-10-12T16:29:58.0855892Z healthy
+2026-10-12T16:29:58.0864823Z redis service is healthy.
+2026-10-12T16:29:58.0865339Z ##[endgroup]
+2026-10-12T16:29:58.1084779Z ##[group]Run set -euo pipefail
+2026-10-12T16:29:58.1085374Z [36;1mset -euo pipefail[0m
+2026-10-12T16:29:58.1085830Z [36;1mtest "$GITHUB_REPOSITORY" = 'Satho82/beaconhs'[0m
+2026-10-12T16:29:58.1086393Z [36;1mtest "$GITHUB_REF" = 'refs/heads/review/uvanoo-v1.4-board-20261016-cloud'[0m
+2026-10-12T16:29:58.1086961Z [36;1m[[ "$SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]][0m
+2026-10-12T16:29:58.1087381Z [36;1mcase "$MODULE:$SOURCE_BRANCH:$SOURCE_SHA" in[0m
+2026-10-12T16:29:58.1087975Z [36;1m  migration-safety:chore/v1.4-migration-safety:6892670fd33e0fe12a1862bb822b451cd1bf7b44) ;;[0m
+2026-10-12T16:29:58.1088528Z [36;1m  *) exit 1 ;;[0m
+2026-10-12T16:29:58.1088839Z [36;1mesac[0m
+2026-10-12T16:29:58.1089251Z [36;1m[[ "$MODULE" =~ ^[a-z0-9][a-z0-9-]{0,63}$ ]][0m
+2026-10-12T16:29:58.1232152Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-10-12T16:29:58.1232939Z env:
+2026-10-12T16:29:58.1233225Z   CI: true
+2026-10-12T16:29:58.1233563Z   NEXT_TELEMETRY_DISABLED: 1
+2026-10-12T16:29:58.1234032Z   TURBO_TELEMETRY_DISABLED: 1
+2026-10-12T16:29:58.1235017Z   DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:29:58.1235710Z   MIGRATION_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:29:58.1236431Z   SUPERADMIN_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:29:58.1237050Z   PEOPLE_PROVENANCE_TEST_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:29:58.1237557Z   DATABASE_OWNER_ROLE: beaconhs_owner
+2026-10-12T16:29:58.1237956Z   DATABASE_BACKUP_ROLE: beaconhs_backup
+2026-10-12T16:29:58.1238327Z   REDIS_URL: redis://localhost:6379
+2026-10-12T16:29:58.1238835Z   BETTER_AUTH_SECRET: module-validation-disposable-secret-not-production
+2026-10-12T16:29:58.1239588Z   ATTACHMENT_CAPABILITY_SECRET: module-validation-disposable-capability-secret
+2026-10-12T16:29:58.1240109Z   BETTER_AUTH_URL: http://localhost:3000
+2026-10-12T16:29:58.1240524Z   APP_URL: http://localhost:3000
+2026-10-12T16:29:58.1241077Z   SOURCE_SHA: 6892670fd33e0fe12a1862bb822b451cd1bf7b44
+2026-10-12T16:29:58.1241559Z   SOURCE_BRANCH: chore/v1.4-migration-safety
+2026-10-12T16:29:58.1241934Z   MODULE: migration-safety
+2026-10-12T16:29:58.1242265Z ##[endgroup]
+2026-10-12T16:29:58.1557040Z ##[group]Run actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+2026-10-12T16:29:58.1557632Z with:
+2026-10-12T16:29:58.1558075Z   ref: fa3e8ad044a03b9af2add540ba3773d7ce3efc9f
+2026-10-12T16:29:58.1558499Z   persist-credentials: false
+2026-10-12T16:29:58.1558873Z   fetch-depth: 1
+2026-10-12T16:29:58.1559197Z   repository: Satho82/beaconhs
+2026-10-12T16:29:58.1562243Z   token: ***
+2026-10-12T16:29:58.1562571Z   ssh-strict: true
+2026-10-12T16:29:58.1562876Z   ssh-user: git
+2026-10-12T16:29:58.1563340Z   clean: true
+2026-10-12T16:29:58.1563685Z   sparse-checkout-cone-mode: true
+2026-10-12T16:29:58.1564033Z   fetch-tags: false
+2026-10-12T16:29:58.1564407Z   show-progress: true
+2026-10-12T16:29:58.1564710Z   lfs: false
+2026-10-12T16:29:58.1565034Z   submodules: false
+2026-10-12T16:29:58.1565366Z   set-safe-directory: true
+2026-10-12T16:29:58.1565692Z   allow-unsafe-pr-checkout: false
+2026-10-12T16:29:58.1566059Z env:
+2026-10-12T16:29:58.1566336Z   CI: true
+2026-10-12T16:29:58.1566763Z   NEXT_TELEMETRY_DISABLED: 1
+2026-10-12T16:29:58.1567130Z   TURBO_TELEMETRY_DISABLED: 1
+2026-10-12T16:29:58.1567718Z   DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:29:58.1568364Z   MIGRATION_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:29:58.1568972Z   SUPERADMIN_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:29:58.1569859Z   PEOPLE_PROVENANCE_TEST_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:29:58.1570305Z   DATABASE_OWNER_ROLE: beaconhs_owner
+2026-10-12T16:29:58.1570719Z   DATABASE_BACKUP_ROLE: beaconhs_backup
+2026-10-12T16:29:58.1571111Z   REDIS_URL: redis://localhost:6379
+2026-10-12T16:29:58.1571630Z   BETTER_AUTH_SECRET: module-validation-disposable-secret-not-production
+2026-10-12T16:29:58.1572259Z   ATTACHMENT_CAPABILITY_SECRET: module-validation-disposable-capability-secret
+2026-10-12T16:29:58.1572750Z   BETTER_AUTH_URL: http://localhost:3000
+2026-10-12T16:29:58.1573160Z   APP_URL: http://localhost:3000
+2026-10-12T16:29:58.1573504Z ##[endgroup]
+2026-10-12T16:29:58.2579934Z Syncing repository: Satho82/beaconhs
+2026-10-12T16:29:58.2582181Z ##[group]Getting Git version info
+2026-10-12T16:29:58.2582825Z Working directory is '/home/runner/work/beaconhs/beaconhs'
+2026-10-12T16:29:58.2583950Z [command]/usr/bin/git version
+2026-10-12T16:29:58.2588575Z git version 2.55.0
+2026-10-12T16:29:58.2607136Z ##[endgroup]
+2026-10-12T16:29:58.2618764Z Temporarily overriding HOME='/home/runner/work/_temp/828e6a9b-5bf7-40a3-a1da-05c7a4aae9cf' before making global git config changes
+2026-10-12T16:29:58.2620282Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-12T16:29:58.2625114Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/beaconhs/beaconhs
+2026-10-12T16:29:58.2678758Z Deleting the contents of '/home/runner/work/beaconhs/beaconhs'
+2026-10-12T16:29:58.2684252Z ##[group]Determining repository object format
+2026-10-12T16:29:58.2685658Z ##[endgroup]
+2026-10-12T16:29:58.2686867Z ##[group]Initializing the repository
+2026-10-12T16:29:58.2688883Z [command]/usr/bin/git init /home/runner/work/beaconhs/beaconhs
+2026-10-12T16:29:58.2788061Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-10-12T16:29:58.2790647Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-10-12T16:29:58.2791645Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-10-12T16:29:58.2792348Z hint: call:
+2026-10-12T16:29:58.2792775Z hint:
+2026-10-12T16:29:58.2793392Z hint: 	git config --global init.defaultBranch <name>
+2026-10-12T16:29:58.2793864Z hint:
+2026-10-12T16:29:58.2794438Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-10-12T16:29:58.2795552Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-10-12T16:29:58.2796118Z hint:
+2026-10-12T16:29:58.2796479Z hint: 	git branch -m <name>
+2026-10-12T16:29:58.2796787Z hint:
+2026-10-12T16:29:58.2797385Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-10-12T16:29:58.2798123Z Initialized empty Git repository in /home/runner/work/beaconhs/beaconhs/.git/
+2026-10-12T16:29:58.2803224Z [command]/usr/bin/git remote add origin https://github.com/Satho82/beaconhs
+2026-10-12T16:29:58.2854692Z ##[endgroup]
+2026-10-12T16:29:58.2855384Z ##[group]Disabling automatic garbage collection
+2026-10-12T16:29:58.2859817Z [command]/usr/bin/git config --local gc.auto 0
+2026-10-12T16:29:58.2892420Z ##[endgroup]
+2026-10-12T16:29:58.2893018Z ##[group]Setting up auth
+2026-10-12T16:29:58.2893784Z Removing SSH command configuration
+2026-10-12T16:29:58.2901444Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-12T16:29:58.2935586Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-12T16:29:58.3268279Z Removing HTTP extra header
+2026-10-12T16:29:58.3275512Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-12T16:29:58.3306991Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-12T16:29:58.3511055Z Removing includeIf entries pointing to credentials config files
+2026-10-12T16:29:58.3516255Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-12T16:29:58.3558377Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-12T16:29:58.3753844Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-f0495099-8dd8-4db5-aadd-1440beb4fe51.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-10-12T16:29:58.3792305Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/beaconhs/beaconhs/.git.path /home/runner/work/_temp/git-credentials-f0495099-8dd8-4db5-aadd-1440beb4fe51.config
+2026-10-12T16:29:58.3822158Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/beaconhs/beaconhs/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-f0495099-8dd8-4db5-aadd-1440beb4fe51.config
+2026-10-12T16:29:58.3854326Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-f0495099-8dd8-4db5-aadd-1440beb4fe51.config
+2026-10-12T16:29:58.3883827Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-f0495099-8dd8-4db5-aadd-1440beb4fe51.config
+2026-10-12T16:29:58.3911318Z ##[endgroup]
+2026-10-12T16:29:58.3912140Z ##[group]Fetching the repository
+2026-10-12T16:29:58.3918802Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin fa3e8ad044a03b9af2add540ba3773d7ce3efc9f
+2026-10-12T16:30:00.8378668Z From https://github.com/Satho82/beaconhs
+2026-10-12T16:30:00.8380075Z  * branch            fa3e8ad044a03b9af2add540ba3773d7ce3efc9f -> FETCH_HEAD
+2026-10-12T16:30:00.8389671Z [command]/usr/bin/git rev-parse --verify --quiet fa3e8ad044a03b9af2add540ba3773d7ce3efc9f^{object}
+2026-10-12T16:30:00.8416844Z fa3e8ad044a03b9af2add540ba3773d7ce3efc9f
+2026-10-12T16:30:00.8430073Z ##[endgroup]
+2026-10-12T16:30:00.8430970Z ##[group]Determining the checkout info
+2026-10-12T16:30:00.8431779Z ##[endgroup]
+2026-10-12T16:30:00.8432340Z [command]/usr/bin/git sparse-checkout disable
+2026-10-12T16:30:00.8487935Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-10-12T16:30:00.8518388Z ##[group]Checking out the ref
+2026-10-12T16:30:00.8523633Z [command]/usr/bin/git checkout --progress --force fa3e8ad044a03b9af2add540ba3773d7ce3efc9f
+2026-10-12T16:30:01.1642723Z Note: switching to 'fa3e8ad044a03b9af2add540ba3773d7ce3efc9f'.
+2026-10-12T16:30:01.1643631Z 
+2026-10-12T16:30:01.1644635Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-10-12T16:30:01.1645482Z changes and commit them, and you can discard any commits you make in this
+2026-10-12T16:30:01.1646325Z state without impacting any branches by switching back to a branch.
+2026-10-12T16:30:01.1646798Z 
+2026-10-12T16:30:01.1647085Z If you want to create a new branch to retain commits you create, you may
+2026-10-12T16:30:01.1647834Z do so (now or later) by using -c with the switch command. Example:
+2026-10-12T16:30:01.1648384Z 
+2026-10-12T16:30:01.1648618Z   git switch -c <new-branch-name>
+2026-10-12T16:30:01.1648981Z 
+2026-10-12T16:30:01.1649213Z Or undo this operation with:
+2026-10-12T16:30:01.1649706Z 
+2026-10-12T16:30:01.1649926Z   git switch -
+2026-10-12T16:30:01.1650199Z 
+2026-10-12T16:30:01.1650557Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-10-12T16:30:01.1651075Z 
+2026-10-12T16:30:01.1651565Z HEAD is now at fa3e8ad ci: verify current-schema fixtures and migration rollback in disposable databases
+2026-10-12T16:30:01.1661980Z ##[endgroup]
+2026-10-12T16:30:01.1709905Z [command]/usr/bin/git log -1 --format=%H
+2026-10-12T16:30:01.1735177Z fa3e8ad044a03b9af2add540ba3773d7ce3efc9f
+2026-10-12T16:30:01.1747880Z ##[group]Removing auth
+2026-10-12T16:30:01.1748291Z Removing SSH command configuration
+2026-10-12T16:30:01.1750286Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-12T16:30:01.1780565Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-12T16:30:01.1978467Z Removing HTTP extra header
+2026-10-12T16:30:01.1982390Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-12T16:30:01.2017095Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-12T16:30:01.2211337Z Removing includeIf entries pointing to credentials config files
+2026-10-12T16:30:01.2214488Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-12T16:30:01.2241444Z includeif.gitdir:/home/runner/work/beaconhs/beaconhs/.git.path
+2026-10-12T16:30:01.2242431Z includeif.gitdir:/home/runner/work/beaconhs/beaconhs/.git/worktrees/*.path
+2026-10-12T16:30:01.2243599Z includeif.gitdir:/github/workspace/.git.path
+2026-10-12T16:30:01.2244211Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-10-12T16:30:01.2249125Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/beaconhs/beaconhs/.git.path
+2026-10-12T16:30:01.2270803Z /home/runner/work/_temp/git-credentials-f0495099-8dd8-4db5-aadd-1440beb4fe51.config
+2026-10-12T16:30:01.2285300Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/beaconhs/beaconhs/.git.path /home/runner/work/_temp/git-credentials-f0495099-8dd8-4db5-aadd-1440beb4fe51.config
+2026-10-12T16:30:01.2320007Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/beaconhs/beaconhs/.git/worktrees/*.path
+2026-10-12T16:30:01.2340809Z /home/runner/work/_temp/git-credentials-f0495099-8dd8-4db5-aadd-1440beb4fe51.config
+2026-10-12T16:30:01.2348541Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/beaconhs/beaconhs/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-f0495099-8dd8-4db5-aadd-1440beb4fe51.config
+2026-10-12T16:30:01.2380612Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+2026-10-12T16:30:01.2401607Z /github/runner_temp/git-credentials-f0495099-8dd8-4db5-aadd-1440beb4fe51.config
+2026-10-12T16:30:01.2407214Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-f0495099-8dd8-4db5-aadd-1440beb4fe51.config
+2026-10-12T16:30:01.2440926Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-10-12T16:30:01.2464665Z /github/runner_temp/git-credentials-f0495099-8dd8-4db5-aadd-1440beb4fe51.config
+2026-10-12T16:30:01.2470673Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-f0495099-8dd8-4db5-aadd-1440beb4fe51.config
+2026-10-12T16:30:01.2503472Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-12T16:30:01.2706579Z Removing credentials config '/home/runner/work/_temp/git-credentials-f0495099-8dd8-4db5-aadd-1440beb4fe51.config'
+2026-10-12T16:30:01.2708385Z ##[endgroup]
+2026-10-12T16:30:01.2819763Z ##[group]Run set -euo pipefail
+2026-10-12T16:30:01.2820230Z [36;1mset -euo pipefail[0m
+2026-10-12T16:30:01.2820838Z [36;1mgit fetch --no-tags origin "refs/heads/${SOURCE_BRANCH}:refs/remotes/origin/module-validation-source"[0m
+2026-10-12T16:30:01.2821439Z [36;1mgit cat-file -e "${SOURCE_SHA}^{commit}"[0m
+2026-10-12T16:30:01.2821946Z [36;1mgit merge-base --is-ancestor "$SOURCE_SHA" origin/module-validation-source[0m
+2026-10-12T16:30:01.2822496Z [36;1mgit checkout --detach "$SOURCE_SHA"[0m
+2026-10-12T16:30:01.2822914Z [36;1mtest "$(git rev-parse HEAD)" = "$SOURCE_SHA"[0m
+2026-10-12T16:30:01.2823409Z [36;1mtest "$(git status --porcelain)" = ''[0m
+2026-10-12T16:30:01.2823981Z [36;1mprintf 'candidate_sha=%s\nsource_branch=%s\n' "$SOURCE_SHA" "$SOURCE_BRANCH" >> "$GITHUB_STEP_SUMMARY"[0m
+2026-10-12T16:30:01.2870201Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-10-12T16:30:01.2870850Z env:
+2026-10-12T16:30:01.2871216Z   CI: true
+2026-10-12T16:30:01.2871688Z   NEXT_TELEMETRY_DISABLED: 1
+2026-10-12T16:30:01.2872103Z   TURBO_TELEMETRY_DISABLED: 1
+2026-10-12T16:30:01.2872947Z   DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:01.2873775Z   MIGRATION_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:01.2874601Z   SUPERADMIN_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:01.2875416Z   PEOPLE_PROVENANCE_TEST_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:01.2875988Z   DATABASE_OWNER_ROLE: beaconhs_owner
+2026-10-12T16:30:01.2876648Z   DATABASE_BACKUP_ROLE: beaconhs_backup
+2026-10-12T16:30:01.2877099Z   REDIS_URL: redis://localhost:6379
+2026-10-12T16:30:01.2877557Z   BETTER_AUTH_SECRET: module-validation-disposable-secret-not-production
+2026-10-12T16:30:01.2878207Z   ATTACHMENT_CAPABILITY_SECRET: module-validation-disposable-capability-secret
+2026-10-12T16:30:01.2878723Z   BETTER_AUTH_URL: http://localhost:3000
+2026-10-12T16:30:01.2879148Z   APP_URL: http://localhost:3000
+2026-10-12T16:30:01.2879787Z   SOURCE_SHA: 6892670fd33e0fe12a1862bb822b451cd1bf7b44
+2026-10-12T16:30:01.2880222Z   SOURCE_BRANCH: chore/v1.4-migration-safety
+2026-10-12T16:30:01.2880613Z ##[endgroup]
+2026-10-12T16:30:06.3055071Z From https://github.com/Satho82/beaconhs
+2026-10-12T16:30:06.3056411Z  * [new branch]        chore/v1.4-migration-safety -> origin/module-validation-source
+2026-10-12T16:30:06.3057584Z  * [new branch]        chore/v1.4-migration-safety -> origin/chore/v1.4-migration-safety
+2026-10-12T16:30:06.4557113Z Warning: you are leaving 1 commit behind, not connected to
+2026-10-12T16:30:06.4558037Z any of your branches:
+2026-10-12T16:30:06.4558265Z 
+2026-10-12T16:30:06.4558635Z   fa3e8ad0 ci: verify current-schema fixtures and migration rollback in disposable databases
+2026-10-12T16:30:06.4559054Z 
+2026-10-12T16:30:06.4559648Z If you want to keep it by creating a new branch, this may be a good time
+2026-10-12T16:30:06.4560265Z to do so with:
+2026-10-12T16:30:06.4560520Z 
+2026-10-12T16:30:06.4560758Z  git branch <new-branch-name> fa3e8ad0
+2026-10-12T16:30:06.4561149Z 
+2026-10-12T16:30:06.4561589Z HEAD is now at 6892670f fix(db): canonicalise V1.4 migrations and preserve security grants
+2026-10-12T16:30:06.4783349Z ##[group]Run set -euo pipefail
+2026-10-12T16:30:06.4783814Z [36;1mset -euo pipefail[0m
+2026-10-12T16:30:06.4784528Z [36;1mgit show "$GITHUB_SHA:docs/v1.4/board-20261016/migration-safety-deadcode-fix.patch" > "$RUNNER_TEMP/correction.patch"[0m
+2026-10-12T16:30:06.4785446Z [36;1mecho "5bb5528b3bd9f11b6e66e5fe8c77567f925529fdafed9a90664952718e654ffa  $RUNNER_TEMP/correction.patch" | sha256sum --check[0m
+2026-10-12T16:30:06.4786143Z [36;1mgit apply --check "$RUNNER_TEMP/correction.patch"[0m
+2026-10-12T16:30:06.4786603Z [36;1mgit apply "$RUNNER_TEMP/correction.patch"[0m
+2026-10-12T16:30:06.4787244Z [36;1mtest "$(git diff --name-only)" = packages/db/src/migration-execution.ts[0m
+2026-10-12T16:30:06.4787766Z [36;1mgit diff --check[0m
+2026-10-12T16:30:06.4788102Z [36;1mgit diff | sha256sum[0m
+2026-10-12T16:30:06.4788905Z [36;1mecho 'PRECOMMIT ONLY: original source plus pinned one-line internal-type correction; not an immutable release candidate.' >> "$GITHUB_STEP_SUMMARY"[0m
+2026-10-12T16:30:06.4830215Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-10-12T16:30:06.4830653Z env:
+2026-10-12T16:30:06.4830936Z   CI: true
+2026-10-12T16:30:06.4831276Z   NEXT_TELEMETRY_DISABLED: 1
+2026-10-12T16:30:06.4831651Z   TURBO_TELEMETRY_DISABLED: 1
+2026-10-12T16:30:06.4832364Z   DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:06.4832990Z   MIGRATION_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:06.4833651Z   SUPERADMIN_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:06.4834334Z   PEOPLE_PROVENANCE_TEST_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:06.4834799Z   DATABASE_OWNER_ROLE: beaconhs_owner
+2026-10-12T16:30:06.4835209Z   DATABASE_BACKUP_ROLE: beaconhs_backup
+2026-10-12T16:30:06.4835593Z   REDIS_URL: redis://localhost:6379
+2026-10-12T16:30:06.4836068Z   BETTER_AUTH_SECRET: module-validation-disposable-secret-not-production
+2026-10-12T16:30:06.4836760Z   ATTACHMENT_CAPABILITY_SECRET: module-validation-disposable-capability-secret
+2026-10-12T16:30:06.4837256Z   BETTER_AUTH_URL: http://localhost:3000
+2026-10-12T16:30:06.4837666Z   APP_URL: http://localhost:3000
+2026-10-12T16:30:06.4838011Z ##[endgroup]
+2026-10-12T16:30:06.4992719Z /home/runner/work/_temp/correction.patch: OK
+2026-10-12T16:30:06.5140400Z 5bb5528b3bd9f11b6e66e5fe8c77567f925529fdafed9a90664952718e654ffa  -
+2026-10-12T16:30:06.5182581Z ##[group]Run set -euo pipefail
+2026-10-12T16:30:06.5183032Z [36;1mset -euo pipefail[0m
+2026-10-12T16:30:06.5183692Z [36;1mgit show "$GITHUB_SHA:docs/v1.4/board-20261016/action-property-current-risk-fixture.patch" > "$RUNNER_TEMP/fixture.patch"[0m
+2026-10-12T16:30:06.5184667Z [36;1mecho "feb3d34966bcea91654361e468ba9544d42b73869ae53b3ae063271c249d2191  $RUNNER_TEMP/fixture.patch" | sha256sum --check[0m
+2026-10-12T16:30:06.5185346Z [36;1mgit apply --check "$RUNNER_TEMP/fixture.patch"[0m
+2026-10-12T16:30:06.5185830Z [36;1mgit apply "$RUNNER_TEMP/fixture.patch"[0m
+2026-10-12T16:30:06.5186214Z [36;1mgit diff --check[0m
+2026-10-12T16:30:06.5186591Z [36;1mtest "$(git diff --name-only | wc -l)" -eq 2[0m
+2026-10-12T16:30:06.5187307Z [36;1mecho 'Fixture setup now uses a valid manual Risk matrix; no migration, policy or denial assertion changed.' >> "$GITHUB_STEP_SUMMARY"[0m
+2026-10-12T16:30:06.5227759Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-10-12T16:30:06.5228298Z env:
+2026-10-12T16:30:06.5228654Z   CI: true
+2026-10-12T16:30:06.5228952Z   NEXT_TELEMETRY_DISABLED: 1
+2026-10-12T16:30:06.5229463Z   TURBO_TELEMETRY_DISABLED: 1
+2026-10-12T16:30:06.5230309Z   DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:06.5231011Z   MIGRATION_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:06.5231636Z   SUPERADMIN_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:06.5232258Z   PEOPLE_PROVENANCE_TEST_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:06.5232744Z   DATABASE_OWNER_ROLE: beaconhs_owner
+2026-10-12T16:30:06.5233112Z   DATABASE_BACKUP_ROLE: beaconhs_backup
+2026-10-12T16:30:06.5233535Z   REDIS_URL: redis://localhost:6379
+2026-10-12T16:30:06.5234010Z   BETTER_AUTH_SECRET: module-validation-disposable-secret-not-production
+2026-10-12T16:30:06.5234624Z   ATTACHMENT_CAPABILITY_SECRET: module-validation-disposable-capability-secret
+2026-10-12T16:30:06.5235154Z   BETTER_AUTH_URL: http://localhost:3000
+2026-10-12T16:30:06.5235536Z   APP_URL: http://localhost:3000
+2026-10-12T16:30:06.5235900Z ##[endgroup]
+2026-10-12T16:30:06.5326749Z /home/runner/work/_temp/fixture.patch: OK
+2026-10-12T16:30:06.5544978Z ##[group]Run pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
+2026-10-12T16:30:06.5545606Z with:
+2026-10-12T16:30:06.5545910Z   run_install: false
+2026-10-12T16:30:06.5546246Z   dest: ~/setup-pnpm
+2026-10-12T16:30:06.5546590Z   cache: false
+2026-10-12T16:30:06.5546920Z   cache_dependency_path: pnpm-lock.yaml
+2026-10-12T16:30:06.5547309Z   package_json_file: package.json
+2026-10-12T16:30:06.5547675Z   standalone: false
+2026-10-12T16:30:06.5548004Z env:
+2026-10-12T16:30:06.5548347Z   CI: true
+2026-10-12T16:30:06.5548654Z   NEXT_TELEMETRY_DISABLED: 1
+2026-10-12T16:30:06.5549006Z   TURBO_TELEMETRY_DISABLED: 1
+2026-10-12T16:30:06.5549958Z   DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:06.5550635Z   MIGRATION_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:06.5551314Z   SUPERADMIN_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:06.5551968Z   PEOPLE_PROVENANCE_TEST_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:06.5552565Z   DATABASE_OWNER_ROLE: beaconhs_owner
+2026-10-12T16:30:06.5552953Z   DATABASE_BACKUP_ROLE: beaconhs_backup
+2026-10-12T16:30:06.5553379Z   REDIS_URL: redis://localhost:6379
+2026-10-12T16:30:06.5553866Z   BETTER_AUTH_SECRET: module-validation-disposable-secret-not-production
+2026-10-12T16:30:06.5554475Z   ATTACHMENT_CAPABILITY_SECRET: module-validation-disposable-capability-secret
+2026-10-12T16:30:06.5554994Z   BETTER_AUTH_URL: http://localhost:3000
+2026-10-12T16:30:06.5555395Z   APP_URL: http://localhost:3000
+2026-10-12T16:30:06.5555748Z ##[endgroup]
+2026-10-12T16:30:06.7039010Z ##[group]Running self-installer...
+2026-10-12T16:30:09.1998725Z 
+2026-10-12T16:30:09.1999685Z added 1 package, and audited 2 packages in 2s
+2026-10-12T16:30:09.2000180Z 
+2026-10-12T16:30:09.2000366Z 1 package is looking for funding
+2026-10-12T16:30:09.2000745Z   run `npm fund` for details
+2026-10-12T16:30:09.2122428Z 
+2026-10-12T16:30:09.2123352Z 1 high severity vulnerability
+2026-10-12T16:30:09.2123736Z 
+2026-10-12T16:30:09.2123951Z To address all issues, run:
+2026-10-12T16:30:09.2124293Z   npm audit fix --force
+2026-10-12T16:30:09.2124511Z 
+2026-10-12T16:30:09.2124684Z Run `npm audit` for details.
+2026-10-12T16:30:09.7670473Z Checking for updates...
+2026-10-12T16:30:10.1335353Z Switching pnpm from v11.7.0 to v10.30.3...
+2026-10-12T16:30:10.5668160Z .../.bin/global/v11/b92-1a130f33ffe      | Progress: resolved 1, reused 0, downloaded 0, added 0
+2026-10-12T16:30:10.5685362Z .../.bin/global/v11/b92-1a130f33ffe      |   +1 +
+2026-10-12T16:30:10.8018789Z .../.bin/global/v11/b92-1a130f33ffe      | Progress: resolved 1, reused 0, downloaded 1, added 1, done
+2026-10-12T16:30:10.8301827Z [WARN] Detected a pnpm v10 installation layout at PNPM_HOME. The pnpm shims at PNPM_HOME have been refreshed so the new version is active, but pnpm v11 expects bins in PNPM_HOME/bin. Run "pnpm setup" to migrate your PATH to the v11 layout.
+2026-10-12T16:30:10.8323395Z Successfully updated pnpm to v10.30.3
+2026-10-12T16:30:10.8526641Z ##[endgroup]
+2026-10-12T16:30:10.8527191Z Installation Completed!
+2026-10-12T16:30:10.8669632Z ##[group]Run actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+2026-10-12T16:30:10.8670203Z with:
+2026-10-12T16:30:10.8670512Z   node-version-file: .nvmrc
+2026-10-12T16:30:10.8670856Z   cache: pnpm
+2026-10-12T16:30:10.8671151Z   check-latest: false
+2026-10-12T16:30:10.8673719Z   token: ***
+2026-10-12T16:30:10.8674029Z   package-manager-cache: true
+2026-10-12T16:30:10.8674432Z env:
+2026-10-12T16:30:10.8674718Z   CI: true
+2026-10-12T16:30:10.8675019Z   NEXT_TELEMETRY_DISABLED: 1
+2026-10-12T16:30:10.8675366Z   TURBO_TELEMETRY_DISABLED: 1
+2026-10-12T16:30:10.8675958Z   DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:10.8676568Z   MIGRATION_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:10.8677220Z   SUPERADMIN_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:10.8677863Z   PEOPLE_PROVENANCE_TEST_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:10.8678330Z   DATABASE_OWNER_ROLE: beaconhs_owner
+2026-10-12T16:30:10.8678827Z   DATABASE_BACKUP_ROLE: beaconhs_backup
+2026-10-12T16:30:10.8679593Z   REDIS_URL: redis://localhost:6379
+2026-10-12T16:30:10.8680091Z   BETTER_AUTH_SECRET: module-validation-disposable-secret-not-production
+2026-10-12T16:30:10.8680709Z   ATTACHMENT_CAPABILITY_SECRET: module-validation-disposable-capability-secret
+2026-10-12T16:30:10.8681253Z   BETTER_AUTH_URL: http://localhost:3000
+2026-10-12T16:30:10.8681628Z   APP_URL: http://localhost:3000
+2026-10-12T16:30:10.8682110Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+2026-10-12T16:30:10.8682503Z ##[endgroup]
+2026-10-12T16:30:11.0167175Z Node version file is not JSON file
+2026-10-12T16:30:11.0168800Z Resolved .nvmrc as 24.18.0
+2026-10-12T16:30:11.0185300Z Attempting to download 24.18.0...
+2026-10-12T16:30:12.1051226Z Acquiring 24.18.0 - x64 from https://github.com/actions/node-versions/releases/download/24.18.0-28070977815/node-24.18.0-linux-x64.tar.gz
+2026-10-12T16:30:12.6770642Z Extracting ...
+2026-10-12T16:30:12.6879214Z [command]/usr/bin/tar xz --strip 1 --warning=no-unknown-keyword --overwrite -C /home/runner/work/_temp/0c490b79-4176-4bda-a97a-e9241ef6d675 -f /home/runner/work/_temp/8cbedf1c-cf0d-4738-9da0-8ae8eb4fcad4
+2026-10-12T16:30:14.0210307Z Adding to the cache ...
+2026-10-12T16:30:15.9439683Z ##[group]Environment details
+2026-10-12T16:30:16.1754306Z node: v24.18.0
+2026-10-12T16:30:16.1754988Z npm: 11.16.0
+2026-10-12T16:30:16.1755379Z yarn: 1.22.22
+2026-10-12T16:30:16.1756156Z ##[endgroup]
+2026-10-12T16:30:16.1772559Z [command]/home/runner/setup-pnpm/node_modules/.bin/bin/pnpm store path --silent
+2026-10-12T16:30:16.5252944Z /home/runner/setup-pnpm/node_modules/.bin/store/v10
+2026-10-12T16:30:16.7454515Z pnpm cache is not found
+2026-10-12T16:30:16.7568120Z ##[group]Run set -euo pipefail
+2026-10-12T16:30:16.7568575Z [36;1mset -euo pipefail[0m
+2026-10-12T16:30:16.7569001Z [36;1mtest "$(node --version)" = "v$(tr -d '\r\n' < .nvmrc)"[0m
+2026-10-12T16:30:16.7569982Z [36;1mtest "pnpm@$(pnpm --version)" = "$(node -p 'JSON.parse(require("node:fs").readFileSync("package.json", "utf8")).packageManager')"[0m
+2026-10-12T16:30:16.7570619Z [36;1mpython3 - <<'PY'[0m
+2026-10-12T16:30:16.7570985Z [36;1mimport os[0m
+2026-10-12T16:30:16.7571329Z [36;1mfrom urllib.parse import urlparse[0m
+2026-10-12T16:30:16.7571771Z [36;1mexpected = {[0m
+2026-10-12T16:30:16.7572107Z [36;1m    'DATABASE_URL': 'beaconhs_app',[0m
+2026-10-12T16:30:16.7572517Z [36;1m    'MIGRATION_DATABASE_URL': 'beaconhs_migrator',[0m
+2026-10-12T16:30:16.7572991Z [36;1m    'SUPERADMIN_DATABASE_URL': 'beaconhs_super',[0m
+2026-10-12T16:30:16.7573444Z [36;1m    'PEOPLE_PROVENANCE_TEST_DATABASE_URL': 'postgres',[0m
+2026-10-12T16:30:16.7573839Z [36;1m}[0m
+2026-10-12T16:30:16.7574290Z [36;1mfor name, user in expected.items():[0m
+2026-10-12T16:30:16.7574684Z [36;1m    value = urlparse(os.environ[name])[0m
+2026-10-12T16:30:16.7575251Z [36;1m    if (value.scheme, value.hostname, value.port, value.path, value.username, value.query) != ([0m
+2026-10-12T16:30:16.7575892Z [36;1m        'postgresql', 'localhost', 5432, '/beaconhs_test', user, ''):[0m
+2026-10-12T16:30:16.7576474Z [36;1m        raise SystemExit('Rejected database boundary: ' + name)[0m
+2026-10-12T16:30:16.7577000Z [36;1mif os.environ['REDIS_URL'] != 'redis://localhost:6379':[0m
+2026-10-12T16:30:16.7577485Z [36;1m    raise SystemExit('Rejected Redis boundary')[0m
+2026-10-12T16:30:16.7577880Z [36;1mPY[0m
+2026-10-12T16:30:16.7618030Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-10-12T16:30:16.7618457Z env:
+2026-10-12T16:30:16.7618848Z   CI: true
+2026-10-12T16:30:16.7619140Z   NEXT_TELEMETRY_DISABLED: 1
+2026-10-12T16:30:16.7619633Z   TURBO_TELEMETRY_DISABLED: 1
+2026-10-12T16:30:16.7620320Z   DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:16.7620982Z   MIGRATION_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:16.7621619Z   SUPERADMIN_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:16.7622242Z   PEOPLE_PROVENANCE_TEST_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:16.7622692Z   DATABASE_OWNER_ROLE: beaconhs_owner
+2026-10-12T16:30:16.7623231Z   DATABASE_BACKUP_ROLE: beaconhs_backup
+2026-10-12T16:30:16.7623588Z   REDIS_URL: redis://localhost:6379
+2026-10-12T16:30:16.7624068Z   BETTER_AUTH_SECRET: module-validation-disposable-secret-not-production
+2026-10-12T16:30:16.7624658Z   ATTACHMENT_CAPABILITY_SECRET: module-validation-disposable-capability-secret
+2026-10-12T16:30:16.7625168Z   BETTER_AUTH_URL: http://localhost:3000
+2026-10-12T16:30:16.7625620Z   APP_URL: http://localhost:3000
+2026-10-12T16:30:16.7625996Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+2026-10-12T16:30:16.7626411Z ##[endgroup]
+2026-10-12T16:30:17.0937132Z ##[group]Run pnpm install --frozen-lockfile
+2026-10-12T16:30:17.0937597Z [36;1mpnpm install --frozen-lockfile[0m
+2026-10-12T16:30:17.0977419Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-10-12T16:30:17.0977853Z env:
+2026-10-12T16:30:17.0978135Z   CI: true
+2026-10-12T16:30:17.0978488Z   NEXT_TELEMETRY_DISABLED: 1
+2026-10-12T16:30:17.0978924Z   TURBO_TELEMETRY_DISABLED: 1
+2026-10-12T16:30:17.0979641Z   DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:17.0980291Z   MIGRATION_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:17.0980959Z   SUPERADMIN_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:17.0981595Z   PEOPLE_PROVENANCE_TEST_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:17.0982088Z   DATABASE_OWNER_ROLE: beaconhs_owner
+2026-10-12T16:30:17.0982473Z   DATABASE_BACKUP_ROLE: beaconhs_backup
+2026-10-12T16:30:17.0982860Z   REDIS_URL: redis://localhost:6379
+2026-10-12T16:30:17.0983464Z   BETTER_AUTH_SECRET: module-validation-disposable-secret-not-production
+2026-10-12T16:30:17.0984072Z   ATTACHMENT_CAPABILITY_SECRET: module-validation-disposable-capability-secret
+2026-10-12T16:30:17.0984594Z   BETTER_AUTH_URL: http://localhost:3000
+2026-10-12T16:30:17.0984970Z   APP_URL: http://localhost:3000
+2026-10-12T16:30:17.0985346Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+2026-10-12T16:30:17.0985795Z ##[endgroup]
+2026-10-12T16:30:17.3887600Z Scope: all 26 workspace projects
+2026-10-12T16:30:17.4866220Z Lockfile is up to date, resolution step is skipped
+2026-10-12T16:30:17.5550892Z Progress: resolved 1, reused 0, downloaded 0, added 0
+2026-10-12T16:30:17.6606830Z Packages: +1383
+2026-10-12T16:30:17.6608281Z ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2026-10-12T16:30:18.5566516Z Progress: resolved 1383, reused 0, downloaded 0, added 0
+2026-10-12T16:30:21.4007830Z Progress: resolved 1383, reused 0, downloaded 1, added 0
+2026-10-12T16:30:22.4007548Z Progress: resolved 1383, reused 0, downloaded 109, added 68
+2026-10-12T16:30:23.4008468Z Progress: resolved 1383, reused 0, downloaded 287, added 271
+2026-10-12T16:30:24.4014848Z Progress: resolved 1383, reused 0, downloaded 461, added 437
+2026-10-12T16:30:25.4019743Z Progress: resolved 1383, reused 0, downloaded 554, added 518
+2026-10-12T16:30:26.4017446Z Progress: resolved 1383, reused 0, downloaded 661, added 602
+2026-10-12T16:30:27.4058024Z Progress: resolved 1383, reused 0, downloaded 762, added 695
+2026-10-12T16:30:28.4023595Z Progress: resolved 1383, reused 0, downloaded 924, added 822
+2026-10-12T16:30:29.4031853Z Progress: resolved 1383, reused 0, downloaded 1136, added 948
+2026-10-12T16:30:30.4027727Z Progress: resolved 1383, reused 0, downloaded 1256, added 1008
+2026-10-12T16:30:31.4027234Z Progress: resolved 1383, reused 0, downloaded 1379, added 1305
+2026-10-12T16:30:31.5937623Z Progress: resolved 1383, reused 0, downloaded 1380, added 1383, done
+2026-10-12T16:30:32.6063106Z 
+2026-10-12T16:30:32.6064039Z devDependencies:
+2026-10-12T16:30:32.6064631Z + @types/node 24.13.3
+2026-10-12T16:30:32.6065349Z + knip 5.88.1
+2026-10-12T16:30:32.6065675Z + prettier 3.9.5
+2026-10-12T16:30:32.6066062Z + prettier-plugin-tailwindcss 0.8.0
+2026-10-12T16:30:32.6066528Z + turbo 2.10.5
+2026-10-12T16:30:32.6066840Z + typescript 6.0.3
+2026-10-12T16:30:32.6066997Z 
+2026-10-12T16:30:32.7991170Z ╭ Warning ─────────────────────────────────────────────────────────────────────╮
+2026-10-12T16:30:32.7992572Z │                                                                              │
+2026-10-12T16:30:32.7993794Z │   Ignored build scripts: @parcel/watcher@2.5.6, @sentry/cli@2.58.6,          │
+2026-10-12T16:30:32.7994886Z │   @swc/core@1.15.43, canvas@3.2.3, core-js@2.6.12, es5-ext@0.10.64,          │
+2026-10-12T16:30:32.7995954Z │   esbuild@0.18.20, esbuild@0.25.12, esbuild@0.28.1,                          │
+2026-10-12T16:30:32.7997040Z │   msgpackr-extract@3.0.4, unrs-resolver@1.12.2.                              │
+2026-10-12T16:30:32.7998401Z │   Run "pnpm approve-builds" to pick which dependencies should be allowed     │
+2026-10-12T16:30:32.8000447Z │   to run scripts.                                                            │
+2026-10-12T16:30:32.8001478Z │                                                                              │
+2026-10-12T16:30:32.8002403Z ╰──────────────────────────────────────────────────────────────────────────────╯
+2026-10-12T16:30:32.8072844Z Done in 15.6s using pnpm v10.30.3
+2026-10-12T16:30:32.8701210Z ##[group]Run set -euo pipefail
+2026-10-12T16:30:32.8701674Z [36;1mset -euo pipefail[0m
+2026-10-12T16:30:32.8702144Z [36;1mpsql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 <<'SQL'[0m
+2026-10-12T16:30:32.8702752Z [36;1mCREATE ROLE beaconhs_owner NOLOGIN NOSUPERUSER NOBYPASSRLS;[0m
+2026-10-12T16:30:32.8703387Z [36;1mCREATE ROLE beaconhs_migrator LOGIN NOINHERIT NOSUPERUSER NOBYPASSRLS PASSWORD 'beaconhs_migrator';[0m
+2026-10-12T16:30:32.8704126Z [36;1mCREATE ROLE beaconhs_app LOGIN NOINHERIT NOSUPERUSER NOBYPASSRLS PASSWORD 'beaconhs_app';[0m
+2026-10-12T16:30:32.8704849Z [36;1mCREATE ROLE beaconhs_super LOGIN NOINHERIT NOSUPERUSER BYPASSRLS PASSWORD 'beaconhs_super';[0m
+2026-10-12T16:30:32.8705571Z [36;1mCREATE ROLE beaconhs_backup LOGIN NOINHERIT NOSUPERUSER BYPASSRLS PASSWORD 'beaconhs_backup';[0m
+2026-10-12T16:30:32.8706224Z [36;1mALTER ROLE beaconhs_backup SET default_transaction_read_only = 'on';[0m
+2026-10-12T16:30:32.8706854Z [36;1mGRANT beaconhs_owner TO beaconhs_migrator;[0m
+2026-10-12T16:30:32.8707318Z [36;1mALTER DATABASE beaconhs_test OWNER TO beaconhs_owner;[0m
+2026-10-12T16:30:32.8707788Z [36;1mREVOKE ALL ON DATABASE beaconhs_test FROM PUBLIC;[0m
+2026-10-12T16:30:32.8708454Z [36;1mGRANT CONNECT ON DATABASE beaconhs_test TO beaconhs_migrator, beaconhs_app, beaconhs_super, beaconhs_backup;[0m
+2026-10-12T16:30:32.8709040Z [36;1m\connect beaconhs_test[0m
+2026-10-12T16:30:32.8709597Z [36;1mALTER SCHEMA public OWNER TO beaconhs_owner;[0m
+2026-10-12T16:30:32.8710033Z [36;1mREVOKE ALL ON SCHEMA public FROM PUBLIC;[0m
+2026-10-12T16:30:32.8710406Z [36;1mSQL[0m
+2026-10-12T16:30:32.8755153Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-10-12T16:30:32.8755673Z env:
+2026-10-12T16:30:32.8755975Z   CI: true
+2026-10-12T16:30:32.8756319Z   NEXT_TELEMETRY_DISABLED: 1
+2026-10-12T16:30:32.8756694Z   TURBO_TELEMETRY_DISABLED: 1
+2026-10-12T16:30:32.8757354Z   DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:32.8758051Z   MIGRATION_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:32.8758702Z   SUPERADMIN_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:32.8759438Z   PEOPLE_PROVENANCE_TEST_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:32.8759948Z   DATABASE_OWNER_ROLE: beaconhs_owner
+2026-10-12T16:30:32.8760302Z   DATABASE_BACKUP_ROLE: beaconhs_backup
+2026-10-12T16:30:32.8760715Z   REDIS_URL: redis://localhost:6379
+2026-10-12T16:30:32.8761209Z   BETTER_AUTH_SECRET: module-validation-disposable-secret-not-production
+2026-10-12T16:30:32.8761818Z   ATTACHMENT_CAPABILITY_SECRET: module-validation-disposable-capability-secret
+2026-10-12T16:30:32.8762336Z   BETTER_AUTH_URL: http://localhost:3000
+2026-10-12T16:30:32.8762710Z   APP_URL: http://localhost:3000
+2026-10-12T16:30:32.8763115Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+2026-10-12T16:30:32.8763567Z   PGPASSWORD: postgres
+2026-10-12T16:30:32.8764018Z ##[endgroup]
+2026-10-12T16:30:32.9817577Z CREATE ROLE
+2026-10-12T16:30:33.0397902Z CREATE ROLE
+2026-10-12T16:30:33.1037852Z CREATE ROLE
+2026-10-12T16:30:33.1347272Z CREATE ROLE
+2026-10-12T16:30:33.1418325Z CREATE ROLE
+2026-10-12T16:30:33.1426392Z ALTER ROLE
+2026-10-12T16:30:33.1436593Z GRANT ROLE
+2026-10-12T16:30:33.1476934Z ALTER DATABASE
+2026-10-12T16:30:33.1516511Z REVOKE
+2026-10-12T16:30:33.1528718Z GRANT
+2026-10-12T16:30:33.1615993Z You are now connected to database "beaconhs_test" as user "postgres".
+2026-10-12T16:30:33.1617140Z ALTER SCHEMA
+2026-10-12T16:30:33.1622203Z REVOKE
+2026-10-12T16:30:33.1866421Z ##[group]Run set -euo pipefail
+2026-10-12T16:30:33.1866839Z [36;1mset -euo pipefail[0m
+2026-10-12T16:30:33.1867186Z [36;1mnode - <<'NODE'[0m
+2026-10-12T16:30:33.1867548Z [36;1mconst fs = require('node:fs')[0m
+2026-10-12T16:30:33.1868122Z [36;1mconst journal = JSON.parse(fs.readFileSync('packages/db/drizzle/meta/_journal.json', 'utf8'))[0m
+2026-10-12T16:30:33.1868770Z [36;1mconst tags = journal.entries.map((entry) => entry.tag)[0m
+2026-10-12T16:30:33.1869512Z [36;1mif (new Set(tags).size !== tags.length || !tags.every((tag) => /^\d{4}_[a-z0-9_]+$/.test(tag))) {[0m
+2026-10-12T16:30:33.1870254Z [36;1m  throw new Error('Invalid or duplicate migration journal entries')[0m
+2026-10-12T16:30:33.1870711Z [36;1m}[0m
+2026-10-12T16:30:33.1871167Z [36;1mconsole.log(`migration-journal-ok: ${tags.length} entries; terminal=${tags.at(-1)}`)[0m
+2026-10-12T16:30:33.1871667Z [36;1mNODE[0m
+2026-10-12T16:30:33.1872007Z [36;1mpnpm --filter @beaconhs/db exec tsx src/migrate.ts[0m
+2026-10-12T16:30:33.1913942Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-10-12T16:30:33.1914370Z env:
+2026-10-12T16:30:33.1914681Z   CI: true
+2026-10-12T16:30:33.1915060Z   NEXT_TELEMETRY_DISABLED: 1
+2026-10-12T16:30:33.1915532Z   TURBO_TELEMETRY_DISABLED: 1
+2026-10-12T16:30:33.1916845Z   DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:33.1917682Z   MIGRATION_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:33.1918608Z   SUPERADMIN_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:33.1919267Z   PEOPLE_PROVENANCE_TEST_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:33.1920006Z   DATABASE_OWNER_ROLE: beaconhs_owner
+2026-10-12T16:30:33.1920406Z   DATABASE_BACKUP_ROLE: beaconhs_backup
+2026-10-12T16:30:33.1920778Z   REDIS_URL: redis://localhost:6379
+2026-10-12T16:30:33.1921234Z   BETTER_AUTH_SECRET: module-validation-disposable-secret-not-production
+2026-10-12T16:30:33.1921870Z   ATTACHMENT_CAPABILITY_SECRET: module-validation-disposable-capability-secret
+2026-10-12T16:30:33.1922389Z   BETTER_AUTH_URL: http://localhost:3000
+2026-10-12T16:30:33.1922786Z   APP_URL: http://localhost:3000
+2026-10-12T16:30:33.1923167Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+2026-10-12T16:30:33.1923563Z ##[endgroup]
+2026-10-12T16:30:33.2285117Z migration-journal-ok: 61 entries; terminal=0061_risk_assessment_revisions_archive_signoffs
+2026-10-12T16:30:34.7748258Z ✔ Database role preflight passed (beaconhs_migrator → beaconhs_owner; runtime beaconhs_app; maintenance beaconhs_super; backup beaconhs_backup)
+2026-10-12T16:30:34.7755213Z ▶ Validating migration ledger…
+2026-10-12T16:30:34.7762941Z   Fresh database detected; the full migration journal will run
+2026-10-12T16:30:34.7764092Z ▶ Running drizzle migrations…
+2026-10-12T16:30:40.3268787Z   Migration ledger valid: 61 applied, 0 pending, 0 historical
+2026-10-12T16:30:40.3270240Z ▶ Applying RLS policies…
+2026-10-12T16:30:40.5242259Z ✔ RLS applied atomically (220 tables)
+2026-10-12T16:30:40.5243142Z ▶ Applying least-privilege runtime grants…
+2026-10-12T16:30:40.5294016Z ✔ Least-privilege grants applied (runtime beaconhs_app; maintenance beaconhs_super; backup beaconhs_backup)
+2026-10-12T16:30:40.6165027Z ▶ Verifying security data invariants…
+2026-10-12T16:30:40.6219263Z ✔ Kiosk PIN hash invariant verified
+2026-10-12T16:30:40.6223254Z ▶ Installing missing standard Risk Library templates…
+2026-10-12T16:30:40.6341294Z ▶ Converging role permissions…
+2026-10-12T16:30:40.6420539Z ✔ Built-in role permissions backfilled
+2026-10-12T16:30:40.6421815Z ▶ Applying planner statistics targets…
+2026-10-12T16:30:40.7482539Z ✔ Statistics applied (32 targets)
+2026-10-12T16:30:40.7483394Z ▶ Applying reporting views…
+2026-10-12T16:30:40.7889788Z ✔ Views applied atomically (10 statements)
+2026-10-12T16:30:40.8761729Z ##[group]Run pnpm --filter @beaconhs/db exec tsx src/migrate.ts
+2026-10-12T16:30:40.8762588Z [36;1mpnpm --filter @beaconhs/db exec tsx src/migrate.ts[0m
+2026-10-12T16:30:40.8820643Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-10-12T16:30:40.8821310Z env:
+2026-10-12T16:30:40.8821712Z   CI: true
+2026-10-12T16:30:40.8822130Z   NEXT_TELEMETRY_DISABLED: 1
+2026-10-12T16:30:40.8822630Z   TURBO_TELEMETRY_DISABLED: 1
+2026-10-12T16:30:40.8823581Z   DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:40.8824485Z   MIGRATION_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:40.8825466Z   SUPERADMIN_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:40.8826509Z   PEOPLE_PROVENANCE_TEST_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:40.8827204Z   DATABASE_OWNER_ROLE: beaconhs_owner
+2026-10-12T16:30:40.8827747Z   DATABASE_BACKUP_ROLE: beaconhs_backup
+2026-10-12T16:30:40.8828290Z   REDIS_URL: redis://localhost:6379
+2026-10-12T16:30:40.8829136Z   BETTER_AUTH_SECRET: module-validation-disposable-secret-not-production
+2026-10-12T16:30:40.8830352Z   ATTACHMENT_CAPABILITY_SECRET: module-validation-disposable-capability-secret
+2026-10-12T16:30:40.8831160Z   BETTER_AUTH_URL: http://localhost:3000
+2026-10-12T16:30:40.8831685Z   APP_URL: http://localhost:3000
+2026-10-12T16:30:40.8832303Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+2026-10-12T16:30:40.8832865Z ##[endgroup]
+2026-10-12T16:30:42.1745727Z ✔ Database role preflight passed (beaconhs_migrator → beaconhs_owner; runtime beaconhs_app; maintenance beaconhs_super; backup beaconhs_backup)
+2026-10-12T16:30:42.1755386Z ▶ Validating migration ledger…
+2026-10-12T16:30:42.1784232Z   Migration ledger valid: 61 applied, 0 pending, 0 historical
+2026-10-12T16:30:42.1785309Z ▶ Running drizzle migrations…
+2026-10-12T16:30:42.1902737Z   Migration ledger valid: 61 applied, 0 pending, 0 historical
+2026-10-12T16:30:42.1904129Z ▶ Applying RLS policies…
+2026-10-12T16:30:42.6404753Z ✔ RLS applied atomically (220 tables)
+2026-10-12T16:30:42.6406145Z ▶ Applying least-privilege runtime grants…
+2026-10-12T16:30:42.6467796Z ✔ Least-privilege grants applied (runtime beaconhs_app; maintenance beaconhs_super; backup beaconhs_backup)
+2026-10-12T16:30:42.7486011Z ▶ Verifying security data invariants…
+2026-10-12T16:30:42.7519783Z ✔ Kiosk PIN hash invariant verified
+2026-10-12T16:30:42.7525447Z ▶ Installing missing standard Risk Library templates…
+2026-10-12T16:30:42.7625127Z ▶ Converging role permissions…
+2026-10-12T16:30:42.7694525Z ✔ Built-in role permissions backfilled
+2026-10-12T16:30:42.7695374Z ▶ Applying planner statistics targets…
+2026-10-12T16:30:42.9002285Z ✔ Statistics applied (32 targets)
+2026-10-12T16:30:42.9002966Z ▶ Applying reporting views…
+2026-10-12T16:30:42.9383367Z ✔ Views applied atomically (10 statements)
+2026-10-12T16:30:43.0287236Z ##[group]Run set -euo pipefail
+2026-10-12T16:30:43.0287614Z [36;1mset -euo pipefail[0m
+2026-10-12T16:30:43.0288378Z [36;1mfor fixture in action-property hospitality-handover-rls hospitality-metering-rls maintenance-evidence-rls incident-property-rls inspection-compliance-property-rls risk-revisions-rls; do[0m
+2026-10-12T16:30:43.0289182Z [36;1m  if [ "$fixture" = action-property ]; then[0m
+2026-10-12T16:30:43.0290426Z [36;1m    pnpm --silent --filter @beaconhs/db run test:action-property-sql | psql -h localhost -U postgres -d beaconhs_test -X -v ON_ERROR_STOP=1[0m
+2026-10-12T16:30:43.0291018Z [36;1m  else[0m
+2026-10-12T16:30:43.0291480Z [36;1m    psql -h localhost -U postgres -d beaconhs_test -X -v ON_ERROR_STOP=1 < "packages/db/src/${fixture}.integration.sql"[0m
+2026-10-12T16:30:43.0291973Z [36;1m  fi[0m
+2026-10-12T16:30:43.0292315Z [36;1mdone[0m
+2026-10-12T16:30:43.0333188Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-10-12T16:30:43.0333600Z env:
+2026-10-12T16:30:43.0333811Z   CI: true
+2026-10-12T16:30:43.0334033Z   NEXT_TELEMETRY_DISABLED: 1
+2026-10-12T16:30:43.0334298Z   TURBO_TELEMETRY_DISABLED: 1
+2026-10-12T16:30:43.0334840Z   DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:43.0335376Z   MIGRATION_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:43.0336093Z   SUPERADMIN_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:43.0336648Z   PEOPLE_PROVENANCE_TEST_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:43.0337030Z   DATABASE_OWNER_ROLE: beaconhs_owner
+2026-10-12T16:30:43.0337325Z   DATABASE_BACKUP_ROLE: beaconhs_backup
+2026-10-12T16:30:43.0337690Z   REDIS_URL: redis://localhost:6379
+2026-10-12T16:30:43.0338077Z   BETTER_AUTH_SECRET: module-validation-disposable-secret-not-production
+2026-10-12T16:30:43.0338600Z   ATTACHMENT_CAPABILITY_SECRET: module-validation-disposable-capability-secret
+2026-10-12T16:30:43.0339049Z   BETTER_AUTH_URL: http://localhost:3000
+2026-10-12T16:30:43.0339532Z   APP_URL: http://localhost:3000
+2026-10-12T16:30:43.0339871Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+2026-10-12T16:30:43.0340189Z   PGPASSWORD: postgres
+2026-10-12T16:30:43.0340426Z ##[endgroup]
+2026-10-12T16:30:43.4984898Z BEGIN
+2026-10-12T16:30:43.4989054Z CREATE ROLE
+2026-10-12T16:30:43.5030016Z GRANT
+2026-10-12T16:30:43.5030388Z GRANT
+2026-10-12T16:30:43.5030674Z GRANT
+2026-10-12T16:30:43.5099574Z GRANT
+2026-10-12T16:30:43.5120441Z INSERT 0 2
+2026-10-12T16:30:43.5129606Z INSERT 0 2
+2026-10-12T16:30:43.5163504Z INSERT 0 2
+2026-10-12T16:30:43.5187231Z INSERT 0 1
+2026-10-12T16:30:43.5210230Z INSERT 0 2
+2026-10-12T16:30:43.5320004Z INSERT 0 3
+2026-10-12T16:30:43.5401689Z INSERT 0 1
+2026-10-12T16:30:43.5433119Z INSERT 0 1
+2026-10-12T16:30:43.5602795Z INSERT 0 7
+2026-10-12T16:30:43.5627258Z INSERT 0 2
+2026-10-12T16:30:43.5648452Z INSERT 0 2
+2026-10-12T16:30:43.5661095Z INSERT 0 2
+2026-10-12T16:30:43.5675389Z INSERT 0 2
+2026-10-12T16:30:43.5691867Z CREATE TABLE
+2026-10-12T16:30:43.5694212Z GRANT
+2026-10-12T16:30:43.5707066Z CREATE TABLE
+2026-10-12T16:30:43.5709720Z GRANT
+2026-10-12T16:30:43.5712952Z INSERT 0 6
+2026-10-12T16:30:43.5718558Z CREATE FUNCTION
+2026-10-12T16:30:43.5721499Z CREATE FUNCTION
+2026-10-12T16:30:43.5722265Z SET
+2026-10-12T16:30:43.5725167Z               set_config              
+2026-10-12T16:30:43.5725636Z --------------------------------------
+2026-10-12T16:30:43.5726051Z  10000000-0000-4000-8000-000000000001
+2026-10-12T16:30:43.5726414Z (1 row)
+2026-10-12T16:30:43.5726577Z 
+2026-10-12T16:30:43.5727144Z  set_config 
+2026-10-12T16:30:43.5727536Z ------------
+2026-10-12T16:30:43.5727895Z  property
+2026-10-12T16:30:43.5728214Z (1 row)
+2026-10-12T16:30:43.5728381Z 
+2026-10-12T16:30:43.5728625Z                 set_config                
+2026-10-12T16:30:43.5729124Z ------------------------------------------
+2026-10-12T16:30:43.5729861Z  ["20000000-0000-4000-8000-000000000001"]
+2026-10-12T16:30:43.5730142Z (1 row)
+2026-10-12T16:30:43.5730265Z 
+2026-10-12T16:30:43.5743213Z  expect_count 
+2026-10-12T16:30:43.5744017Z --------------
+2026-10-12T16:30:43.5744385Z  
+2026-10-12T16:30:43.5744653Z (1 row)
+2026-10-12T16:30:43.5744781Z 
+2026-10-12T16:30:43.7001368Z  expect_count 
+2026-10-12T16:30:43.7001764Z --------------
+2026-10-12T16:30:43.7002061Z  
+2026-10-12T16:30:43.7002341Z (1 row)
+2026-10-12T16:30:43.7002494Z 
+2026-10-12T16:30:43.8004872Z  expect_count 
+2026-10-12T16:30:43.8005363Z --------------
+2026-10-12T16:30:43.8005678Z  
+2026-10-12T16:30:43.8005988Z (1 row)
+2026-10-12T16:30:43.8006206Z 
+2026-10-12T16:30:43.8966750Z  expect_count 
+2026-10-12T16:30:43.8967073Z --------------
+2026-10-12T16:30:43.8967310Z  
+2026-10-12T16:30:43.8967577Z (1 row)
+2026-10-12T16:30:43.8967733Z 
+2026-10-12T16:30:44.0020710Z  expect_count 
+2026-10-12T16:30:44.0021142Z --------------
+2026-10-12T16:30:44.0021461Z  
+2026-10-12T16:30:44.0021772Z (1 row)
+2026-10-12T16:30:44.0022445Z 
+2026-10-12T16:30:44.2020522Z  expect_count 
+2026-10-12T16:30:44.2023522Z --------------
+2026-10-12T16:30:44.2024290Z  
+2026-10-12T16:30:44.2024668Z (1 row)
+2026-10-12T16:30:44.2024847Z 
+2026-10-12T16:30:44.4051425Z  expect_count 
+2026-10-12T16:30:44.4051812Z --------------
+2026-10-12T16:30:44.4052106Z  
+2026-10-12T16:30:44.4052370Z (1 row)
+2026-10-12T16:30:44.4052589Z 
+2026-10-12T16:30:44.6082662Z  expect_count 
+2026-10-12T16:30:44.6083053Z --------------
+2026-10-12T16:30:44.6083370Z  
+2026-10-12T16:30:44.6083633Z (1 row)
+2026-10-12T16:30:44.6083795Z 
+2026-10-12T16:30:44.8053925Z INSERT 0 1
+2026-10-12T16:30:45.0054431Z  expect_count 
+2026-10-12T16:30:45.0055033Z --------------
+2026-10-12T16:30:45.0055849Z  
+2026-10-12T16:30:45.0056202Z (1 row)
+2026-10-12T16:30:45.0056388Z 
+2026-10-12T16:30:45.2015420Z  expect_denied 
+2026-10-12T16:30:45.2016300Z ---------------
+2026-10-12T16:30:45.2016646Z  
+2026-10-12T16:30:45.2016908Z (1 row)
+2026-10-12T16:30:45.2017067Z 
+2026-10-12T16:30:45.5856841Z  expect_count 
+2026-10-12T16:30:45.5857249Z --------------
+2026-10-12T16:30:45.5857532Z  
+2026-10-12T16:30:45.5857783Z (1 row)
+2026-10-12T16:30:45.5857939Z 
+2026-10-12T16:30:45.7840802Z  expect_count 
+2026-10-12T16:30:45.7841195Z --------------
+2026-10-12T16:30:45.7841502Z  
+2026-10-12T16:30:45.7841751Z (1 row)
+2026-10-12T16:30:45.7841910Z 
+2026-10-12T16:30:46.1386576Z  expect_denied 
+2026-10-12T16:30:46.1386951Z ---------------
+2026-10-12T16:30:46.1387242Z  
+2026-10-12T16:30:46.1387496Z (1 row)
+2026-10-12T16:30:46.1387663Z 
+2026-10-12T16:30:46.5205749Z  expect_count 
+2026-10-12T16:30:46.5206094Z --------------
+2026-10-12T16:30:46.5206316Z  
+2026-10-12T16:30:46.5206515Z (1 row)
+2026-10-12T16:30:46.5206649Z 
+2026-10-12T16:30:46.8713098Z  expect_denied 
+2026-10-12T16:30:46.8713535Z ---------------
+2026-10-12T16:30:46.8713922Z  
+2026-10-12T16:30:46.8714161Z (1 row)
+2026-10-12T16:30:46.8714300Z 
+2026-10-12T16:30:47.0174278Z  expect_denied 
+2026-10-12T16:30:47.0174728Z ---------------
+2026-10-12T16:30:47.0175075Z  
+2026-10-12T16:30:47.0175374Z (1 row)
+2026-10-12T16:30:47.0175570Z 
+2026-10-12T16:30:47.2088402Z  expect_denied 
+2026-10-12T16:30:47.2088854Z ---------------
+2026-10-12T16:30:47.2089200Z  
+2026-10-12T16:30:47.2089626Z (1 row)
+2026-10-12T16:30:47.2090238Z 
+2026-10-12T16:30:47.2091482Z                 set_config                
+2026-10-12T16:30:47.2091972Z ------------------------------------------
+2026-10-12T16:30:47.2092352Z  ["20000000-0000-4000-8000-000000000002"]
+2026-10-12T16:30:47.2092693Z (1 row)
+2026-10-12T16:30:47.2092855Z 
+2026-10-12T16:30:47.4119796Z  expect_count 
+2026-10-12T16:30:47.4120248Z --------------
+2026-10-12T16:30:47.4120551Z  
+2026-10-12T16:30:47.4120814Z (1 row)
+2026-10-12T16:30:47.4120978Z 
+2026-10-12T16:30:47.4125784Z  expect_count 
+2026-10-12T16:30:47.4126198Z --------------
+2026-10-12T16:30:47.4126404Z  
+2026-10-12T16:30:47.4126603Z (1 row)
+2026-10-12T16:30:47.5227412Z 
+2026-10-12T16:30:47.5227926Z  expect_count 
+2026-10-12T16:30:47.5228237Z --------------
+2026-10-12T16:30:47.5228501Z  
+2026-10-12T16:30:47.5228704Z (1 row)
+2026-10-12T16:30:47.5228818Z 
+2026-10-12T16:30:47.6191911Z  expect_count 
+2026-10-12T16:30:47.6192374Z --------------
+2026-10-12T16:30:47.6193019Z  
+2026-10-12T16:30:47.6193229Z (1 row)
+2026-10-12T16:30:47.7147397Z 
+2026-10-12T16:30:47.7147949Z  expect_count 
+2026-10-12T16:30:47.7148290Z --------------
+2026-10-12T16:30:47.7148591Z  
+2026-10-12T16:30:47.7148940Z (1 row)
+2026-10-12T16:30:47.7149108Z 
+2026-10-12T16:30:47.7150239Z                                    set_config                                    
+2026-10-12T16:30:47.7151032Z ---------------------------------------------------------------------------------
+2026-10-12T16:30:47.7151751Z  ["20000000-0000-4000-8000-000000000001","20000000-0000-4000-8000-000000000002"]
+2026-10-12T16:30:47.7152287Z (1 row)
+2026-10-12T16:30:47.7152461Z 
+2026-10-12T16:30:47.7154758Z  expect_count 
+2026-10-12T16:30:47.7155066Z --------------
+2026-10-12T16:30:47.7155340Z  
+2026-10-12T16:30:47.7155640Z (1 row)
+2026-10-12T16:30:47.7156117Z 
+2026-10-12T16:30:47.8134630Z  expect_count 
+2026-10-12T16:30:47.8135024Z --------------
+2026-10-12T16:30:47.8135298Z  
+2026-10-12T16:30:47.8135601Z (1 row)
+2026-10-12T16:30:47.8135761Z 
+2026-10-12T16:30:47.9144481Z  expect_count 
+2026-10-12T16:30:47.9161066Z --------------
+2026-10-12T16:30:47.9161439Z  
+2026-10-12T16:30:47.9161715Z (1 row)
+2026-10-12T16:30:47.9161880Z 
+2026-10-12T16:30:48.0116539Z  expect_count 
+2026-10-12T16:30:48.0117004Z --------------
+2026-10-12T16:30:48.0117313Z  
+2026-10-12T16:30:48.0117716Z (1 row)
+2026-10-12T16:30:48.0117897Z 
+2026-10-12T16:30:48.0118370Z  set_config 
+2026-10-12T16:30:48.0118673Z ------------
+2026-10-12T16:30:48.0118880Z  []
+2026-10-12T16:30:48.0119074Z (1 row)
+2026-10-12T16:30:48.0119274Z 
+2026-10-12T16:30:48.1069852Z  expect_count 
+2026-10-12T16:30:48.1070169Z --------------
+2026-10-12T16:30:48.1070391Z  
+2026-10-12T16:30:48.1070596Z (1 row)
+2026-10-12T16:30:48.1070717Z 
+2026-10-12T16:30:48.1075278Z  expect_count 
+2026-10-12T16:30:48.1075603Z --------------
+2026-10-12T16:30:48.1075920Z  
+2026-10-12T16:30:48.1076155Z (1 row)
+2026-10-12T16:30:48.1076310Z 
+2026-10-12T16:30:48.1076476Z  set_config 
+2026-10-12T16:30:48.1076785Z ------------
+2026-10-12T16:30:48.1077062Z  legacy
+2026-10-12T16:30:48.1077316Z (1 row)
+2026-10-12T16:30:48.1077466Z 
+2026-10-12T16:30:48.2025562Z  expect_count 
+2026-10-12T16:30:48.2025943Z --------------
+2026-10-12T16:30:48.2026201Z  
+2026-10-12T16:30:48.2026445Z (1 row)
+2026-10-12T16:30:48.2026596Z 
+2026-10-12T16:30:48.2030244Z  expect_count 
+2026-10-12T16:30:48.2030594Z --------------
+2026-10-12T16:30:48.2030882Z  
+2026-10-12T16:30:48.2031179Z (1 row)
+2026-10-12T16:30:48.2031347Z 
+2026-10-12T16:30:48.2031896Z  set_config 
+2026-10-12T16:30:48.2032191Z ------------
+2026-10-12T16:30:48.2032503Z  
+2026-10-12T16:30:48.2032691Z (1 row)
+2026-10-12T16:30:48.2032802Z 
+2026-10-12T16:30:48.2980155Z  expect_count 
+2026-10-12T16:30:48.2980542Z --------------
+2026-10-12T16:30:48.2980832Z  
+2026-10-12T16:30:48.2981143Z (1 row)
+2026-10-12T16:30:48.2981344Z 
+2026-10-12T16:30:48.2981542Z  set_config 
+2026-10-12T16:30:48.2981842Z ------------
+2026-10-12T16:30:48.2982149Z  tenant
+2026-10-12T16:30:48.2982360Z (1 row)
+2026-10-12T16:30:48.2982486Z 
+2026-10-12T16:30:48.2986927Z  expect_count 
+2026-10-12T16:30:48.2987343Z --------------
+2026-10-12T16:30:48.2987627Z  
+2026-10-12T16:30:48.2987825Z (1 row)
+2026-10-12T16:30:48.2987976Z 
+2026-10-12T16:30:48.3944053Z  expect_count 
+2026-10-12T16:30:48.3944366Z --------------
+2026-10-12T16:30:48.3944594Z  
+2026-10-12T16:30:48.3944795Z (1 row)
+2026-10-12T16:30:48.3944919Z 
+2026-10-12T16:30:48.4885298Z  expect_count 
+2026-10-12T16:30:48.4885770Z --------------
+2026-10-12T16:30:48.4886097Z  
+2026-10-12T16:30:48.4886423Z (1 row)
+2026-10-12T16:30:48.4886623Z 
+2026-10-12T16:30:48.4887056Z               set_config              
+2026-10-12T16:30:48.4887630Z --------------------------------------
+2026-10-12T16:30:48.4888118Z  10000000-0000-4000-8000-000000000002
+2026-10-12T16:30:48.4888547Z (1 row)
+2026-10-12T16:30:48.4888740Z 
+2026-10-12T16:30:48.4888998Z               set_config              
+2026-10-12T16:30:48.4889828Z --------------------------------------
+2026-10-12T16:30:48.4890719Z  10000000-0000-4000-8000-000000000001
+2026-10-12T16:30:48.4890981Z (1 row)
+2026-10-12T16:30:48.4891083Z 
+2026-10-12T16:30:48.4905371Z INSERT 0 1
+2026-10-12T16:30:48.4931775Z INSERT 0 1
+2026-10-12T16:30:48.6437737Z INSERT 0 1
+2026-10-12T16:30:48.6439191Z  set_config 
+2026-10-12T16:30:48.6439731Z ------------
+2026-10-12T16:30:48.6440001Z  legacy
+2026-10-12T16:30:48.6440247Z (1 row)
+2026-10-12T16:30:48.6440502Z 
+2026-10-12T16:30:48.7392116Z  expect_count 
+2026-10-12T16:30:48.7392508Z --------------
+2026-10-12T16:30:48.7392792Z  
+2026-10-12T16:30:48.7393045Z (1 row)
+2026-10-12T16:30:48.7393213Z 
+2026-10-12T16:30:48.7397024Z  expect_count 
+2026-10-12T16:30:48.7397365Z --------------
+2026-10-12T16:30:48.7397658Z  
+2026-10-12T16:30:48.7397919Z (1 row)
+2026-10-12T16:30:48.7398091Z 
+2026-10-12T16:30:48.7403833Z  expect_count 
+2026-10-12T16:30:48.7404177Z --------------
+2026-10-12T16:30:48.7404994Z  
+2026-10-12T16:30:48.7405203Z (1 row)
+2026-10-12T16:30:48.7405318Z 
+2026-10-12T16:30:48.7414580Z  set_config 
+2026-10-12T16:30:48.7415043Z ------------
+2026-10-12T16:30:48.7415313Z  tenant
+2026-10-12T16:30:48.7415565Z (1 row)
+2026-10-12T16:30:48.7415717Z 
+2026-10-12T16:30:48.7415909Z INSERT 0 1
+2026-10-12T16:30:48.7418230Z               set_config              
+2026-10-12T16:30:48.7418681Z --------------------------------------
+2026-10-12T16:30:48.7418989Z  10000000-0000-4000-8000-000000000002
+2026-10-12T16:30:48.7419241Z (1 row)
+2026-10-12T16:30:48.7419501Z 
+2026-10-12T16:30:48.7426406Z INSERT 0 1
+2026-10-12T16:30:48.7444126Z INSERT 0 1
+2026-10-12T16:30:48.7446532Z               set_config              
+2026-10-12T16:30:48.7447056Z --------------------------------------
+2026-10-12T16:30:48.7447497Z  10000000-0000-4000-8000-000000000001
+2026-10-12T16:30:48.7447876Z (1 row)
+2026-10-12T16:30:48.7448048Z 
+2026-10-12T16:30:48.8943049Z INSERT 0 1
+2026-10-12T16:30:49.0436898Z INSERT 0 1
+2026-10-12T16:30:49.1940893Z INSERT 0 1
+2026-10-12T16:30:49.1942250Z  set_config 
+2026-10-12T16:30:49.1942536Z ------------
+2026-10-12T16:30:49.1942872Z  legacy
+2026-10-12T16:30:49.1943125Z (1 row)
+2026-10-12T16:30:49.1943280Z 
+2026-10-12T16:30:49.3462569Z INSERT 0 1
+2026-10-12T16:30:49.5011013Z INSERT 0 1
+2026-10-12T16:30:49.5980913Z  expect_count 
+2026-10-12T16:30:49.5981208Z --------------
+2026-10-12T16:30:49.5981440Z  
+2026-10-12T16:30:49.5981640Z (1 row)
+2026-10-12T16:30:49.5981766Z 
+2026-10-12T16:30:49.6942208Z  expect_count 
+2026-10-12T16:30:49.6942600Z --------------
+2026-10-12T16:30:49.6942897Z  
+2026-10-12T16:30:49.6943164Z (1 row)
+2026-10-12T16:30:49.6943334Z 
+2026-10-12T16:30:49.8427261Z  expect_denied 
+2026-10-12T16:30:49.8427642Z ---------------
+2026-10-12T16:30:49.8427956Z  
+2026-10-12T16:30:49.8428204Z (1 row)
+2026-10-12T16:30:49.8428372Z 
+2026-10-12T16:30:50.1980500Z  expect_denied 
+2026-10-12T16:30:50.1981397Z ---------------
+2026-10-12T16:30:50.1981984Z  
+2026-10-12T16:30:50.1982485Z (1 row)
+2026-10-12T16:30:50.1982635Z 
+2026-10-12T16:30:50.3553723Z  expect_denied 
+2026-10-12T16:30:50.3554111Z ---------------
+2026-10-12T16:30:50.3554342Z  
+2026-10-12T16:30:50.3554584Z (1 row)
+2026-10-12T16:30:50.3554710Z 
+2026-10-12T16:30:50.7165880Z  expect_denied 
+2026-10-12T16:30:50.7166303Z ---------------
+2026-10-12T16:30:50.7166641Z  
+2026-10-12T16:30:50.7166922Z (1 row)
+2026-10-12T16:30:50.7167096Z 
+2026-10-12T16:30:50.8661918Z  expect_denied 
+2026-10-12T16:30:50.8662276Z ---------------
+2026-10-12T16:30:50.8662545Z  
+2026-10-12T16:30:50.8662789Z (1 row)
+2026-10-12T16:30:50.8662945Z 
+2026-10-12T16:30:51.2198574Z  expect_denied 
+2026-10-12T16:30:51.2198876Z ---------------
+2026-10-12T16:30:51.2199179Z  
+2026-10-12T16:30:51.2200625Z (1 row)
+2026-10-12T16:30:51.2200776Z 
+2026-10-12T16:30:51.3670084Z  expect_denied 
+2026-10-12T16:30:51.3670504Z ---------------
+2026-10-12T16:30:51.3670803Z  
+2026-10-12T16:30:51.3671061Z (1 row)
+2026-10-12T16:30:51.3671225Z 
+2026-10-12T16:30:51.5154431Z  expect_denied 
+2026-10-12T16:30:51.5154840Z ---------------
+2026-10-12T16:30:51.5155070Z  
+2026-10-12T16:30:51.5155273Z (1 row)
+2026-10-12T16:30:51.5155395Z 
+2026-10-12T16:30:51.8985255Z  expect_count 
+2026-10-12T16:30:51.8985648Z --------------
+2026-10-12T16:30:51.8985922Z  
+2026-10-12T16:30:51.8986166Z (1 row)
+2026-10-12T16:30:51.8986321Z 
+2026-10-12T16:30:52.2777966Z  expect_count 
+2026-10-12T16:30:52.2778391Z --------------
+2026-10-12T16:30:52.2778636Z  
+2026-10-12T16:30:52.2778837Z (1 row)
+2026-10-12T16:30:52.2778955Z 
+2026-10-12T16:30:52.3742263Z  expect_count 
+2026-10-12T16:30:52.3742531Z --------------
+2026-10-12T16:30:52.3742754Z  
+2026-10-12T16:30:52.3742947Z (1 row)
+2026-10-12T16:30:52.3743068Z 
+2026-10-12T16:30:52.4750860Z  expect_count 
+2026-10-12T16:30:52.4751420Z --------------
+2026-10-12T16:30:52.4751862Z  
+2026-10-12T16:30:52.4752170Z (1 row)
+2026-10-12T16:30:52.4752317Z 
+2026-10-12T16:30:52.5739666Z  expect_count 
+2026-10-12T16:30:52.5740017Z --------------
+2026-10-12T16:30:52.5740340Z  
+2026-10-12T16:30:52.5741127Z (1 row)
+2026-10-12T16:30:52.5741330Z 
+2026-10-12T16:30:52.5742018Z  set_config 
+2026-10-12T16:30:52.5742290Z ------------
+2026-10-12T16:30:52.5742539Z  tenant
+2026-10-12T16:30:52.5742730Z (1 row)
+2026-10-12T16:30:52.5742843Z 
+2026-10-12T16:30:52.8818743Z INSERT 0 2
+2026-10-12T16:30:53.1913107Z INSERT 0 2
+2026-10-12T16:30:53.5021022Z INSERT 0 2
+2026-10-12T16:30:53.5981468Z INSERT 0 2
+2026-10-12T16:30:53.6927732Z  expect_count 
+2026-10-12T16:30:53.6928058Z --------------
+2026-10-12T16:30:53.6928307Z  
+2026-10-12T16:30:53.6928561Z (1 row)
+2026-10-12T16:30:53.6928677Z 
+2026-10-12T16:30:53.6929465Z  set_config 
+2026-10-12T16:30:53.6929748Z ------------
+2026-10-12T16:30:53.6930022Z  legacy
+2026-10-12T16:30:53.6930265Z (1 row)
+2026-10-12T16:30:53.6930406Z 
+2026-10-12T16:30:53.8952932Z  expect_count 
+2026-10-12T16:30:53.8953467Z --------------
+2026-10-12T16:30:53.8953798Z  
+2026-10-12T16:30:53.8954084Z (1 row)
+2026-10-12T16:30:53.8954282Z 
+2026-10-12T16:30:54.0972453Z  expect_count 
+2026-10-12T16:30:54.0972854Z --------------
+2026-10-12T16:30:54.0973146Z  
+2026-10-12T16:30:54.0973396Z (1 row)
+2026-10-12T16:30:54.0973545Z 
+2026-10-12T16:30:54.2969267Z  expect_count 
+2026-10-12T16:30:54.2969818Z --------------
+2026-10-12T16:30:54.2970083Z  
+2026-10-12T16:30:54.2970331Z (1 row)
+2026-10-12T16:30:54.2970483Z 
+2026-10-12T16:30:54.3960145Z  expect_count 
+2026-10-12T16:30:54.3960482Z --------------
+2026-10-12T16:30:54.3960713Z  
+2026-10-12T16:30:54.3960914Z (1 row)
+2026-10-12T16:30:54.3961041Z 
+2026-10-12T16:30:54.5974508Z  expect_count 
+2026-10-12T16:30:54.5974965Z --------------
+2026-10-12T16:30:54.5975269Z  
+2026-10-12T16:30:54.5975555Z (1 row)
+2026-10-12T16:30:54.5975751Z 
+2026-10-12T16:30:54.7997524Z  expect_count 
+2026-10-12T16:30:54.7998015Z --------------
+2026-10-12T16:30:54.7998378Z  
+2026-10-12T16:30:54.7998703Z (1 row)
+2026-10-12T16:30:54.7998929Z 
+2026-10-12T16:30:55.0034132Z  expect_count 
+2026-10-12T16:30:55.0034555Z --------------
+2026-10-12T16:30:55.0034784Z  
+2026-10-12T16:30:55.0034985Z (1 row)
+2026-10-12T16:30:55.0035141Z 
+2026-10-12T16:30:55.1042147Z  expect_count 
+2026-10-12T16:30:55.1042554Z --------------
+2026-10-12T16:30:55.1042787Z  
+2026-10-12T16:30:55.1043033Z (1 row)
+2026-10-12T16:30:55.1043148Z 
+2026-10-12T16:30:55.3007371Z  expect_denied 
+2026-10-12T16:30:55.3007699Z ---------------
+2026-10-12T16:30:55.3007933Z  
+2026-10-12T16:30:55.3008130Z (1 row)
+2026-10-12T16:30:55.3008252Z 
+2026-10-12T16:30:55.4991202Z  expect_count 
+2026-10-12T16:30:55.4991567Z --------------
+2026-10-12T16:30:55.4991885Z  
+2026-10-12T16:30:55.4992087Z (1 row)
+2026-10-12T16:30:55.4992214Z 
+2026-10-12T16:30:55.4992441Z  set_config 
+2026-10-12T16:30:55.4993009Z ------------
+2026-10-12T16:30:55.4993360Z  tenant
+2026-10-12T16:30:55.4993695Z (1 row)
+2026-10-12T16:30:55.4993946Z 
+2026-10-12T16:30:55.4994702Z               set_config              
+2026-10-12T16:30:55.4995185Z --------------------------------------
+2026-10-12T16:30:55.4995604Z  10000000-0000-4000-8000-000000000002
+2026-10-12T16:30:55.4995870Z (1 row)
+2026-10-12T16:30:55.5959662Z 
+2026-10-12T16:30:55.5960347Z  expect_count 
+2026-10-12T16:30:55.5960729Z --------------
+2026-10-12T16:30:55.5961010Z  
+2026-10-12T16:30:55.5961750Z (1 row)
+2026-10-12T16:30:55.5961878Z 
+2026-10-12T16:30:55.5962354Z               set_config              
+2026-10-12T16:30:55.5962840Z --------------------------------------
+2026-10-12T16:30:55.5963282Z  10000000-0000-4000-8000-000000000001
+2026-10-12T16:30:55.5963624Z (1 row)
+2026-10-12T16:30:55.5963779Z 
+2026-10-12T16:30:55.5963904Z  set_config 
+2026-10-12T16:30:55.5964187Z ------------
+2026-10-12T16:30:55.5964469Z  tenant
+2026-10-12T16:30:55.5964724Z (1 row)
+2026-10-12T16:30:55.5964865Z 
+2026-10-12T16:30:55.5984576Z INSERT 0 1
+2026-10-12T16:30:55.7518524Z INSERT 0 2
+2026-10-12T16:30:55.7521547Z  set_config 
+2026-10-12T16:30:55.7522008Z ------------
+2026-10-12T16:30:55.7522377Z  legacy
+2026-10-12T16:30:55.7522743Z (1 row)
+2026-10-12T16:30:55.7522918Z 
+2026-10-12T16:30:55.7541020Z  expect_count 
+2026-10-12T16:30:55.7541450Z --------------
+2026-10-12T16:30:55.7559953Z  
+2026-10-12T16:30:55.7560217Z (1 row)
+2026-10-12T16:30:55.7560454Z 
+2026-10-12T16:30:55.8526928Z  expect_count 
+2026-10-12T16:30:55.8527367Z --------------
+2026-10-12T16:30:55.8527648Z  
+2026-10-12T16:30:55.8527848Z (1 row)
+2026-10-12T16:30:55.8527974Z 
+2026-10-12T16:30:55.8544743Z  expect_denied 
+2026-10-12T16:30:55.8545114Z ---------------
+2026-10-12T16:30:55.8545406Z  
+2026-10-12T16:30:55.8545649Z (1 row)
+2026-10-12T16:30:55.8545812Z 
+2026-10-12T16:30:55.8572848Z  expect_denied 
+2026-10-12T16:30:55.8573200Z ---------------
+2026-10-12T16:30:55.8573485Z  
+2026-10-12T16:30:55.8573757Z (1 row)
+2026-10-12T16:30:55.8573907Z 
+2026-10-12T16:30:55.8588719Z  expect_denied 
+2026-10-12T16:30:55.8589005Z ---------------
+2026-10-12T16:30:55.8589811Z  
+2026-10-12T16:30:55.8590060Z (1 row)
+2026-10-12T16:30:55.8590223Z 
+2026-10-12T16:30:55.8617152Z  expect_denied 
+2026-10-12T16:30:55.8620198Z ---------------
+2026-10-12T16:30:55.8620482Z  
+2026-10-12T16:30:55.8620734Z (1 row)
+2026-10-12T16:30:55.8620915Z 
+2026-10-12T16:30:55.8633867Z  expect_denied 
+2026-10-12T16:30:55.8634175Z ---------------
+2026-10-12T16:30:55.8634591Z  
+2026-10-12T16:30:55.8634801Z (1 row)
+2026-10-12T16:30:55.8634908Z 
+2026-10-12T16:30:55.8660328Z  expect_denied 
+2026-10-12T16:30:55.8660614Z ---------------
+2026-10-12T16:30:55.8660884Z  
+2026-10-12T16:30:55.8661099Z (1 row)
+2026-10-12T16:30:55.8661220Z 
+2026-10-12T16:30:55.8677278Z  expect_count 
+2026-10-12T16:30:55.8677580Z --------------
+2026-10-12T16:30:55.8677848Z  
+2026-10-12T16:30:55.8678103Z (1 row)
+2026-10-12T16:30:55.8678259Z 
+2026-10-12T16:30:55.8706217Z  expect_count 
+2026-10-12T16:30:55.8706492Z --------------
+2026-10-12T16:30:55.8706700Z  
+2026-10-12T16:30:55.8707051Z (1 row)
+2026-10-12T16:30:55.8707254Z 
+2026-10-12T16:30:55.8723030Z  expect_count 
+2026-10-12T16:30:55.8723333Z --------------
+2026-10-12T16:30:55.8723598Z  
+2026-10-12T16:30:55.8723858Z (1 row)
+2026-10-12T16:30:55.8724028Z 
+2026-10-12T16:30:55.8725203Z  set_config 
+2026-10-12T16:30:55.8725631Z ------------
+2026-10-12T16:30:55.8725904Z  property
+2026-10-12T16:30:55.8726122Z (1 row)
+2026-10-12T16:30:55.8726280Z 
+2026-10-12T16:30:55.8726666Z                 set_config                
+2026-10-12T16:30:55.8727133Z ------------------------------------------
+2026-10-12T16:30:55.8727524Z  ["20000000-0000-4000-8000-000000000002"]
+2026-10-12T16:30:55.8727863Z (1 row)
+2026-10-12T16:30:55.8728037Z 
+2026-10-12T16:30:55.9685222Z  expect_count 
+2026-10-12T16:30:55.9685663Z --------------
+2026-10-12T16:30:55.9685960Z  
+2026-10-12T16:30:55.9686228Z (1 row)
+2026-10-12T16:30:55.9686398Z 
+2026-10-12T16:30:56.1180766Z  expect_denied 
+2026-10-12T16:30:56.1181184Z ---------------
+2026-10-12T16:30:56.1181473Z  
+2026-10-12T16:30:56.1181702Z (1 row)
+2026-10-12T16:30:56.1181856Z 
+2026-10-12T16:30:56.4755948Z  expect_denied 
+2026-10-12T16:30:56.4756326Z ---------------
+2026-10-12T16:30:56.4756595Z  
+2026-10-12T16:30:56.4756831Z (1 row)
+2026-10-12T16:30:56.4756987Z 
+2026-10-12T16:30:56.8610404Z  expect_count 
+2026-10-12T16:30:56.8610826Z --------------
+2026-10-12T16:30:56.8611106Z  
+2026-10-12T16:30:56.8611356Z (1 row)
+2026-10-12T16:30:56.8611506Z 
+2026-10-12T16:30:56.9587858Z  expect_count 
+2026-10-12T16:30:56.9588632Z --------------
+2026-10-12T16:30:56.9588929Z  
+2026-10-12T16:30:56.9589129Z (1 row)
+2026-10-12T16:30:56.9589608Z 
+2026-10-12T16:30:56.9590122Z                                    set_config                                    
+2026-10-12T16:30:56.9591098Z ---------------------------------------------------------------------------------
+2026-10-12T16:30:56.9592034Z  ["20000000-0000-4000-8000-000000000001","20000000-0000-4000-8000-000000000002"]
+2026-10-12T16:30:56.9592767Z (1 row)
+2026-10-12T16:30:56.9593187Z 
+2026-10-12T16:30:57.0557909Z  expect_count 
+2026-10-12T16:30:57.0558323Z --------------
+2026-10-12T16:30:57.0558554Z  
+2026-10-12T16:30:57.0558752Z (1 row)
+2026-10-12T16:30:57.0558878Z 
+2026-10-12T16:30:57.2090068Z  expect_denied 
+2026-10-12T16:30:57.2090502Z ---------------
+2026-10-12T16:30:57.2090765Z  
+2026-10-12T16:30:57.2091384Z (1 row)
+2026-10-12T16:30:57.2091516Z 
+2026-10-12T16:30:57.5706801Z  expect_denied 
+2026-10-12T16:30:57.5707181Z ---------------
+2026-10-12T16:30:57.5707501Z  
+2026-10-12T16:30:57.5707748Z (1 row)
+2026-10-12T16:30:57.5707900Z 
+2026-10-12T16:30:57.9555763Z  expect_count 
+2026-10-12T16:30:57.9556117Z --------------
+2026-10-12T16:30:57.9556377Z  
+2026-10-12T16:30:57.9556630Z (1 row)
+2026-10-12T16:30:57.9556765Z 
+2026-10-12T16:30:58.0531448Z  expect_count 
+2026-10-12T16:30:58.0531769Z --------------
+2026-10-12T16:30:58.0532072Z  
+2026-10-12T16:30:58.0532355Z (1 row)
+2026-10-12T16:30:58.0532513Z 
+2026-10-12T16:30:58.0532857Z                 set_config                
+2026-10-12T16:30:58.0533284Z ------------------------------------------
+2026-10-12T16:30:58.0533597Z  ["20000000-0000-4000-8000-000000000001"]
+2026-10-12T16:30:58.0533864Z (1 row)
+2026-10-12T16:30:58.0533983Z 
+2026-10-12T16:30:58.0553868Z  expect_count 
+2026-10-12T16:30:58.0554212Z --------------
+2026-10-12T16:30:58.0554476Z  
+2026-10-12T16:30:58.0554753Z (1 row)
+2026-10-12T16:30:58.0554900Z 
+2026-10-12T16:30:58.1511235Z  expect_count 
+2026-10-12T16:30:58.1511608Z --------------
+2026-10-12T16:30:58.1512011Z  
+2026-10-12T16:30:58.1512242Z (1 row)
+2026-10-12T16:30:58.1512421Z 
+2026-10-12T16:30:58.1513431Z  set_config 
+2026-10-12T16:30:58.1513731Z ------------
+2026-10-12T16:30:58.1514002Z  tenant
+2026-10-12T16:30:58.1514247Z (1 row)
+2026-10-12T16:30:58.1514384Z 
+2026-10-12T16:30:58.2453226Z  expect_count 
+2026-10-12T16:30:58.2453677Z --------------
+2026-10-12T16:30:58.2453966Z  
+2026-10-12T16:30:58.2454190Z (1 row)
+2026-10-12T16:30:58.2454340Z 
+2026-10-12T16:30:58.2454466Z RESET
+2026-10-12T16:30:58.2468791Z ROLLBACK
+2026-10-12T16:30:58.2470721Z                 result                 
+2026-10-12T16:30:58.2471187Z ---------------------------------------
+2026-10-12T16:30:58.2471638Z  Action property RLS integration: PASS
+2026-10-12T16:30:58.2472120Z (1 row)
+2026-10-12T16:30:58.2472320Z 
+2026-10-12T16:30:58.2808850Z BEGIN
+2026-10-12T16:30:58.2811520Z CREATE ROLE
+2026-10-12T16:30:58.2818710Z GRANT
+2026-10-12T16:30:58.2822445Z GRANT
+2026-10-12T16:30:58.2824230Z GRANT
+2026-10-12T16:30:58.2893915Z GRANT
+2026-10-12T16:30:58.2912936Z INSERT 0 2
+2026-10-12T16:30:58.2921242Z INSERT 0 3
+2026-10-12T16:30:58.2964060Z INSERT 0 3
+2026-10-12T16:30:58.3011140Z INSERT 0 3
+2026-10-12T16:30:58.3172925Z INSERT 0 3
+2026-10-12T16:30:58.3190070Z INSERT 0 2
+2026-10-12T16:30:58.3203020Z INSERT 0 2
+2026-10-12T16:30:58.3213016Z CREATE FUNCTION
+2026-10-12T16:30:58.3216918Z CREATE FUNCTION
+2026-10-12T16:30:58.3217847Z SET
+2026-10-12T16:30:58.3221287Z               set_config              
+2026-10-12T16:30:58.3221768Z --------------------------------------
+2026-10-12T16:30:58.3222173Z  11000000-0000-4000-8000-000000000001
+2026-10-12T16:30:58.3222605Z (1 row)
+2026-10-12T16:30:58.3222777Z 
+2026-10-12T16:30:58.3223208Z  set_config 
+2026-10-12T16:30:58.3223509Z ------------
+2026-10-12T16:30:58.3223891Z  property
+2026-10-12T16:30:58.3224155Z (1 row)
+2026-10-12T16:30:58.3224310Z 
+2026-10-12T16:30:58.3224575Z                 set_config                
+2026-10-12T16:30:58.3225021Z ------------------------------------------
+2026-10-12T16:30:58.3225774Z  ["21000000-0000-4000-8000-000000000001"]
+2026-10-12T16:30:58.3226037Z (1 row)
+2026-10-12T16:30:58.3226191Z 
+2026-10-12T16:30:58.3232915Z  expect_count 
+2026-10-12T16:30:58.3239693Z --------------
+2026-10-12T16:30:58.3239993Z  
+2026-10-12T16:30:58.3240279Z (1 row)
+2026-10-12T16:30:58.3240496Z 
+2026-10-12T16:30:58.3240625Z  expect_count 
+2026-10-12T16:30:58.3240884Z --------------
+2026-10-12T16:30:58.3241265Z  
+2026-10-12T16:30:58.3241467Z (1 row)
+2026-10-12T16:30:58.3241574Z 
+2026-10-12T16:30:58.3246859Z  expect_count 
+2026-10-12T16:30:58.3247148Z --------------
+2026-10-12T16:30:58.3247405Z  
+2026-10-12T16:30:58.3247655Z (1 row)
+2026-10-12T16:30:58.3247867Z 
+2026-10-12T16:30:58.3252262Z  expect_denied 
+2026-10-12T16:30:58.3257158Z ---------------
+2026-10-12T16:30:58.3257604Z  
+2026-10-12T16:30:58.3257938Z (1 row)
+2026-10-12T16:30:58.3258161Z 
+2026-10-12T16:30:58.3258617Z  expect_denied 
+2026-10-12T16:30:58.3258904Z ---------------
+2026-10-12T16:30:58.3259166Z  
+2026-10-12T16:30:58.3259641Z (1 row)
+2026-10-12T16:30:58.3259834Z 
+2026-10-12T16:30:58.3260046Z                 set_config                
+2026-10-12T16:30:58.3260499Z ------------------------------------------
+2026-10-12T16:30:58.3260915Z  ["21000000-0000-4000-8000-000000000002"]
+2026-10-12T16:30:58.3261266Z (1 row)
+2026-10-12T16:30:58.3261417Z 
+2026-10-12T16:30:58.3264344Z  expect_count 
+2026-10-12T16:30:58.3264804Z --------------
+2026-10-12T16:30:58.3265096Z  
+2026-10-12T16:30:58.3265298Z (1 row)
+2026-10-12T16:30:58.3265414Z 
+2026-10-12T16:30:58.3270721Z  expect_count 
+2026-10-12T16:30:58.3271004Z --------------
+2026-10-12T16:30:58.3271232Z  
+2026-10-12T16:30:58.3271424Z (1 row)
+2026-10-12T16:30:58.3271535Z 
+2026-10-12T16:30:58.3273339Z                                    set_config                                    
+2026-10-12T16:30:58.3274040Z ---------------------------------------------------------------------------------
+2026-10-12T16:30:58.3274794Z  ["21000000-0000-4000-8000-000000000001","21000000-0000-4000-8000-000000000002"]
+2026-10-12T16:30:58.3275345Z (1 row)
+2026-10-12T16:30:58.3275498Z 
+2026-10-12T16:30:58.3277375Z  expect_count 
+2026-10-12T16:30:58.3277676Z --------------
+2026-10-12T16:30:58.3278022Z  
+2026-10-12T16:30:58.3278304Z (1 row)
+2026-10-12T16:30:58.3278462Z 
+2026-10-12T16:30:58.3278918Z  set_config 
+2026-10-12T16:30:58.3279192Z ------------
+2026-10-12T16:30:58.3279557Z  []
+2026-10-12T16:30:58.3279889Z (1 row)
+2026-10-12T16:30:58.3280008Z 
+2026-10-12T16:30:58.3282765Z  expect_count 
+2026-10-12T16:30:58.3283036Z --------------
+2026-10-12T16:30:58.3283237Z  
+2026-10-12T16:30:58.3283432Z (1 row)
+2026-10-12T16:30:58.3283593Z 
+2026-10-12T16:30:58.3284226Z  set_config 
+2026-10-12T16:30:58.3284505Z ------------
+2026-10-12T16:30:58.3284727Z  tenant
+2026-10-12T16:30:58.3284912Z (1 row)
+2026-10-12T16:30:58.3285021Z 
+2026-10-12T16:30:58.3287871Z  expect_count 
+2026-10-12T16:30:58.3288174Z --------------
+2026-10-12T16:30:58.3288451Z  
+2026-10-12T16:30:58.3288880Z (1 row)
+2026-10-12T16:30:58.3289047Z 
+2026-10-12T16:30:58.3289266Z               set_config              
+2026-10-12T16:30:58.3289867Z --------------------------------------
+2026-10-12T16:30:58.3290313Z  11000000-0000-4000-8000-000000000002
+2026-10-12T16:30:58.3290692Z (1 row)
+2026-10-12T16:30:58.3290866Z 
+2026-10-12T16:30:58.3293065Z  expect_count 
+2026-10-12T16:30:58.3293470Z --------------
+2026-10-12T16:30:58.3293928Z  
+2026-10-12T16:30:58.3294182Z (1 row)
+2026-10-12T16:30:58.3294329Z 
+2026-10-12T16:30:58.3294427Z RESET
+2026-10-12T16:30:58.3300255Z ROLLBACK
+2026-10-12T16:30:58.3302371Z                 result                
+2026-10-12T16:30:58.3302813Z --------------------------------------
+2026-10-12T16:30:58.3303232Z  Hotel Handover RLS integration: PASS
+2026-10-12T16:30:58.3303602Z (1 row)
+2026-10-12T16:30:58.3303747Z 
+2026-10-12T16:30:58.3636910Z BEGIN
+2026-10-12T16:30:58.3639997Z CREATE ROLE
+2026-10-12T16:30:58.3645720Z GRANT
+2026-10-12T16:30:58.3650010Z GRANT
+2026-10-12T16:30:58.3652046Z GRANT
+2026-10-12T16:30:58.3726986Z GRANT
+2026-10-12T16:30:58.3745741Z INSERT 0 2
+2026-10-12T16:30:58.3753782Z INSERT 0 3
+2026-10-12T16:30:58.3778860Z INSERT 0 3
+2026-10-12T16:30:58.3839942Z INSERT 0 3
+2026-10-12T16:30:58.3854278Z INSERT 0 3
+2026-10-12T16:30:58.3874562Z INSERT 0 2
+2026-10-12T16:30:58.3893466Z INSERT 0 2
+2026-10-12T16:30:58.3902411Z CREATE FUNCTION
+2026-10-12T16:30:58.3905104Z CREATE FUNCTION
+2026-10-12T16:30:58.3906701Z SET
+2026-10-12T16:30:58.3910219Z               set_config              
+2026-10-12T16:30:58.3910963Z --------------------------------------
+2026-10-12T16:30:58.3911969Z  12000000-0000-4000-8000-000000000001
+2026-10-12T16:30:58.3912416Z (1 row)
+2026-10-12T16:30:58.3912616Z 
+2026-10-12T16:30:58.3912718Z  set_config 
+2026-10-12T16:30:58.3912948Z ------------
+2026-10-12T16:30:58.3913246Z  property
+2026-10-12T16:30:58.3913498Z (1 row)
+2026-10-12T16:30:58.3913633Z 
+2026-10-12T16:30:58.3913866Z                 set_config                
+2026-10-12T16:30:58.3914732Z ------------------------------------------
+2026-10-12T16:30:58.3915238Z  ["22000000-0000-4000-8000-000000000001"]
+2026-10-12T16:30:58.3915705Z (1 row)
+2026-10-12T16:30:58.3915894Z 
+2026-10-12T16:30:58.3921730Z  expect_count 
+2026-10-12T16:30:58.3921998Z --------------
+2026-10-12T16:30:58.3922216Z  
+2026-10-12T16:30:58.3922412Z (1 row)
+2026-10-12T16:30:58.3922533Z 
+2026-10-12T16:30:58.3928331Z  expect_count 
+2026-10-12T16:30:58.3928644Z --------------
+2026-10-12T16:30:58.3928867Z  
+2026-10-12T16:30:58.3929063Z (1 row)
+2026-10-12T16:30:58.3929175Z 
+2026-10-12T16:30:58.3937325Z  expect_count 
+2026-10-12T16:30:58.3937580Z --------------
+2026-10-12T16:30:58.3937795Z  
+2026-10-12T16:30:58.3937986Z (1 row)
+2026-10-12T16:30:58.3938104Z 
+2026-10-12T16:30:58.3947823Z  expect_denied 
+2026-10-12T16:30:58.3948197Z ---------------
+2026-10-12T16:30:58.3948414Z  
+2026-10-12T16:30:58.3948610Z (1 row)
+2026-10-12T16:30:58.3948732Z 
+2026-10-12T16:30:58.3952239Z                 set_config                
+2026-10-12T16:30:58.3953201Z ------------------------------------------
+2026-10-12T16:30:58.3953895Z  ["22000000-0000-4000-8000-000000000002"]
+2026-10-12T16:30:58.3954515Z (1 row)
+2026-10-12T16:30:58.3954819Z 
+2026-10-12T16:30:58.3955796Z  expect_count 
+2026-10-12T16:30:58.3956056Z --------------
+2026-10-12T16:30:58.3956272Z  
+2026-10-12T16:30:58.3956476Z (1 row)
+2026-10-12T16:30:58.3956634Z 
+2026-10-12T16:30:58.3957824Z                                    set_config                                    
+2026-10-12T16:30:58.3958516Z ---------------------------------------------------------------------------------
+2026-10-12T16:30:58.3959017Z  ["22000000-0000-4000-8000-000000000001","22000000-0000-4000-8000-000000000002"]
+2026-10-12T16:30:58.3959542Z (1 row)
+2026-10-12T16:30:58.3959670Z 
+2026-10-12T16:30:58.3961470Z  expect_count 
+2026-10-12T16:30:58.3961782Z --------------
+2026-10-12T16:30:58.3962067Z  
+2026-10-12T16:30:58.3962369Z (1 row)
+2026-10-12T16:30:58.3962555Z 
+2026-10-12T16:30:58.3962776Z  set_config 
+2026-10-12T16:30:58.3963301Z ------------
+2026-10-12T16:30:58.3963566Z  []
+2026-10-12T16:30:58.3963763Z (1 row)
+2026-10-12T16:30:58.3963891Z 
+2026-10-12T16:30:58.3966436Z  expect_count 
+2026-10-12T16:30:58.3966749Z --------------
+2026-10-12T16:30:58.3967133Z  
+2026-10-12T16:30:58.3967442Z (1 row)
+2026-10-12T16:30:58.3967611Z 
+2026-10-12T16:30:58.3968021Z  set_config 
+2026-10-12T16:30:58.3968330Z ------------
+2026-10-12T16:30:58.3968619Z  tenant
+2026-10-12T16:30:58.3968885Z (1 row)
+2026-10-12T16:30:58.3969045Z 
+2026-10-12T16:30:58.3973099Z  expect_count 
+2026-10-12T16:30:58.3973755Z --------------
+2026-10-12T16:30:58.3974163Z  
+2026-10-12T16:30:58.3974546Z (1 row)
+2026-10-12T16:30:58.3974715Z 
+2026-10-12T16:30:58.3974915Z               set_config              
+2026-10-12T16:30:58.3975416Z --------------------------------------
+2026-10-12T16:30:58.3975718Z  12000000-0000-4000-8000-000000000002
+2026-10-12T16:30:58.3975970Z (1 row)
+2026-10-12T16:30:58.3976082Z 
+2026-10-12T16:30:58.3978659Z  expect_count 
+2026-10-12T16:30:58.3979108Z --------------
+2026-10-12T16:30:58.3979541Z  
+2026-10-12T16:30:58.3979860Z (1 row)
+2026-10-12T16:30:58.3980086Z 
+2026-10-12T16:30:58.3980429Z RESET
+2026-10-12T16:30:58.3982031Z ROLLBACK
+2026-10-12T16:30:58.3984006Z                    result                   
+2026-10-12T16:30:58.3984508Z --------------------------------------------
+2026-10-12T16:30:58.3985015Z  Hospitality Metering RLS integration: PASS
+2026-10-12T16:30:58.3985534Z (1 row)
+2026-10-12T16:30:58.3985719Z 
+2026-10-12T16:30:58.4318927Z BEGIN
+2026-10-12T16:30:58.4340393Z INSERT 0 2
+2026-10-12T16:30:58.4348443Z INSERT 0 1
+2026-10-12T16:30:58.4370550Z INSERT 0 1
+2026-10-12T16:30:58.4419848Z INSERT 0 3
+2026-10-12T16:30:58.4434379Z INSERT 0 3
+2026-10-12T16:30:58.4446192Z INSERT 0 3
+2026-10-12T16:30:58.4460801Z INSERT 0 3
+2026-10-12T16:30:58.4483350Z INSERT 0 3
+2026-10-12T16:30:58.4507003Z INSERT 0 3
+2026-10-12T16:30:58.4531327Z INSERT 0 3
+2026-10-12T16:30:58.4542102Z CREATE FUNCTION
+2026-10-12T16:30:58.4545154Z CREATE FUNCTION
+2026-10-12T16:30:58.4546979Z SET
+2026-10-12T16:30:58.4549837Z               set_config              
+2026-10-12T16:30:58.4550616Z --------------------------------------
+2026-10-12T16:30:58.4551096Z  13000000-0000-4000-8000-000000000001
+2026-10-12T16:30:58.4551601Z (1 row)
+2026-10-12T16:30:58.4551770Z 
+2026-10-12T16:30:58.4551897Z  set_config 
+2026-10-12T16:30:58.4552222Z ------------
+2026-10-12T16:30:58.4552560Z  property
+2026-10-12T16:30:58.4552830Z (1 row)
+2026-10-12T16:30:58.4552978Z 
+2026-10-12T16:30:58.4553178Z                 set_config                
+2026-10-12T16:30:58.4553693Z ------------------------------------------
+2026-10-12T16:30:58.4554212Z  ["23000000-0000-4000-8000-000000000001"]
+2026-10-12T16:30:58.4554641Z (1 row)
+2026-10-12T16:30:58.4554833Z 
+2026-10-12T16:30:58.4605954Z  expect_count 
+2026-10-12T16:30:58.4606227Z --------------
+2026-10-12T16:30:58.4606456Z  
+2026-10-12T16:30:58.4606708Z (1 row)
+2026-10-12T16:30:58.4606839Z 
+2026-10-12T16:30:58.4688221Z  expect_count 
+2026-10-12T16:30:58.4688523Z --------------
+2026-10-12T16:30:58.4688786Z  
+2026-10-12T16:30:58.4689024Z (1 row)
+2026-10-12T16:30:58.4689214Z 
+2026-10-12T16:30:58.4763598Z  expect_denied 
+2026-10-12T16:30:58.4763987Z ---------------
+2026-10-12T16:30:58.4764410Z  
+2026-10-12T16:30:58.4764801Z (1 row)
+2026-10-12T16:30:58.4764957Z 
+2026-10-12T16:30:58.4765267Z                                    set_config                                    
+2026-10-12T16:30:58.4765864Z ---------------------------------------------------------------------------------
+2026-10-12T16:30:58.4766365Z  ["23000000-0000-4000-8000-000000000001","23000000-0000-4000-8000-000000000002"]
+2026-10-12T16:30:58.4766731Z (1 row)
+2026-10-12T16:30:58.4766849Z 
+2026-10-12T16:30:58.4841543Z  expect_count 
+2026-10-12T16:30:58.4841888Z --------------
+2026-10-12T16:30:58.4842193Z  
+2026-10-12T16:30:58.4842474Z (1 row)
+2026-10-12T16:30:58.4842653Z 
+2026-10-12T16:30:58.4844585Z  set_config 
+2026-10-12T16:30:58.4844938Z ------------
+2026-10-12T16:30:58.4845306Z  []
+2026-10-12T16:30:58.4845609Z (1 row)
+2026-10-12T16:30:58.4845807Z 
+2026-10-12T16:30:58.4916495Z  expect_count 
+2026-10-12T16:30:58.4916804Z --------------
+2026-10-12T16:30:58.4917013Z  
+2026-10-12T16:30:58.4917230Z (1 row)
+2026-10-12T16:30:58.4917422Z 
+2026-10-12T16:30:58.4918365Z  set_config 
+2026-10-12T16:30:58.4918696Z ------------
+2026-10-12T16:30:58.4918899Z  tenant
+2026-10-12T16:30:58.4919090Z (1 row)
+2026-10-12T16:30:58.4919201Z 
+2026-10-12T16:30:58.4988236Z  expect_count 
+2026-10-12T16:30:58.4988615Z --------------
+2026-10-12T16:30:58.4988903Z  
+2026-10-12T16:30:58.4989150Z (1 row)
+2026-10-12T16:30:58.4989446Z 
+2026-10-12T16:30:58.5055880Z  expect_denied 
+2026-10-12T16:30:58.5056181Z ---------------
+2026-10-12T16:30:58.5056549Z  
+2026-10-12T16:30:58.5056857Z (1 row)
+2026-10-12T16:30:58.5056972Z 
+2026-10-12T16:30:58.5057345Z               set_config              
+2026-10-12T16:30:58.5057808Z --------------------------------------
+2026-10-12T16:30:58.5058198Z  13000000-0000-4000-8000-000000000002
+2026-10-12T16:30:58.5058455Z (1 row)
+2026-10-12T16:30:58.5058561Z 
+2026-10-12T16:30:58.5124919Z  expect_count 
+2026-10-12T16:30:58.5125217Z --------------
+2026-10-12T16:30:58.5125798Z  
+2026-10-12T16:30:58.5126056Z (1 row)
+2026-10-12T16:30:58.5126197Z 
+2026-10-12T16:30:58.5126311Z RESET
+2026-10-12T16:30:58.5128506Z ROLLBACK
+2026-10-12T16:30:58.5130401Z                    result                   
+2026-10-12T16:30:58.5130915Z --------------------------------------------
+2026-10-12T16:30:58.5131607Z  Maintenance evidence RLS integration: PASS
+2026-10-12T16:30:58.5132137Z (1 row)
+2026-10-12T16:30:58.5132309Z 
+2026-10-12T16:30:58.5469010Z BEGIN
+2026-10-12T16:30:58.5491446Z INSERT 0 2
+2026-10-12T16:30:58.5546280Z INSERT 0 3
+2026-10-12T16:30:58.5571624Z INSERT 0 3
+2026-10-12T16:30:58.5613508Z INSERT 0 3
+2026-10-12T16:30:58.5639178Z INSERT 0 3
+2026-10-12T16:30:58.5667342Z INSERT 0 3
+2026-10-12T16:30:58.5687533Z INSERT 0 3
+2026-10-12T16:30:58.5827304Z INSERT 0 2
+2026-10-12T16:30:58.5837732Z CREATE FUNCTION
+2026-10-12T16:30:58.5841303Z CREATE FUNCTION
+2026-10-12T16:30:58.5843036Z SET
+2026-10-12T16:30:58.5845732Z               set_config              
+2026-10-12T16:30:58.5846506Z --------------------------------------
+2026-10-12T16:30:58.5846936Z  14000000-0000-4000-8000-000000000001
+2026-10-12T16:30:58.5847318Z (1 row)
+2026-10-12T16:30:58.5847489Z 
+2026-10-12T16:30:58.5847598Z  set_config 
+2026-10-12T16:30:58.5847874Z ------------
+2026-10-12T16:30:58.5848153Z  property
+2026-10-12T16:30:58.5848356Z (1 row)
+2026-10-12T16:30:58.5848470Z 
+2026-10-12T16:30:58.5848601Z                 set_config                
+2026-10-12T16:30:58.5848918Z ------------------------------------------
+2026-10-12T16:30:58.5849219Z  ["24000000-0000-4000-8000-000000000001"]
+2026-10-12T16:30:58.5849737Z (1 row)
+2026-10-12T16:30:58.5849844Z 
+2026-10-12T16:30:58.5872650Z  expect_count 
+2026-10-12T16:30:58.5873009Z --------------
+2026-10-12T16:30:58.5873378Z  
+2026-10-12T16:30:58.5873659Z (1 row)
+2026-10-12T16:30:58.5873815Z 
+2026-10-12T16:30:58.5904567Z  expect_count 
+2026-10-12T16:30:58.5905194Z --------------
+2026-10-12T16:30:58.5905763Z  
+2026-10-12T16:30:58.5906243Z (1 row)
+2026-10-12T16:30:58.5906384Z 
+2026-10-12T16:30:58.5936450Z  expect_count 
+2026-10-12T16:30:58.5936722Z --------------
+2026-10-12T16:30:58.5936942Z  
+2026-10-12T16:30:58.5937138Z (1 row)
+2026-10-12T16:30:58.5937263Z 
+2026-10-12T16:30:58.7140974Z  expect_count 
+2026-10-12T16:30:58.7141364Z --------------
+2026-10-12T16:30:58.7141645Z  
+2026-10-12T16:30:58.7141888Z (1 row)
+2026-10-12T16:30:58.7142040Z 
+2026-10-12T16:30:58.7158149Z  expect_count 
+2026-10-12T16:30:58.7158555Z --------------
+2026-10-12T16:30:58.7158825Z  
+2026-10-12T16:30:58.7159464Z (1 row)
+2026-10-12T16:30:58.7159964Z 
+2026-10-12T16:30:58.7177352Z  expect_denied 
+2026-10-12T16:30:58.7177802Z ---------------
+2026-10-12T16:30:58.7178124Z  
+2026-10-12T16:30:58.7178395Z (1 row)
+2026-10-12T16:30:58.7178552Z 
+2026-10-12T16:30:58.7233376Z  expect_denied 
+2026-10-12T16:30:58.7233733Z ---------------
+2026-10-12T16:30:58.7234076Z  
+2026-10-12T16:30:58.7234347Z (1 row)
+2026-10-12T16:30:58.7234521Z 
+2026-10-12T16:30:58.7265779Z  expect_denied 
+2026-10-12T16:30:58.7266277Z ---------------
+2026-10-12T16:30:58.7266668Z  
+2026-10-12T16:30:58.7266949Z (1 row)
+2026-10-12T16:30:58.7267109Z 
+2026-10-12T16:30:58.8747213Z  expect_denied 
+2026-10-12T16:30:58.8747663Z ---------------
+2026-10-12T16:30:58.8748011Z  
+2026-10-12T16:30:58.8748315Z (1 row)
+2026-10-12T16:30:58.8748487Z 
+2026-10-12T16:30:58.8777512Z  expect_denied 
+2026-10-12T16:30:58.8778000Z ---------------
+2026-10-12T16:30:58.8778337Z  
+2026-10-12T16:30:58.8778691Z (1 row)
+2026-10-12T16:30:58.8778901Z 
+2026-10-12T16:30:58.8779239Z                                    set_config                                    
+2026-10-12T16:30:58.8780149Z ---------------------------------------------------------------------------------
+2026-10-12T16:30:58.8780980Z  ["24000000-0000-4000-8000-000000000001","24000000-0000-4000-8000-000000000002"]
+2026-10-12T16:30:58.8781591Z (1 row)
+2026-10-12T16:30:58.8781839Z 
+2026-10-12T16:30:58.8797845Z  expect_count 
+2026-10-12T16:30:58.8798242Z --------------
+2026-10-12T16:30:58.8798544Z  
+2026-10-12T16:30:58.8799233Z (1 row)
+2026-10-12T16:30:58.8799552Z 
+2026-10-12T16:30:58.8829634Z  expect_count 
+2026-10-12T16:30:58.8830032Z --------------
+2026-10-12T16:30:58.8830325Z  
+2026-10-12T16:30:58.8830533Z (1 row)
+2026-10-12T16:30:58.8830660Z 
+2026-10-12T16:30:58.8861926Z  expect_count 
+2026-10-12T16:30:58.8862292Z --------------
+2026-10-12T16:30:58.8862599Z  
+2026-10-12T16:30:58.8862810Z (1 row)
+2026-10-12T16:30:58.8862922Z 
+2026-10-12T16:30:58.9818005Z  expect_count 
+2026-10-12T16:30:58.9818370Z --------------
+2026-10-12T16:30:58.9818632Z  
+2026-10-12T16:30:58.9818991Z (1 row)
+2026-10-12T16:30:58.9819141Z 
+2026-10-12T16:30:58.9819859Z  set_config 
+2026-10-12T16:30:58.9820155Z ------------
+2026-10-12T16:30:58.9820397Z  []
+2026-10-12T16:30:58.9820614Z (1 row)
+2026-10-12T16:30:58.9820726Z 
+2026-10-12T16:30:58.9837068Z  expect_count 
+2026-10-12T16:30:58.9837344Z --------------
+2026-10-12T16:30:58.9838261Z  
+2026-10-12T16:30:58.9838551Z (1 row)
+2026-10-12T16:30:58.9838735Z 
+2026-10-12T16:30:58.9838902Z  set_config 
+2026-10-12T16:30:58.9839200Z ------------
+2026-10-12T16:30:58.9839495Z  tenant
+2026-10-12T16:30:58.9839676Z (1 row)
+2026-10-12T16:30:58.9839825Z 
+2026-10-12T16:30:58.9856003Z  expect_count 
+2026-10-12T16:30:58.9856304Z --------------
+2026-10-12T16:30:58.9856800Z  
+2026-10-12T16:30:58.9857043Z (1 row)
+2026-10-12T16:30:58.9857195Z 
+2026-10-12T16:30:58.9857395Z               set_config              
+2026-10-12T16:30:58.9857866Z --------------------------------------
+2026-10-12T16:30:58.9858273Z  14000000-0000-4000-8000-000000000002
+2026-10-12T16:30:58.9858617Z (1 row)
+2026-10-12T16:30:58.9858764Z 
+2026-10-12T16:30:58.9874304Z  expect_count 
+2026-10-12T16:30:58.9874586Z --------------
+2026-10-12T16:30:58.9874843Z  
+2026-10-12T16:30:58.9875081Z (1 row)
+2026-10-12T16:30:58.9875227Z 
+2026-10-12T16:30:58.9905592Z  expect_count 
+2026-10-12T16:30:58.9906074Z --------------
+2026-10-12T16:30:58.9906465Z  
+2026-10-12T16:30:58.9906672Z (1 row)
+2026-10-12T16:30:58.9906784Z 
+2026-10-12T16:30:58.9906875Z RESET
+2026-10-12T16:30:58.9909635Z ROLLBACK
+2026-10-12T16:30:58.9911057Z                  result                  
+2026-10-12T16:30:58.9911550Z -----------------------------------------
+2026-10-12T16:30:58.9912000Z  Incident property RLS integration: PASS
+2026-10-12T16:30:58.9912287Z (1 row)
+2026-10-12T16:30:58.9912413Z 
+2026-10-12T16:30:59.0247454Z BEGIN
+2026-10-12T16:30:59.0266735Z INSERT 0 2
+2026-10-12T16:30:59.0328814Z INSERT 0 3
+2026-10-12T16:30:59.0342962Z INSERT 0 2
+2026-10-12T16:30:59.0374844Z INSERT 0 3
+2026-10-12T16:30:59.0421355Z INSERT 0 3
+2026-10-12T16:30:59.0461295Z INSERT 0 3
+2026-10-12T16:30:59.0618803Z INSERT 0 3
+2026-10-12T16:30:59.0643927Z INSERT 0 3
+2026-10-12T16:30:59.0662325Z INSERT 0 3
+2026-10-12T16:30:59.0679721Z INSERT 0 3
+2026-10-12T16:30:59.0696293Z INSERT 0 3
+2026-10-12T16:30:59.0705844Z CREATE FUNCTION
+2026-10-12T16:30:59.0708876Z CREATE FUNCTION
+2026-10-12T16:30:59.0712785Z CREATE FUNCTION
+2026-10-12T16:30:59.0714382Z SET
+2026-10-12T16:30:59.0717284Z               set_config              
+2026-10-12T16:30:59.0717801Z --------------------------------------
+2026-10-12T16:30:59.0718267Z  16000000-0000-4000-8000-000000000001
+2026-10-12T16:30:59.0718644Z (1 row)
+2026-10-12T16:30:59.0718809Z 
+2026-10-12T16:30:59.0718943Z  set_config 
+2026-10-12T16:30:59.0719454Z ------------
+2026-10-12T16:30:59.0719788Z  property
+2026-10-12T16:30:59.0720230Z (1 row)
+2026-10-12T16:30:59.0720411Z 
+2026-10-12T16:30:59.0720610Z                 set_config                
+2026-10-12T16:30:59.0721163Z ------------------------------------------
+2026-10-12T16:30:59.0721607Z  ["26000000-0000-4000-8000-000000000001"]
+2026-10-12T16:30:59.0721977Z (1 row)
+2026-10-12T16:30:59.0722138Z 
+2026-10-12T16:30:59.0878621Z  module_counts 
+2026-10-12T16:30:59.0879652Z ---------------
+2026-10-12T16:30:59.0880063Z  
+2026-10-12T16:30:59.0880272Z (1 row)
+2026-10-12T16:30:59.0880390Z 
+2026-10-12T16:30:59.0922427Z  expect_denied 
+2026-10-12T16:30:59.0922771Z ---------------
+2026-10-12T16:30:59.0923062Z  
+2026-10-12T16:30:59.0923373Z (1 row)
+2026-10-12T16:30:59.0923496Z 
+2026-10-12T16:30:59.0964135Z  expect_denied 
+2026-10-12T16:30:59.0964528Z ---------------
+2026-10-12T16:30:59.0964839Z  
+2026-10-12T16:30:59.0965052Z (1 row)
+2026-10-12T16:30:59.0965166Z 
+2026-10-12T16:30:59.1041004Z  expect_denied 
+2026-10-12T16:30:59.1041475Z ---------------
+2026-10-12T16:30:59.1041881Z  
+2026-10-12T16:30:59.1042260Z (1 row)
+2026-10-12T16:30:59.1042530Z 
+2026-10-12T16:30:59.1050318Z  expect_denied 
+2026-10-12T16:30:59.1050722Z ---------------
+2026-10-12T16:30:59.1051126Z  
+2026-10-12T16:30:59.1051472Z (1 row)
+2026-10-12T16:30:59.1051791Z 
+2026-10-12T16:30:59.1064576Z  expect_denied 
+2026-10-12T16:30:59.1064958Z ---------------
+2026-10-12T16:30:59.1065343Z  
+2026-10-12T16:30:59.1065681Z (1 row)
+2026-10-12T16:30:59.1065838Z 
+2026-10-12T16:30:59.1070967Z  expect_denied 
+2026-10-12T16:30:59.1071264Z ---------------
+2026-10-12T16:30:59.1071888Z  
+2026-10-12T16:30:59.1072142Z (1 row)
+2026-10-12T16:30:59.1072286Z 
+2026-10-12T16:30:59.1072810Z                                    set_config                                    
+2026-10-12T16:30:59.1073538Z ---------------------------------------------------------------------------------
+2026-10-12T16:30:59.1074278Z  ["26000000-0000-4000-8000-000000000001","26000000-0000-4000-8000-000000000002"]
+2026-10-12T16:30:59.1074818Z (1 row)
+2026-10-12T16:30:59.1074949Z 
+2026-10-12T16:30:59.1206744Z  module_counts 
+2026-10-12T16:30:59.1207140Z ---------------
+2026-10-12T16:30:59.1207435Z  
+2026-10-12T16:30:59.1207767Z (1 row)
+2026-10-12T16:30:59.1207930Z 
+2026-10-12T16:30:59.1208123Z                 set_config                
+2026-10-12T16:30:59.1208586Z ------------------------------------------
+2026-10-12T16:30:59.1208989Z  ["26000000-0000-4000-8000-000000000002"]
+2026-10-12T16:30:59.1209531Z (1 row)
+2026-10-12T16:30:59.1209713Z 
+2026-10-12T16:30:59.1337384Z  module_counts 
+2026-10-12T16:30:59.1337708Z ---------------
+2026-10-12T16:30:59.1338015Z  
+2026-10-12T16:30:59.1338269Z (1 row)
+2026-10-12T16:30:59.1338418Z 
+2026-10-12T16:30:59.1338792Z  set_config 
+2026-10-12T16:30:59.1339100Z ------------
+2026-10-12T16:30:59.1339522Z  []
+2026-10-12T16:30:59.1339793Z (1 row)
+2026-10-12T16:30:59.1339915Z 
+2026-10-12T16:30:59.1473016Z  module_counts 
+2026-10-12T16:30:59.1473386Z ---------------
+2026-10-12T16:30:59.1473702Z  
+2026-10-12T16:30:59.1474015Z (1 row)
+2026-10-12T16:30:59.1474195Z 
+2026-10-12T16:30:59.1474779Z  set_config 
+2026-10-12T16:30:59.1475095Z ------------
+2026-10-12T16:30:59.1475426Z  tenant
+2026-10-12T16:30:59.1475693Z (1 row)
+2026-10-12T16:30:59.1475841Z 
+2026-10-12T16:30:59.1603246Z  module_counts 
+2026-10-12T16:30:59.1604176Z ---------------
+2026-10-12T16:30:59.1604706Z  
+2026-10-12T16:30:59.1605178Z (1 row)
+2026-10-12T16:30:59.1605333Z 
+2026-10-12T16:30:59.1605525Z               set_config              
+2026-10-12T16:30:59.1605957Z --------------------------------------
+2026-10-12T16:30:59.1606356Z  16000000-0000-4000-8000-000000000002
+2026-10-12T16:30:59.1606746Z (1 row)
+2026-10-12T16:30:59.1606903Z 
+2026-10-12T16:30:59.1739018Z  module_counts 
+2026-10-12T16:30:59.1739749Z ---------------
+2026-10-12T16:30:59.1740089Z  
+2026-10-12T16:30:59.1740388Z (1 row)
+2026-10-12T16:30:59.1740580Z 
+2026-10-12T16:30:59.1740817Z               set_config              
+2026-10-12T16:30:59.1741366Z --------------------------------------
+2026-10-12T16:30:59.1741850Z  16000000-0000-4000-8000-000000000001
+2026-10-12T16:30:59.1742200Z (1 row)
+2026-10-12T16:30:59.1742325Z 
+2026-10-12T16:30:59.1742426Z  set_config 
+2026-10-12T16:30:59.1742689Z ------------
+2026-10-12T16:30:59.1742905Z  tenant
+2026-10-12T16:30:59.1743100Z (1 row)
+2026-10-12T16:30:59.1743203Z 
+2026-10-12T16:30:59.1753331Z INSERT 0 1
+2026-10-12T16:30:59.1776752Z INSERT 0 1
+2026-10-12T16:30:59.1798246Z INSERT 0 1
+2026-10-12T16:30:59.1820274Z INSERT 0 1
+2026-10-12T16:30:59.1843651Z INSERT 0 1
+2026-10-12T16:30:59.1864610Z INSERT 0 1
+2026-10-12T16:30:59.1885980Z INSERT 0 1
+2026-10-12T16:30:59.1890916Z  set_config 
+2026-10-12T16:30:59.1891257Z ------------
+2026-10-12T16:30:59.1891672Z  legacy
+2026-10-12T16:30:59.1891963Z (1 row)
+2026-10-12T16:30:59.1892466Z 
+2026-10-12T16:30:59.1919067Z  expect_count 
+2026-10-12T16:30:59.1919623Z --------------
+2026-10-12T16:30:59.1919932Z  
+2026-10-12T16:30:59.1920212Z (1 row)
+2026-10-12T16:30:59.1920379Z 
+2026-10-12T16:30:59.1942425Z  expect_count 
+2026-10-12T16:30:59.1942702Z --------------
+2026-10-12T16:30:59.1960106Z  
+2026-10-12T16:30:59.1960378Z (1 row)
+2026-10-12T16:30:59.1960529Z 
+2026-10-12T16:30:59.1981531Z  expect_denied 
+2026-10-12T16:30:59.1981972Z ---------------
+2026-10-12T16:30:59.1982381Z  
+2026-10-12T16:30:59.1983070Z (1 row)
+2026-10-12T16:30:59.1983276Z 
+2026-10-12T16:30:59.2018413Z  expect_denied 
+2026-10-12T16:30:59.2018749Z ---------------
+2026-10-12T16:30:59.2019048Z  
+2026-10-12T16:30:59.2019467Z (1 row)
+2026-10-12T16:30:59.2019631Z 
+2026-10-12T16:30:59.2054458Z  expect_denied 
+2026-10-12T16:30:59.2060389Z ---------------
+2026-10-12T16:30:59.2061011Z  
+2026-10-12T16:30:59.2061259Z (1 row)
+2026-10-12T16:30:59.2061416Z 
+2026-10-12T16:30:59.2075303Z  expect_count 
+2026-10-12T16:30:59.2075619Z --------------
+2026-10-12T16:30:59.2075886Z  
+2026-10-12T16:30:59.2076125Z (1 row)
+2026-10-12T16:30:59.2076280Z 
+2026-10-12T16:30:59.2094536Z  expect_count 
+2026-10-12T16:30:59.2094805Z --------------
+2026-10-12T16:30:59.2095045Z  
+2026-10-12T16:30:59.2095290Z (1 row)
+2026-10-12T16:30:59.2095404Z 
+2026-10-12T16:30:59.2127881Z  expect_denied 
+2026-10-12T16:30:59.2128157Z ---------------
+2026-10-12T16:30:59.2128428Z  
+2026-10-12T16:30:59.2128650Z (1 row)
+2026-10-12T16:30:59.2128779Z 
+2026-10-12T16:30:59.2161042Z  expect_denied 
+2026-10-12T16:30:59.2161331Z ---------------
+2026-10-12T16:30:59.2161588Z  
+2026-10-12T16:30:59.2161819Z (1 row)
+2026-10-12T16:30:59.2161964Z 
+2026-10-12T16:30:59.2197236Z  expect_denied 
+2026-10-12T16:30:59.2197508Z ---------------
+2026-10-12T16:30:59.2197779Z  
+2026-10-12T16:30:59.2198005Z (1 row)
+2026-10-12T16:30:59.2198158Z 
+2026-10-12T16:30:59.2198926Z  set_config 
+2026-10-12T16:30:59.2199136Z ------------
+2026-10-12T16:30:59.2199472Z  property
+2026-10-12T16:30:59.2199691Z (1 row)
+2026-10-12T16:30:59.2199794Z 
+2026-10-12T16:30:59.2200564Z                 set_config                
+2026-10-12T16:30:59.2201030Z ------------------------------------------
+2026-10-12T16:30:59.2201319Z  ["26000000-0000-4000-8000-000000000001"]
+2026-10-12T16:30:59.2201572Z (1 row)
+2026-10-12T16:30:59.2201753Z 
+2026-10-12T16:30:59.2221756Z  expect_count 
+2026-10-12T16:30:59.2222144Z --------------
+2026-10-12T16:30:59.2222413Z  
+2026-10-12T16:30:59.2222618Z (1 row)
+2026-10-12T16:30:59.2222722Z 
+2026-10-12T16:30:59.2258604Z  expect_denied 
+2026-10-12T16:30:59.2258991Z ---------------
+2026-10-12T16:30:59.2259257Z  
+2026-10-12T16:30:59.2259618Z (1 row)
+2026-10-12T16:30:59.2259762Z 
+2026-10-12T16:30:59.2279831Z  expect_count 
+2026-10-12T16:30:59.2280123Z --------------
+2026-10-12T16:30:59.2280381Z  
+2026-10-12T16:30:59.2280622Z (1 row)
+2026-10-12T16:30:59.2280796Z 
+2026-10-12T16:30:59.2322099Z  expect_denied 
+2026-10-12T16:30:59.2322483Z ---------------
+2026-10-12T16:30:59.2322826Z  
+2026-10-12T16:30:59.2323137Z (1 row)
+2026-10-12T16:30:59.2323313Z 
+2026-10-12T16:30:59.2323571Z                                    set_config                                    
+2026-10-12T16:30:59.2324077Z ---------------------------------------------------------------------------------
+2026-10-12T16:30:59.2324577Z  ["26000000-0000-4000-8000-000000000001","26000000-0000-4000-8000-000000000002"]
+2026-10-12T16:30:59.2324947Z (1 row)
+2026-10-12T16:30:59.2325057Z 
+2026-10-12T16:30:59.2345132Z  expect_count 
+2026-10-12T16:30:59.2345431Z --------------
+2026-10-12T16:30:59.2345637Z  
+2026-10-12T16:30:59.2345890Z (1 row)
+2026-10-12T16:30:59.2346017Z 
+2026-10-12T16:30:59.2383730Z  expect_denied 
+2026-10-12T16:30:59.2384030Z ---------------
+2026-10-12T16:30:59.2384305Z  
+2026-10-12T16:30:59.2384563Z (1 row)
+2026-10-12T16:30:59.2384718Z 
+2026-10-12T16:30:59.2407161Z  expect_count 
+2026-10-12T16:30:59.2407543Z --------------
+2026-10-12T16:30:59.2407774Z  
+2026-10-12T16:30:59.2407978Z (1 row)
+2026-10-12T16:30:59.2408096Z 
+2026-10-12T16:30:59.2449488Z  expect_denied 
+2026-10-12T16:30:59.2449816Z ---------------
+2026-10-12T16:30:59.2450078Z  
+2026-10-12T16:30:59.2450327Z (1 row)
+2026-10-12T16:30:59.2450438Z 
+2026-10-12T16:30:59.2450807Z  set_config 
+2026-10-12T16:30:59.2451105Z ------------
+2026-10-12T16:30:59.2451369Z  tenant
+2026-10-12T16:30:59.2451605Z (1 row)
+2026-10-12T16:30:59.2451748Z 
+2026-10-12T16:30:59.2472856Z  expect_count 
+2026-10-12T16:30:59.2473163Z --------------
+2026-10-12T16:30:59.2473376Z  
+2026-10-12T16:30:59.2473570Z (1 row)
+2026-10-12T16:30:59.2473690Z 
+2026-10-12T16:30:59.2494955Z  expect_count 
+2026-10-12T16:30:59.2495226Z --------------
+2026-10-12T16:30:59.2495488Z  
+2026-10-12T16:30:59.2495717Z (1 row)
+2026-10-12T16:30:59.2495862Z 
+2026-10-12T16:30:59.2496411Z RESET
+2026-10-12T16:30:59.2498671Z ROLLBACK
+2026-10-12T16:30:59.2501222Z                        result                       
+2026-10-12T16:30:59.2502135Z ----------------------------------------------------
+2026-10-12T16:30:59.2502700Z  Inspection and Compliance property isolation: PASS
+2026-10-12T16:30:59.2503247Z (1 row)
+2026-10-12T16:30:59.2503447Z 
+2026-10-12T16:30:59.2832513Z BEGIN
+2026-10-12T16:30:59.2833269Z SET
+2026-10-12T16:30:59.2836086Z SET
+2026-10-12T16:30:59.2845312Z DO
+2026-10-12T16:30:59.2848830Z CREATE ROLE
+2026-10-12T16:30:59.2856108Z GRANT
+2026-10-12T16:30:59.2860035Z GRANT
+2026-10-12T16:30:59.2878440Z INSERT 0 2
+2026-10-12T16:30:59.2885877Z INSERT 0 2
+2026-10-12T16:30:59.2909142Z INSERT 0 2
+2026-10-12T16:30:59.2953215Z INSERT 0 3
+2026-10-12T16:30:59.2969805Z CREATE TABLE
+2026-10-12T16:30:59.2981610Z INSERT 0 1
+2026-10-12T16:30:59.3066176Z INSERT 0 3
+2026-10-12T16:30:59.3288597Z INSERT 0 3
+2026-10-12T16:30:59.3356679Z SET CONSTRAINTS
+2026-10-12T16:30:59.3357091Z SET CONSTRAINTS
+2026-10-12T16:30:59.3363032Z CREATE FUNCTION
+2026-10-12T16:30:59.3367456Z CREATE FUNCTION
+2026-10-12T16:30:59.3368755Z SET
+2026-10-12T16:30:59.3372566Z               set_config              
+2026-10-12T16:30:59.3373054Z --------------------------------------
+2026-10-12T16:30:59.3373628Z  d1250000-0000-4000-8000-000000000001
+2026-10-12T16:30:59.3374012Z (1 row)
+2026-10-12T16:30:59.3374183Z 
+2026-10-12T16:30:59.3374319Z  set_config 
+2026-10-12T16:30:59.3374600Z ------------
+2026-10-12T16:30:59.3374878Z  property
+2026-10-12T16:30:59.3375156Z (1 row)
+2026-10-12T16:30:59.3375295Z 
+2026-10-12T16:30:59.3375472Z                 set_config                
+2026-10-12T16:30:59.3375930Z ------------------------------------------
+2026-10-12T16:30:59.3376393Z  ["d1250000-0000-4000-8000-000000000021"]
+2026-10-12T16:30:59.3376777Z (1 row)
+2026-10-12T16:30:59.3376941Z 
+2026-10-12T16:30:59.3388818Z  risk_expect_count 
+2026-10-12T16:30:59.3389199Z -------------------
+2026-10-12T16:30:59.3389651Z  
+2026-10-12T16:30:59.3389941Z (1 row)
+2026-10-12T16:30:59.3390064Z 
+2026-10-12T16:30:59.3398399Z  risk_expect_count 
+2026-10-12T16:30:59.3398855Z -------------------
+2026-10-12T16:30:59.3399150Z  
+2026-10-12T16:30:59.3399560Z (1 row)
+2026-10-12T16:30:59.3399733Z 
+2026-10-12T16:30:59.3408619Z  risk_expect_count 
+2026-10-12T16:30:59.3408959Z -------------------
+2026-10-12T16:30:59.3409225Z  
+2026-10-12T16:30:59.3409680Z (1 row)
+2026-10-12T16:30:59.3409824Z 
+2026-10-12T16:30:59.3421512Z  risk_expect_error 
+2026-10-12T16:30:59.3421933Z -------------------
+2026-10-12T16:30:59.3422261Z  
+2026-10-12T16:30:59.3422547Z (1 row)
+2026-10-12T16:30:59.3422736Z 
+2026-10-12T16:30:59.3465798Z  risk_expect_error 
+2026-10-12T16:30:59.3466295Z -------------------
+2026-10-12T16:30:59.3466724Z  
+2026-10-12T16:30:59.3467047Z (1 row)
+2026-10-12T16:30:59.3467227Z 
+2026-10-12T16:30:59.3472573Z  risk_expect_error 
+2026-10-12T16:30:59.3472968Z -------------------
+2026-10-12T16:30:59.3473308Z  
+2026-10-12T16:30:59.3473566Z (1 row)
+2026-10-12T16:30:59.3473732Z 
+2026-10-12T16:30:59.3473906Z  set_config 
+2026-10-12T16:30:59.3474191Z ------------
+2026-10-12T16:30:59.3474491Z  tenant
+2026-10-12T16:30:59.3474881Z (1 row)
+2026-10-12T16:30:59.3475049Z 
+2026-10-12T16:30:59.3483283Z  risk_expect_count 
+2026-10-12T16:30:59.3483826Z -------------------
+2026-10-12T16:30:59.3484203Z  
+2026-10-12T16:30:59.3484512Z (1 row)
+2026-10-12T16:30:59.3484677Z 
+2026-10-12T16:30:59.3484842Z  set_config 
+2026-10-12T16:30:59.3485127Z ------------
+2026-10-12T16:30:59.3485345Z  
+2026-10-12T16:30:59.3485541Z (1 row)
+2026-10-12T16:30:59.3485647Z 
+2026-10-12T16:30:59.3493098Z  risk_expect_count 
+2026-10-12T16:30:59.3493411Z -------------------
+2026-10-12T16:30:59.3493719Z  
+2026-10-12T16:30:59.3494000Z (1 row)
+2026-10-12T16:30:59.3494147Z 
+2026-10-12T16:30:59.3494274Z RESET
+2026-10-12T16:30:59.3495250Z SET
+2026-10-12T16:30:59.3499094Z  risk_expect_error 
+2026-10-12T16:30:59.3499595Z -------------------
+2026-10-12T16:30:59.3499873Z  
+2026-10-12T16:30:59.3500064Z (1 row)
+2026-10-12T16:30:59.3500180Z 
+2026-10-12T16:30:59.3501902Z  risk_expect_error 
+2026-10-12T16:30:59.3502291Z -------------------
+2026-10-12T16:30:59.3502906Z  
+2026-10-12T16:30:59.3503221Z (1 row)
+2026-10-12T16:30:59.3503372Z 
+2026-10-12T16:30:59.3511019Z  risk_expect_error 
+2026-10-12T16:30:59.3511353Z -------------------
+2026-10-12T16:30:59.3511621Z  
+2026-10-12T16:30:59.3511863Z (1 row)
+2026-10-12T16:30:59.3512014Z 
+2026-10-12T16:30:59.3512438Z RESET
+2026-10-12T16:30:59.3517851Z ROLLBACK
+2026-10-12T16:30:59.3560596Z ##[group]Run set -euo pipefail
+2026-10-12T16:30:59.3560928Z [36;1mset -euo pipefail[0m
+2026-10-12T16:30:59.3561419Z [36;1mdocker pull postgres:16-alpine@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777[0m
+2026-10-12T16:30:59.3562179Z [36;1mdocker tag postgres:16-alpine@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777 postgres:16-alpine[0m
+2026-10-12T16:30:59.3562825Z [36;1mdocker run --detach --rm --name uvanoo-migration-safety-20261012 \[0m
+2026-10-12T16:30:59.3563337Z [36;1m  --label uvanoo.task=migration-safety --network none --memory 768m --cpus 2 \[0m
+2026-10-12T16:30:59.3563786Z [36;1m  --tmpfs /var/lib/postgresql/data:rw \[0m
+2026-10-12T16:30:59.3564227Z [36;1m  -e POSTGRES_HOST_AUTH_METHOD=trust -e POSTGRES_DB=safety_admin postgres:16-alpine[0m
+2026-10-12T16:30:59.3564633Z [36;1mready=false[0m
+2026-10-12T16:30:59.3564881Z [36;1mfor attempt in $(seq 1 30); do[0m
+2026-10-12T16:30:59.3565377Z [36;1m  if docker exec uvanoo-migration-safety-20261012 pg_isready -U postgres -d safety_admin; then[0m
+2026-10-12T16:30:59.3565842Z [36;1m    ready=true[0m
+2026-10-12T16:30:59.3566072Z [36;1m    break[0m
+2026-10-12T16:30:59.3566316Z [36;1m  fi[0m
+2026-10-12T16:30:59.3566526Z [36;1m  sleep 1[0m
+2026-10-12T16:30:59.3566737Z [36;1mdone[0m
+2026-10-12T16:30:59.3566950Z [36;1mtest "$ready" = true[0m
+2026-10-12T16:30:59.3567326Z [36;1mpnpm --filter @beaconhs/db exec tsx src/migration-safety.integration.ts[0m
+2026-10-12T16:30:59.3608125Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-10-12T16:30:59.3608467Z env:
+2026-10-12T16:30:59.3608675Z   CI: true
+2026-10-12T16:30:59.3608917Z   NEXT_TELEMETRY_DISABLED: 1
+2026-10-12T16:30:59.3609175Z   TURBO_TELEMETRY_DISABLED: 1
+2026-10-12T16:30:59.3609903Z   DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:59.3610439Z   MIGRATION_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:59.3610970Z   SUPERADMIN_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:59.3611481Z   PEOPLE_PROVENANCE_TEST_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:30:59.3611857Z   DATABASE_OWNER_ROLE: beaconhs_owner
+2026-10-12T16:30:59.3612140Z   DATABASE_BACKUP_ROLE: beaconhs_backup
+2026-10-12T16:30:59.3612427Z   REDIS_URL: redis://localhost:6379
+2026-10-12T16:30:59.3612803Z   BETTER_AUTH_SECRET: module-validation-disposable-secret-not-production
+2026-10-12T16:30:59.3613312Z   ATTACHMENT_CAPABILITY_SECRET: module-validation-disposable-capability-secret
+2026-10-12T16:30:59.3613726Z   BETTER_AUTH_URL: http://localhost:3000
+2026-10-12T16:30:59.3614014Z   APP_URL: http://localhost:3000
+2026-10-12T16:30:59.3614323Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+2026-10-12T16:30:59.3614631Z ##[endgroup]
+2026-10-12T16:30:59.5787527Z docker.io/library/postgres@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777: Pulling from library/postgres
+2026-10-12T16:30:59.5835098Z Digest: sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777
+2026-10-12T16:30:59.5836492Z Status: Image is up to date for postgres@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777
+2026-10-12T16:30:59.5842643Z docker.io/library/postgres:16-alpine@sha256:57c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777
+2026-10-12T16:31:02.5719147Z c70715c1ea85d407c5eef49fc5ce1bd37c2f272a0fc9e13270a19097bace0cce
+2026-10-12T16:31:02.7015852Z /var/run/postgresql:5432 - no response
+2026-10-12T16:31:03.7589133Z /var/run/postgresql:5432 - accepting connections
+2026-10-12T16:31:04.9674448Z Pinned Approvals security fixture SHA256: 9d7e47851e1ddf38335826fe0160099e8839d542d18505f141f36653da8c7780
+2026-10-12T16:31:05.0845643Z PostgreSQL: PostgreSQL 16.14 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit
+2026-10-12T16:31:14.5338425Z PASS safety_fresh: replay, exact 61-entry ledger, no-op, Risk privilege preservation
+2026-10-12T16:31:23.6099616Z PASS existing prepared-Risk security predicate; injected application ACL drift detected and rolled back
+2026-10-12T16:31:23.6208751Z PASS unchanged People 0057 provenance/property-isolation SQL regression
+2026-10-12T16:31:23.8249556Z PASS actual unnumbered Approvals proposal table/column privilege preservation
+2026-10-12T16:31:24.3520497Z PASS backup SELECT, denied writes with read-only disabled, no escalation; column-ACL and role-membership drift rejected
+2026-10-12T16:31:27.0971551Z Creating consistent logical backup…
+2026-10-12T16:31:27.0972925Z Backup verified: /tmp/safety-backups/beaconhs-20261012T163124Z.dump 
+2026-10-12T16:31:27.0973512Z  beaconhs-20261012T163124Z.dump: OK
+2026-10-12T16:31:27.0974255Z Restore verified; disposable database will be removed: beaconhs_restore_20261012163124_118
+2026-10-12T16:31:27.0975277Z PASS repository backup.sh and checksum-portable restore-verify.sh against disposable data
+2026-10-12T16:31:36.1836634Z PASS old broad default grants removed before new objects are created
+2026-10-12T16:31:36.5678952Z PASS safety_forward: replay, exact 61-entry ledger, no-op, Risk privilege preservation
+2026-10-12T16:31:36.7527224Z PASS ledger insertion failure rolls back SQL; unchanged retry commits both
+2026-10-12T16:31:36.7528195Z PASS failure rollback, previous commit survives, unchanged-SQL retry, duplicate/hash ledger rejection
+2026-10-12T16:31:36.7688281Z PASS explicit zero-access and Approvals-style column privilege preservation
+2026-10-12T16:31:36.8320322Z PASS concurrent connection exclusion and successor no-op
+2026-10-12T16:31:46.7620457Z ✔ Database role preflight passed (beaconhs_migrator → beaconhs_owner; runtime beaconhs_app; maintenance beaconhs_super; backup beaconhs_backup)
+2026-10-12T16:31:46.7630353Z ▶ Validating migration ledger…
+2026-10-12T16:31:46.7640671Z   Fresh database detected; the full migration journal will run
+2026-10-12T16:31:46.7641562Z ▶ Running drizzle migrations…
+2026-10-12T16:31:55.7874079Z   Migration ledger valid: 61 applied, 0 pending, 0 historical
+2026-10-12T16:31:55.7875074Z ▶ Applying RLS policies…
+2026-10-12T16:32:04.9908385Z ✔ RLS applied atomically (220 tables)
+2026-10-12T16:32:04.9909053Z ▶ Applying least-privilege runtime grants…
+2026-10-12T16:32:05.0010406Z ✔ Least-privilege grants applied (runtime beaconhs_app; maintenance beaconhs_super; backup beaconhs_backup)
+2026-10-12T16:32:05.2505083Z ▶ Verifying security data invariants…
+2026-10-12T16:32:05.2568987Z ✔ Kiosk PIN hash invariant verified
+2026-10-12T16:32:05.2577224Z ▶ Installing missing standard Risk Library templates…
+2026-10-12T16:32:05.2707816Z ▶ Converging role permissions…
+2026-10-12T16:32:05.2819822Z ✔ Built-in role permissions backfilled
+2026-10-12T16:32:05.2820457Z ▶ Applying planner statistics targets…
+2026-10-12T16:32:05.4043968Z ✔ Statistics applied (32 targets)
+2026-10-12T16:32:05.4044637Z ▶ Applying reporting views…
+2026-10-12T16:32:05.4881513Z ✔ Views applied atomically (10 statements)
+2026-10-12T16:32:05.6761618Z PASS complete migrate.ts CLI fresh using canonical 61-entry journal
+2026-10-12T16:32:06.9924813Z ✔ Database role preflight passed (beaconhs_migrator → beaconhs_owner; runtime beaconhs_app; maintenance beaconhs_super; backup beaconhs_backup)
+2026-10-12T16:32:06.9938058Z ▶ Validating migration ledger…
+2026-10-12T16:32:06.9977781Z   Migration ledger valid: 61 applied, 0 pending, 0 historical
+2026-10-12T16:32:06.9978658Z ▶ Running drizzle migrations…
+2026-10-12T16:32:07.0127958Z   Migration ledger valid: 61 applied, 0 pending, 0 historical
+2026-10-12T16:32:07.0128773Z ▶ Applying RLS policies…
+2026-10-12T16:32:16.3481663Z ✔ RLS applied atomically (220 tables)
+2026-10-12T16:32:16.3482761Z ▶ Applying least-privilege runtime grants…
+2026-10-12T16:32:16.3593029Z ✔ Least-privilege grants applied (runtime beaconhs_app; maintenance beaconhs_super; backup beaconhs_backup)
+2026-10-12T16:32:16.5684585Z ▶ Verifying security data invariants…
+2026-10-12T16:32:16.5729840Z ✔ Kiosk PIN hash invariant verified
+2026-10-12T16:32:16.5737604Z ▶ Installing missing standard Risk Library templates…
+2026-10-12T16:32:16.5850028Z ▶ Converging role permissions…
+2026-10-12T16:32:16.5951627Z ✔ Built-in role permissions backfilled
+2026-10-12T16:32:16.5952347Z ▶ Applying planner statistics targets…
+2026-10-12T16:32:16.7473542Z ✔ Statistics applied (32 targets)
+2026-10-12T16:32:16.7474147Z ▶ Applying reporting views…
+2026-10-12T16:32:16.8268786Z ✔ Views applied atomically (10 statements)
+2026-10-12T16:32:17.0271515Z PASS complete migrate.ts CLI no-op using canonical 61-entry journal
+2026-10-12T16:32:18.3857795Z ✔ Database role preflight passed (beaconhs_migrator → beaconhs_owner; runtime beaconhs_app; maintenance beaconhs_super; backup beaconhs_backup)
+2026-10-12T16:32:18.3867133Z ▶ Validating migration ledger…
+2026-10-12T16:32:18.3904714Z   Migration ledger valid: 58 applied, 3 pending, 0 historical
+2026-10-12T16:32:18.3905508Z ▶ Running drizzle migrations…
+2026-10-12T16:32:18.5451655Z   Migration ledger valid: 61 applied, 0 pending, 0 historical
+2026-10-12T16:32:18.5452367Z ▶ Applying RLS policies…
+2026-10-12T16:32:27.6978684Z ✔ RLS applied atomically (220 tables)
+2026-10-12T16:32:27.6979247Z ▶ Applying least-privilege runtime grants…
+2026-10-12T16:32:27.7111746Z ✔ Least-privilege grants applied (runtime beaconhs_app; maintenance beaconhs_super; backup beaconhs_backup)
+2026-10-12T16:32:28.0564347Z ▶ Verifying security data invariants…
+2026-10-12T16:32:28.0612911Z ✔ Kiosk PIN hash invariant verified
+2026-10-12T16:32:28.0620710Z ▶ Installing missing standard Risk Library templates…
+2026-10-12T16:32:28.0744269Z ▶ Converging role permissions…
+2026-10-12T16:32:28.0848159Z ✔ Built-in role permissions backfilled
+2026-10-12T16:32:28.0848626Z ▶ Applying planner statistics targets…
+2026-10-12T16:32:28.2624434Z ✔ Statistics applied (32 targets)
+2026-10-12T16:32:28.2625117Z ▶ Applying reporting views…
+2026-10-12T16:32:28.3516245Z ✔ Views applied atomically (10 statements)
+2026-10-12T16:32:28.5463101Z PASS complete migrate.ts CLI forward-58-to-61 using canonical 61-entry journal
+2026-10-12T16:32:29.8671592Z ✔ Database role preflight passed (beaconhs_migrator → beaconhs_owner; runtime beaconhs_app; maintenance beaconhs_super; backup beaconhs_backup)
+2026-10-12T16:32:29.8681846Z ▶ Validating migration ledger…
+2026-10-12T16:32:29.8721625Z   Migration ledger valid: 61 applied, 0 pending, 0 historical
+2026-10-12T16:32:29.8723075Z ▶ Running drizzle migrations…
+2026-10-12T16:32:29.8868494Z   Migration ledger valid: 61 applied, 0 pending, 0 historical
+2026-10-12T16:32:29.8869501Z ▶ Applying RLS policies…
+2026-10-12T16:32:39.1987843Z ✔ RLS applied atomically (220 tables)
+2026-10-12T16:32:39.1989089Z ▶ Applying least-privilege runtime grants…
+2026-10-12T16:32:39.2107684Z ✔ Least-privilege grants applied (runtime beaconhs_app; maintenance beaconhs_super; backup beaconhs_backup)
+2026-10-12T16:32:39.4137097Z ▶ Verifying security data invariants…
+2026-10-12T16:32:39.4180317Z ✔ Kiosk PIN hash invariant verified
+2026-10-12T16:32:39.4187313Z ▶ Installing missing standard Risk Library templates…
+2026-10-12T16:32:39.4313782Z ▶ Converging role permissions…
+2026-10-12T16:32:39.4414354Z ✔ Built-in role permissions backfilled
+2026-10-12T16:32:39.4414993Z ▶ Applying planner statistics targets…
+2026-10-12T16:32:39.6139498Z ✔ Statistics applied (32 targets)
+2026-10-12T16:32:39.6140118Z ▶ Applying reporting views…
+2026-10-12T16:32:39.7042767Z ✔ Views applied atomically (10 statements)
+2026-10-12T16:32:39.9081187Z PASS complete migrate.ts CLI existing-61-no-op using canonical 61-entry journal
+2026-10-12T16:32:40.0720214Z ##[group]Run set -euo pipefail
+2026-10-12T16:32:40.0720558Z [36;1mset -euo pipefail[0m
+2026-10-12T16:32:40.0720956Z [36;1mif docker inspect uvanoo-migration-safety-20261012 >/dev/null 2>&1; then[0m
+2026-10-12T16:32:40.0721642Z [36;1m  test "$(docker inspect --format '{{ index .Config.Labels "uvanoo.task" }}' uvanoo-migration-safety-20261012)" = migration-safety[0m
+2026-10-12T16:32:40.0722392Z [36;1m  docker stop uvanoo-migration-safety-20261012[0m
+2026-10-12T16:32:40.0722701Z [36;1mfi[0m
+2026-10-12T16:32:40.0762737Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-10-12T16:32:40.0763086Z env:
+2026-10-12T16:32:40.0763292Z   CI: true
+2026-10-12T16:32:40.0763506Z   NEXT_TELEMETRY_DISABLED: 1
+2026-10-12T16:32:40.0763763Z   TURBO_TELEMETRY_DISABLED: 1
+2026-10-12T16:32:40.0764256Z   DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:32:40.0764797Z   MIGRATION_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:32:40.0765380Z   SUPERADMIN_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:32:40.0765898Z   PEOPLE_PROVENANCE_TEST_DATABASE_URL: ***localhost:5432/beaconhs_test
+2026-10-12T16:32:40.0766279Z   DATABASE_OWNER_ROLE: beaconhs_owner
+2026-10-12T16:32:40.0766569Z   DATABASE_BACKUP_ROLE: beaconhs_backup
+2026-10-12T16:32:40.0766864Z   REDIS_URL: redis://localhost:6379
+2026-10-12T16:32:40.0767256Z   BETTER_AUTH_SECRET: module-validation-disposable-secret-not-production
+2026-10-12T16:32:40.0767771Z   ATTACHMENT_CAPABILITY_SECRET: module-validation-disposable-capability-secret
+2026-10-12T16:32:40.0768201Z   BETTER_AUTH_URL: http://localhost:3000
+2026-10-12T16:32:40.0768493Z   APP_URL: http://localhost:3000
+2026-10-12T16:32:40.0768801Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+2026-10-12T16:32:40.0769114Z ##[endgroup]
+2026-10-12T16:32:40.2904154Z uvanoo-migration-safety-20261012
+2026-10-12T16:32:40.3010012Z Post job cleanup.
+2026-10-12T16:32:40.4345850Z [command]/usr/bin/tar --posix -cf cache.tzst --exclude cache.tzst -P -C /home/runner/work/beaconhs/beaconhs --files-from manifest.txt --use-compress-program zstdmt
+2026-10-12T16:32:45.9959975Z Sent 0 of 387051023 (0.0%), 0.0 MBs/sec
+2026-10-12T16:32:46.9964386Z Sent 185724431 of 387051023 (48.0%), 88.6 MBs/sec
+2026-10-12T16:32:47.2727897Z Sent 387051023 of 387051023 (100.0%), 162.1 MBs/sec
+2026-10-12T16:32:48.0958549Z Cache saved with the key: node-cache-Linux-x64-pnpm-ad5e69b0f6254985c54ac3e2bb9516f0aa056da77ee809332d40ed80793061fe
+2026-10-12T16:32:48.1091728Z Post job cleanup.
+2026-10-12T16:32:48.2464854Z Pruning is unnecessary.
+2026-10-12T16:32:48.2631746Z Post job cleanup.
+2026-10-12T16:32:48.3607206Z [command]/usr/bin/git version
+2026-10-12T16:32:48.3693483Z git version 2.55.0
+2026-10-12T16:32:48.3730564Z Temporarily overriding HOME='/home/runner/work/_temp/df8048bc-85f3-4f9c-b958-c2088a267868' before making global git config changes
+2026-10-12T16:32:48.3731793Z Adding repository directory to the temporary git global config as a safe directory
+2026-10-12T16:32:48.3736696Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/beaconhs/beaconhs
+2026-10-12T16:32:48.3766807Z Removing SSH command configuration
+2026-10-12T16:32:48.3774148Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-10-12T16:32:48.3813606Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-10-12T16:32:48.4014354Z Removing HTTP extra header
+2026-10-12T16:32:48.4021061Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-10-12T16:32:48.4052724Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-10-12T16:32:48.4254542Z Removing includeIf entries pointing to credentials config files
+2026-10-12T16:32:48.4259758Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-10-12T16:32:48.4287478Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-10-12T16:32:48.4603730Z Print service container logs: 7f04e4e434f2414dafb8cd9598a33a2f_postgres16alpinesha25657c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777_5387ec
+2026-10-12T16:32:48.4610312Z ##[command]/usr/bin/docker logs --details a25cb4782fee63e76bea559aa92685af483354908fb073a6b356cd291f9f59e1
+2026-10-12T16:32:48.4759823Z  sh: locale: not found
+2026-10-12T16:32:48.4760264Z  The files belonging to this database system will be owned by user "postgres".
+2026-10-12T16:32:48.4760925Z  2026-10-12 16:29:50.355 UTC [36] WARNING:  no usable system locales were found
+2026-10-12T16:32:48.4761495Z  initdb: warning: enabling "trust" authentication for local connections
+2026-10-12T16:32:48.4762251Z  initdb: hint: You can change this by editing pg_hba.conf or using the option -A, or --auth-local and --auth-host, the next time you run initdb.
+2026-10-12T16:32:48.4763174Z  2026-10-12 16:29:51.654 UTC [1] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit
+2026-10-12T16:32:48.4763866Z  2026-10-12 16:29:51.654 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+2026-10-12T16:32:48.4764424Z  2026-10-12 16:29:51.654 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+2026-10-12T16:32:48.4765004Z  2026-10-12 16:29:51.655 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+2026-10-12T16:32:48.4765618Z  2026-10-12 16:29:51.659 UTC [58] LOG:  database system was shut down at 2026-10-12 16:29:51 UTC
+2026-10-12T16:32:48.4766195Z  2026-10-12 16:29:51.664 UTC [1] LOG:  database system is ready to accept connections
+2026-10-12T16:32:48.4772647Z  This user must also own the server process.
+2026-10-12T16:32:48.4773220Z  
+2026-10-12T16:32:48.4773544Z  The database cluster will be initialized with locale "en_US.utf8".
+2026-10-12T16:32:48.4773976Z  The default database encoding has accordingly been set to "UTF8".
+2026-10-12T16:32:48.4774390Z  The default text search configuration will be set to "english".
+2026-10-12T16:32:48.4774739Z  
+2026-10-12T16:32:48.4775077Z  Data page checksums are disabled.
+2026-10-12T16:32:48.4775367Z  
+2026-10-12T16:32:48.4775680Z  fixing permissions on existing directory /var/lib/postgresql/data ... ok
+2026-10-12T16:32:48.4776065Z  creating subdirectories ... ok
+2026-10-12T16:32:48.4776432Z  selecting dynamic shared memory implementation ... posix
+2026-10-12T16:32:48.4776798Z  selecting default max_connections ... 100
+2026-10-12T16:32:48.4777105Z  selecting default shared_buffers ... 128MB
+2026-10-12T16:32:48.4777406Z  selecting default time zone ... UTC
+2026-10-12T16:32:48.4777689Z  creating configuration files ... ok
+2026-10-12T16:32:48.4777982Z  running bootstrap script ... ok
+2026-10-12T16:32:48.4778295Z  performing post-bootstrap initialization ... ok
+2026-10-12T16:32:48.4778610Z  syncing data to disk ... ok
+2026-10-12T16:32:48.4778862Z  
+2026-10-12T16:32:48.4779046Z  
+2026-10-12T16:32:48.4779290Z  Success. You can now start the database server using:
+2026-10-12T16:32:48.4779858Z  
+2026-10-12T16:32:48.4780171Z      pg_ctl -D /var/lib/postgresql/data -l logfile start
+2026-10-12T16:32:48.4780484Z  
+2026-10-12T16:32:48.4781040Z  waiting for server to start....2026-10-12 16:29:51.189 UTC [42] LOG:  starting PostgreSQL 16.14 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit
+2026-10-12T16:32:48.4781780Z  2026-10-12 16:29:51.190 UTC [42] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+2026-10-12T16:32:48.4782322Z  2026-10-12 16:29:51.194 UTC [45] LOG:  database system was shut down at 2026-10-12 16:29:50 UTC
+2026-10-12T16:32:48.4782810Z  2026-10-12 16:29:51.198 UTC [42] LOG:  database system is ready to accept connections
+2026-10-12T16:32:48.4783176Z   done
+2026-10-12T16:32:48.4783389Z  server started
+2026-10-12T16:32:48.4783609Z  CREATE DATABASE
+2026-10-12T16:32:48.4783822Z  
+2026-10-12T16:32:48.4784007Z  
+2026-10-12T16:32:48.4784339Z  /usr/local/bin/docker-entrypoint.sh: ignoring /docker-entrypoint-initdb.d/*
+2026-10-12T16:32:48.4784730Z  
+2026-10-12T16:32:48.4785321Z  waiting for server to shut down....2026-10-12 16:29:51.354 UTC [42] LOG:  received fast shutdown request
+2026-10-12T16:32:48.4785934Z  2026-10-12 16:29:51.355 UTC [42] LOG:  aborting any active transactions
+2026-10-12T16:32:48.4786482Z  2026-10-12 16:29:51.360 UTC [42] LOG:  background worker "logical replication launcher" (PID 48) exited with exit code 1
+2026-10-12T16:32:48.4786992Z  2026-10-12 16:29:51.360 UTC [43] LOG:  shutting down
+2026-10-12T16:32:48.4787376Z  2026-10-12 16:29:51.360 UTC [43] LOG:  checkpoint starting: shutdown immediate
+2026-10-12T16:32:48.4788389Z  2026-10-12 16:29:51.472 UTC [43] LOG:  checkpoint complete: wrote 926 buffers (5.7%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.073 s, sync=0.037 s, total=0.112 s; sync files=301, longest=0.036 s, average=0.001 s; distance=4283 kB, estimate=4283 kB; lsn=0/1925D68, redo lsn=0/1925D68
+2026-10-12T16:32:48.4789472Z  2026-10-12 16:29:51.482 UTC [42] LOG:  database system is shut down
+2026-10-12T16:32:48.4789801Z   done
+2026-10-12T16:32:48.4790010Z  server stopped
+2026-10-12T16:32:48.4790223Z  
+2026-10-12T16:32:48.4790486Z  PostgreSQL init process complete; ready for start up.
+2026-10-12T16:32:48.4790791Z  
+2026-10-12T16:32:48.4795828Z Stop and remove container: 7f04e4e434f2414dafb8cd9598a33a2f_postgres16alpinesha25657c72fd2a128e416c7fcc499958864df5301e940bca0a56f58fddf30ffc07777_5387ec
+2026-10-12T16:32:48.4800502Z ##[command]/usr/bin/docker rm --force a25cb4782fee63e76bea559aa92685af483354908fb073a6b356cd291f9f59e1
+2026-10-12T16:32:48.7207190Z a25cb4782fee63e76bea559aa92685af483354908fb073a6b356cd291f9f59e1
+2026-10-12T16:32:48.7222628Z Print service container logs: f92387714d034069a3e2934b9ff5a51f_redis7alpinesha2566ab0b6e7381779332f97b8ca76193e45b0756f38d4c0dcda72dbb3c32061ab99_1fe96f
+2026-10-12T16:32:48.7224176Z ##[command]/usr/bin/docker logs --details 81d7806ed24fa5952bd18cd7bc6cc67cb82a99c6a1049d24312223b80427c456
+2026-10-12T16:32:48.7351748Z  1:C 12 Oct 2026 16:29:51.837 # WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+2026-10-12T16:32:48.7353291Z  1:C 12 Oct 2026 16:29:51.837 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+2026-10-12T16:32:48.7359815Z  1:C 12 Oct 2026 16:29:51.837 * Redis version=7.4.9, bits=64, commit=00000000, modified=0, pid=1, just started
+2026-10-12T16:32:48.7360911Z  1:C 12 Oct 2026 16:29:51.837 # Warning: no config file specified, using the default config. In order to specify a config file use redis-server /path/to/redis.conf
+2026-10-12T16:32:48.7361562Z  1:M 12 Oct 2026 16:29:51.837 * monotonic clock: POSIX clock_gettime
+2026-10-12T16:32:48.7361963Z  1:M 12 Oct 2026 16:29:51.838 * Running mode=standalone, port=6379.
+2026-10-12T16:32:48.7362345Z  1:M 12 Oct 2026 16:29:51.838 * Server initialized
+2026-10-12T16:32:48.7362702Z  1:M 12 Oct 2026 16:29:51.838 * Ready to accept connections tcp
+2026-10-12T16:32:48.7363909Z Stop and remove container: f92387714d034069a3e2934b9ff5a51f_redis7alpinesha2566ab0b6e7381779332f97b8ca76193e45b0756f38d4c0dcda72dbb3c32061ab99_1fe96f
+2026-10-12T16:32:48.7364895Z ##[command]/usr/bin/docker rm --force 81d7806ed24fa5952bd18cd7bc6cc67cb82a99c6a1049d24312223b80427c456
+2026-10-12T16:32:48.8527403Z 81d7806ed24fa5952bd18cd7bc6cc67cb82a99c6a1049d24312223b80427c456
+2026-10-12T16:32:48.8545786Z Remove container network: github_network_5cf34ae7c21e4692946131636cadfb7d
+2026-10-12T16:32:48.8550974Z ##[command]/usr/bin/docker network rm github_network_5cf34ae7c21e4692946131636cadfb7d
+2026-10-12T16:32:48.9490131Z github_network_5cf34ae7c21e4692946131636cadfb7d
+2026-10-12T16:32:48.9561985Z Cleaning up orphan processes

@@ -1,0 +1,154 @@
+SUCCESS: 18 unchanged real database property-authority checks on original Approvals fed0709f79922d003aefbdb6674e5b92270bdeea.
+Run 38279023873; control ae01d309e13c79c2e6f6e0431ae9198cff09c5f2.
+Fixture reconstructed from exact Safety 6892670fd33e0fe12a1862bb822b451cd1bf7b44's existing harness, then copied between task-owned network-none/tmpfs PostgreSQL 16.14 containers. Canonical 61-entry ledger and exact proposal SHA256 9d7e47851e1ddf38335826fe0160099e8839d542d18505f141f36653da8c7780 verified. Original Approvals script/guards/assertions unchanged; runtime assertions use non-superuser/non-BYPASSRLS beaconhs_app. Synthetic test records rolled back; containers disposed.
+No captured DEV metadata was invented or supplied. This does not claim the separate full Batch01 captured-contract test, production adapters, localization, visual acceptance, or candidate freeze.
+
+{
+  "jobs": [
+    {
+      "id": 114911467848,
+      "name": "Original Approvals source — disposable property authority proof only",
+      "status": "completed",
+      "conclusion": "success",
+      "run_id": 38279023873,
+      "logs_url": null,
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Verify isolated control boundary",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        },
+        {
+          "name": "Run actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3
+        },
+        {
+          "name": "Verify canonical fixture source",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4
+        },
+        {
+          "name": "Run pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5
+        },
+        {
+          "name": "Run actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6
+        },
+        {
+          "name": "Verify pinned toolchain",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 7
+        },
+        {
+          "name": "Run pnpm install --frozen-lockfile",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 8
+        },
+        {
+          "name": "Reproduce canonical disposable database with existing harness",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 9
+        },
+        {
+          "name": "Copy only the disposable fixture into the original Approvals guard boundary",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 10
+        },
+        {
+          "name": "Checkout and verify original immutable Approvals source",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 11
+        },
+        {
+          "name": "Run unchanged real property-authority assertions",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12
+        },
+        {
+          "name": "Dispose only the two task-owned fixtures",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13
+        },
+        {
+          "name": "Post Run actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 24
+        },
+        {
+          "name": "Post Run pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 25
+        },
+        {
+          "name": "Post Run actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 26
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 27
+        }
+      ]
+    }
+  ]
+}
+
+##[group]Run set -euo pipefail
+2026-10-12T16:42:55.4146772Z [36;1mset -euo pipefail[0m
+2026-10-12T16:42:55.4147230Z [36;1mpnpm --filter @beaconhs/web exec tsx scripts/verify-approvals-property-authority.ts[0m
+2026-10-12T16:42:55.4147716Z [36;1mgit diff --exit-code[0m
+2026-10-12T16:42:55.4148749Z [36;1mecho 'Original Approvals SHA fed0709f79922d003aefbdb6674e5b92270bdeea; disposable property-authority proof only. No captured DEV metadata or full Batch01 claim. No production adapter, localization, visual or freeze acceptance.' >> "$GITHUB_STEP_SUMMARY"[0m
+2026-10-12T16:42:55.4213357Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-10-12T16:42:55.4213701Z env:
+2026-10-12T16:42:55.4213884Z   CI: true
+2026-10-12T16:42:55.4214087Z   NEXT_TELEMETRY_DISABLED: 1
+2026-10-12T16:42:55.4214333Z   TURBO_TELEMETRY_DISABLED: 1
+2026-10-12T16:42:55.4214633Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+2026-10-12T16:42:55.4214957Z ##[endgroup]
+2026-10-12T16:42:58.5921523Z PASS Reproduces canonical mixed-role scope combination without changing global RBAC
+2026-10-12T16:42:58.6086155Z PASS Mixed roles cannot configure Property B using Property A permission
+2026-10-12T16:42:58.9392875Z PASS Same-assignment Property A permission succeeds
+2026-10-12T16:42:58.9473982Z PASS Foreign property denied
+2026-10-12T16:42:58.9538614Z PASS Selected unrelated role cannot borrow privileged role permission
+2026-10-12T16:42:58.9664974Z PASS Unscoped override cannot elevate unrelated Property B role
+2026-10-12T16:43:01.2082374Z PASS Actual collection SQL excludes B requests and workflows for mixed roles
+2026-10-12T16:43:01.5093792Z PASS Unscoped read override cannot expose B collections or detail
+2026-10-12T16:43:01.5361559Z PASS Read deny and suspended requester block collections and detail with stale context
+2026-10-12T16:43:01.5387279Z PASS Forged foreign tenant context cannot read collections or detail
+2026-10-12T16:43:01.5455394Z PASS User without configure permission cannot create workflows
+2026-10-12T16:43:01.8354430Z PASS Request stages survive creation of another workflow version
+2026-10-12T16:43:01.8437266Z PASS Suspended approver denied despite stale context
+2026-10-12T16:43:01.8537196Z PASS Revoked property binding blocks assigned approver despite stale context
+2026-10-12T16:43:01.8791212Z PASS Mixed-role read access cannot restore revoked decision authority
+2026-10-12T16:43:01.8911404Z PASS Explicit deny still overrides same-property wildcard role grant
+2026-10-12T16:43:01.9010889Z PASS Revoked permission denied despite stale context and remaining read role
+2026-10-12T16:43:01.9029766Z PASS No denied operations produced approval decisions
+2026-10-12T16:43:01.9080942Z 18 checks passed; all synthetic records rolled back; no DDL or DEV access
+2026-10-12T16:43:01.9732118Z 

@@ -1,0 +1,282 @@
+{
+  "sourceSha": "0a4a04ca13758b68068f9483a3c0816b741478d8",
+  "controlSha": "71a1ab819c7030a5205821b7e6d7fc9d4a4bef9f",
+  "runId": 38278704970,
+  "job": {
+    "id": 114910411574,
+    "name": "Full isolated checks — people",
+    "status": "completed",
+    "conclusion": "success",
+    "run_id": 38278704970,
+    "logs_url": null,
+    "steps": [
+      {
+        "name": "Set up job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 1
+      },
+      {
+        "name": "Initialize containers",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 2
+      },
+      {
+        "name": "Verify control branch and immutable input shape",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 3
+      },
+      {
+        "name": "Checkout validation control definition",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 4
+      },
+      {
+        "name": "Verify source branch provenance and checkout exact candidate",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 5
+      },
+      {
+        "name": "Run pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 6
+      },
+      {
+        "name": "Run actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 7
+      },
+      {
+        "name": "Verify pinned toolchain and disposable service boundaries",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 8
+      },
+      {
+        "name": "Frozen dependency install",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 9
+      },
+      {
+        "name": "Provision disposable database roles",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 10
+      },
+      {
+        "name": "Formatting",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 11
+      },
+      {
+        "name": "Fresh route types",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 12
+      },
+      {
+        "name": "Typecheck",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 13
+      },
+      {
+        "name": "Database typecheck",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 14
+      },
+      {
+        "name": "Lint",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 15
+      },
+      {
+        "name": "Dead-code gate",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 16
+      },
+      {
+        "name": "Validate migration journal and apply migrations",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 17
+      },
+      {
+        "name": "Prove migration idempotence",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 18
+      },
+      {
+        "name": "Unit and regression tests",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 19
+      },
+      {
+        "name": "Cross-tenant and cross-property enforcement",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 20
+      },
+      {
+        "name": "Real People provenance and RLS boundary tests",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 21
+      },
+      {
+        "name": "Related real property RLS regressions",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 22
+      },
+      {
+        "name": "Closed Risk revision regression",
+        "status": "completed",
+        "conclusion": "skipped",
+        "number": 23
+      },
+      {
+        "name": "Migration Safety isolated rollback and ACL harness",
+        "status": "completed",
+        "conclusion": "skipped",
+        "number": 24
+      },
+      {
+        "name": "Dispose only task-owned Migration Safety fixture",
+        "status": "completed",
+        "conclusion": "skipped",
+        "number": 25
+      },
+      {
+        "name": "Deployment contract regressions without deployment",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 26
+      },
+      {
+        "name": "Production build only",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 27
+      },
+      {
+        "name": "Post Run actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 51
+      },
+      {
+        "name": "Post Run pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 52
+      },
+      {
+        "name": "Post Checkout validation control definition",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 53
+      },
+      {
+        "name": "Stop containers",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 54
+      },
+      {
+        "name": "Complete job",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 55
+      }
+    ]
+  },
+  "result": "all_in_one_job_success",
+  "freeze": "not_board_frozen_authenticated_visual_and_combined_candidate_acceptance_pending",
+  "selectedEvidence": [
+    "2026-10-12T16:37:55.8928692Z   SOURCE_SHA: 0a4a04ca13758b68068f9483a3c0816b741478d8",
+    "2026-10-12T16:37:58.4021712Z \u001b[36;1mprintf 'candidate_sha=%s\\nsource_branch=%s\\n' \"$SOURCE_SHA\" \"$SOURCE_BRANCH\" >> \"$GITHUB_STEP_SUMMARY\"\u001b[0m",
+    "2026-10-12T16:37:58.4075145Z   SOURCE_SHA: 0a4a04ca13758b68068f9483a3c0816b741478d8",
+    "2026-10-12T16:41:51.1561286Z  Tasks:    25 successful, 25 total",
+    "2026-10-12T16:42:32.6322022Z  Tasks:    1 successful, 1 total",
+    "2026-10-12T16:42:45.6319816Z \u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m6 passed\u001b[39m\u001b[22m\u001b[90m (6)\u001b[39m",
+    "2026-10-12T16:42:46.1984670Z \u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m14 passed\u001b[39m\u001b[22m\u001b[90m (14)\u001b[39m",
+    "2026-10-12T16:42:46.8545331Z \u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m12 passed\u001b[39m\u001b[22m\u001b[90m (12)\u001b[39m",
+    "2026-10-12T16:42:47.7447326Z \u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m48 passed\u001b[39m\u001b[22m\u001b[90m (48)\u001b[39m",
+    "2026-10-12T16:42:48.2676134Z \u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m6 passed\u001b[39m\u001b[22m\u001b[90m (6)\u001b[39m",
+    "2026-10-12T16:42:49.5446526Z \u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m12 passed\u001b[39m\u001b[22m\u001b[90m (12)\u001b[39m",
+    "2026-10-12T16:42:50.0667380Z \u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m4 passed\u001b[39m\u001b[22m\u001b[90m (4)\u001b[39m",
+    "2026-10-12T16:42:52.4753565Z \u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m246 passed\u001b[39m\u001b[22m\u001b[90m (246)\u001b[39m",
+    "2026-10-12T16:43:03.6060504Z \u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m312 passed\u001b[39m\u001b[22m\u001b[90m (312)\u001b[39m",
+    "2026-10-12T16:43:04.7907787Z \u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m15 passed\u001b[39m\u001b[22m\u001b[90m (15)\u001b[39m",
+    "2026-10-12T16:43:08.1048722Z \u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m57 passed\u001b[39m\u001b[22m\u001b[90m (57)\u001b[39m",
+    "2026-10-12T16:43:09.2736388Z \u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m19 passed\u001b[39m\u001b[22m\u001b[90m (19)\u001b[39m",
+    "2026-10-12T16:43:10.5565787Z \u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m51 passed\u001b[39m\u001b[22m\u001b[90m (51)\u001b[39m",
+    "2026-10-12T16:43:11.0866066Z \u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m21 passed\u001b[39m\u001b[22m\u001b[90m (21)\u001b[39m",
+    "2026-10-12T16:43:25.6508199Z \u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m18 passed\u001b[39m\u001b[22m\u001b[90m (18)\u001b[39m",
+    "2026-10-12T16:43:28.1077817Z \u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m16 passed\u001b[39m\u001b[22m\u001b[90m (16)\u001b[39m",
+    "2026-10-12T16:43:33.5768789Z \u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m26 passed\u001b[39m\u001b[22m\u001b[90m (26)\u001b[39m",
+    "2026-10-12T16:43:36.8845275Z \u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m10 passed\u001b[39m\u001b[22m\u001b[90m (10)\u001b[39m",
+    "2026-10-12T16:44:19.3326244Z \u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m1557 passed\u001b[39m\u001b[22m\u001b[2m | \u001b[22m\u001b[33m1 skipped\u001b[39m\u001b[90m (1558)\u001b[39m",
+    "2026-10-12T16:44:23.6111199Z \u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m96 passed\u001b[39m\u001b[22m\u001b[90m (96)\u001b[39m",
+    "2026-10-12T16:44:23.6112372Z  Tasks:    23 successful, 23 total",
+    "2026-10-12T16:44:25.4278586Z \u001b[2m      Tests \u001b[22m \u001b[1m\u001b[32m1 passed\u001b[39m\u001b[22m\u001b[90m (1)\u001b[39m",
+    "2026-10-12T16:44:25.8366388Z PASS: original hidden-assignment and unassigned-person regression, rolled back",
+    "2026-10-12T16:44:25.9341995Z PASS: unassigned, legacy, single-property, foreign-property, tenant-wide, cross-tenant, Training and PPE",
+    "2026-10-12T16:44:26.0071788Z PASS: property assignment creation and reassignment cannot claim a hidden Person",
+    "2026-10-12T16:44:26.0127032Z PASS: mixed assignments deny legacy; multi-property union preserves access",
+    "2026-10-12T16:44:26.0376922Z PASS: future, expired, inclusive start/end and open-ended assignment dates",
+    "2026-10-12T16:44:26.0918412Z PASS: empty, null, malformed, foreign and missing property provenance fail closed",
+    "2026-10-12T16:44:26.1077412Z PASS: non-object site metadata fails closed",
+    "2026-10-12T16:44:26.1345831Z PASS: SELECT/INSERT/UPDATE/DELETE, hidden assignment DML and tenant-qualified foreign keys",
+    "2026-10-12T16:44:26.1426316Z PASS: function owner/search_path/FORCE RLS/boolean contract and runtime privilege escalation denials",
+    "2026-10-12T16:44:26.1553292Z PASS: concurrent writer-first assignment creation: observed lock wait and fresh authorization",
+    "2026-10-12T16:44:26.1654372Z PASS: concurrent writer-first assignment reassignment: observed lock wait and fresh authorization",
+    "2026-10-12T16:44:26.1747319Z PASS: concurrent writer-first assignment deletion: observed lock wait and fresh authorization",
+    "2026-10-12T16:44:26.1818911Z PASS: concurrent writer-first assignment rollback: observed lock wait and fresh authorization",
+    "2026-10-12T16:44:26.1901967Z PASS: concurrent writer-first site remapping: observed lock wait and fresh authorization",
+    "2026-10-12T16:44:26.2001180Z PASS: concurrent writer-first property reassignment: observed lock wait and fresh authorization",
+    "2026-10-12T16:44:26.2078763Z PASS: concurrent writer-first property deletion: observed lock wait and fresh authorization",
+    "2026-10-12T16:44:26.2509391Z PASS: reader-first SELECT FOR UPDATE and mutation serialize; other tenant continues independently",
+    "2026-10-12T16:44:26.2529648Z PASS: fixed-snapshot isolation fails closed",
+    "2026-10-12T16:44:26.2815055Z PASS: stale legacy assignment deletion cannot erase newly committed hotel provenance",
+    "2026-10-12T16:44:26.3032271Z PASS: same-transaction site cascade removes authoritative assignments without stale eligibility",
+    "2026-10-12T16:44:26.3032729Z People provenance integration: 20 groups PASS",
+    "2026-10-12T16:44:36.8979309Z  Action property RLS integration: PASS",
+    "2026-10-12T16:44:36.9566548Z  Hotel Handover RLS integration: PASS",
+    "2026-10-12T16:44:37.0052511Z  Hospitality Metering RLS integration: PASS",
+    "2026-10-12T16:44:37.0892608Z  Maintenance evidence RLS integration: PASS",
+    "2026-10-12T16:44:37.4334236Z  Incident property RLS integration: PASS",
+    "2026-10-12T16:44:39.1731319Z PASS candidate verifier success",
+    "2026-10-12T16:44:39.4892495Z PASS candidate verifier feature-plus-visual",
+    "2026-10-12T16:44:39.5432044Z PASS candidate verifier ambiguous-feature",
+    "2026-10-12T16:44:39.5971043Z PASS candidate verifier failed-feature",
+    "2026-10-12T16:44:39.6520521Z PASS candidate verifier incomplete-feature",
+    "2026-10-12T16:44:39.7048842Z PASS candidate verifier sha-mismatch",
+    "2026-10-12T16:44:39.7586613Z PASS candidate verifier visual-only",
+    "2026-10-12T16:44:39.8146171Z PASS candidate verifier truncated-runs",
+    "2026-10-12T16:44:40.0559860Z PASS candidate verifier digest-mismatch",
+    "2026-10-12T16:44:40.1984674Z PASS candidate verifier inspect-failure",
+    "2026-10-12T16:44:40.4010549Z PASS candidate verifier invalid-digest",
+    "2026-10-12T16:44:40.6463067Z PASS candidate verifier pull-failure",
+    "2026-10-12T16:44:40.9630286Z PASS candidate verifier wrong-revision",
+    "2026-10-12T16:44:41.2800056Z PASS candidate verifier wrong-version",
+    "2026-10-12T16:44:41.2850341Z PASS candidate verifier old-caller",
+    "2026-10-12T16:44:41.2895787Z PASS V1.4 candidate deployment is manual, DEV-only, digest-bound and writer-fenced",
+    "2026-10-12T16:50:48.4921704Z ✓ Compiled successfully in 3.2min",
+    "2026-10-12T16:50:48.6130998Z  Tasks:    2 successful, 2 total"
+  ]
+}

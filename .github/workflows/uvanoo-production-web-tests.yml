@@ -1,7 +1,7 @@
-name: Uvanoo web regression diagnostics
+name: Uvanoo immutable Approvals recovery preflight
 on:
   push:
-    branches: [review/uvanoo-v1.4-production-completion-cloud-20261012]
+    branches: [recovery/uvanoo-v1.4-approvals-validation-20261012]
     paths: [.github/workflows/uvanoo-production-web-tests.yml]
 permissions:
   contents: read
@@ -27,7 +27,7 @@ jobs:
       - name: Apply isolated draft without publishing production source
         run: |
           set -euo pipefail
-          test "$GITHUB_REF" = refs/heads/review/uvanoo-v1.4-production-completion-cloud-20261012
+          test "$GITHUB_REF" = refs/heads/recovery/uvanoo-v1.4-approvals-validation-20261012
           cp docs/v1.4/production-completion/source-draft.json /tmp/uvanoo-production-draft.json
           cp .github/recovery/prepare-production-draft.ts /tmp/uvanoo-production-prepare.ts
           git checkout --detach c306bd6bbe0571eeca18a410c1ac08fe55c524b6
@@ -56,10 +56,30 @@ jobs:
           paths += ['packages/i18n/src/messages/'+lang+'.json' for lang in ['en','es','fr']]
           subprocess.run(['pnpm','exec','prettier','--write',*paths],check=True)
           PY
-      - name: Verify recovered source identity without repeating tests
+      - name: Verify immutable recovered source and protected files
         run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = c306bd6bbe0571eeca18a410c1ac08fe55c524b6
+          test "$(git rev-parse HEAD^{tree})" = cfc536197c361962def84db347d1344924661f1d
           git add apps packages
-          printf 'DRAFT_SOURCE_TREE=%s\n' "$(git write-tree)"
-          git diff --cached --name-status 40eedb50794510be943d15e6d029168504aca2fa
-          git diff --cached --stat 40eedb50794510be943d15e6d029168504aca2fa
-          git diff --cached 40eedb50794510be943d15e6d029168504aca2fa -- ':!packages/i18n/src/messages/*'
+          actual="$(git write-tree)"
+          test "$actual" = 9912feac29a30b4b32d219b4cc21f80f1f57f7f7
+          git cat-file -e "$actual^{tree}"
+          git diff --cached --check c306bd6bbe0571eeca18a410c1ac08fe55c524b6
+          git diff --cached --exit-code c306bd6bbe0571eeca18a410c1ac08fe55c524b6 -- 'packages/db/drizzle/00[0-5]*.sql' 'packages/db/drizzle/006[0-2]*.sql' 'apps/web/src/lib/people' 'apps/web/src/app/(app)/people' 'apps/web/src/lib/risk'
+          test "$(git rev-parse :packages/db/drizzle/0063_approvals_production.sql)" = 000d76e52c965c6487707f20cd4a7f1c13436e3d
+          git diff --cached --name-status c306bd6bbe0571eeca18a410c1ac08fe55c524b6
+          python3 - <<'PY'
+          import hashlib,json,pathlib,re,subprocess
+          d=json.load(open('/tmp/uvanoo-production-draft.json'))
+          assert pathlib.Path('packages/db/drizzle/0063_approvals_production.sql').read_text()==d['files']['packages/db/drizzle/0063_approvals_production.sql']
+          paths=subprocess.check_output(['git','diff','--cached','--name-only','c306bd6bbe0571eeca18a410c1ac08fe55c524b6'],text=True).splitlines()
+          allowed=set(d['files'])|{f'packages/i18n/src/messages/{lang}.json' for lang in ['en','es','fr']}
+          assert set(paths)<=allowed
+          for p in paths:
+              b=pathlib.Path(p).read_bytes()
+              assert not re.search(rb'-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|gh[pousr]_[A-Za-z0-9]{30,}|AKIA[A-Z0-9]{16}',b),p
+              print('RECOVERED_FILE '+json.dumps({'path':p,'gitBlob':subprocess.check_output(['git','hash-object',p],text=True).strip(),'sha256':hashlib.sha256(b).hexdigest()}))
+          print('RECOVERY_IDENTITY_PASS=9912feac29a30b4b32d219b4cc21f80f1f57f7f7')
+          PY
+          printf 'Verified recovered tree: %s\nMigration 0063: 000d76e52c965c6487707f20cd4a7f1c13436e3d\nDiff check: PASS\n' "$actual" >> "$GITHUB_STEP_SUMMARY"

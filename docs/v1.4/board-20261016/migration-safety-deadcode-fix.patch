@@ -1,0 +1,13 @@
+diff --git a/packages/db/src/migration-execution.ts b/packages/db/src/migration-execution.ts
+index 8a25f2e5..2d7c952c 100644
+--- a/packages/db/src/migration-execution.ts
++++ b/packages/db/src/migration-execution.ts
+@@ -5,7 +5,7 @@ import { sql } from 'drizzle-orm'
+ import type { MigrationDatabase } from './migration-connection'
+ import { validateMigrationState, type MigrationFile } from './migration-state'
+ 
+-export type ExecutableMigration = MigrationFile & { body: string }
++type ExecutableMigration = MigrationFile & { body: string }
+ export function loadMigrationBodies(folder: string, files: MigrationFile[]): ExecutableMigration[] {
+   return files.map((file) => {
+     const body = readFileSync(resolve(folder, `${file.tag}.sql`), 'utf8')

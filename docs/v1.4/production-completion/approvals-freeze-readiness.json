@@ -1,0 +1,41 @@
+{
+  "repository": "Satho82/beaconhs",
+  "sourceCommit": "937242e7e35806acab48c28c4163719b00c0f16d",
+  "sourceTree": "9912feac29a30b4b32d219b4cc21f80f1f57f7f7",
+  "sourceBranch": "recovery/uvanoo-v1.4-approvals-production-20261012",
+  "baseCommit": "c306bd6bbe0571eeca18a410c1ac08fe55c524b6",
+  "formalFreeze": false,
+  "implementationUnchangedAfterRecovery": true,
+  "validationRun": "https://github.com/Satho82/beaconhs/actions/runs/38306431626",
+  "validationStatus": "IN_PROGRESS",
+  "module": "Approvals",
+  "status": "NOT_READY_FOR_FREEZE",
+  "functions": [
+    "Native financial request records with precise amounts and supported currencies",
+    "Secure PDF/JPG/PNG attachments, scoped audited downloads and retry protection",
+    "Workflow category/currency/amount and configured-role authority",
+    "Sequential decisions and immutable audit; comments, more information, resubmission and cancellation",
+    "Append-only delegation preserves original approver stages; stale assignment checks",
+    "Durable notifications and scheduled reminders",
+    "Authenticated scoped lists, detail views, search/filter/pagination and audited CSV exports"
+  ],
+  "requiredBrowserAcceptance": [
+    "Use real authenticated synthetic requester, approver, finance/configurator and unauthorized accounts in disposable infrastructure",
+    "Create configured workflows; submit financial requests with documents; reject invalid amounts and files",
+    "Approve/reject sequentially; request more information, resubmit, comment, cancel and delegate",
+    "Verify original approver history, delegated authority, stale tabs and double-submit/retry behavior",
+    "Verify cross-tenant/property denials, revoked-role access, document downloads and CSV exports",
+    "Verify notification delivery/reminders and duplicate suppression",
+    "Exercise search, filters, pagination, localization and help/walkthroughs"
+  ],
+  "requiredVisualAcceptance": [
+    "Compare actual production routes with approved originals, not the synthetic preview",
+    "Owner review of list/detail/form/action states, light sidebar, desktop/tablet and accessibility"
+  ],
+  "ownerAcceptance": "PENDING",
+  "migration0063": {
+    "path": "packages/db/drizzle/0063_approvals_production.sql",
+    "gitBlob": "000d76e52c965c6487707f20cd4a7f1c13436e3d",
+    "sha256": "db91fbe88b2eb9d3dd8cb28cdb30422f10492c5bafaac9573df16c071b0682f8"
+  }
+}

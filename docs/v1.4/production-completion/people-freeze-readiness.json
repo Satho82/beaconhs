@@ -1,0 +1,30 @@
+{
+  "repository": "Satho82/beaconhs",
+  "sourceCommit": "937242e7e35806acab48c28c4163719b00c0f16d",
+  "sourceTree": "9912feac29a30b4b32d219b4cc21f80f1f57f7f7",
+  "sourceBranch": "recovery/uvanoo-v1.4-approvals-production-20261012",
+  "baseCommit": "c306bd6bbe0571eeca18a410c1ac08fe55c524b6",
+  "formalFreeze": false,
+  "implementationUnchangedAfterRecovery": true,
+  "validationRun": "https://github.com/Satho82/beaconhs/actions/runs/38306431626",
+  "validationStatus": "IN_PROGRESS",
+  "module": "People",
+  "status": "NOT_READY_FOR_FREEZE",
+  "implementation": "Unchanged from validated base; all original migration identities preserved.",
+  "preservedTechnicalEvidence": [
+    "https://github.com/Satho82/beaconhs/actions/runs/38290116395"
+  ],
+  "requiredBrowserAcceptance": [
+    "Authenticated tenant-wide, property A, property B, legacy and mixed-scope sessions",
+    "People directory search, filtering, pagination, primary title, detail navigation and allowed editing",
+    "Hotel-assigned person hidden from legacy scope even when assignments are invisible; truly unassigned person visible",
+    "Malformed, foreign, deleted and mixed property provenance denied; Training/PPE dependent visibility",
+    "Role revocation and concurrent provenance changes reflected safely"
+  ],
+  "requiredVisualAcceptance": [
+    "Compare actual authenticated screens with the nine approved originals",
+    "Use the approved light application sidebar; desktop and tablet, loading/empty/error states, responsive layout",
+    "Owner must approve visual and workflow outcomes separately from database security evidence"
+  ],
+  "ownerAcceptance": "PENDING"
+}

@@ -1,0 +1,104 @@
+{
+  "status": "ENGINEERING_IN_PROGRESS_NOT_READY_FOR_FREEZE",
+  "repository": "Satho82/beaconhs",
+  "date": "2026-10-12",
+  "execution": "GitHub Actions disposable cloud runners only; no owner Mac",
+  "productionBranch": "feature/uvanoo-v1.4-approvals-production-20261012",
+  "productionHead": "c306bd6bbe0571eeca18a410c1ac08fe55c524b6",
+  "productionTree": "cfc536197c361962def84db347d1344924661f1d",
+  "controlBranch": "review/uvanoo-v1.4-production-completion-cloud-20261012",
+  "sourceDraft": {
+    "commit": "62a4b0d21e00ad0d5318ff9ffb7b3a927ed48553",
+    "path": "docs/v1.4/production-completion/source-draft.json",
+    "status": "UNVALIDATED; apply files over productionHead in disposable runner, then use preparation script and validate"
+  },
+  "preparationScript": ".github/recovery/prepare-production-draft.ts",
+  "ownership": {
+    "writer": "Current autonomous completion session",
+    "parallelActivity": "Only read-only validation jobs on isolated runner checkouts; no delegated source writers",
+    "publicationGuard": "Recheck production branch expected head; normal forward-only push or expected-SHA update; never force"
+  },
+  "preservedEvidence": {
+    "url": "https://github.com/Satho82/beaconhs/actions/runs/38290116395",
+    "result": "SUCCESS",
+    "covers": [
+      "Formatting",
+      "Typecheck",
+      "Database typecheck",
+      "Lint",
+      "Dead-code",
+      "Tests",
+      "Build",
+      "People provenance",
+      "Property delegation",
+      "Risk revisions",
+      "Migration replay/rollback/locking/ACL/backup"
+    ]
+  },
+  "newEvidence": [
+    {
+      "url": "https://github.com/Satho82/beaconhs/actions/runs/38294975148",
+      "result": "25 workspace typechecks + DB typecheck passed; focused test expected-source-list failed and corrected"
+    },
+    {
+      "url": "https://github.com/Satho82/beaconhs/actions/runs/38296182090",
+      "result": "One UI unknown-to-ReactNode type error; corrected in later draft"
+    },
+    {
+      "url": "https://github.com/Satho82/beaconhs/actions/runs/38296988133",
+      "result": "Fresh 63 migration replay + no-op + RLS and grants passed; upstream storage image unavailable"
+    },
+    {
+      "url": "https://github.com/Satho82/beaconhs/actions/runs/38297168331",
+      "result": "RUNNING; official pinned MinIO source replaces missing image"
+    },
+    {
+      "url": "https://github.com/Satho82/beaconhs/actions/runs/38297332297",
+      "result": "RUNNING; lint/dead-code/unit failures require log review; no gates bypassed"
+    }
+  ],
+  "migrations": {
+    "original61": "Preserved byte-for-byte",
+    "canonical0062": "Unchanged",
+    "proposedAdditive": [
+      "0063_approvals_production.sql"
+    ],
+    "persistentDatabasesAccessed": false
+  },
+  "people": {
+    "source": "Unchanged",
+    "priorSecurity": "PASS at preserved source",
+    "authenticatedBrowser": "NOT VERIFIED",
+    "visualAcceptance": "NOT VERIFIED",
+    "ownerAcceptance": "PENDING"
+  },
+  "approvals": {
+    "draftFunctions": [
+      "Authenticated dashboard and scoped request lists",
+      "Native financial submission and secure attachments",
+      "Comments and immutable lifecycle/audit",
+      "Sequential decisions, cancellation, more information",
+      "Role-bound amounts and delegation",
+      "Workflow configuration",
+      "Durable notifications and reminder scheduling",
+      "Scoped CSV exports"
+    ],
+    "status": "DRAFT; not production-complete",
+    "browser": "NOT VERIFIED"
+  },
+  "remaining": [
+    "Correct every static and regression failure",
+    "Run latest attachment and concurrency tests",
+    "Validate notification delivery and reminders",
+    "Complete production build and combined security regression",
+    "Verify migration/source invariants at final SHA/tree",
+    "Publish only validated source to production branch",
+    "Prepare separate final freeze manifests with explicit browser/owner blockers"
+  ],
+  "restrictions": {
+    "merged": false,
+    "deployed": false,
+    "persistentDatabaseChanges": false,
+    "formalFreeze": false
+  }
+}

@@ -1,0 +1,42 @@
+name: DEV recovery documentation format
+on:
+  push:
+    branches: [feat/uvanoo-v1.4-secure-dev-backup-20261013]
+    paths:
+      - scripts/cluster/dev-recovery/README.md
+      - .github/workflows/dev-recovery-docs.yml
+permissions:
+  contents: read
+jobs:
+  format:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with:
+          node-version: 24.18.0
+      - name: Check added documentation with repository formatting configuration
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --prefix "$RUNNER_TEMP/recovery-format" --ignore-scripts --no-audit --no-fund prettier@3.9.5 prettier-plugin-tailwindcss@0.8.0
+          node --input-type=module <<'JS'
+          import {readFileSync} from 'node:fs'
+          import {createRequire} from 'node:module'
+          import {pathToFileURL} from 'node:url'
+          const req=createRequire(process.env.RUNNER_TEMP+'/recovery-format/package.json')
+          const prettier=await import(pathToFileURL(req.resolve('prettier')).href)
+          const config=JSON.parse(readFileSync('.prettierrc','utf8'))
+          config.plugins=await Promise.all(config.plugins.map(async name=>import(pathToFileURL(req.resolve(name)).href)))
+          const path='scripts/cluster/dev-recovery/README.md'
+          const original=readFileSync(path,'utf8')
+          const formatted=await prettier.format(original,{...config,filepath:path})
+          if(formatted!==original){
+            console.log('FORMATTED_PUBLIC_README_BASE64='+Buffer.from(formatted).toString('base64'))
+            throw new Error('Repository documentation formatting differs')
+          }
+          console.log('Added documentation formatting PASS')
+          JS

@@ -167,7 +167,8 @@ guard = root/"guard"
 r.write_new(guard, ("#!/bin/sh\nset -eu\n"
     "test \"$(docker inspect --format '{{.HostConfig.NetworkMode}}' "+source+")\" = none\n").encode())
 os.chmod(guard, 0o700)
-ctx = {"sourceSha":os.environ["GITHUB_SHA"], "sourceTree":r.run(["git","rev-parse","HEAD^{tree}"]).decode().strip(),
+ctx = {"sourceSha":os.environ.get("GITHUB_SHA") or r.run(["git", "rev-parse", "HEAD"]).decode().strip(),
+       "sourceTree":r.run(["git","rev-parse","HEAD^{tree}"]).decode().strip(),
        "imageDigest":restore.IMAGE.split("@")[1], "database":"beaconhs",
        "databaseOid":int(sql(source,"SELECT oid FROM pg_database WHERE datname='beaconhs'")),
        "postgresVersion":"160015", "ledgerHash":"a"*64, "schemaHash":"b"*64, "dataHash":"c"*64,

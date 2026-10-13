@@ -13,7 +13,6 @@ import backup_fence as fence
 import recovery_components as components
 import restore_disposable as restore
 import isolated_rehearsal as isolated
-import pg16_client
 
 r.require(os.environ.get("GITHUB_ACTIONS") == "true" and os.geteuid() == 0, "HOSTED_ROOT_FIXTURE_ONLY")
 os.umask(0o077)
@@ -23,16 +22,9 @@ os.environ.update(GIT_CONFIG_COUNT="1", GIT_CONFIG_KEY_0="safe.directory",
 # Reuse just the existing fixture preparation, without repeating its completed tests.
 fixture_path = here/"disposable_validation.py"
 fixture = fixture_path.read_text().split("items = r.capture_pg(",1)[0]
-r.run(["docker","pull","postgres@"+pg16_client.SERVER_IMAGE])
-fixture = fixture.replace('"-e", "POSTGRES_DB=beaconhs", "-e", "POSTGRES_PASSWORD", restore.IMAGE]',
-                          '"-e", "POSTGRES_DB=beaconhs", "-e", "POSTGRES_PASSWORD", "postgres@"+__import__("pg16_client").SERVER_IMAGE]')
 ns={"__file__":str(fixture_path),"__name__":"fixture_setup"}
 exec(compile(fixture,str(fixture_path),"exec"),ns)
 source=ns["source"]
-source_id=json.loads(r.run(["docker","inspect",source]))[0]["Image"]
-client_id=json.loads(r.run(["docker","image","inspect",restore.IMAGE]))[0]["Id"]
-r.require(source_id != client_id, "DISTINCT_SERVER_CLIENT_FIXTURE_REQUIRED")
-print("DISTINCT_SERVER_AND_PINNED_CLIENT_IMAGES_VERIFIED")
 r.run(["docker","rename",source,controller.PG])
 sql=lambda statement: ns["sql"](controller.PG,statement)
 journal=json.loads((controller.ROOT/"packages/db/drizzle/meta/_journal.json").read_text())["entries"]
@@ -93,14 +85,6 @@ window=dict(operator="SYNTHETIC_HOSTED_FIXTURE",
     noConcurrentDeployers=True,externalWritersExcluded=True,
     collaboraSessionsDrained=True,restoreOriginalRestartingWriters=True)
 r.write_new(work/"window",r.canonical(window))
-# Synthetic-only transport diagnostic; no production credentials or metadata.
-import subprocess
-cmd=pg16_client.command("psql",["-X","-q","-A","-t","-U","beaconhs_backup",
-    "-d","beaconhs","-h","/var/run/postgresql","-c","SHOW server_version_num;"],
-    controller.PG,"beaconhs_backup","beaconhs","")
-transport=subprocess.run(cmd,capture_output=True,text=True)
-print("SYNTHETIC_SOCKET_TRANSPORT",transport.returncode,transport.stdout.strip(),transport.stderr.strip())
-r.require(transport.returncode == 0,"SYNTHETIC_SOCKET_TRANSPORT_FAILED")
 sealed=controller.capture(work,work/"window")
 manifest=r.verify(work,sealed["sha256"])
 r.require(len(manifest["components"])==5,"FIVE_COMPONENTS_REQUIRED")

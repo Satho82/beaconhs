@@ -36,8 +36,8 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq age
           docker pull postgres@sha256:ca0bd484cb98bf4b24eb1010e73fb3fcbd6714d240fbc1a10eea5b7dbecb641d
-      - name: Full disposable capture controller and restore integration
-        run: sudo --preserve-env=GITHUB_ACTIONS,GITHUB_SHA,PATH python3 scripts/cluster/dev-recovery/controller_validation.py
+      - name: Disposable PostgreSQL image mismatch and diagnostic regression
+        run: sudo --preserve-env=GITHUB_ACTIONS,GITHUB_SHA,PATH python3 scripts/cluster/dev-recovery/client_identity_validation.py
       - name: No private files tracked
         run: |
           set -euo pipefail

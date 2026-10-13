@@ -8,56 +8,21 @@ import sys
 import dev_recovery as r
 from restore_disposable import IMAGE
 
-# Independently observed DEV server identity; client bytes remain bound to IMAGE.
-SERVER_IMAGE = "sha256:f1c3376c26f2609ab9f29f71f824103fe2fcd8ee0346485cb6122a4f93df6f94"
-
 def checked_container(name, inspect=None):
     inspect = inspect or (lambda args: json.loads(r.run(args)))
     r.require(isinstance(name, str) and r.NAME.fullmatch(name), "PG_CONTAINER_NAME_REJECTED")
     c = inspect(["docker", "inspect", name])[0]
     image = inspect(["docker", "image", "inspect", IMAGE])[0]
-    server_image = inspect(["docker", "image", "inspect", "postgres@"+SERVER_IMAGE])[0]
-    r.require(c["Image"] in (server_image["Id"], image["Id"]) and c["State"]["Running"],
-              "PINNED_PG_IMAGE_REQUIRED")
+    r.require(c["Image"] == image["Id"] and c["State"]["Running"], "PINNED_PG_IMAGE_REQUIRED")
     r.require(not c["HostConfig"].get("PortBindings"), "PG_PUBLISHED_PORT_REJECTED")
     return c["Id"]
 
 def command(tool, args, container, role, database, options):
     r.require(tool in {"psql", "pg_dump", "pg_restore"}, "PG_TOOL_REJECTED")
     r.require(role == "beaconhs_backup" and database == "beaconhs", "BACKUP_ROLE_REQUIRED")
-    # A fresh pinned client sees only the existing server's Unix socket directory.
-    # No TCP, server data mount, Docker socket, credential or server mutation.
-    c = json.loads(r.run(["docker", "inspect", container]))[0]
-    r.require(checked_container(container) == c["Id"], "SERVER_IDENTITY_CHANGED")
-    pid = c["State"].get("Pid")
-    r.require(type(pid) is int and pid > 1, "SERVER_PID_REJECTED")
-    socket = "/proc/"+str(pid)+"/root/var/run/postgresql"
-    return ["docker", "run", "--rm", "-i", "--network", "none", "--read-only",
-            "--cap-drop", "ALL", "--security-opt", "no-new-privileges",
-            "--user", "postgres", "--pids-limit", "64", "--memory", "512m", "--cpus", "1",
-            "--label", "uvanoo.recovery=pg-client", "--label", "uvanoo.server="+c["Id"],
-            "--mount", "type=bind,src="+socket+",dst=/var/run/postgresql,readonly",
-            "--entrypoint", tool, "-e",
+    return ["docker", "exec", "-i", "-e",
             "PGOPTIONS=-c default_transaction_read_only=on -c statement_timeout=1800000 "+options,
-            "-e", "PGAPPNAME=uvanoo-protected-backup", IMAGE]+args
-
-def is_client(c, server):
-    if c["Config"].get("Labels", {}).get("uvanoo.recovery") != "pg-client":
-        return False
-    image = json.loads(r.run(["docker", "image", "inspect", IMAGE]))[0]
-    h, labels = c["HostConfig"], c["Config"].get("Labels", {})
-    expected = "/proc/"+str(server["State"]["Pid"])+"/root/var/run/postgresql"
-    mounts = c.get("Mounts", [])
-    r.require(c["Image"] == image["Id"] and labels.get("uvanoo.server") == server["Id"]
-              and h.get("NetworkMode") == "none" and h.get("ReadonlyRootfs") is True
-              and not h.get("Privileged") and not h.get("PortBindings")
-              and c["Config"].get("User") == "postgres"
-              and h.get("CapDrop") == ["ALL"]
-              and "no-new-privileges" in h.get("SecurityOpt", [])
-              and len(mounts) == 1 and mounts[0]["Source"] == expected
-              and mounts[0]["Destination"] == "/var/run/postgresql"
-              and mounts[0]["RW"] is False, "CLIENT_ISOLATION_REJECTED")
-    return True
+            "-e", "PGAPPNAME=uvanoo-protected-backup", container, tool]+args
 
 def execute(tool, args):
     os.umask(0o077)

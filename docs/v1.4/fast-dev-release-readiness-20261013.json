@@ -1,8 +1,8 @@
 {
   "version": 1,
-  "status": "KEY_CUSTODY_OWNER_CONFIRMED; CAPTURE_BLOCKED_ON_REMAINING_PREFLIGHT",
+  "status": "KEY_CUSTODY_AND_RECIPIENT_MATCH_PASS; REMOTE_EXECUTION_BLOCKED",
   "scope": "DEV Risk Assessments, People and Approvals only",
-  "recordedAt": "2026-10-13T10:37:51.443Z",
+  "recordedAt": "2026-10-13T10:42:30.311Z",
   "product": {
     "sha": "563fb0e9b79a838a5f394abaffb2f7dc743fc571",
     "tree": "324c50a60e2cb0639ba920488a150c6531968374",
@@ -76,18 +76,16 @@
       "publicRecipientSha256": "138aa3b6a8f40c219b5d69a30357cf5ac9971c9523c87c04e42fc43c5434727f",
       "independentOwnerRecovery": "OWNER CONFIRMED: secure SCP transfer to independent Mac;0600;184bytes;age-keygen validation PASS; no private disclosure",
       "privateKeyRead": false,
-      "publicRecipientCrossCheck": "Pending public-recipient fingerprint from owner-retained identity; previous approved recipient SHA256 retained"
+      "publicRecipientCrossCheck": "PASS: owner independently derived public-recipient SHA256; exact match to approved 138aa3b6a8f40c219b5d69a30357cf5ac9971c9523c87c04e42fc43c5434727f"
     },
     "localRecoveryRootExists": false,
     "defaultUbuntuAwsConfigExists": false,
     "defaultUbuntuAwsCredentialsExists": false,
     "note": "Absence of default AWS files is not proof that no bucket or alternative credential configuration exists.",
     "freshCheck": {
-      "deviceList": "ONLINE",
-      "startProcess": "MCP request timed out; error -32603",
-      "result": "NOT VERIFIED",
-      "scope": "Read-only age public derivation and equality check, destination metadata and service/process status. No backup, SQL or service mutation in submitted command.",
-      "remoteReadOnlyProcessCompletion": "Unknown; no duplicate request dispatched"
+      "startProcess": "MCP -32603 request timed out",
+      "probe": "Read-only printf connection marker only; no filesystem, database or service changes",
+      "result": "Remote execution unavailable; destinations, restore and fence not freshly verified"
     },
     "previousObservationOnly": true
   },
@@ -118,8 +116,7 @@
     "status": "Configured old image is not validated product. Final governed source/tree and immutable image must be bound after approved integration and authoritative build."
   },
   "blockers": [
-    "Match public recipient derived from independently retained owner identity to approved fingerprint. Custody itself is owner-confirmed.",
-    "Remote Desktop Commander listed VPS online but read-only execution timed out; live preflight cannot currently complete.",
+    "Remote Desktop Commander minimal read-only connection probe timed out again (MCP -32603). No usable VPS command channel.",
     "No verified private encrypted-backup destination or independent restore destination.",
     "Complete DEV writer inventory, persistent fencing, continuous verification and unchanged-state restoration are not proven.",
     "Existing activation helper releases web/worker/scheduler together before external readiness; PR10 containment alone does not resolve controlled release ordering.",
@@ -127,7 +124,7 @@
     "Final integrated-source release validation and immutable image binding remain required."
   ],
   "preparedSequence": [
-    "Owner custody confirmed. Compare public recipient derived from retained identity with approved fingerprint, then verify exact private destination and isolated PostgreSQL16.15 restore target.",
+    "Key custody and independent recipient fingerprint match PASS. Next verify protected OVH destination and establish isolated PostgreSQL16.15 restore target once VPS execution is restored.",
     "Verify exclusive operation, DEV-only saved writer state and fencing including direct/external writers; do not infer fencing from 0/1.",
     "Using existing approved backup tooling, capture one protected encrypted database plus required storage/Redis recovery evidence; independently verify encrypted archive checksums and restore.",
     "On restored real data only, verify58 ledger/security/data identities, apply tested narrow default-ACL correction, match canonical58, rehearse0059-0063 and verify data/security/locking/rollback/retry.",
@@ -139,13 +136,11 @@
   ],
   "approvals": {
     "backupAndIsolatedRehearsal": "Already authorised; prerequisites remain unverified. No repeat blanket approval requested.",
-    "nextOwnerAction": "Provide only public recipient fingerprint from retained identity (never private key). Identify exact protected OVH bucket/access profile and private isolated restore destination if already prepared; no provider reselection or new platform requested. Remote execution must work for fence verification.",
+    "nextOwnerAction": "Restore Remote Desktop Commander agent connectivity on vps-c54e0b88 without VPS/Docker restart. Identify existing protected OVH bucket/region and secure access-profile location if available; do not share credentials. No further key validation or blanket backup approval needed.",
     "persistentSql": "Separate exact two-statement approval after real-data rehearsal evidence",
     "governedMerge": "Separate exact PR heads/resulting tree approval",
     "deployment": "Separate final SHA/tree/image/ReleaseEvidence and precise DEV operations approval"
   },
-  "changesThisTurn": "Recovered existing evidence, accepted owner's independent key custody confirmation, attempted bounded read-only VPS check (connector timeout), and published evidence only. No repeated tests, new infrastructure, backup, restore, rehearsal, service changes, persistent SQL, migrations, merge, deployment or Traefik change.",
-  "supersedes": "c1eaeec3df86c9fa2124db446bd0b4e33f6f6135",
-  "ownerPublicFingerprintCommand": "set -o pipefail; age-keygen -y \"$HOME/.uvanoo-backup-keys/uvanoo-dev-20261013.agekey\" | tr -d '\\r\\n' | shasum -a 256",
-  "commandOutputClassification": "Public-recipient SHA256 only; do not send private identity."
+  "changesThisTurn": "Accepted exact independent owner fingerprint match. Minimal read-only VPS connection check timed out; no capture or restore attempted. Completed engineering tests reused; no new tests, infrastructure, SQL, services, migrations, merge, deployment or Traefik changes.",
+  "supersedes": "34dd7cd98e7fc677eb6a66a07360d3252559c38b"
 }

@@ -1,0 +1,44 @@
+name: Canonical58 retained evidence reporting
+on:
+  push:
+    branches: [audit/uvanoo-v1.4-canonical58-cloud-20261013]
+    paths: [.github/workflows/canonical58-report.yml]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  report:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Correct summary from immutable successful artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir report
+          gh api repos/Satho82/beaconhs/actions/artifacts/11796739255/zip > original.zip
+          echo '903dce49022412739b03d3d867a90adca5d853e7eb6aeeb6effe2c6902589ed6  original.zip' | sha256sum -c -
+          python3 - <<'PY'
+          import hashlib,json,zipfile
+          with zipfile.ZipFile('original.zip') as z:
+              obj=json.loads(z.read('reference-public.json'))
+          assert obj['fingerprint']=='adce2e70b4447ac5787ade49040f1a8f101c3e3b0dd067069f029bbd13c0493e'
+          assert obj['workflowSha']=='5b427356d5230f6db72397b8a4b6c519652f0c31'
+          assert len(obj['sections'])==19 and len(obj['migrations'])==58
+          obj['policies']=obj['sections'][8]['count']
+          obj['reportCorrection']='Policy count uses section 8; prior summary accidentally counted section 6 (triggers). Fingerprints/rows/ledger are unchanged.'
+          raw=(json.dumps(obj,indent=2,ensure_ascii=False)+'\n').encode()
+          open('report/reference-public.json','wb').write(raw)
+          checksum=hashlib.sha256(raw).hexdigest()
+          open('report/reference-public.sha256','w').write(checksum+'  reference-public.json\n')
+          print('CORRECTED_REFERENCE '+json.dumps({k:v for k,v in obj.items() if k not in ['sections','migrations']}))
+          print('REFERENCE_FILE_SHA256 '+checksum)
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: canonical58-public-corrected
+          path: report/
+          if-no-files-found: error
+          retention-days: 30

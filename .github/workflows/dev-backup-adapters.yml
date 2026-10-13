@@ -1,0 +1,43 @@
+name: DEV backup adapter disposable validation
+on:
+  push:
+    branches: [fix/uvanoo-dev-backup-adapters-20261013]
+    paths:
+      - scripts/cluster/dev-recovery/**
+      - .github/workflows/dev-backup-adapters.yml
+permissions:
+  contents: read
+concurrency:
+  group: uvanoo-dev-backup-adapters
+  cancel-in-progress: false
+jobs:
+  adapters:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Preserve accepted runtime and deployment contracts
+        run: |
+          set -euo pipefail
+          git diff --exit-code 3043a489171face85cf2331c7ea45a2a09ab5a2e HEAD -- apps packages scripts/cluster/dev-writer-fence.mjs .github/workflows/deploy-dev.yml .github/workflows/deploy-v1.4-dev-candidate.yml
+          python3 -m py_compile scripts/cluster/dev-recovery/*.py
+      - name: Focused adapter fault-injection contracts
+        working-directory: scripts/cluster/dev-recovery
+        run: python3 -m unittest -v test_backup_adapters.py
+      - name: Disposable prerequisites
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq age
+          docker pull postgres@sha256:ca0bd484cb98bf4b24eb1010e73fb3fcbd6714d240fbc1a10eea5b7dbecb641d
+      - name: Pinned clients, encrypted restore, Swarm fencing and Redis capture
+        run: python3 scripts/cluster/dev-recovery/adapter_validation.py
+      - name: No private files tracked
+        run: |
+          set -euo pipefail
+          git diff --exit-code
+          test -z "$(git ls-files '*.agekey' '*.dump' '*.dump.age' '*private.jsonl')"
+# No secrets, artifacts, self-hosted runner, deployment or persistent endpoints.

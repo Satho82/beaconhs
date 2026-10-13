@@ -49,7 +49,7 @@ def cleanup_fixture():
     """Remove only this synthetic fixture's containers and private workspace."""
     for name in reversed(cleanup_containers):
         if re.fullmatch(r"uvanoo-(?:backup-test|restore)-[0-9a-f]{32}", name):
-            subprocess.run(["docker", "rm", "--force", name], stdout=subprocess.DEVNULL,
+            subprocess.run(["docker", "rm", "--force", "--volumes", name], stdout=subprocess.DEVNULL,
                            stderr=subprocess.DEVNULL, check=False)
     if root.parent == Path(tempfile.gettempdir()) and root.name.startswith("uvanoo-backup-test-"):
         shutil.rmtree(root, ignore_errors=True)
@@ -69,6 +69,15 @@ for _ in range(60):
     if subprocess.run(["docker", "exec", source, "pg_isready", "-U", "uvanoo_dev", "-d", "beaconhs"],
                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode == 0: break
     time.sleep(1)
+
+
+source_config = json.loads(r.run(["docker", "inspect", source]))[0]
+source_host = source_config["HostConfig"]
+require(source_host["NetworkMode"] == "none" and not source_host.get("PortBindings") and
+        source_host.get("Memory") == 2 * 1024**3 and source_host.get("NanoCpus") == 10**9 and
+        source_host.get("PidsLimit") == 128 and
+        "no-new-privileges" in source_host.get("SecurityOpt", []),
+        "SYNTHETIC_SOURCE_ISOLATION_REJECTED")
 
 def sql(container, statement, user="uvanoo_dev"):
     return r.run(["docker", "exec", "-i", container, "psql", "-X", "-q", "-A", "-t",

@@ -31,7 +31,7 @@ Current queued and in-progress GitHub Actions queries each returned zero. Broade
 
 The current workflow restores all three writers together before external readiness, and does not automatically re-fence after a late failure. Queue disposition and external-writer containment must be complete beforehand.
 
-Storage bootstrap can modify bucket policies/lifecycle. Collabora branding writes a fixed host path; DEV exclusivity must be proved to preserve staging/production. Existing saved compose fenceability is unverified.
+The deployment workflow also prunes host-wide unused images/build cache before fencing, so durable rollback image retention and approved shared-runner scope are required. Storage bootstrap can modify bucket policies/lifecycle. Collabora branding writes a fixed host path; DEV exclusivity must be proved to preserve staging/production. Existing saved compose fenceability is unverified.
 
 The backup script writes a restricted plaintext temporary dump before age encryption; use protected encrypted ephemeral storage/tmpfs. Restore script count checks and optional sidecars are insufficient alone: the release procedure requires archive hash, full ledger/data/schema/security proof and exact PostgreSQL 16.15 rehearsal.
 

@@ -80,6 +80,8 @@ This section corrects overly generic “restart in controlled order” language 
 
 Critical preconditions:
 
+- Before checkout/fencing, the reusable workflow prunes builder cache and unused images older than 168 hours on the shared deployment runner (lines 216–225). This is host-wide housekeeping, not DEV-service-only. Prove its permitted scope and preserve/re-pull the rollback digest from a durable registry; an old local image alone is not rollback protection. If strict staging/production isolation cannot be established, block dispatch and review a candidate-only correction before deployment.
+
 - The existing saved compose must already have one unambiguous WRITER_REPLICAS setting and fenceable web/worker/scheduler services. `dev-writer-fence.mjs` fails closed if not. Current saved compose/scheduler state is NOT VERIFIED. Do not dispatch merely to discover this.
 - The automatic fence covers only these three services. Independently exclude other writers and reconcile queues before restore. Keep external ingress/integrations controlled through smoke tests. If queue processing must wait for browser smoke, the current joint-restore workflow does not meet that requirement; approve and validate a narrow candidate-only control change first.
 - `storage-init` runs at one replica and can change bucket policies and expiry rules. Include storage backup, private-bucket verification and approved lifecycle effects in the release plan.

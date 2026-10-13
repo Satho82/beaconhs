@@ -1,4 +1,5 @@
 name: Uvanoo final release evidence formatting
+# Final source-review addition: shared-runner pruning and rollback retention.
 on:
   push:
     branches: [review/uvanoo-v1.4-final-freeze-dev-prep-20261013]

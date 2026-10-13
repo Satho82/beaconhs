@@ -66,10 +66,10 @@ def restore(directory, digest, identity, parent, roles_sql, roles_sha):
     # Reviewed role/bootstrap SQL for the isolated destination only. Never execute
     # broad provisioning against a restored or persistent database.
     sql(roles_sql.read_bytes())
-    # Drop only the initially empty public schema if the verified dump creates it.
-    toc = recovery.run(["pg_restore", "--list", str(dump)]).decode()
-    if any(" SCHEMA - public " in line for line in toc.splitlines()):
-        sql(b"DROP SCHEMA public;")
+    # PostgreSQL16.15 emits an owner-bearing public SCHEMA TOC entry that
+    # relies on initdb public already existing. TOC presence does not imply
+    # CREATE SCHEMA. Preserve the fresh empty schema and let the dump set its ACL/owner.
+    recovery.run(["pg_restore", "--list", str(dump)])
     # Preserve archive owners and ACLs. Restore as the isolated bootstrap superuser.
     errors = work / "restore-errors.private.log"
     recovery.write_new(errors, b"")

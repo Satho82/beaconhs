@@ -155,8 +155,8 @@ for kind in ("storage","redis","clean155"):
 sealed = r.finalize(root,ctx,items)
 result = restore.restore(root,sealed["sha256"],identity,root,roles_file,r.sha(roles_file))
 target = result["container"]
-before = [json.loads(x) for x in sql(source,collector.read_text(),"beaconhs_backup").splitlines() if x.strip()]
-after = [json.loads(x) for x in sql(target,collector.read_text(),"beaconhs_backup").splitlines() if x.strip()]
+before = r.parse_documents(sql(source,collector.read_text(),"beaconhs_backup"))
+after = r.parse_documents(sql(target,collector.read_text(),"beaconhs_backup"))
 require(len(before)==len(after)==21,"COLLECTOR_DOCUMENT_COUNT")
 # Database OIDs and collection times differ by design; compare ledger and all19 sections.
 for a,b in zip(before[1:],after[1:]):

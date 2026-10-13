@@ -136,6 +136,27 @@ def psql(sql):
                input=sql.encode(), timeout=60).decode().strip()
 
 
+def parse_documents(text):
+    decoder = json.JSONDecoder()
+    documents = []
+    remaining = text
+    while remaining.strip():
+        remaining = remaining.lstrip()
+        try:
+            value, end = decoder.raw_decode(remaining)
+        except (ValueError, TypeError):
+            raise Rejected("METADATA_JSON_REJECTED") from None
+        require(isinstance(value, dict), "METADATA_DOCUMENT_REJECTED")
+        documents.append(value)
+        remaining = remaining[end:]
+    require([x.get("section") for x in documents] == ["identity", "ledger"] + list(range(19)),
+            "METADATA_SECTION_ORDER_REJECTED")
+    require(documents[0].get("database") == "beaconhs"
+            and documents[0].get("postgresVersion") == "160015", "METADATA_DATABASE_REJECTED")
+    require(all(isinstance(x.get("rows"), list) for x in documents[1:]), "METADATA_ROWS_REJECTED")
+    return documents
+
+
 def capture_pg(directory, recipient_file, ctx, guard_file, metadata_sql):
     directory = private(directory, True)
     ctx = context(ctx)
@@ -181,7 +202,7 @@ ROLLBACK;"""))
                 os.environ.pop("PGOPTIONS", None)
             else:
                 os.environ["PGOPTIONS"] = env_before
-        documents = [json.loads(line) for line in raw.read_text().splitlines() if line.strip()]
+        documents = parse_documents(raw.read_text())
         require(len(documents) == 21, "METADATA_DOCUMENT_COUNT_REJECTED")
         guard(guard_file, ctx["fenceGuardSha256"])
         token = uuid.uuid4().hex

@@ -105,6 +105,16 @@ class RecoveryContract(unittest.TestCase):
         self.ctx["imageDigest"] = "latest"
         with self.assertRaisesRegex(r.Rejected, "IMAGE_IDENTITY"): self.seal()
 
+    def test_multiline_metadata_documents(self):
+        docs = [{"section":"identity","database":"beaconhs","postgresVersion":"160015"},
+                {"section":"ledger","rows":[]}] + [{"section":i,"rows":[]} for i in range(19)]
+        text = "\n".join(json.dumps(d,indent=2) for d in docs)
+        self.assertEqual(r.parse_documents(text), docs)
+        with self.assertRaises(r.Rejected): r.parse_documents(text[:-1])
+        with self.assertRaises(r.Rejected): r.parse_documents(text+"trailing garbage")
+        docs[-1]["section"] = 17
+        with self.assertRaises(r.Rejected): r.parse_documents("\n".join(json.dumps(d) for d in docs))
+
     def test_capture_binding_rejected(self):
         self.ctx["sourceSha"] = "9"*40
         with self.assertRaisesRegex(r.Rejected, "CAPTURE_CONTEXT"): self.seal()

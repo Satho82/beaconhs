@@ -93,6 +93,14 @@ window=dict(operator="SYNTHETIC_HOSTED_FIXTURE",
     noConcurrentDeployers=True,externalWritersExcluded=True,
     collaboraSessionsDrained=True,restoreOriginalRestartingWriters=True)
 r.write_new(work/"window",r.canonical(window))
+# Synthetic-only transport diagnostic; no production credentials or metadata.
+import subprocess
+cmd=pg16_client.command("psql",["-X","-q","-A","-t","-U","beaconhs_backup",
+    "-d","beaconhs","-h","/var/run/postgresql","-c","SHOW server_version_num;"],
+    controller.PG,"beaconhs_backup","beaconhs","")
+transport=subprocess.run(cmd,capture_output=True,text=True)
+print("SYNTHETIC_SOCKET_TRANSPORT",transport.returncode,transport.stdout.strip(),transport.stderr.strip())
+r.require(transport.returncode == 0,"SYNTHETIC_SOCKET_TRANSPORT_FAILED")
 sealed=controller.capture(work,work/"window")
 manifest=r.verify(work,sealed["sha256"])
 r.require(len(manifest["components"])==5,"FIVE_COMPONENTS_REQUIRED")

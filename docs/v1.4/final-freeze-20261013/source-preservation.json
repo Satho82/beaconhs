@@ -1,0 +1,664 @@
+{
+  "sourceSha": "563fb0e9b79a838a5f394abaffb2f7dc743fc571",
+  "sourceTree": "324c50a60e2cb0639ba920488a150c6531968374",
+  "governedBase": "d18f635a41f092e9e86aa6f53518f9c28992b0d2",
+  "checks": {
+    "people": [
+      {
+        "path": "apps/web/src/app/(app)/hospitality/risk/assessments/[assessmentId]/people-at-risk-field.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/people/[id]/_files-drawers.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/people/[id]/badge/print/route.ts",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/people/[id]/badge/route.ts",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/people/[id]/loading.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/people/[id]/page.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/people/_actions/bulk.ts",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/people/_actions/departments.ts",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/people/_actions/files.ts",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/people/_actions/groups.ts",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/people/_actions/titles.ts",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/people/_actions/workforce.ts",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/people/_bulk-bar.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/people/_components/member-picker.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/people/_components/name-taxonomy-list.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/people/_components/people-sub-nav.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/people/_lib/person-access.ts",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/people/_primary-title-directory-contract.test.ts",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/people/_records-table.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/people/badges/design/_actions.ts",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/people/badges/design/_studio.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/people/badges/design/page.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/people/crews/page.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/people/custom-fields/page.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/people/departments/_drawers.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/people/departments/page.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/people/export.csv/route.ts",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/people/groups/[id]/page.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/people/groups/page.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/people/loading.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/people/manage/page.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/people/new/page.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/people/org-chart/_tree-node.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/people/org-chart/page.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/people/page.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/people/titles/[id]/page.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/people/titles/[id]/pdf/page.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/people/titles/[id]/tasks/page.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/people/titles/new/page.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/people/titles/page.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/people/trades/page.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/lib/imports/people-references.server.ts",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/lib/imports/people.test.ts",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/lib/imports/people.ts",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/lib/people-sync.ts",
+        "ok": true
+      },
+      {
+        "path": "packages/db/src/people-org-relational-integrity.test.ts",
+        "ok": true
+      },
+      {
+        "path": "packages/db/src/people-property-provenance.integration.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/src/people-provenance.integration.ts",
+        "ok": true
+      },
+      {
+        "path": "packages/db/src/schema/people-groups.ts",
+        "ok": true
+      },
+      {
+        "path": "packages/db/src/schema/people-titles.ts",
+        "ok": true
+      }
+    ],
+    "risk": [
+      {
+        "path": "apps/web/src/app/(app)/hazard-assessments/_risk-scale.ts",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/hazard-assessments/_risk.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/hazard-assessments/risk-matrix/_actions.ts",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/hazard-assessments/risk-matrix/_editor.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/hazard-assessments/risk-matrix/_policy.ts",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/hazard-assessments/risk-matrix/page.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/hospitality/risk/actions.ts",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/hospitality/risk/assessments/[assessmentId]/assessment-editor.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/hospitality/risk/assessments/[assessmentId]/lifecycle-panel.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/hospitality/risk/assessments/[assessmentId]/page.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/hospitality/risk/assessments/[assessmentId]/pdf/route.ts",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/hospitality/risk/assessments/[assessmentId]/people-at-risk-field.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/hospitality/risk/assessments/[assessmentId]/revision-controls.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/hospitality/risk/available-templates.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/hospitality/risk/create-manual-assessment.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/hospitality/risk/export.csv/route.ts",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/hospitality/risk/library/export.csv/route.ts",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/hospitality/risk/page.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/hospitality/risk/register/pdf/route.ts",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/hospitality/risk/review-schedule/page.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/hospitality/risk/review-schedule/schedule-review-picker.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/hospitality/risk/risk-schema-notice.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/hospitality/risk/risk-view-tabs.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/hospitality/risk/save-tenant-template.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/hospitality/risk/templates/[templateId]/adoption-panel.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/hospitality/risk/templates/[templateId]/page.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/app/(app)/hospitality/risk/templates/[templateId]/template-draft-editor.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/components/risk-matrix.tsx",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/lib/risk-assessment-matrix.ts",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/lib/risk-assessments.ts",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/lib/risk-export-response.ts",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/lib/risk-hazard-edit.ts",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/lib/risk-library-views.ts",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/lib/risk-lifecycle.ts",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/lib/risk-pdf-response.ts",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/lib/risk-reporting.ts",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/lib/risk-review-schedule.ts",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/lib/risk-revisions.ts",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/lib/risk-schema-readiness.ts",
+        "ok": true
+      },
+      {
+        "path": "apps/web/src/lib/risk-tenant-templates.ts",
+        "ok": true
+      },
+      {
+        "path": "apps/worker/src/lib/risk-review-scanner.ts",
+        "ok": true
+      },
+      {
+        "path": "packages/db/src/risk-0059-runner.ts",
+        "ok": true
+      },
+      {
+        "path": "packages/db/src/risk-catalogue.json",
+        "ok": true
+      },
+      {
+        "path": "packages/db/src/risk-catalogue.ts",
+        "ok": true
+      },
+      {
+        "path": "packages/db/src/risk-library-install.ts",
+        "ok": true
+      },
+      {
+        "path": "packages/db/src/risk-library.ts",
+        "ok": true
+      },
+      {
+        "path": "packages/db/src/risk-matrix.ts",
+        "ok": true
+      },
+      {
+        "path": "packages/db/src/risk-migration-readiness.ts",
+        "ok": true
+      },
+      {
+        "path": "packages/db/src/schema/risk.ts",
+        "ok": true
+      }
+    ],
+    "migrations": [
+      {
+        "path": "packages/db/drizzle/0000_init.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0001_migration_cutover.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0002_drop_retired_plugin_tables.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0003_converge_dev_schema.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0004_flawless_boomer.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0005_production_cutover.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0006_tenant_language_policy.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0007_compliance_scan_toggle.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0008_hazid_review_conditions_signatures.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0009_early_longshot.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0010_lush_sue_storm.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0011_calm_talkback.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0012_orange_violations.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0013_remarkable_mimic.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0014_military_major_mapleleaf.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0015_deep_scalphunter.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0016_smiling_thunderbolts.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0017_wakeful_jackal.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0018_training_report_parity.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0019_report_parity_cutover.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0020_inspection_location_storage.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0021_training_assessment_history.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0022_hazid_submit_trigger_cutover.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0023_gorgeous_sheva_callister.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0024_flawless_la_nuit.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0025_unify_builder_photo_fields.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0026_order_frontline_photos.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0027_report_portrait_cutover.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0028_generalize_monitored_sessions.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0029_faulty_thunderball.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0030_unify_hazid_app_locations.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0031_hazid_optional_risk_ratings.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0032_ppe_status_lifecycle.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0034_compliance_group_audience_ppe_report.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0035_journal_analysis_runs.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0036_training_report_wallet_cutover.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0037_platform_branding.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0038_uvanoo_hospitality_foundation.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0039_uvanoo_maintenance_issue_lifecycle.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0040_uvanoo_operational_diary_completion.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0041_uvanoo_operational_task_lifecycle.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0042_uvanoo_guest_room_reporting.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0043_hospitality_issue_sources.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0044_risk_assessment_foundation.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0045_risk_review_lifecycle.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0046_risk_signoff_snapshot.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0047_hospitality_handover.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0048_hospitality_metering.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0049_maintenance_issue_evidence.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0050_report_property_context.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0051_platform_audit.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0052_user_identity_lifecycle.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0053_property_scope_repair.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0054_v14_configuration_tenant_defaults.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0055_v14_configuration_governance_lifecycle.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0056_v14_governed_bulk_imports.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0057_people_property_provenance.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0058_platform_regional_defaults.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0059_risk_template_draft_state.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0060_risk_template_families_manual_assessments.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0061_risk_assessment_revisions_archive_signoffs.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0062_approvals_batch01.sql",
+        "ok": true
+      },
+      {
+        "path": "packages/db/drizzle/0063_approvals_production.sql",
+        "ok": true
+      }
+    ],
+    "journal": true
+  },
+  "migrationManifest": "../overnight/migration-identity-manifest.json",
+  "hashEvidence": "63 SQL Git blobs and journal rechecked against immutable source; SHA256/timestamps reused from unchanged validated bytes"
+}

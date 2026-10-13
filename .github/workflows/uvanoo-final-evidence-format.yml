@@ -1,0 +1,32 @@
+name: Uvanoo final release evidence formatting
+on:
+  push:
+    branches: [review/uvanoo-v1.4-final-freeze-dev-prep-20261013]
+    paths: [.github/workflows/uvanoo-final-evidence-format.yml]
+permissions:
+  contents: read
+jobs:
+  format:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with: { persist-credentials: false }
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with: { node-version: 24.18.0, cache: pnpm }
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Format only review evidence and validate resulting bytes
+        run: |
+          set -euo pipefail
+          pnpm exec prettier --write 'docs/v1.4/final-freeze-20261013/*.{md,json}' .github/workflows/uvanoo-final-evidence-format.yml
+          pnpm exec prettier --check 'docs/v1.4/final-freeze-20261013/*.{md,json}' .github/workflows/uvanoo-final-evidence-format.yml
+          python3 - <<'PY'
+          import pathlib, json, base64, subprocess
+          paths=sorted(pathlib.Path('docs/v1.4/final-freeze-20261013').glob('*'))
+          paths.append(pathlib.Path('.github/workflows/uvanoo-final-evidence-format.yml'))
+          for p in paths:
+              b=p.read_bytes()
+              if p.suffix=='.json': json.loads(b)
+              print('FORMATTED_FILE '+str(p)+' '+subprocess.check_output(['git','hash-object','--stdin'],input=b).decode().strip()+' '+base64.b64encode(b).decode())
+          PY

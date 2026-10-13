@@ -1,0 +1,102 @@
+{
+  "version": 1,
+  "reviewDate": "2026-10-13",
+  "timezone": "Europe/London",
+  "sourceSha": "563fb0e9b79a838a5f394abaffb2f7dc743fc571",
+  "sourceTree": "324c50a60e2cb0639ba920488a150c6531968374",
+  "governedBase": "d18f635a41f092e9e86aa6f53518f9c28992b0d2",
+  "priorEvidence": "2d5ec5246d61ef35ac86af308399cde1fd9f0cfa",
+  "branch": "review/uvanoo-v1.4-final-freeze-dev-prep-20261013",
+  "pr": {
+    "number": 9,
+    "draft": true,
+    "mergeable": true,
+    "mergeableState": "clean",
+    "head": "563fb0e9b79a838a5f394abaffb2f7dc743fc571",
+    "base": "d18f635a41f092e9e86aa6f53518f9c28992b0d2",
+    "previewCommit": "b9ed505a4150b4dc8929edcf52f8574f43a154b0",
+    "previewTree": "324c50a60e2cb0639ba920488a150c6531968374",
+    "previewIsNotMerged": true
+  },
+  "identityChecks": {
+    "peoplePaths": 50,
+    "riskPaths": 49,
+    "migrationSqlFiles": 63,
+    "journalUnchanged": true,
+    "failures": []
+  },
+  "validation": {
+    "reusedRun": 38313918871,
+    "allFourJobsSuccessReconfirmed": true,
+    "newFullTestRuns": 0,
+    "coreBrowser": 38318803277,
+    "focusedBrowser": 38320812403,
+    "financialStep": 38320245029,
+    "financialOverallRun": "failure; separate financial step passed",
+    "artifactIdsReconfirmed": [
+      11777954723,
+      11778358853
+    ],
+    "artifactsExpired": false
+  },
+  "visual": {
+    "people": "ACCEPTED — FREEZE PENDING",
+    "approvals": "ACCEPTED — FREEZE PENDING",
+    "ownerAcceptance": "2026-10-12",
+    "frozen": false,
+    "originalPeoplePixels": "NOT VERIFIED: Library read returned asset pointers and OCR only",
+    "option2": "written specification recovered; exact approved image unresolved",
+    "approvalsReference": "qualitative composite comparison refreshed from retained inspection log",
+    "branding": "default fixture branding; approved release logo/tenant configuration not demonstrated",
+    "runtimeCorrections": 0
+  },
+  "liveDev": {
+    "status": "NOT VERIFIED",
+    "device": "vps-c54e0b88",
+    "inventory": "offline, last seen 86h ago",
+    "explicitDevicePing": "failed: no device online",
+    "ledger": null,
+    "schema": null,
+    "roles": null,
+    "tenantInventory": null,
+    "clean155Inventory": null,
+    "redisQueues": null,
+    "backup": null,
+    "storage": null,
+    "deployedImage": null
+  },
+  "releaseBinding": {
+    "candidateSource": "563fb0e9b79a838a5f394abaffb2f7dc743fc571",
+    "candidateTree": "324c50a60e2cb0639ba920488a150c6531968374",
+    "ociDigest": null,
+    "postMergeSource": null,
+    "postMergeTree": null,
+    "releaseEvidenceSha256": null,
+    "status": "BLOCKED; not an executable ReleaseEvidence manifest"
+  },
+  "concurrency": {
+    "githubQueued": 0,
+    "githubInProgress": 0,
+    "externalCloudWorkerInventory": "NOT VERIFIED: Codex list_threads returned MCP error"
+  },
+  "scope": {
+    "runtimeChanged": false,
+    "workflowChanged": false,
+    "historicalSqlChanged": false,
+    "persistentWrites": false,
+    "vpsChanges": false,
+    "governedMerge": false,
+    "deployment": false,
+    "forcePush": false,
+    "isolatedEvidenceFormattingWorkflowAdded": true
+  },
+  "blockers": [
+    "Exact People/Option 2 pixels and approved branding configuration",
+    "Live PostgreSQL ledger/catalogue/roles/data and clean155 reconciliation",
+    "Redis/storage inventory and queue disposition",
+    "Verified encrypted backup and exact PostgreSQL 16.15 restore rehearsal",
+    "Post-merge authoritative source/image evidence",
+    "Current saved compose fenceability and nonwriter/shared Collabora storage side effects",
+    "Separate governed merge and DEV execution approval"
+  ]
+}

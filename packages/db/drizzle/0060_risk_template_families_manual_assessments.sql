@@ -1,8 +1,34 @@
--- PREPARED ONLY: outside the runnable migration chain; do not execute until separately approved.
+-- Pending-source correction: owner-only atomic backfill under FORCE RLS.
+-- Execute through the transaction-per-migration runner; live execution needs approval.
 -- Existing templates remain distinct families, platform templates remain read-only,
 -- and assessment matrix evidence remains NULL unless captured at creation.
 SET lock_timeout = '5s';
 SET statement_timeout = '120s';
+
+-- These policies exist only inside this atomic statement, including on failure.
+-- FORCE RLS remains enabled. No application role or PUBLIC receives wider access.
+-- SELECT is needed for tenant-owned source rows as well as UPDATE for backfills.
+DO $migration_backfill$
+BEGIN
+  IF current_user <> 'beaconhs_owner' OR EXISTS (
+    SELECT 1 FROM pg_roles WHERE rolname = current_user
+      AND (rolsuper OR rolbypassrls OR rolcanlogin)
+  ) OR EXISTS (
+    SELECT 1 FROM pg_class WHERE oid IN ('public.risk_templates'::regclass,
+      'public.risk_assessments'::regclass) AND relowner <> current_user::regrole
+  ) THEN
+    RAISE EXCEPTION 'Risk backfill requires the non-login, non-bypass migration owner';
+  END IF;
+  CREATE POLICY migration_0060_read ON public.risk_templates FOR SELECT
+    TO beaconhs_owner USING (current_user = 'beaconhs_owner');
+  CREATE POLICY migration_0060_update ON public.risk_templates FOR UPDATE
+    TO beaconhs_owner USING (current_user = 'beaconhs_owner')
+    WITH CHECK (current_user = 'beaconhs_owner');
+  CREATE POLICY migration_0060_read ON public.risk_assessments FOR SELECT
+    TO beaconhs_owner USING (current_user = 'beaconhs_owner');
+  CREATE POLICY migration_0060_update ON public.risk_assessments FOR UPDATE
+    TO beaconhs_owner USING (current_user = 'beaconhs_owner')
+    WITH CHECK (current_user = 'beaconhs_owner');
 
 -- CHECK expressions must return false, not NULL, for incomplete JSON.
 CREATE FUNCTION public.risk_matrix_snapshot_valid(value jsonb)
@@ -144,6 +170,12 @@ ALTER TABLE risk_assessments ADD COLUMN assessment_category risk_template_catego
 UPDATE risk_assessments
 SET assessment_category = (adopted_template_snapshot->>'category')::risk_template_category;
 ALTER TABLE risk_assessments ALTER COLUMN assessment_category SET NOT NULL;
+  DROP POLICY migration_0060_read ON public.risk_templates;
+  DROP POLICY migration_0060_update ON public.risk_templates;
+  DROP POLICY migration_0060_read ON public.risk_assessments;
+  DROP POLICY migration_0060_update ON public.risk_assessments;
+END $migration_backfill$;
+
 ALTER TABLE risk_assessments ADD COLUMN matrix_snapshot jsonb NULL;
 ALTER TABLE risk_assessments ADD CONSTRAINT risk_assessments_matrix_valid_ck
   CHECK (matrix_snapshot IS NULL OR public.risk_matrix_snapshot_valid(matrix_snapshot));

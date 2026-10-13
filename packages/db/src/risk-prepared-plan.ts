@@ -16,12 +16,12 @@ export const preparedRiskProposals = [
   [
     '0060_risk_template_families_manual_assessments',
     1791542400003,
-    '870037015142f7764bf0ea1645a65a8152097ae1e14caba28f5096761953915d',
+    'c65f9ebe3ac4b3e93c7fa0a062eab786cadc4dcfbf67ef62ff0860c9a8d75e33',
   ],
   [
     '0061_risk_assessment_revisions_archive_signoffs',
     1791542400004,
-    '967e01c579434a1230124f1659ac451bd4834a46106d27261a7e2fc61e4ba602',
+    '43d1c71e5260d03264433e8224f324ad8dc56b6dc10053b5610b6e9b27625b47',
   ],
 ] as const
 

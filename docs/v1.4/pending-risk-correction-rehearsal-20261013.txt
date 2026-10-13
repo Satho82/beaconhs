@@ -1,0 +1,148 @@
+UVANOO V1.4 — pending Risk backfill correction and actual-data rehearsal
+2026-10-13 — isolated engineering PASS; live release remains unapproved.
+
+Checkpoint / scope
+------------------
+Branch: fix/uvanoo-wopi-admission-20261013
+Parent: a0fb85d306d7d8b375f78b432ea034f57488659a
+Preserved governed module candidate: PR #9, 563fb0e9b79a838a5f394abaffb2f7dc743fc571
+Preserved foundation: PR #11, 86db6a4cb7c31272b6865d79e1c18eada379a1c6
+No existing PR or shared branch was changed or published. This engineering
+checkout is not by itself the governed deployable image/configuration candidate.
+No worker was spawned. No live access, capture, database mutation, deployment,
+service change, MinIO change, merge or legacy modification occurred.
+
+Pending-source change review
+----------------------------
+0060 failed previously because the non-login, NOBYPASSRLS migration owner could
+SELECT the platform template but its UPDATE was excluded by FORCE RLS. Tenant
+templates and assessment-category backfills also need complete owner visibility.
+
+Correction: four temporary policies permit SELECT/UPDATE only as beaconhs_owner
+on risk_templates and risk_assessments. They are created and dropped inside one
+atomic DO statement containing the backfill. Role and table-owner checks fail
+closed. FORCE RLS, runtime roles, table ACLs and existing tenant policies are not
+relaxed. No INSERT/DELETE policy, BYPASSRLS grant or SECURITY DEFINER is added.
+Policy names collide closed rather than replacing an existing policy.
+
+Regression fixtures then proved a second real defect in pending0061: its baseline
+INSERT silently omitted existing tenant assessments under FORCE RLS. Correction:
+temporary owner-only SELECT policies on its five source tables, atomically
+created/removed around the baseline INSERT. These cover assessment, hazard,
+property, tenant and linked-action evidence; they grant no source writes.
+The source data has no assessments, so multi-tenant synthetic assessment/hazard
+fixtures are essential coverage, not evidence that historical assessments existed.
+
+Review findings: policies cannot survive a successful statement or error rollback;
+current_user checks prevent application access even during the temporary policy
+interval. Non-owner execution is rejected. No migration-runner security or ledger
+validator was weakened. PostgreSQL policy semantics:
+https://www.postgresql.org/docs/16/sql-createpolicy.html
+
+Explicit pending hash changes (no historical receipt rewritten):
+0060_risk_template_families_manual_assessments, timestamp1791542400003
+ old 870037015142f7764bf0ea1645a65a8152097ae1e14caba28f5096761953915d
+ new c65f9ebe3ac4b3e93c7fa0a062eab786cadc4dcfbf67ef62ff0860c9a8d75e33
+0061_risk_assessment_revisions_archive_signoffs, timestamp1791542400004
+ old 967e01c579434a1230124f1659ac451bd4834a46106d27261a7e2fc61e4ba602
+ new 43d1c71e5260d03264433e8224f324ad8dc56b6dc10053b5610b6e9b27625b47
+
+0000–0059, 0062, 0063 and journal tags/order/timestamps are byte-identical to the
+parent checkpoint. Only pending0060/0061 SQL changed. Offline prepared-plan hashes
+now explicitly bind those corrected bodies. The earlier recorded61-entry fixture
+is preserved unchanged. Tests explicitly require rejection of a database that
+already applied the OLD0060/0061 bodies; no checksum alias or ledger repair exists.
+This is a correction for the independently proven58 baseline, not permission to
+rewrite migration history on another environment. Governed release review must
+accept these exact new hashes before publication/deployment.
+
+Rehearsal provenance and isolation
+---------------------------------
+Source backup: 2026-10-13 21:20 UTC, PostgreSQL16.15, beaconhs,58 migrations.
+Ciphertext bytes1723636; SHA256:
+825349df2c7bd69a552e5498bc797f10194fe3226cec6fe8fcca116074b13478
+No recapture, retransmission or repeat pristine data-hash checks.
+
+The stopped pristine volume was mounted READ ONLY into a network-none copy helper.
+A fresh named disposable volume received its offline contents. The original
+pristine container was never started or written during this operation.
+The clone passed the existing19-section logical catalog comparison at58 before
+the production runner executed0059–0063, one transaction per migration.
+Pinned PostgreSQL16.15:
+postgres@sha256:ca0bd484cb98bf4b24eb1010e73fb3fcbd6714d240fbc1a10eea5b7dbecb641d
+Database: no network/ports,2GiB,1CPU,256PIDs,no-new-privileges, only its own volume.
+Node runner: network namespace of that isolated database,2GiB,1CPU,128PIDs,
+read-only root, bounded tmpfs and read-only bundle mount. No live credentials.
+Migration runner bundle SHA256:
+4b25337316b30c2805e7d5d5dc8c39a9b028d3618ec54493c35080a6322f34bc
+Runner exit0. Exact63 journal hashes/timestamps and ordered IDs1–63 PASS.
+Historical first58 IDs/hashes/timestamps are identical to encrypted source evidence.
+Production role, privilege, RLS, standard Risk-library, role-permission, statistics
+and view phases completed. This used the isolated ordinary migration path, NOT a
+verified live-release exception; releaseEvidenceEligible remains false.
+
+Validation evidence
+-------------------
+Affected unit suites:15 tests PASS in risk-migration-preparation,
+risk-prepared-plan and migration-canonicalisation. Changed TS formatting PASS.
+Eight PostgreSQL regression groups PASS on a separate correction_fixture database:
+1. Platform + two-tenant family/matrix/category backfills, complete references,
+   unchanged FORCE RLS, no remaining temporary policies, runtime isolation.
+2. Injected0060 failure rolls back data,DDL and policies.
+3. Missing family references reject and roll back.
+4. Missing source assessment category rejects and rolls back.
+5. 0061 baselines retain both tenant assessments and hazard/property/tenant data.
+6. Runtime cross-tenant reads/writes remain denied while owner policies exist.
+7. Wrong execution role rejected.
+8. Injected0061 failure rolls back data,DDL and temporary policies.
+Missing/cross-owner family INSERTs reject23514; cross-tenant writes reject42501.
+No old passing catalog tests or unrelated CI were repeated.
+
+Actual-data acceptance PASS:
+-226 non-ledger/non-role relations: original-column row counts and SHA256 hashes
+ exactly match source. Added columns are separately checked, not treated as drift.
+-10 role rows: identities and all non-permission fields preserved; exact expected
+ permission-catalogue convergence verified. One role permission set changed as
+ intended by the unchanged production runner, not by this correction.
+-Counts preserved:2 tenants,5 properties,21 users,20 tenant memberships,25 people,
+ 2 attachments,10 roles.
+-17 People/Risk/Approvals tables: owner identity, enabled+forced RLS, policies,
+ backup SELECT/no-write privileges PASS. Immutable runtime grants remain enforced.
+-No invalid constraints/indexes; no temporary policies; runtime non-bypass/non-owner,
+ owner non-login/non-bypass, backup read-only, complete families/matrices PASS.
+-Rollback-only future-table probe confirms no automatic runtime/maintenance grants.
+-Post63 Risk revision RLS/history-immutability and People hidden-assignment/property
+ provenance integration probes PASS, rolled back on the disposable actual-data copy.
+-Six new Approvals checks PASS: selected-property visibility, hidden-property write
+ denial, cross-tenant write denial, tenant-wide visibility, missing-scope denial,
+ missing-tenant denial. All fixtures rolled back.
+No full web build, browser/native-login acceptance or release CI was claimed.
+
+Preserved recovery checkpoint
+-----------------------------
+Pristine58: uvanoo-db-only-pristine-a372c6d88726, remains stopped/unchanged.
+Original failed59: uvanoo-db-only-rehearsal-2305634c3778, retained stopped.
+Corrected63: uvanoo-db-only-correction-a4b5546c6517, retained stopped.
+All three corresponding -data volumes remain intact. Only the exited new Node
+runner was removed after evidence preservation. The disposable fixture database
+is retained inside the corrected volume; it is not the pristine recovery dataset.
+Private evidence: correction-run.json, correction-acceptance.json, private runner
+and probe logs under the task's existing uvanoo-db-only-yrlth_v4 custody directory.
+The prior failure report remains as historical evidence; this result supersedes
+its migration NO-GO for the corrected pending-source candidate only.
+
+Remaining deployment gates
+--------------------------
+1. Review/integrate exact0060/0061 corrections into the governed module/foundation
+ candidate, rebuild the exact candidate image and perform required release CI.
+ Do not deploy this recovery/WOPI engineering branch as a substitute.
+2. Reconfirm the live migration baseline and dataset freshness at any separately
+ approved operational window. This rehearsal is evidence for the21:20 snapshot.
+3. Database-only capture does not establish PostgreSQL/MinIO/Redis consistency or
+ retained MinIO completeness. Storage/configuration reconciliation remains separate.
+4. Temporary owner-Mac custody is non-immutable and NOT release eligible. No
+ exception was enabled. Existing custody expires2026-10-16T21:20:25.558727Z;
+ no automatic deletion or renewal is authorized by this report.
+5. Live backup/recovery, migration/deployment and web-only activation require their
+ own explicit approval and safety admission. Native login and two-property module
+ acceptance remain future deployment checks. Background-service admission is separate.

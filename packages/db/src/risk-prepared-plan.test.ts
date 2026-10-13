@@ -35,7 +35,7 @@ describe('offline governed Risk migration plan', () => {
   it('writes reviewed tracker entries only after DDL in their transactions', () => {
     const plan = preparedRiskPlan('isolated_test')
     expect(plan.match(/INSERT INTO drizzle\.__drizzle_migrations/g)).toHaveLength(3)
-    expect(plan).toContain('967e01c579434a1230124f1659ac451bd4834a46106d27261a7e2fc61e4ba602')
+    expect(plan).toContain('43d1c71e5260d03264433e8224f324ad8dc56b6dc10053b5610b6e9b27625b47')
     expect(plan).not.toMatch(/UPDATE drizzle|DELETE FROM drizzle/)
     expect(plan).toContain('RISK_LEDGER_MISMATCH')
     expect(plan).toContain('RISK_ROLE_MISMATCH')

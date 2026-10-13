@@ -1,4 +1,5 @@
--- PREPARED ONLY: outside the runnable migration chain; do not execute until separately approved.
+-- Pending-source correction: owner-only atomic baseline reads under FORCE RLS.
+-- Execute through the transaction-per-migration runner; live execution needs approval.
 -- Historical matrices/signoff revisions remain NULL when the original evidence is unknown.
 SET lock_timeout = '5s';
 SET statement_timeout = '120s';
@@ -51,6 +52,22 @@ CREATE TABLE risk_assessment_versions (
 
 -- A labelled baseline captures only values present at migration time. It does not
 -- assert that the row was the content historically signed or that its matrix is known.
+DO $migration_baseline$
+DECLARE source_table text;
+BEGIN
+  IF current_user <> 'beaconhs_owner' OR EXISTS (
+    SELECT 1 FROM pg_roles WHERE rolname = current_user
+      AND (rolsuper OR rolbypassrls OR rolcanlogin)
+  ) THEN RAISE EXCEPTION 'Risk baseline requires the non-login, non-bypass migration owner'; END IF;
+  -- Read policies are atomic with the INSERT and removed before this statement
+  -- ends. Application roles, existing policies and FORCE RLS remain unchanged.
+  FOREACH source_table IN ARRAY ARRAY['risk_assessments','risk_hazards',
+    'hospitality_properties','tenants','corrective_actions'] LOOP
+    IF (SELECT relowner FROM pg_class WHERE oid=format('public.%I',source_table)::regclass)
+      <> current_user::regrole THEN RAISE EXCEPTION 'Risk baseline source owner mismatch'; END IF;
+    EXECUTE format('CREATE POLICY migration_0061_read ON public.%I FOR SELECT TO beaconhs_owner USING (current_user = %L)',
+      source_table, 'beaconhs_owner');
+  END LOOP;
 INSERT INTO risk_assessment_versions (
   tenant_id, assessment_id, revision, actor_tenant_user_id, event, reason, snapshot
 )
@@ -83,6 +100,11 @@ SELECT ra.tenant_id, ra.id, ra.content_revision, NULL, 'baseline', NULL,
     ), '[]'::jsonb)
   )
 FROM risk_assessments ra;
+  FOREACH source_table IN ARRAY ARRAY['risk_assessments','risk_hazards',
+    'hospitality_properties','tenants','corrective_actions'] LOOP
+    EXECUTE format('DROP POLICY migration_0061_read ON public.%I',source_table);
+  END LOOP;
+END $migration_baseline$;
 
 ALTER TABLE risk_hazards
   ADD COLUMN archived_at timestamptz NULL,

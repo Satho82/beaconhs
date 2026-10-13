@@ -14,7 +14,27 @@ import restore_disposable as restore
 
 os.umask(0o077)
 require = r.require
-require(os.environ.get("GITHUB_ACTIONS") == "true", "CLOUD_VALIDATION_REQUIRED")
+
+
+def isolated_executor_allowed():
+    """Allow the synthetic fixture on CI or an explicitly local Docker daemon.
+
+    The local escape hatch is intentionally narrow: it exists solely for the
+    source-VPS, network-none synthetic rehearsal.  It rejects remote Docker
+    contexts so the fixture cannot be pointed at another host by accident.
+    It never accepts real data, live volume mounts, or a live PostgreSQL target.
+    """
+    if os.environ.get("GITHUB_ACTIONS") == "true":
+        return
+    require(os.environ.get("UVANOO_ISOLATED_REHEARSAL") == "true",
+            "EXPLICIT_ISOLATED_REHEARSAL_REQUIRED")
+    require(os.environ.get("DOCKER_CONTEXT", "default") == "default",
+            "LOCAL_DOCKER_CONTEXT_REQUIRED")
+    require(os.environ.get("DOCKER_HOST", "") in ("", "unix:///var/run/docker.sock"),
+            "LOCAL_DOCKER_SOCKET_REQUIRED")
+
+
+isolated_executor_allowed()
 repo = Path(__file__).resolve().parents[3]
 root = Path(tempfile.mkdtemp(prefix="uvanoo-backup-test-"))
 os.chmod(root, 0o700)
@@ -22,8 +42,10 @@ source = "uvanoo-backup-test-" + uuid.uuid4().hex
 os.environ["POSTGRES_PASSWORD"] = __import__("secrets").token_urlsafe(32)
 try:
     r.run(["docker", "run", "-d", "--name", source, "--network", "none",
-           "--label", "uvanoo.recovery=synthetic-test", "-e", "POSTGRES_USER=uvanoo_dev",
-           "-e", "POSTGRES_DB=beaconhs", "-e", "POSTGRES_PASSWORD", restore.IMAGE])
+           "--memory", "2g", "--cpus", "1", "--pids-limit", "128",
+           "--security-opt", "no-new-privileges", "--label", "uvanoo.recovery=synthetic-test",
+           "-e", "POSTGRES_USER=uvanoo_dev", "-e", "POSTGRES_DB=beaconhs",
+           "-e", "POSTGRES_PASSWORD", restore.IMAGE])
 finally:
     os.environ.pop("POSTGRES_PASSWORD", None)
 for _ in range(60):

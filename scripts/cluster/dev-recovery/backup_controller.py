@@ -205,10 +205,11 @@ OR NOT has_schema_privilege(current_user,n.oid,'USAGE'));""")
             while not finished.wait(2):
                 try:
                     guard_state(work)
-                except Exception:
+                except Exception as exc:
                     failure.append(True)
                     r.write_new(work/"capture-invalid.private.json", r.canonical(
-                        {"status": "INVALID", "reason": "FENCE_MONITOR_FAILED"}))
+                        {"status": "INVALID", "reason": str(exc) if isinstance(exc, r.Rejected)
+                         and __import__("re").fullmatch("[A-Z0-9_]{1,80}", str(exc)) else "FENCE_MONITOR_FAILED"}))
                     break
         monitor = threading.Thread(target=watch, daemon=True)
         monitor.start()

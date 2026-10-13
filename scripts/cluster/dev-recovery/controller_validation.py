@@ -89,7 +89,13 @@ window=dict(operator="SYNTHETIC_HOSTED_FIXTURE",
     noConcurrentDeployers=True,externalWritersExcluded=True,
     collaboraSessionsDrained=True,restoreOriginalRestartingWriters=True)
 r.write_new(work/"window",r.canonical(window))
-sealed=controller.capture(work,work/"window")
+try:
+    sealed=controller.capture(work,work/"window")
+except Exception:
+    diagnostic=work/"capture-invalid.private.json"
+    if diagnostic.exists():
+        print("SYNTHETIC_MONITOR_REJECTION",json.loads(diagnostic.read_text())["reason"])
+    raise
 manifest=r.verify(work,sealed["sha256"])
 r.require(len(manifest["components"])==5,"FIVE_COMPONENTS_REQUIRED")
 controller.transfer(work,sealed["sha256"],work/"transfer")

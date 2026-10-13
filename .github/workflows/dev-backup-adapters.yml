@@ -38,6 +38,8 @@ jobs:
           docker pull postgres@sha256:ca0bd484cb98bf4b24eb1010e73fb3fcbd6714d240fbc1a10eea5b7dbecb641d
       - name: Disposable PostgreSQL image mismatch regression
         run: sudo --preserve-env=GITHUB_ACTIONS,GITHUB_SHA,PATH python3 scripts/cluster/dev-recovery/client_identity_validation.py
+      - name: Focused independent client and restore profile contracts
+        run: sudo --preserve-env=GITHUB_ACTIONS,GITHUB_SHA,PATH python3 scripts/cluster/dev-recovery/client_profile_validation.py
       - name: Full disposable capture controller and restore integration
         run: sudo --preserve-env=GITHUB_ACTIONS,GITHUB_SHA,PATH python3 scripts/cluster/dev-recovery/controller_validation.py
       - name: No private files tracked

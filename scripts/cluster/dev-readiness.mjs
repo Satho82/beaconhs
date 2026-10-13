@@ -129,10 +129,7 @@ export async function verifyReadiness(io, config) {
   check(internal.sha === config.sha, 'READINESS_SHA_MISMATCH')
   check(internal.login === 200, 'INTERNAL_LOGIN_FAILED')
   const external = await io.external()
-  check(
-    external.status === 200 && !external.challenge,
-    'EXTERNAL_PROTECTION_FAILED',
-  )
+  check(external.status === 200 && !external.challenge, 'EXTERNAL_PROTECTION_FAILED')
   check(
     external.protectedRoutes?.length === protectedPaths.length &&
       external.protectedRoutes.every((route, index) => {
@@ -175,7 +172,9 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   verifyReadiness(liveIO(), config)
     .then(() => {
       console.log(`DEV internal readiness/login and immutable runtime verified: ${config.sha}`)
-      console.log('DEV native login verified: HTTP 200, no Basic challenge; protected routes require login')
+      console.log(
+        'DEV native login verified: HTTP 200, no Basic challenge; protected routes require login',
+      )
     })
     .catch((error) => {
       const safe = new Set([

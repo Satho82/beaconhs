@@ -48,3 +48,32 @@ Do not use recover or scale merely because a failure-refence journal exists with
 Existing passing backup validation 38399343438 is reused. New CI tests only the read-only
 diagnostic and a newly created disposable missing-object fixture. That fixture demonstrates
 classification of a possible list/inspect race, not the actual DEV cause.
+
+## Validated checkpoint and exact SSH command
+
+Diagnostic executable SHA: e26b83cde0e665c9c201db2316b41025d50763c3.
+Focused CI: https://github.com/Satho82/beaconhs/actions/runs/38401256768 — PASS.
+Six diagnostic unit tests and an actual disposable Docker missing-object fixture passed.
+Existing adapter, image pins, historical SQL, application and deployment behavior are unchanged.
+This is not a root-cause correction or live retry approval.
+
+Run on the VPS through the owner's existing authorised SSH route:
+
+```bash
+sudo bash <<'SH'
+set -euo pipefail
+umask 077
+DIAGNOSTIC_SHA=e26b83cde0e665c9c201db2316b41025d50763c3
+DIAGNOSTIC_TOOLSET="$(mktemp -d /opt/uvanoo-dev/backups/recovery/diagnostic-tools.XXXXXXXX)"
+git -C "$DIAGNOSTIC_TOOLSET" init --quiet
+git -C "$DIAGNOSTIC_TOOLSET" remote add origin https://github.com/Satho82/beaconhs.git
+git -C "$DIAGNOSTIC_TOOLSET" fetch --quiet --depth=1 origin "$DIAGNOSTIC_SHA"
+git -C "$DIAGNOSTIC_TOOLSET" checkout --quiet --detach FETCH_HEAD
+test "$(git -C "$DIAGNOSTIC_TOOLSET" rev-parse HEAD)" = "$DIAGNOSTIC_SHA"
+python3 "$DIAGNOSTIC_TOOLSET/scripts/cluster/dev-recovery/diagnose_prefence.py" \
+  /opt/uvanoo-dev/backups/recovery/capture.wIPhsDTV
+SH
+```
+
+This creates only a fresh private source checkout and reads the failed attempt and Docker metadata.
+No mutation or recovery entrypoint is called. Keep the output summary and original private evidence.

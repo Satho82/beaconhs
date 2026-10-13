@@ -1,0 +1,102 @@
+UVANOO V1.4 — canonical DEV preflight checkpoint — 2026-10-13
+STATUS: EVIDENCE COLLECTION BLOCKED; NOT MIGRATION READY
+
+SOURCE
+Product candidate: 563fb0e9b79a838a5f394abaffb2f7dc743fc571
+Product tree: 324c50a60e2cb0639ba920488a150c6531968374
+Historical 58-entry runner/RLS source: d18f635a41f092e9e86aa6f53518f9c28992b0d2
+Historical tree: cac8f1184b7852629aab49e77f49a693abd0e350
+All first 58 journal tag/timestamp/Git SQL blob identities checked against candidate identity lock and governed Git tree: MATCH.
+Prefix ends at idx 57, 0058_platform_regional_defaults, timestamp 1791542400001, SQL Git blob 0d69608905d83238c55d5006f236edf9cf7d7578.
+Git blob identity is NOT the ledger SQL SHA256. Actual ledger SHA256/timestamps/order still require export.
+reference-identity.json records all 58 source identities; fingerprint is deliberately null.
+
+ACCESS AND EXISTING EVIDENCE
+VPS connector cbab0184-0ddc-483a-87ac-1ba36ecbdab0 is offline; ping failed with "No Desktop Commander device is currently online". This does not contradict owner's working SSH.
+No online authorized cloud shell/PostgreSQL executor was available through the inspected connectors. Owner Mac was not used.
+Run 38313918871 is completed/success. Its workflow HEAD is 4e6095032db739ade1fdc43ca9d46a7e2a1b9803 (controller, not product SHA). Its artifact list contains only gitleaks-results.sarif, no canonical schema fingerprint.
+Existing integration source constructs 58 using historical migrate.ts and rls.ts, checks forward convergence, but does not publish before/after fingerprint values. Do not confuse passing fixture tests with a persistent DEV comparison.
+No CI was dispatched and no disposable or persistent migrations were executed in this audit.
+
+OWNER-SUPPLIED DEV EVIDENCE (NOT INDEPENDENTLY QUERIED)
+PostgreSQL 16.15; beaconhs; 58 entries matching Decision155's first 58; 227 public tables; RLS 218; FORCE 219; 226 policies; 16 active non-internal triggers; zero disabled; five permanent properties; 968 lifecycle events.
+Decision155's 61-entry synthetic dataset is distinct. Original recovery volumes preserved.
+These facts do not establish exact ACL, policy/function/trigger definition, role membership or data compatibility.
+
+INDEPENDENT REFERENCE REQUIREMENT
+Use a fresh disposable cloud PostgreSQL 16.15 cluster, not the VPS and not a DEV-derived schema dump. Pin and record image digest and SELECT version()/server_version_num=160015. Existing postgres:16-alpine digest is not proof of minor version.
+Use the candidate's locked SQL/journal identities, and the governed historical migrate.ts/rls.ts for prefix 58, following packages/db/src/dev-migration-gate.integration.ts.
+Work only in a disposable copied checkout; slice journal to 58 there without changing canonical SQL or repository journal.
+Provision canonical five roles and ownership from reviewed contracts; record role flags, memberships, DB/schema ACLs, defaults, extensions and locale. Do not copy unknown DEV ACLs into the reference.
+Stop the adapted reference builder immediately after historical 58 convergence; do NOT run the full integration script, which advances each fixture to 63 and deletes it.
+Collect the exact 19 schemaFingerprint sections from candidate dev-migration-gate.ts plus ordered ledger, using the same read-only collector.
+Reference schema digest = candidate digest(stable(sections.map(rows => rows.map(stable).sort()))), where sections are numeric 0..18 in that order. Use candidate stable() and SHA256 implementation; hash excludes collector timestamp/identity/ledger wrapper.
+Keep raw sections for actionable diff, not just a hash. Match role names/owner/ACL provenance and PostgreSQL settings deliberately. ACL serialization/order mismatches need investigation; never overwrite the trusted hash to accept DEV.
+Additional environment/role attributes outside the existing fingerprint (including non-beaconhs roles, per-database role settings and effective memberships) require separate review. Matching the gate hash is necessary, not an exhaustive security proof.
+Reference generation remains NOT EXECUTED. No trusted schema hash exists in this checkpoint.
+
+READ-ONLY DEV COLLECTION
+export-metadata.sql contains the candidate gate's exact 19 SELECT sections, ordered ledger and DB/version/session identity, within REPEATABLE READ READ ONLY.
+It asserts database beaconhs, version 160015 and read-only transaction; uses bounded statement/lock timeouts; ends ROLLBACK.
+It does not query pg_authid/passwords, application rows, credentials or Docker environment variables.
+Raw metadata includes function definitions and role settings: confidential, not suitable for public logs or GitHub. Review privately for embedded sensitive literals before sharing.
+Use an authorized cloud terminal with an existing trusted SSH host key and SSH identity, plus an immutable checkout of THIS checkpoint.
+Set UVANOO_SSH_USER to the existing VPS login name; this was not supplied and must not be guessed.
+From the checkpoint repository root, execute:
+
+  umask 077
+  : "${UVANOO_SSH_USER:?Set the existing authorised VPS SSH username}"
+  evidence_dir=$(mktemp -d "${TMPDIR:-/tmp}/uvanoo-preflight.XXXXXXXX")
+  if ssh -T -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=10 "${UVANOO_SSH_USER}@57.129.152.57" \
+    "sudo -n docker exec -i uvanoo-dev-postgres env PGOPTIONS='-c default_transaction_read_only=on -c statement_timeout=30000 -c lock_timeout=3000' psql -X -w -qAt -v ON_ERROR_STOP=1 -U uvanoo_dev -d beaconhs" \
+    < docs/v1.4/canonical-preflight-20261013/export-metadata.sql \
+    > "$evidence_dir/dev-metadata.jsonl" 2> "$evidence_dir/collector.stderr"; then
+    printf 'Metadata collected in protected directory: %s\n' "$evidence_dir"
+  else
+    printf 'Collection failed; partial evidence is invalid. Inspect protected stderr privately: %s\n' "$evidence_dir"
+  fi
+
+No password is passed on the command line. Existing container socket authentication must already permit uvanoo_dev; -w fails instead of prompting. If SSH, sudo, container name, authentication, catalog or ledger access fails, STOP. Do not change authentication/grants, substitute a privileged role, start containers, or publish partial output.
+Docker exec launches only a read-only psql client in the existing running database container; it does not restart/update the service.
+SQL was statically checked against the source query list; execution is NOT VERIFIED because connector is offline.
+Do not run migrate.ts as a preflight: it performs writes even when no migration SQL is pending.
+
+COMPARISON AND DRIFT
+Actual DEV metadata and independently generated 58 fingerprint: unavailable. Comparison NOT RUN; genuine drift UNKNOWN.
+Compare all 58 SQL SHA256s/timestamps in increasing ledger ID order against canonical sourceMigrations/readMigrationFiles, not just count or Decision155 name.
+Compare ownership, DB/schema/object/column/default ACLs, RLS flags, policy expressions/roles, trigger state/definitions, function bodies/ownership/ACLs, constraints/indexes/extensions and five-role membership/attributes.
+Preserve the nine canonical global exceptions: account, session, user, verification, tenants, platform_settings, platform_audit_log, configuration_masters, configuration_master_versions.
+tenants FORCE=true/ENABLE=false follows migration 0006. No blanket ENABLE RLS or broad re-provisioning grants.
+Published configuration master immutability must exist. Global platform audit UPDATE/DELETE access is a source-level hardening concern, not proven DEV drift.
+
+0059–0063 COMPATIBILITY
+0059 adds Risk draft enum value. Validate exact existing enum/type identity and ledger.
+0060 derives Risk families and matrices, backfills assessment category, adds NOT NULL/check/FK/unique contracts. Validate existing category values, snapshots, matrix shape, ownership and references against exact SQL before execution.
+0061 creates revision baselines and signoff references, archive constraints and immutable history protections. Verify all existing assessments/signoffs can satisfy the exact snapshot, revision and FK contracts.
+0062 and 0063 install Approvals relations, property/tenant policies, constrained update permissions and immutable activity/document/financial contracts. Reject pre-existing unjournaled objects and incompatible dependency definitions.
+None changes the nine global exceptions. Preserve Risk, People provenance and Approvals ACLs.
+A restored private DEV copy must subsequently rehearse 58→63 with data preservation checks; existing synthetic CI does not prove real-data backfills.
+
+BACKUP / RESTORE PREPARATION — NOT AUTHORISED FOR EXECUTION HERE
+After separate authorization, fence every DB/queue/storage writer, confirm no active writer transactions, and capture source/image/service/queue/storage inventory.
+Confirm beaconhs_backup is SELECT-only, NOINHERIT, NOSUPERUSER, no elevated memberships, BYPASSRLS, default_transaction_read_only=on; complete public/drizzle/sequence coverage, no write/grant-option privileges.
+Use canonical backup tooling after review; encrypt a custom-format logical dump directly to an age recipient without plaintext on persistent disk; protect recipient/private-key handling separately, checksum ciphertext and record UTC times.
+Capture roles/ACL recreation without password hashes, matching object storage versions/attachments and Redis persistence provenance.
+Restore into a new isolated PG16.15 instance, with no external mail/webhook/jobs, independently verify decryption/restore exit codes and ledger/schema/data fingerprints, property/lifecycle counts, Risk/People/Approvals security and attachment accessibility.
+A metadata export is not a backup. No backup file or independent restore pass has been verified.
+Candidate gate requires matching original/restored ledger/schema/data hashes, a restore-run URL, immutable rollback image and backup freshness <=1 hour at validation. Do not reuse stale evidence.
+Rollback after schema/data changes means verified coordinated restore of DB/storage/queue state with compatible old image; never SQL down-migrate or blindly start an older image on migrated data. Keep writers fenced on failure, including re-fencing after any attempted rollout.
+
+REDIS / CLEAN155 DECISIONS
+Decision now: preserve all original volumes and backups; do not start clean155, merge synthetic data, flush queues, replay jobs, or point workers at an unreviewed queue.
+The permanent five-property/968-event dataset remains the recovery subject. Decision155 is reference/synthetic evidence, not a replacement database.
+Before later release, inventory permanent Redis namespaces and waiting/active/delayed/failed/repeatable/scheduler metadata with bounded read-only SCAN/TYPE/count operations. Avoid payload dumps, KEYS, job execution and mutating BullMQ APIs.
+Stopped clean155 Redis cannot be queried without violating this task; inspect existing persistence provenance only. Any offline copy/restore requires a separately authorized isolated recovery rehearsal.
+Compare recovered clean155 data privately for unique non-synthetic records/attachments. Absence of unique data is not established.
+Quarantine jobs tied to synthetic or missing entities; approve any discard or replay explicitly. For permanent valid jobs require tenant/property validity, idempotency and deduplication before resumption. Reconcile repeatable schedules to avoid double registration. No destructive disposition approved.
+
+READINESS / NEXT APPROVALS
+NO-GO pending independent PG16.15 reference generation, protected DEV metadata export/comparison, real-data rehearsal, verified backup/restore and queue/storage reconciliation.
+Owner metadata collection is already authorized. Supply protected complete output or restore connector access; no security changes required.
+Separate subsequent authorization is needed for backup/restore and restored-data migration rehearsal, then writer fencing, endpoint/service corrections, persistent migration and deployment. Governed merge remains separate and prohibited now.
+This checkpoint changes documentation/evidence collection material only. No runtime, historical SQL, workflows, Risk/People, persistent DB, service or network changes. No new full CI.

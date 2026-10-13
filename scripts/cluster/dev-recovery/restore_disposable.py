@@ -51,7 +51,8 @@ def restore(directory, digest, identity, parent, roles_sql, roles_sha):
                      "RESTORE_ISOLATION_REJECTED")
     ready = False
     for _ in range(60):
-        r = subprocess.run(["docker", "exec", name, "pg_isready", "-U", "uvanoo_dev", "-d", "beaconhs"],
+        r = subprocess.run(["docker", "exec", name, "sh", "-c",
+                            'test "$(cat /proc/1/comm)" = postgres && pg_isready -U uvanoo_dev -d beaconhs'],
                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         if r.returncode == 0:
             ready = True

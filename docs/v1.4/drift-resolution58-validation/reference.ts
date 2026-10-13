@@ -4,7 +4,7 @@ import { cpSync, mkdirSync, mkdtempSync, readFileSync, symlinkSync, writeFileSyn
 import { tmpdir } from 'node:os'
 import { resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
-import postgres from 'uvanoo_dev'
+import postgres from 'postgres'
 import { sourceMigrations, strictPrefix, schemaFingerprint } from './dev-migration-gate'
 const candidate='563fb0e9b79a838a5f394abaffb2f7dc743fc571'
 const historical='d18f635a41f092e9e86aa6f53518f9c28992b0d2'
@@ -65,6 +65,7 @@ try {
   for(const k of ['rolsuper','rolinherit','rolcreaterole','rolcreatedb','rolcanlogin','rolreplication','rolbypassrls']) assert.equal(bootstrap[0]![k],true)
   const dependencies=await client.unsafe("SELECT e.extname,d.classid::regclass::text object_catalog,count(*)::int member_count FROM pg_depend d JOIN pg_extension e ON e.oid=d.refobjid WHERE d.refclassid='pg_extension'::regclass AND d.deptype='e' GROUP BY e.extname,d.classid ORDER BY e.extname,object_catalog")
   assert.deepEqual(dependencies.map(r=>[r.extname,r.object_catalog,r.member_count]),[['pg_trgm','pg_opclass',2],['pg_trgm','pg_operator',10],['pg_trgm','pg_opfamily',2],['pg_trgm','pg_proc',31],['pg_trgm','pg_type',1],['pgcrypto','pg_proc',36],['plpgsql','pg_language',1],['plpgsql','pg_proc',3]])
+  const dependencyInventory=await client.unsafe("SELECT encode(digest(coalesce(jsonb_agg(to_jsonb(r) ORDER BY extname,object_catalog,identity,owner),'[]'::jsonb)::text,'sha256'),'hex') AS hash FROM (SELECT e.extname,d.classid::regclass::text object_catalog,pg_describe_object(d.classid,d.objid,d.objsubid) identity,pg_get_userbyid(sd.refobjid) owner FROM pg_depend d JOIN pg_extension e ON e.oid=d.refobjid LEFT JOIN pg_shdepend sd ON sd.dbid=(SELECT oid FROM pg_database WHERE datname=current_database()) AND sd.classid=d.classid AND sd.objid=d.objid AND sd.deptype='o' WHERE d.refclassid='pg_extension'::regclass AND d.deptype='e') r")
   const arrayDependency=await client.unsafe("SELECT d.deptype FROM pg_type t JOIN pg_depend d ON d.classid='pg_type'::regclass AND d.objid=t.oid JOIN pg_type b ON d.refclassid='pg_type'::regclass AND d.refobjid=b.oid WHERE t.typname='_gtrgm' AND b.typname='gtrgm'")
   assert.deepEqual(arrayDependency.map(r=>r.deptype),['i'])
   // Build a controlled drift fixture only from the historical provisioning SQL.
@@ -93,7 +94,7 @@ try {
   assert.equal(after,fp,'All 19 sections must equal independent canonical baseline after correction')
   const finalLedger=await client.unsafe('SELECT id,hash,created_at::text FROM drizzle.__drizzle_migrations ORDER BY id')
   assert.deepEqual(finalLedger,ledger)
-  const remediation={fixtureSource:historical+':scripts/cluster/provision.sql',baselineFingerprint:fp,driftFixtureFingerprint:dirtyFingerprint,correctedFingerprint:after,all19SectionsRestored:true,rollbackPreservedDrift:true,ledgerUnchanged:true,sqlSha256:util.hash(correction),extensionDependencies:dependencies,bootstrapOid:10,profileApproval:'PENDING OWNER APPROVAL; independently generated, not adopted from DEV'}
+  const remediation={fixtureSource:historical+':scripts/cluster/provision.sql',baselineFingerprint:fp,driftFixtureFingerprint:dirtyFingerprint,correctedFingerprint:after,all19SectionsRestored:true,rollbackPreservedDrift:true,ledgerUnchanged:true,sqlSha256:util.hash(correction),extensionDependencies:dependencies,dependencyInventorySha256:dependencyInventory[0]!.hash,bootstrapOid:10,profileApproval:'PENDING OWNER APPROVAL; independently generated, not adopted from DEV'}
   const summary={...evidence,remediation,sourceSha:candidate,sourceTree:'324c50a60e2cb0639ba920488a150c6531968374',historicalSource:historical,postgresVersion:'160015',imageDigest:process.env.POSTGRES_IMAGE,workflowSha:process.env.GITHUB_SHA,run:process.env.GITHUB_RUN_ID,rawChecksum:util.hash(raw),counts:counts[0],triggers:triggers[0],policies:docs.find((d:any)=>d.section===8).rows.length,bootstrapRole:'uvanoo_dev',provisioningContract:'historical scripts/cluster/provision.sql before historical migration runner and RLS installer',ledgerVerification:'58 exact ordered SQL SHA256/timestamp matches',algorithmVerification:'matches candidate schemaFingerprint; mutation/ledger/truncation rejection tests passed'}
   writeFileSync(resolve(output,'reference-public.json'),JSON.stringify(summary,null,2)+'\n')
   console.log('PUBLIC_FILE_SHA256 '+util.hash(readFileSync(resolve(output,'reference-public.json'))))

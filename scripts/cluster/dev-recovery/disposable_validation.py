@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """Synthetic disposable contract test; never connects to DEV or uses DEV data."""
+import atexit
 import hashlib
 import json
 import os
 from pathlib import Path
+import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -39,6 +42,20 @@ repo = Path(__file__).resolve().parents[3]
 root = Path(tempfile.mkdtemp(prefix="uvanoo-backup-test-"))
 os.chmod(root, 0o700)
 source = "uvanoo-backup-test-" + uuid.uuid4().hex
+cleanup_containers = [source]
+
+
+def cleanup_fixture():
+    """Remove only this synthetic fixture's containers and private workspace."""
+    for name in reversed(cleanup_containers):
+        if re.fullmatch(r"uvanoo-(?:backup-test|restore)-[0-9a-f]{32}", name):
+            subprocess.run(["docker", "rm", "--force", name], stdout=subprocess.DEVNULL,
+                           stderr=subprocess.DEVNULL, check=False)
+    if root.parent == Path(tempfile.gettempdir()) and root.name.startswith("uvanoo-backup-test-"):
+        shutil.rmtree(root, ignore_errors=True)
+
+
+atexit.register(cleanup_fixture)
 os.environ["POSTGRES_PASSWORD"] = __import__("secrets").token_urlsafe(32)
 try:
     r.run(["docker", "run", "-d", "--name", source, "--network", "none",
@@ -176,6 +193,9 @@ except r.Rejected:
         print(log.read_text()[:4000])
     raise
 target = result["container"]
+require(re.fullmatch(r"uvanoo-restore-[0-9a-f]{32}", target) is not None,
+        "SYNTHETIC_RESTORE_NAME_REJECTED")
+cleanup_containers.append(target)
 before = r.parse_documents(sql(source,collector.read_text(),"beaconhs_backup"))
 after = r.parse_documents(sql(target,collector.read_text(),"beaconhs_backup"))
 require(len(before)==len(after)==21,"COLLECTOR_DOCUMENT_COUNT")

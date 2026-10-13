@@ -178,6 +178,7 @@ class AdapterTests(unittest.TestCase):
                 components.custody("/unused","a"*64,{"status":"PLANNED_NOT_CAPTURED"})
     def test_custody_false_confirmation_rejected(self):
         value=dict(manifestSha256="a"*64,location="owner-independent-Mac",
+                   hostSha256="b"*64,
                    verifiedAt=dt.datetime.now(dt.timezone.utc).isoformat(),
                    allChecksumsMatch=False,independentHost=True,attestedBy="fixture")
         with patch.object(r,"verify",return_value={}):

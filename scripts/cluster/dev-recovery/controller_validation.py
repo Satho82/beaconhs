@@ -14,6 +14,8 @@ import recovery_components as components
 import restore_disposable as restore
 import isolated_rehearsal as isolated
 import pg16_client
+import recovery_admission as admission
+from unittest.mock import patch
 
 r.require(os.environ.get("GITHUB_ACTIONS") == "true" and os.geteuid() == 0, "HOSTED_ROOT_FIXTURE_ONLY")
 os.umask(0o077)
@@ -89,8 +91,35 @@ window=dict(operator="SYNTHETIC_HOSTED_FIXTURE",
     noConcurrentDeployers=True,externalWritersExcluded=True,
     collaboraSessionsDrained=True,restoreOriginalRestartingWriters=True)
 r.write_new(work/"window",r.canonical(window))
+# New admission contract: fixture services are persistently zero before capture.
+# This disposable harness does NOT prove real systemd/vault/host independence.
+for role in fence.REPEATING+fence.ONESHOT:
+    r.run(['docker', 'service', 'scale', fence.STACK+'_'+role+'=0'])
+for _ in range(60):
+    try:
+        admission.zero(fence.Docker())
+        break
+    except r.Rejected:
+        time.sleep(1)
+else:
+    raise r.Rejected('SYNTHETIC_ZERO_FENCE_FAILED')
+key_receipt = dict(recipientSha256=controller.RECIPIENT,
+    retrievalHostSha256='b'*64, vaultVersionId='synthetic-only',
+    verifiedAt=dt.datetime.now(dt.timezone.utc).isoformat(),
+    challengeDecryptPassed=True, attestedBy='SYNTHETIC_NOT_REAL_CUSTODY')
+r.write_new(work/'key-custody.private.json', r.canonical(key_receipt))
+policy = dict(sourceHostSha256=admission.host_identity(), restoreHostSha256='b'*64,
+    destinationId='synthetic-private-destination', recipientSha256=controller.RECIPIENT,
+    keyReceiptSha256=r.sha(work/'key-custody.private.json'), externalGuardSha256='d'*64,
+    expiresAt=window['expiresAt'], privateRestoreHost=True,
+    immutableRetention=True, separateDeleteAuthority=True)
+r.write_new(work/admission.POLICY, r.canonical(policy))
+os.environ['UVANOO_RECOVERY_POLICY_SHA256'] = r.sha(work/admission.POLICY)
 try:
-    sealed=controller.capture(work,work/"window")
+    # Real daemon all-zero observations retained; watchdog integration needs its
+    # separate systemd fault-injection acceptance before any live execution.
+    with patch.object(admission, 'watchdog', side_effect=lambda *_: admission.zero(fence.Docker())):
+        sealed=controller.capture(work,work/"window")
 except Exception:
     diagnostic=work/"capture-invalid.private.json"
     if diagnostic.exists():
@@ -104,7 +133,8 @@ r.require(json.loads(components.redis_query(controller.REDIS,"GET","synthetic:qu
 print("FULL_CONTROLLER_CAPTURE_FENCE_MONITOR_COMPONENTS_CLOSURE_PASS")
 # Explicit synthetic receipt exercises the custody boundary, not actual off-host evidence.
 components.custody(work,sealed["sha256"],dict(manifestSha256=sealed["sha256"],
-    location="owner-independent-Mac",verifiedAt=dt.datetime.now(dt.timezone.utc).isoformat(),
+    location=policy['destinationId'], hostSha256=policy['restoreHostSha256'],
+    verifiedAt=dt.datetime.now(dt.timezone.utc).isoformat(),
     allChecksumsMatch=True,independentHost=True,attestedBy="SYNTHETIC_TEST_ONLY_NOT_REAL_CUSTODY"))
 roles=work/"roles.sql"
 r.write_new(roles,(here/"bootstrap-restore.sql").read_bytes())

@@ -9,6 +9,7 @@ import subprocess
 import tarfile
 import tempfile
 import dev_recovery as r
+import recovery_admission as admission
 
 VOLUMES = ("uvanoo-decision149-restore-data", "uvanoo-decision154-clean-data",
            "uvanoo-decision155-clean-data", "uvanoo-clean155-redis-data")
@@ -141,10 +142,18 @@ def capture_redis(container, directory, recipient, guard):
 def check_custody(directory, digest, receipt):
     manifest = r.verify(directory, digest)
     r.require(set(receipt) == {"manifestSha256", "location", "verifiedAt", "allChecksumsMatch",
-                              "independentHost", "attestedBy"},
+                              "independentHost", "attestedBy", "hostSha256"},
               "CUSTODY_RECEIPT_FIELDS_REJECTED")
+    r.require(receipt['allChecksumsMatch'] is True and receipt['independentHost'] is True,
+              'OFF_VPS_CUSTODY_NOT_CONFIRMED')
+    approved = admission.policy(directory, fresh=False)
+    r.require(r.sha(Path(directory)/admission.POLICY) == manifest['context']['offHostReceiptSha256']
+              and approved['keyReceiptSha256'] == manifest['context']['custodyReceiptSha256']
+              and approved['recipientSha256'] == manifest['context']['recipientSha256'],
+              'CAPTURE_POLICY_BINDING_REJECTED')
     r.require(receipt["manifestSha256"] == digest and receipt["allChecksumsMatch"] is True and
-              receipt["independentHost"] is True and receipt["location"] == "owner-independent-Mac" and
+              receipt["independentHost"] is True and receipt["location"] == approved['destinationId'] and
+              receipt['hostSha256'] == approved['restoreHostSha256'] and
               isinstance(receipt["attestedBy"], str) and bool(receipt["attestedBy"]),
               "OFF_VPS_CUSTODY_NOT_CONFIRMED")
     import datetime as dt

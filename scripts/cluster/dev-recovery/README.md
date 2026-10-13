@@ -1,5 +1,11 @@
 # Uvanoo DEV encrypted recovery system
 
+Current isolated revision: see `FINALISATION-20261013.txt` before using any command.
+It supersedes the historical custody/controller procedure below: externally
+verified custody, a bound destination/private restore host, all-five zero baseline
+and an independent system service watchdog are now mandatory. No live approval
+is implied. Historical passing validation remains bound to its original commit.
+
 Status: implementation proposal; first live capture is blocked pending independent
 key custody, off-host destination and a reviewed unchanged-state fencing supervisor.
 Product, historical migrations, existing generic backup/restore helpers, DEV

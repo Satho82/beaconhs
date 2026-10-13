@@ -19,6 +19,7 @@ import backup_fence as f
 import recovery_components as components
 import pg16_client
 import restore_disposable
+import recovery_admission as admission
 
 PG = "uvanoo-dev-postgres"
 REDIS = "uvanoo-dev-redis"
@@ -134,7 +135,11 @@ WHERE schemaname NOT LIKE 'pg_%') x;"""))
                              input=r.canonical({"metadata": raw.decode(), "data": result})))
     return hashes, raw
 
-def guard_state(work):
+def guard_state(work, check_watchdog=True):
+    admission.policy(work)
+    if check_watchdog:
+        admission.watchdog(work)
+    admission.zero(f.Docker())
     state = read(work/"fence-state.private.json")
     api = f.Docker()
     fence = f.Fence(api, state["baseline"], state["window"], lambda *_: None)
@@ -145,6 +150,7 @@ def guard_state(work):
 def capture(work, window_file):
     r.require(os.geteuid() == 0, "OWNER_SUDO_SSH_REQUIRED")
     work = r.private(work, True)
+    approved = admission.admission(work)
     # Never permits a duplicate or abandoned capture to restart under the same directory.
     lock = os.open(work/"operation.lock", os.O_WRONLY|os.O_CREAT|os.O_EXCL, 0o600)
     fcntl.flock(lock, fcntl.LOCK_EX|fcntl.LOCK_NB)
@@ -155,14 +161,10 @@ def capture(work, window_file):
     recipient = work/"recipient"
     r.require(hashlib.sha256(r.private(recipient).read_text().strip().encode()).hexdigest() == RECIPIENT,
               "APPROVED_RECIPIENT_MISMATCH")
-    # Existing independently verified key custody is retained; this is not a new key check.
-    custody = {"status": "OWNER_CONFIRMED", "recipientSha256": RECIPIENT,
-               "identityOutsideVPS": True, "evidence": "owner-confirmed-age-key-custody"}
-    offhost = {"status": "PLANNED_NOT_CAPTURED", "destination": "owner-independent-Mac",
-               "archiveCustodyRequiredBeforeRehearsal": True}
-    r.write_new(work/"key-custody.private.json", r.canonical(custody))
-    r.write_new(work/"offhost-plan.private.json", r.canonical(offhost))
-    baseline = f.Docker().services()
+    r.require(approved['recipientSha256'] == RECIPIENT, 'APPROVED_RECIPIENT_MISMATCH')
+    # Existing independently retrieved key receipt is required, never manufactured.
+    r.write_new(work/"offhost-plan.private.json", (work/admission.POLICY).read_bytes())
+    baseline = admission.zero(f.Docker())
     source = identity(baseline)
     snapshot = containers()
     r.require(r.run(["node", "--version"]).decode().startswith("v24."), "NODE_24_REQUIRED")
@@ -193,6 +195,7 @@ OR NOT has_schema_privilege(current_user,n.oid,'USAGE'));""")
     failure = []
     monitor = None
     try:
+        admission.admission(work)
         fence.acquire(lambda drained: probe(snapshot, drained))
         r.write_new(work/"fence-state.private.json",
                     r.canonical({"baseline": baseline, "owned": fence.owned,
@@ -244,6 +247,8 @@ OR NOT has_schema_privilege(current_user,n.oid,'USAGE'));""")
         monitor.join(timeout=25)
         r.require(not monitor.is_alive() and not failure, "MONITOR_NOT_CLOSED")
         fence.restore(lambda drained: probe(snapshot, drained))
+        # Baseline was all-zero: cleanup MUST NOT resume any service.
+        admission.admission(work)
         r.write_new(work/"safe-closure.private.json", r.canonical(
                     {"liveSQLChanged": False, "migrationCount": 58, "originalSpecsRestored": True,
                      "captureAccepted": True}))
@@ -274,45 +279,7 @@ def replay_owned(events):
     return owned
 
 def recover(work, window_file):
-    r.require(os.geteuid() == 0, "OWNER_SUDO_SSH_REQUIRED")
-    # The capture lock is retained on disk. Its advisory lock proves no adapter
-    # process still owns this recovery directory; it does not replace the operator window.
-    descriptor = os.open(work/"operation.lock", os.O_RDWR|os.O_NOFOLLOW)
-    try:
-        fcntl.flock(descriptor, fcntl.LOCK_EX|fcntl.LOCK_NB)
-        r.require(not (work/"safe-closure.private.json").exists(), "ALREADY_RESTORED")
-        state = read(work/"preflight-state.private.json")
-        events = [read(path) for path in sorted((work/"journal").glob("*.private.json"))]
-        for directory in sorted(work.glob("recovery-*")):
-            r.private(directory, True)
-            events.extend(read(path) for path in sorted(directory.glob("*.private.json")))
-        owned = replay_owned(events)
-        client_setup(work)
-        active = r.psql("SELECT count(*) FROM pg_stat_activity WHERE datname=current_database() "
-                       "AND backend_type='client backend' AND pid<>pg_backend_pid();")
-        r.require(active == "0", "RECOVERY_DATABASE_OPERATION_STILL_ACTIVE")
-        redis_clients = components.redis_raw(REDIS, "CLIENT", "LIST")
-        r.require(not any("cmd=sync" in line or "cmd=psync" in line
-                          for line in redis_clients.splitlines()), "REDIS_CAPTURE_STILL_ACTIVE")
-        r.require(r.psql("SELECT count(*) FROM drizzle.__drizzle_migrations;") == "58",
-                  "LIVE_LEDGER_CHANGED_DO_NOT_RESUME")
-        recovery_log = work/("recovery-"+str(time.time_ns()))
-        recovery_log.mkdir(mode=0o700)
-        sequence = 0
-        def journal(name, value):
-            nonlocal sequence
-            sequence += 1
-            r.write_new(recovery_log/(str(sequence).zfill(6)+"-"+name+".private.json"),
-                        r.canonical({"event": name, "value": value}))
-        fence = f.Fence(f.Docker(), state["baseline"], f.window(read(window_file)), journal)
-        fence.owned = owned
-        fence.restore(lambda drained: probe(state["containers"], drained))
-        r.write_new(work/"safe-closure.private.json",
-                    r.canonical({"originalSpecsRestored": True, "captureAccepted": False,
-                                 "liveSQLChanged": False, "manualRecovery": True}))
-        return {"originalSpecsRestored": True, "captureAccepted": False}
-    finally:
-        os.close(descriptor)
+    raise r.Rejected("NO_AUTOMATIC_RECOVERY_USE_OWNER_REVIEW")
 
 def transfer(work, digest, destination):
     work = r.private(work, True)
@@ -323,7 +290,9 @@ def transfer(work, digest, destination):
     manifest = r.verify(work, digest)
     destination = Path(destination)
     destination.mkdir(mode=0o700)
-    files = [x["file"] for x in manifest["components"]]+["manifest-"+digest+".json"]
+    files = [x["file"] for x in manifest["components"]]+["manifest-"+digest+".json",
+        admission.POLICY, "key-custody.private.json", "offhost-plan.private.json",
+        "safe-closure.private.json", "collector.sql"]
     for name in files:
         r.write_new(destination/name, (work/name).read_bytes())
     r.write_new(destination/"SHA256SUMS", "".join(r.sha(destination/n)+"  "+n+"\n" for n in files).encode())
@@ -355,10 +324,13 @@ def main():
         r.require(not (work/"capture-invalid.private.json").exists(), "INVALID_CAPTURE")
         r.require(read(work/"safe-closure.private.json").get("captureAccepted") is True,
                   "CAPTURE_NOT_ACCEPTED")
-        # The existing restore helper creates its own fresh network-none destination.
-        # Host pg_restore adapter remains bound to the pinned permanent client image;
-        # it only lists an archive and has no write path.
-        client_setup(work)
+        # No live PG adapter, source host or source container is contacted.
+        approved = admission.policy(work, fresh=False)
+        r.require(admission.host_identity() == approved['restoreHostSha256'],
+                  'APPROVED_PRIVATE_RESTORE_HOST_REQUIRED')
+        admission.key_custody(work, approved, fresh=False)
+        r.require(r.run(['pg_restore', '--version']).decode().split()[2] == '16.15',
+                  'ISOLATED_PG_RESTORE_16_15_REQUIRED')
         result = restore_disposable.restore(work, digest, identity_file, parent, roles, roles_sha)
     print(json.dumps(result))
 

@@ -33,7 +33,9 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq age
           docker pull postgres@sha256:ca0bd484cb98bf4b24eb1010e73fb3fcbd6714d240fbc1a10eea5b7dbecb641d
-      - name: Pinned clients, encrypted restore, Swarm fencing and Redis capture
+      - name: Redis adapter correction validation
+        env:
+          ADAPTER_PHASE: redis
         run: python3 scripts/cluster/dev-recovery/adapter_validation.py
       - name: No private files tracked
         run: |

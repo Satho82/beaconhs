@@ -87,6 +87,11 @@ def capture_trees(kind, sources, directory, recipient, evidence, guard):
 def redis_query(container, *args):
     return r.run(["docker", "exec", container, "redis-cli", "--json"]+list(args))
 
+def redis_raw(container, *args):
+    value = r.run(["docker", "exec", container, "redis-cli", "--raw"]+list(args)).decode()
+    r.require(not value.startswith(("NOAUTH", "WRONGPASS", "ERR ", "(error)")), "REDIS_AUTH_OR_COMMAND_REJECTED")
+    return value
+
 def capture_redis(container, directory, recipient, guard):
     """SYNC snapshot streams to host; original Redis filesystem and queues are untouched."""
     guard()
@@ -96,7 +101,8 @@ def capture_redis(container, directory, recipient, guard):
     config = json.loads(redis_query(container, "CONFIG", "GET", "dir", "dbfilename",
                                    "appendonly", "appenddirname", "appendfilename", "save"))
     r.require(isinstance(config, (dict, list)), "REDIS_CONFIG_REJECTED")
-    before = json.loads(redis_query(container, "INFO", "keyspace"))
+    before = redis_raw(container, "INFO", "keyspace").strip()
+    r.require(before.startswith("# Keyspace"), "REDIS_KEYSPACE_FORMAT_REJECTED")
     with tempfile.TemporaryDirectory(prefix=".redis-", dir=directory) as tmp:
         os.chmod(tmp, 0o700)
         tmp = Path(tmp)
@@ -115,7 +121,7 @@ def capture_redis(container, directory, recipient, guard):
                                info["Image"], "redis-check-rdb", "/snapshot.rdb"],
                                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=900)
         r.require(p.returncode == 0, "REDIS_SNAPSHOT_INTEGRITY_REJECTED")
-        after = json.loads(redis_query(container, "INFO", "keyspace"))
+        after = redis_raw(container, "INFO", "keyspace").strip()
         r.require(before == after, "REDIS_KEYSPACE_CHANGED")
         provenance = {"containerId": info["Id"], "imageId": info["Image"],
                       "mounts": info["Mounts"], "config": config, "keyspace": before,

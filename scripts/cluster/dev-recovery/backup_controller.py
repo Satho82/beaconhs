@@ -73,9 +73,8 @@ AND backend_type='client backend' AND pid<>pg_backend_pid()
 AND NOT (usename='beaconhs_backup' AND application_name='uvanoo-protected-backup'
 AND client_addr IS NULL);""")
     r.require(count == "0", "EXTERNAL_DATABASE_CLIENT")
-    clients = components.redis_query(REDIS, "CLIENT", "LIST")
-    text = json.loads(clients)
-    r.require(isinstance(text, str), "REDIS_CLIENTS_REJECTED")
+    text = components.redis_raw(REDIS, "CLIENT", "LIST")
+    r.require(text.startswith("id="), "REDIS_CLIENTS_REJECTED")
     for line in text.splitlines():
         fields = dict(part.split("=", 1) for part in line.split() if "=" in part)
         own = fields.get("cmd") in ("client|list", "client") and fields.get("addr", "").startswith("127.0.0.1:")

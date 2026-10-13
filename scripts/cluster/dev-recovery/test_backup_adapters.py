@@ -139,6 +139,13 @@ class AdapterTests(unittest.TestCase):
             return [{"Id":"same"}]
         with self.assertRaisesRegex(r.Rejected,"PUBLISHED"):
             pg16_client.checked_container("fixture",inspect)
+    def test_redis_raw_info_is_text(self):
+        with patch.object(r,"run",return_value=b"# Keyspace\r\ndb0:keys=1,expires=0\r\n"):
+            self.assertTrue(components.redis_raw("fixture","INFO","keyspace").startswith("# Keyspace"))
+    def test_redis_auth_failure_is_not_data(self):
+        with patch.object(r,"run",return_value=b"NOAUTH Authentication required."):
+            with self.assertRaisesRegex(r.Rejected,"AUTH"):
+                components.redis_raw("fixture","CLIENT","LIST")
     def test_backup_role_enforced(self):
         with self.assertRaises(r.Rejected):
             pg16_client.command("psql",[],"fixture","uvanoo_dev","beaconhs","")

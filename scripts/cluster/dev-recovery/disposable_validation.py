@@ -36,17 +36,7 @@ def sql(container, statement, user="uvanoo_dev"):
                   "-v", "ON_ERROR_STOP=1", "-U", user, "-d", "beaconhs"],
                  input=statement.encode()).decode().strip()
 
-roles = """CREATE ROLE beaconhs_owner NOLOGIN;
-CREATE ROLE beaconhs_app LOGIN NOINHERIT;
-CREATE ROLE beaconhs_super LOGIN NOINHERIT BYPASSRLS;
-CREATE ROLE beaconhs_migrator LOGIN NOINHERIT;
-CREATE ROLE beaconhs_backup LOGIN NOINHERIT BYPASSRLS;
-ALTER ROLE beaconhs_backup SET default_transaction_read_only=on;
-GRANT beaconhs_owner TO beaconhs_migrator;
-ALTER DATABASE beaconhs OWNER TO beaconhs_owner;
-REVOKE ALL ON DATABASE beaconhs FROM PUBLIC;
-GRANT CONNECT ON DATABASE beaconhs TO beaconhs_app,beaconhs_super,beaconhs_backup,beaconhs_migrator;
-"""
+roles = (Path(__file__).parent/"bootstrap-restore.sql").read_text()
 sql(source, roles)
 fixture = """
 CREATE EXTENSION pgcrypto;
@@ -153,7 +143,16 @@ for kind in ("storage","redis","clean155"):
     item = r.encrypt(plain, recipient, root/(kind+".age"))
     items.append(dict(item,kind=kind))
 sealed = r.finalize(root,ctx,items)
-result = restore.restore(root,sealed["sha256"],identity,root,roles_file,r.sha(roles_file))
+try:
+    result = restore.restore(root,sealed["sha256"],identity,root,roles_file,r.sha(roles_file))
+except r.Rejected:
+    # Only this hard-coded synthetic fixture may expose PG diagnostics.
+    operation = json.loads((root/(".restore-"+sealed["sha256"]+".lock")/"started.json").read_text())
+    log = Path(operation["workDirectory"])/"restore-errors.private.log"
+    if log.exists():
+        print("SYNTHETIC_ONLY_RESTORE_DIAGNOSTIC")
+        print(log.read_text()[:4000])
+    raise
 target = result["container"]
 before = r.parse_documents(sql(source,collector.read_text(),"beaconhs_backup"))
 after = r.parse_documents(sql(target,collector.read_text(),"beaconhs_backup"))

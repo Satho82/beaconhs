@@ -71,10 +71,12 @@ def restore(directory, digest, identity, parent, roles_sql, roles_sha):
     if any(" SCHEMA - public " in line for line in toc.splitlines()):
         sql(b"DROP SCHEMA public;")
     # Preserve archive owners and ACLs. Restore as the isolated bootstrap superuser.
-    with dump.open("rb") as source:
+    errors = work / "restore-errors.private.log"
+    recovery.write_new(errors, b"")
+    with dump.open("rb") as source, errors.open("wb") as diagnostic:
         r = subprocess.run(["docker", "exec", "-i", name, "pg_restore", "--exit-on-error",
                             "--single-transaction", "-U", "uvanoo_dev", "-d", "beaconhs"],
-                           stdin=source, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                           stdin=source, stdout=subprocess.DEVNULL, stderr=diagnostic,
                            timeout=1800)
     recovery.require(r.returncode == 0, "RESTORE_ARCHIVE_REJECTED")
     dump.unlink()  # Only the verified temporary plaintext we created.

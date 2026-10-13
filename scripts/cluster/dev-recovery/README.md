@@ -176,9 +176,14 @@ performed by this implementation. Verifying this supervisor remains required.
 ## Independent restore and gate integration
 
 The restore helper restores only into its newly created isolated container.
-A reviewed, hash-bound bootstrap SQL file must create the approved uvanoo_dev
-profile and canonical roles with fresh disposable credentials, database owner/ACLs
-and role settings. Do not restore live password hashes. Extension owners must
+An exclusive per-manifest lock and private started/completed records prevent
+concurrent or accidental duplicate restores in the same destination parent.
+Failures retain private diagnostics, operation identity and the isolated copy.
+The included bootstrap-restore.sql derives roles, memberships, database ownership,
+ACLs and role settings from the historical provisioning contract. Its fresh-cluster
+guard rejects existing BeaconHS roles or user tables. Passwords remain unset in
+the socket-only isolated container; no live password hashes are imported. Any
+future private network client must receive fresh protected credentials separately. Do not restore live password hashes. Extension owners must
 match the independently approved bootstrap profile. Do not run broad provisioning
 grants after restoration. The archive preserves per-object owners/ACLs.
 

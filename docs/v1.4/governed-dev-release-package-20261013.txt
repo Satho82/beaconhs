@@ -1,0 +1,136 @@
+UVANOO V1.4 — governed DEV release integration and approval package
+Preparation only. No live execution is authorized by this document.
+
+SOURCE / BOUNDARIES
+Release branch: release/uvanoo-v1.4-dev-governed-20261013.
+Base PR11:86db6a4cb7c31272b6865d79e1c18eada379a1c6, which includes
+PR9:563fb0e9b79a838a5f394abaffb2f7dc743fc571 and PR10 safeguards.
+Apply only correction commit f8934085b4ebf72d66554683ab2a27a4efbbe37c.
+Application, auth, tenant, UI, Dockerfile and foundation deployment controls are
+unchanged from PR11. No WOPI telemetry or read-only-operator development is included.
+Collabora remains fenced; editor functionality is not part of this acceptance.
+Any later Collabora admission still requires supported session/save evidence.
+
+The full packages/db tree is byte-identical to the successful actual-data58-to63
+rehearsal. Reuse its receipts,15 affected unit tests,8 PostgreSQL regression groups,
+226 relation data hashes,10 role validations and People/Risk/Approvals security
+results. Do not rerun actual-data migrations simply to change the branch label.
+0000–0059 and0062–0063 remain unchanged;0060/0061 new hashes are documented in
+pending-risk-correction-rehearsal-20261013.txt and bound by the offline source proof.
+No ledger rewrite or compatibility alias is accepted for databases already at
+the old0060/0061 hashes. Keep all historical PRs, branches and failure evidence.
+
+VALIDATION / IMAGE CONTRACT
+Run scripts/ci/governed-release-source-proof.mjs; compare candidate packages/db
+with the rehearsal checkpoint and runtime/deployment source with PR11. Reuse the
+unchanged75 foundation cases/native-login and deployment-contract evidence with
+their original SHA binding; this is not exact-new-SHA hosted CI success.
+Run affected DB and web typechecks, then build from a clean tracked-source archive.
+No .env, private backups, untracked helpers or credential-bearing local state may
+enter the image context. No production database, storage or credential is needed.
+Use the existing pinned Dockerfile, linux/amd64 and one exact DEPLOYMENT_VERSION.
+The image must carry source/revision/version OCI labels and have an actual manifest
+digest. An image tag, source SHA or config/image ID is NOT a substitute for it.
+Record the digest and build outcome in a separate, source-SHA-bound receipt; never
+invent a digest before successful build/export. No registry push is implicit.
+The authoritative Full Release workflow and exact-SHA image publication remain
+required release gates. Existing deploy verifier requires the governed feature
+branch head and matching successful validation; do not bypass that restriction
+to deploy this isolated integration branch. Governed branch integration needs
+separate approval. No workflow dispatch or repository publication is implied.
+
+SANITIZED CONFIGURATION / DOKPLOY CHANGE CONTRACT
+Target identity must simultaneously match:
+compose wYb0LxLQrvj2FPI21i-Oj; stack uvanoo-v1-4-dev-gniriv;
+environment qT391QtcIqahNap5wPjif; domain dev.uvanoo.com -> web:3000.
+AutoDeploy stays OFF. No legacy BeaconHS target or shared token is touched.
+
+This is an intended semantic diff, NOT a freshly captured live-renderer diff.
+Before authorization execution, privately re-render installed Dokploy settings
+and use dev-foundation-preflight.mjs against independently verified values.
+It reports booleans/field names, never credentials or credential fingerprints.
+
+Stage A — configuration/fence, retain current pinned application image:
+ web/worker DATABASE_URL -> uvanoo-dev-postgres:5432/beaconhs, beaconhs_app.
+ web/worker SUPERADMIN_DATABASE_URL -> same database, beaconhs_super.
+ scheduler DATABASE_URL -> same runtime role; no migration or admin credentials.
+ Preserve approved query options and privately verify credential identities.
+ web/worker/scheduler REDIS_URL -> authenticated uvanoo-dev-redis:6379/0.
+ R2 endpoint/bucket -> preserve independently verified DEV identities; never
+ redirect to legacy. Original admin and application keys are separate identities.
+ Replace coupled/implicit admission with WEB_REPLICAS=0,WORKER_REPLICAS=0,
+ SCHEDULER_REPLICAS=0,STORAGE_INIT_REPLICAS=0,COLLABORA_REPLICAS=0.
+ Retain all five Compose services even for --prune; never submit a web-only subset.
+ Preserve all networks, mounts, routes, healthchecks and shared branding file.
+ Changing any other rendered field is a separate diff requiring review.
+
+Stage B — separate retained-MinIO restoration, only after storage gates:
+ Exact external volume uvanoo-dev-minio-data -> /data, nocopy; no new empty volume.
+ MinIO pin:minio/minio@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e
+ Only uvanoo-dev-private and uvanoo-dev-runtime; no published ports/legacy network.
+ Inspect an authorized copied dataset first, reconcile the2 attachment references,
+ confirm original admin/app identities, bucket completeness and anonymous denial.
+ Starting MinIO can write metadata and requires explicit approval; storage-init
+ remains zero. Current database-only evidence does not satisfy this storage gate.
+
+Stage C — candidate rollout after migration/custody/CI approval:
+ Change IMAGE to the verified registry@sha256 manifest only; APP_VERSION must be
+ its exact source SHA. All application roles reference that same candidate pin.
+ Collabora pin remains unchanged:
+ collabora/code:26.04.2.1.1@sha256:df33af88c59e26b7335ea98d91e65f1edf13f33369ce6115941b8d59d3409cb5
+ Keep all replicas zero through the separately approved58-to63 live migration.
+ After verified63 journal/RLS/privileges, explicitly admit only WEB_REPLICAS=1.
+ Worker,scheduler,storage-init,Collabora remain0. No automatic resumption.
+
+RECOVERY AND ROLLBACK LIMITS
+The21:20 UTC snapshot is internally consistent PostgreSQL evidence, not an atomic
+PostgreSQL/MinIO/Redis backup. Validate freshness and external-writer exclusion
+before any future live migration. Preserve the stopped pristine58 and corrected63
+Mac volumes, encrypted source and receipts. Temporary Mac custody is non-immutable
+and not release eligible; no policy exception is enabled by this branch.
+Its existing deadline is2026-10-16T21:20:25.558727Z, with no automatic deletion.
+The earlier foundation document's cloud-only/Mac prohibition is historical; the
+later owner-approved Mac route permits rehearsal, not automatic release admission.
+Apply the current custody policy rather than treating either record as blanket
+operational authorization.
+
+Migrations commit separately:0059 can commit even if0060 later fails. No automatic
+down migration or ledger editing. An old application image is NOT proven compatible
+with schema63. On failure keep writers fenced, preserve diagnostics, and require a
+reviewed forward repair or restore/switch plan; restoring58 loses later writes.
+Restoring service counts is not a data rollback. Do not roll back legacy settings.
+
+BROWSER ACCEPTANCE — PREPARED, NOT EXECUTED
+Use ordinary native login, no header/session shortcuts; test one authorized admin
+and scoped non-admin role with two existing approved properties. Keep credentials
+and tenant identifiers private. Confirm health reports exact candidate revision.
+Record aggregate outcomes/screenshots without personal data or secret-bearing URLs.
+1. Signed-out redirects, valid login/logout, invalid-login rejection, session/CSRF
+   behavior and absence of stale-client/server-action mismatch.
+2. Property A/B switching: only authorized data visible; direct foreign-tenant and
+   unauthorized-property URLs/read/write requests denied. Hidden is not unassigned.
+3. People list/detail/search/pagination/property assignments and scoped permissions.
+4. Approvals workflow/request/evidence visibility and delegated-role restrictions;
+   synthetic submit/decision tests require separately approved disposable fixtures.
+5. Risk templates/families/matrix and assessment/revision routes. Platform templates
+   read-only, ownership/history immutable; tenant/property boundaries preserved.
+6. Light and Terra: teal primary/coral accent branding, readable focus/contrast,
+   responsive list/detail/error/empty states. Semantic safety colors are distinct
+   from branding; do not rewrite Risk matrix evidence to change branding.
+7. Five-service observation confirms only web running. No queued jobs consumed or
+   scheduler/storage/Collabora admission. Editing documents remains unavailable.
+Native-login, two-property visual acceptance and live credentials remain unverified
+until a separately approved activation; source inspection is not browser evidence.
+
+ONE CONSOLIDATED OWNER AUTHORIZATION PACKAGE (CONDITIONAL, NOT EXECUTED)
+Review exact0060/0061 changes and approve governed candidate integration plus
+non-deploying Full Release validation/image publication after event safety review.
+For one DEV-only window, separately authorize the exact private rendered diff,
+external-writer/operator hold, independent watchdog, safe Collabora drainage,
+persistent five-service fencing, retained-storage recovery, required consistent
+recovery evidence, exact pending migrations and web-only activation/acceptance.
+Execution must STOP before mutation if any identity, credential, storage, custody,
+drainage, watchdog, CI, digest, baseline or rollback gate is missing. A broad yes
+cannot override a failed prerequisite or silently activate temporary-custody exceptions.
+No legacy changes, merge, background-service admission, paid resources or secrets
+in outputs. Stop with all writers fenced on any failure; escalate once with evidence.

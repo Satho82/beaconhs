@@ -148,7 +148,7 @@ def capture_pg(directory, recipient_file, ctx, guard_file, metadata_sql):
     require(hashlib.sha256(rec.encode()).hexdigest() == ctx["recipientSha256"], "RECIPIENT_IDENTITY_REJECTED")
     guard(guard_file, ctx["fenceGuardSha256"])
     state = json.loads(psql("""BEGIN READ ONLY;
-SELECT json_build_object('database',current_database(),'oid',(SELECT oid FROM pg_database WHERE datname=current_database()),
+SELECT json_build_object('database',current_database(),'oid',(SELECT oid::integer FROM pg_database WHERE datname=current_database()),
 'version',current_setting('server_version_num'),'role',current_user,'super',rolsuper,'bypass',rolbypassrls,
 'readonly',current_setting('default_transaction_read_only')) FROM pg_roles WHERE rolname=current_user;
 ROLLBACK;"""))

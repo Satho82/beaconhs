@@ -153,6 +153,24 @@ class RecoveryContract(unittest.TestCase):
         self.assertTrue(out["allCiphertextChecksumsMatch"])
         self.assertIn("MUST_BE_VERIFIED", out["offHostIndependence"])
 
+    def test_duplicate_restore_operation_rejected_before_container_start(self):
+        import restore_disposable
+        digest = self.seal()
+        roles = self.root/"roles.sql"
+        r.write_new(roles, b"-- reviewed disposable role contract\n")
+        (self.root/(".restore-"+digest+".lock")).mkdir(mode=0o700)
+        with self.assertRaises(FileExistsError):
+            restore_disposable.restore(self.root, digest, self.identity, self.root, roles, r.sha(roles))
+
+    def test_capture_requires_approved_collector_before_connection(self):
+        collector = self.root/"collector.sql"
+        r.write_new(collector, b"SELECT 1;\n")
+        from unittest.mock import patch
+        with patch.dict(os.environ, {"PGDATABASE":"beaconhs","PGUSER":"beaconhs_backup",
+                                     "PGHOST":"test","PGPORT":"5432"}):
+            with self.assertRaisesRegex(r.Rejected, "COLLECTOR_IDENTITY"):
+                r.capture_pg(self.root,self.recipient,self.ctx,self.root/"guard",collector)
+
     def test_fence_guard_hash_rejected(self):
         guard = self.root/"guard"
         r.write_new(guard, b"#!/bin/sh\nexit 0\n")

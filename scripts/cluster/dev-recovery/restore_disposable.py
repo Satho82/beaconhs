@@ -22,8 +22,12 @@ def restore(directory, digest, identity, parent, roles_sql, roles_sha):
     roles_sql = recovery.private(roles_sql)
     recovery.require(recovery.sha(roles_sql) == roles_sha, "ROLE_CONTRACT_IDENTITY_REJECTED")
     name = "uvanoo-restore-" + uuid.uuid4().hex
+    lock = parent / (".restore-" + digest + ".lock")
+    lock.mkdir(mode=0o700)  # Exclusive; a failed/finished operation must be reviewed before another.
     work = Path(tempfile.mkdtemp(prefix=name + "-", dir=parent))
     os.chmod(work, 0o700)
+    recovery.write_new(lock / "started.json", recovery.canonical({
+        "container": name, "workDirectory": str(work), "manifestSha256": digest}))
     # This is the only destination this helper creates. No existing container name,
     # data mount or database endpoint can be supplied by the caller.
     data = work / "pgdata"
@@ -79,6 +83,7 @@ def restore(directory, digest, identity, parent, roles_sql, roles_sha):
               "fullSchemaDataSecurityVerification": "REQUIRED_BEFORE_ACCEPTANCE",
               "privateReviewRequired": True}
     recovery.write_new(work / "restore-receipt.private.json", recovery.canonical(result))
+    recovery.write_new(lock / "completed.json", recovery.canonical(result))
     # Container and private files retained, including on failure. Never auto-delete
     # a restore database and never auto-resume live writers.
     return result

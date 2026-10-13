@@ -1,0 +1,99 @@
+{
+  "status": "BLOCKED_BEFORE_SERVICE_MUTATION: PRIVILEGED_WRITER_AND_RECOVERY_INVENTORY_DENIED",
+  "recordedAt": "2026-10-13T10:59:27.511Z",
+  "previousCheckpoint": "f087631a2dd9d5c9d12d2b766143c7d99318d1b9",
+  "product": "563fb0e9b79a838a5f394abaffb2f7dc743fc571",
+  "backupImplementation": "e1c6a7e87e115bad10276b93b2eec6304a7d8506",
+  "preserved": {
+    "ageCustodyAndRecipient": "PASS; not retested",
+    "localStaging": "/opt/uvanoo-dev/backups/recovery;0700",
+    "restoreStaging": "/opt/uvanoo-dev/backups/recovery/restore-isolated;0700",
+    "ovhObjectStorage": "Not required",
+    "previousPassingTests": "Reused; none repeated"
+  },
+  "newVerifiedEvidence": {
+    "vpsReadOnlyExecution": "PASS",
+    "webWorker": "Running/restarting tasks reference missing clean155 PostgreSQL/Redis and absent DEV MinIO, not permanent endpoints; no service change.",
+    "permanentDatabaseClients": {
+      "otherClientSessions": 0,
+      "otherActiveClientSessions": 0,
+      "method": "Explicit READ ONLY transaction; no row data or SQL text emitted",
+      "limitation": "Point-in-time activity is not an admission fence"
+    },
+    "networkPrivate": {
+      "scope": "local",
+      "attachable": false,
+      "members": [
+        "uvanoo-dev-postgres",
+        "uvanoo-dev-redis"
+      ]
+    },
+    "networkRuntime": {
+      "scope": "swarm",
+      "attachable": true,
+      "members": "DEV web/worker plus permanent PostgreSQL/Redis and overlay endpoint observed"
+    },
+    "permanentRedis": {
+      "mountCount": 0,
+      "restartPolicy": "no",
+      "readOnlyRootfs": false,
+      "implication": "Cannot assume a mounted persistent Redis volume. Inspect actual Redis persistence/configuration before copying; no queue operations performed."
+    },
+    "recoveryInspection": {
+      "name": "uvanoo-decision155-inspect",
+      "status": "running",
+      "hostProcess": "postgres",
+      "processCount": 6,
+      "network": "none",
+      "publishedPorts": false,
+      "rwBindSource": "/var/lib/uvanoo-recovery/decision155-copy",
+      "target": "/var/lib/postgresql/data",
+      "implication": "Active PostgreSQL writes are possible on this recovery copy. Do not archive its live data directory as a verified consistent backup or stop it without resolving active-operation ownership and a safe recovery-copy plan."
+    },
+    "protectedRecoveryVolumes": [
+      "uvanoo-clean155-redis-data",
+      "uvanoo-decision149-restore-data",
+      "uvanoo-decision154-clean-data",
+      "uvanoo-decision155-clean-data",
+      "uvanoo-dev-minio-data"
+    ],
+    "recoveryVolumeDirectRead": "Current ubuntu process lacks read/traverse access to listed mountpoints",
+    "rootCrontabDirectRead": "Unavailable to current user",
+    "privilegedReadOnlyInventory": {
+      "commandClass": "sudo -n python3: root cron summary and du byte sizes of five recovery volumes",
+      "result": "Remote Desktop Commander rejected: Command not allowed",
+      "errorCode": "INVALID_ARGUMENT",
+      "reasonDetails": "No more specific reason provided",
+      "alternatePrivilegeRouteAttempted": false
+    }
+  },
+  "fenceAssessment": {
+    "complete": false,
+    "applied": false,
+    "composeDeployUsed": false,
+    "oneShotJobsRestarted": false,
+    "proposal": "Use only a reviewed direct DEV service-level pause for repeating writers; preserve scheduler/storage-init completed state unchanged. Resolve Collabora callbacks, root/direct writers, concurrent deployment control and active recovery-copy ownership. Save and compare original specifications/replicas; do not equate starting/restarting state with safe readiness.",
+    "unresolved": [
+      "Privileged host scheduled/direct writer inventory",
+      "Recovery-copy active PostgreSQL operation ownership and consistent capture plan",
+      "Complete recovery-component size/readability and Redis persistence inventory",
+      "Independent verification of no concurrent writer reactivation and safe unchanged-state restoration"
+    ]
+  },
+  "backup": {
+    "captured": false,
+    "path": null,
+    "sha256": null,
+    "scpCommand": "Not issued: no real archive exists",
+    "offVpsArchiveCustody": "Pending capture and owner transfer confirmation; key custody is already complete"
+  },
+  "restore": {
+    "executed": false
+  },
+  "rehearsal": {
+    "executed": false
+  },
+  "deploymentReady": false,
+  "nextOwnerAction": "Provide an approved privileged read-only execution path, or have the VPS administrator supply sanitized root-job inventory and size/access evidence for the five named recovery volumes. Also identify whether the running decision155 inspection belongs to an active operation. Existing backup/rehearsal authorisation does not need repeating; no request for live SQL/merge/deployment approval.",
+  "restrictionsPreserved": "No service/network changes, original data deletion, live SQL correction/migration, queue replay/deletion, merge, deployment, Traefik, staging/production changes or access-control bypass."
+}

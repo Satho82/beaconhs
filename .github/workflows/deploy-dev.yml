@@ -213,7 +213,17 @@ jobs:
       # The deploy runner shares storage with Dokploy. Keep stale build cache
       # and superseded images from exhausting the host and taking the Dokploy
       # API offline. Active service images and all volumes are preserved.
+      - name: Check DEV free space without shared-host cleanup
+        if: inputs.feature_candidate_verified
+        run: |
+          set -euo pipefail
+          available_kb="$(df -Pk / | awk 'NR==2 {print $4}')"
+          if ! [[ "$available_kb" =~ ^[0-9]+$ ]] || [ "$available_kb" -lt 2097152 ]; then
+            echo "::error::DEV release requires 2 GiB free; shared-host pruning is not authorized"
+            exit 1
+          fi
       - name: Reclaim stale deployment-runner storage
+        if: ${{ !inputs.feature_candidate_verified }}
         run: |
           set -euo pipefail
           echo "Storage before cleanup:"
@@ -908,6 +918,7 @@ jobs:
       # coolwsd caches browser assets at startup, so a changed branding file
       # needs a Collabora restart; an unchanged file needs nothing.
       - name: Install Collabora branding on the swarm manager
+        if: ${{ !inputs.feature_candidate_verified }}
         run: |
           set -euo pipefail
           before="$(docker run --rm --pull=never -v /etc/dokploy/beaconhs:/target "$DEPLOY_UTILITY_IMAGE" \
@@ -1051,20 +1062,6 @@ jobs:
           DOKPLOY_TOKEN: ${{ secrets.DOKPLOY_TOKEN }}
         run: node .deployment-governance/scripts/cluster/dev-writer-fence.mjs restore
 
-      - name: Report DEV writer recovery state
-        if: ${{ always() && inputs.feature_candidate_verified && (failure() || cancelled()) }}
-        env:
-          FENCE_OUTCOME: ${{ steps.writer-fence.outcome }}
-          MIGRATION_OUTCOME: ${{ steps.migrations.outcome }}
-          RESTORE_OUTCOME: ${{ steps.writer-restore.outcome }}
-        run: |
-          {
-            echo 'DEV deployment failed or was cancelled; no automatic writer recovery.'
-            echo "Fence: $FENCE_OUTCOME; migration: $MIGRATION_OUTCOME; restore: $RESTORE_OUTCOME."
-            echo 'If fencing began, assume writers remain fenced or state is uncertain until inspected.'
-            echo 'After any migration failure, require explicit database recovery review before restoring writers.'
-          } >> "$GITHUB_STEP_SUMMARY"
-
       - name: Roll the immutable image directly on Swarm
         if: env.DOKPLOY_DEPLOY_MODE == 'direct'
         run: |
@@ -1112,3 +1109,25 @@ jobs:
           done
           echo "::error::Deployment did not become externally ready with a healthy login page within 10 minutes (last /login status: ${last_login_status:-000})"
           exit 1
+
+      - name: Re-fence DEV writers after release failure
+        if: ${{ always() && inputs.feature_candidate_verified && (failure() || cancelled()) && steps.writer-fence.outcome != 'skipped' && steps.writer-fence.outcome != '' }}
+        env:
+          FEATURE_CANDIDATE_VERIFIED: ${{ inputs.feature_candidate_verified }}
+          DOKPLOY_URL: ${{ secrets.DOKPLOY_URL }}
+          DOKPLOY_TOKEN: ${{ secrets.DOKPLOY_TOKEN }}
+        run: node .deployment-governance/scripts/cluster/dev-writer-fence.mjs fence
+
+      - name: Report DEV writer recovery state
+        if: ${{ always() && inputs.feature_candidate_verified && (failure() || cancelled()) }}
+        env:
+          FENCE_OUTCOME: ${{ steps.writer-fence.outcome }}
+          MIGRATION_OUTCOME: ${{ steps.migrations.outcome }}
+          RESTORE_OUTCOME: ${{ steps.writer-restore.outcome }}
+        run: |
+          {
+            echo 'DEV deployment failed or was cancelled; no automatic writer recovery.'
+            echo "Fence: $FENCE_OUTCOME; migration: $MIGRATION_OUTCOME; restore: $RESTORE_OUTCOME."
+            echo 'If fencing began, assume writers remain fenced or state is uncertain until inspected.'
+            echo 'After any migration failure, require explicit database recovery review before restoring writers.'
+          } >> "$GITHUB_STEP_SUMMARY"

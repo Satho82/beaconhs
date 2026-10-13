@@ -1,6 +1,7 @@
 import { execFileSync } from 'node:child_process'
 import { pathToFileURL } from 'node:url'
 
+const protectedPaths = ['/hospitality/risk', '/people', '/approvals']
 const service = 'uvanoo-v1-4-dev-gniriv_web'
 const check = (condition, code) => {
   if (!condition) throw new Error(code)
@@ -62,7 +63,25 @@ export function liveIO(exec = execFileSync, request = fetch) {
         signal: AbortSignal.timeout(15000),
       })
       await response.body?.cancel()
-      return { status: response.status, challenge: response.headers.get('www-authenticate') }
+      const protectedRoutes = []
+      for (const path of protectedPaths) {
+        const route = await request('https://dev.uvanoo.com' + path, {
+          redirect: 'manual',
+          signal: AbortSignal.timeout(15000),
+        })
+        await route.body?.cancel()
+        protectedRoutes.push({
+          path,
+          status: route.status,
+          location: route.headers.get('location'),
+          challenge: route.headers.get('www-authenticate'),
+        })
+      }
+      return {
+        status: response.status,
+        challenge: response.headers.get('www-authenticate'),
+        protectedRoutes,
+      }
     },
   }
 }
@@ -110,9 +129,30 @@ export async function verifyReadiness(io, config) {
   check(internal.sha === config.sha, 'READINESS_SHA_MISMATCH')
   check(internal.login === 200, 'INTERNAL_LOGIN_FAILED')
   const external = await io.external()
+  check(external.status === 200 && !external.challenge, 'EXTERNAL_PROTECTION_FAILED')
   check(
-    external.status === 401 && /^Basic realm="Uvanoo Development"$/i.test(external.challenge ?? ''),
-    'EXTERNAL_PROTECTION_FAILED',
+    external.protectedRoutes?.length === protectedPaths.length &&
+      external.protectedRoutes.every((route, index) => {
+        if (
+          route.path !== protectedPaths[index] ||
+          ![302, 303, 307, 308].includes(route.status) ||
+          route.challenge ||
+          !route.location
+        )
+          return false
+        try {
+          const target = new URL(route.location, 'https://dev.uvanoo.com')
+          return (
+            target.origin === 'https://dev.uvanoo.com' &&
+            target.pathname === '/login' &&
+            !target.username &&
+            !target.password
+          )
+        } catch {
+          return false
+        }
+      }),
+    'UNAUTHENTICATED_ROUTE_EXPOSED',
   )
   const after = await io.runtime(image)
   validate(after)
@@ -132,7 +172,9 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   verifyReadiness(liveIO(), config)
     .then(() => {
       console.log(`DEV internal readiness/login and immutable runtime verified: ${config.sha}`)
-      console.log('DEV external protection verified: HTTP 401, expected Basic challenge')
+      console.log(
+        'DEV native login verified: HTTP 200, no Basic challenge; protected routes require login',
+      )
     })
     .catch((error) => {
       const safe = new Set([
@@ -146,6 +188,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
         'READINESS_SHA_MISMATCH',
         'INTERNAL_LOGIN_FAILED',
         'EXTERNAL_PROTECTION_FAILED',
+        'UNAUTHENTICATED_ROUTE_EXPOSED',
         'WEB_CHANGED_DURING_PROBE',
       ])
       console.error(

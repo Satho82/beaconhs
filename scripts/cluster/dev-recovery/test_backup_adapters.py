@@ -185,6 +185,24 @@ class AdapterTests(unittest.TestCase):
                 components.custody("/unused","a"*64,value)
 
 class ClientPreflightTests(unittest.TestCase):
+    def test_restore_name_selects_unchanged_restore_pin(self):
+        calls=[]
+        def inspect(args):
+            calls.append(args)
+            return ([{"Id":"restore","Image":"restore-image","State":{"Running":True},
+                      "HostConfig":{}}] if args[1]=="inspect" else [{"Id":"restore-image"}])
+        pg16_client.checked_container("uvanoo-restore-"+"a"*32,inspect)
+        self.assertEqual(calls[-1][-1],pg16_client.RESTORE_IMAGE)
+
+    def test_live_name_selects_exact_client_pin(self):
+        calls=[]
+        def inspect(args):
+            calls.append(args)
+            return ([{"Id":"live","Image":"client-image","State":{"Running":True},
+                      "HostConfig":{}}] if args[1]=="inspect" else [{"Id":"client-image"}])
+        pg16_client.checked_container("uvanoo-dev-postgres",inspect)
+        self.assertEqual(calls[-1][-1],pg16_client.IMAGE)
+
     def test_identity_error_is_not_hidden_by_subprocess(self):
         with patch.object(pg16_client,"checked_container",side_effect=r.Rejected("PINNED_PG_IMAGE_REQUIRED")), \
              patch.object(r,"run") as run:

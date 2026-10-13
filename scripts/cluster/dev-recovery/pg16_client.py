@@ -2,10 +2,13 @@
 """Pinned PostgreSQL16.15 client bridge; no host client installation or TCP endpoint."""
 import json
 import os
+import re
 from pathlib import Path
 import subprocess
 import sys
 import dev_recovery as r
+from restore_disposable import IMAGE as RESTORE_IMAGE
+
 # Client profile is independently pinned; restore_disposable.IMAGE remains unchanged.
 IMAGE = "postgres@sha256:f1c3376c26f2609ab9f29f71f824103fe2fcd8ee0346485cb6122a4f93df6f94"
 
@@ -13,7 +16,8 @@ def checked_container(name, inspect=None):
     inspect = inspect or (lambda args: json.loads(r.run(args)))
     r.require(isinstance(name, str) and r.NAME.fullmatch(name), "PG_CONTAINER_NAME_REJECTED")
     c = inspect(["docker", "inspect", name])[0]
-    image = inspect(["docker", "image", "inspect", IMAGE])[0]
+    profile = RESTORE_IMAGE if re.fullmatch(r"uvanoo-restore-[0-9a-f]{32}", name) else IMAGE
+    image = inspect(["docker", "image", "inspect", profile])[0]
     r.require(c["Image"] == image["Id"] and c["State"]["Running"], "PINNED_PG_IMAGE_REQUIRED")
     r.require(not c["HostConfig"].get("PortBindings"), "PG_PUBLISHED_PORT_REJECTED")
     return c["Id"]

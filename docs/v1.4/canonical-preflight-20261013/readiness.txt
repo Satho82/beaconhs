@@ -100,3 +100,31 @@ NO-GO pending independent PG16.15 reference generation, protected DEV metadata e
 Owner metadata collection is already authorized. Supply protected complete output or restore connector access; no security changes required.
 Separate subsequent authorization is needed for backup/restore and restored-data migration rehearsal, then writer fencing, endpoint/service corrections, persistent migration and deployment. Governed merge remains separate and prohibited now.
 This checkpoint changes documentation/evidence collection material only. No runtime, historical SQL, workflows, Risk/People, persistent DB, service or network changes. No new full CI.
+
+MANDATORY DEV LOGIN REQUIREMENT — OWNER INSTRUCTION 2026-10-13
+Applies to the next separately authorised DEV release only. Documentation now; no Traefik changes or deployment authorised by this addition.
+
+Required outcome:
+- Remove the initial Traefik HTTP Basic Auth browser popup from https://dev.uvanoo.com.
+- Retain native Uvanoo email/password authentication.
+- Preserve RBAC, RLS, tenant isolation, property scope, session validation and audit controls.
+- Unauthenticated requests must not expose protected application pages, APIs, downloads or exports.
+- Do not expose internal administration, database, Redis, storage/MinIO administration, Dokploy, Traefik administration or other infrastructure services.
+- Staging and production routers, middlewares and authentication behaviour remain unchanged.
+
+Implementation constraints for the later authorised release:
+Inspect the exact DEV router/middleware binding first. Remove only the Basic Auth binding responsible for the public DEV application popup. If a middleware is shared, do not delete or alter the shared middleware; scope any binding correction to the DEV application router. Retain TLS, security headers and all other applicable proxy protections.
+Verify native application authentication enforcement before removing the proxy prompt. Native platform administration remains restricted to authorised platform operators. No new infrastructure routes, ports or network exposure.
+Record the existing DEV router binding securely and prepare a DEV-only rollback. Keep credential material out of logs and published evidence.
+
+Mandatory post-deployment browser acceptance:
+1. In a fresh desktop and mobile browser session, visit dev.uvanoo.com: no HTTP Basic Auth popup; native Uvanoo login renders.
+2. Visit protected deep links, APIs and document/export URLs while signed out: redirect to native login or appropriate unauthorised response, with no protected data returned.
+3. Verify valid email/password login, invalid credential rejection and logout/session invalidation.
+4. Verify authorised People, Approvals and Risk access, restricted-role rejection, cross-tenant denial and cross-property isolation using approved synthetic accounts.
+5. Verify platform administration denies non-platform operators and internal infrastructure/storage administration remains inaccessible publicly.
+6. Capture actual browser screenshots and network outcomes without passwords, session tokens or confidential data.
+7. Confirm staging/production configuration was not changed. Any remaining HTTP 401 must be classified by source; native unauthorised API responses remain valid security behaviour.
+
+Acceptance status: REQUIRED / NOT EXECUTED.
+Failure blocks DEV release acceptance; no bypass of native authentication or security controls is permitted.

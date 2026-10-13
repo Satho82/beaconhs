@@ -1,0 +1,33 @@
+name: DEV read-only pre-fence diagnostics
+on:
+  push:
+    branches: [fix/uvanoo-dev-prefence-diagnostics-20261013]
+    paths:
+      - scripts/cluster/dev-recovery/diagnose_prefence.py
+      - scripts/cluster/dev-recovery/test_prefence_diagnostics.py
+      - scripts/cluster/dev-recovery/prefence_diagnostic_validation.py
+      - .github/workflows/dev-prefence-diagnostics.yml
+permissions:
+  contents: read
+concurrency:
+  group: uvanoo-dev-prefence-diagnostics
+  cancel-in-progress: false
+jobs:
+  diagnostics:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Existing implementation unchanged
+        run: |
+          git diff --exit-code acbd4e4e40ae179d85ce30b78b59d83b304e7486 HEAD -- apps packages scripts/cluster/dev-recovery/backup_controller.py scripts/cluster/dev-recovery/backup_fence.py scripts/cluster/dev-recovery/pg16_client.py scripts/cluster/dev-recovery/restore_disposable.py .github/workflows/dev-backup-adapters.yml
+      - name: Focused read-only diagnostic contracts
+        working-directory: scripts/cluster/dev-recovery
+        run: python3 -m unittest -v test_prefence_diagnostics.py
+      - name: Disposable missing-container classification
+        run: |
+          docker pull postgres@sha256:ca0bd484cb98bf4b24eb1010e73fb3fcbd6714d240fbc1a10eea5b7dbecb641d
+          python3 scripts/cluster/dev-recovery/prefence_diagnostic_validation.py

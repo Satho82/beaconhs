@@ -33,10 +33,7 @@
     "focusedBrowser": 38320812403,
     "financialStep": 38320245029,
     "financialOverallRun": "failure; separate financial step passed",
-    "artifactIdsReconfirmed": [
-      11777954723,
-      11778358853
-    ],
+    "artifactIdsReconfirmed": [11777954723, 11778358853],
     "artifactsExpired": false
   },
   "visual": {

@@ -105,6 +105,7 @@ On failure, restrict ingress, contain writers using the approved DEV-only proced
 ## Required owner decisions
 
 No more permission is required for this completed isolated review. Later:
+
 - Identify accessible approved visual references/assets and disposition exact remaining visual differences before freeze; functional acceptance is not being requested again.
 - Approve PR9 governed merge at the exact head/base after final checks, including expected image-publication effects.
 - Approve authoritative dataset, clean155 and queue reconciliation, any required role/configuration corrections, DEV-only/nonwriter side effects, execution window, fence scope, immutable image and fresh backup/restore manifest digest.

@@ -28,7 +28,7 @@ jobs:
           import {createRequire} from 'node:module'
           import {pathToFileURL} from 'node:url'
           const req=createRequire(process.env.RUNNER_TEMP+'/recovery-format/package.json')
-          const prettier=await import(pathToFileURL(req.resolve('prettier')).href)
+          const prettier=req('prettier')
           const config=JSON.parse(readFileSync('.prettierrc','utf8'))
           config.plugins=await Promise.all(config.plugins.map(async name=>import(pathToFileURL(req.resolve(name)).href)))
           const path='scripts/cluster/dev-recovery/README.md'

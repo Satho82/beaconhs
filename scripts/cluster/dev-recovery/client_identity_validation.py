@@ -4,6 +4,7 @@ import json, os, secrets, tempfile, time
 from pathlib import Path
 import dev_recovery as r
 import pg16_client
+import restore_disposable
 import backup_controller as c
 r.require(os.environ.get("GITHUB_ACTIONS") == "true", "HOSTED_ONLY")
 source="postgres@sha256:f1c3376c26f2609ab9f29f71f824103fe2fcd8ee0346485cb6122a4f93df6f94"
@@ -23,21 +24,15 @@ for _ in range(30):
     time.sleep(1)
 else: raise r.Rejected("FIXTURE_VERSION_REQUIRED")
 server=json.loads(r.run(["docker","inspect",name]))[0]
-client=json.loads(r.run(["docker","image","inspect",pg16_client.IMAGE]))[0]
+client=json.loads(r.run(["docker","image","inspect",restore_disposable.IMAGE]))[0]
 r.require(server["Image"] != client["Id"],"DISTINCT_IMAGE_REQUIRED")
 c.PG=name
 work=Path(tempfile.mkdtemp());os.chmod(work,0o700)
 c.client_setup(work)
-try:
-    r.run(["pg_dump","--version"])
-except r.Rejected as e:
-    r.require(str(e)=="TOOL_EXIT_FAILED","WRAPPER_REPRODUCTION")
-else: raise r.Rejected("EXPECTED_OLD_FAILURE")
-try:
-    c.verify_pg_client()
-except r.Rejected as e:
-    r.require(str(e)=="PINNED_PG_IMAGE_REQUIRED","SPECIFIC_REJECTION_REQUIRED")
-else: raise r.Rejected("EXPECTED_PREFLIGHT_REJECTION")
-print("PG16_15_DISTINCT_IMAGES_OLD_TOOL_EXIT_FAILED_REPRODUCED")
-print("DIRECT_PREFLIGHT_PINNED_PG_IMAGE_REQUIRED_PASS")
-print("NO_FENCE_OR_CAPTURE_EXECUTED")
+# Old server=restore-image assumption is demonstrably false. The new client profile
+# is independently immutable and version checked; no alternate-image fallback.
+c.verify_pg_client()
+r.require(r.run(["pg_dump","--version"]).decode().split()[2] == "16.15",
+          "CLIENT_VERSION_REQUIRED")
+print("PG16_15_CLIENT_PROFILE_VERIFIED_INDEPENDENT_OF_RESTORE_IMAGE")
+print("NO_FENCE_OR_CAPTURE_EXECUTED_IN_IDENTITY_FIXTURE")

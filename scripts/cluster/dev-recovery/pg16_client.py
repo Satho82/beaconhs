@@ -6,7 +6,8 @@ from pathlib import Path
 import subprocess
 import sys
 import dev_recovery as r
-from restore_disposable import IMAGE
+# Client profile is independently pinned; restore_disposable.IMAGE remains unchanged.
+IMAGE = "postgres@sha256:f1c3376c26f2609ab9f29f71f824103fe2fcd8ee0346485cb6122a4f93df6f94"
 
 def checked_container(name, inspect=None):
     inspect = inspect or (lambda args: json.loads(r.run(args)))

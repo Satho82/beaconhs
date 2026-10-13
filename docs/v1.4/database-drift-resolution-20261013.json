@@ -1,0 +1,167 @@
+{
+  "status": "TESTED_PROPOSAL_OWNER_APPROVAL_REQUIRED",
+  "source": {
+    "version": 1,
+    "fingerprint": "730d95c22ad6914d68bcdbea46283741f24ebd21a5f609c7951a4e5f72392a7c",
+    "remediation": {
+      "fixtureSource": "d18f635a41f092e9e86aa6f53518f9c28992b0d2:scripts/cluster/provision.sql",
+      "baselineFingerprint": "730d95c22ad6914d68bcdbea46283741f24ebd21a5f609c7951a4e5f72392a7c",
+      "driftFixtureFingerprint": "0529262d8f4b1a323994e1dbeae85e70b3506cd0746c2faf3d0b4e014ccb0074",
+      "correctedFingerprint": "730d95c22ad6914d68bcdbea46283741f24ebd21a5f609c7951a4e5f72392a7c",
+      "all19SectionsRestored": true,
+      "rollbackPreservedDrift": true,
+      "ledgerUnchanged": true,
+      "sqlSha256": "7262d5c6a52d5c57f1888837eabb44e3b29fa43f253ccc1086f888d46fbe9d54",
+      "extensionDependencies": [
+        {
+          "extname": "pg_trgm",
+          "object_catalog": "pg_opclass",
+          "member_count": 2
+        },
+        {
+          "extname": "pg_trgm",
+          "object_catalog": "pg_operator",
+          "member_count": 10
+        },
+        {
+          "extname": "pg_trgm",
+          "object_catalog": "pg_opfamily",
+          "member_count": 2
+        },
+        {
+          "extname": "pg_trgm",
+          "object_catalog": "pg_proc",
+          "member_count": 31
+        },
+        {
+          "extname": "pg_trgm",
+          "object_catalog": "pg_type",
+          "member_count": 1
+        },
+        {
+          "extname": "pgcrypto",
+          "object_catalog": "pg_proc",
+          "member_count": 36
+        },
+        {
+          "extname": "plpgsql",
+          "object_catalog": "pg_language",
+          "member_count": 1
+        },
+        {
+          "extname": "plpgsql",
+          "object_catalog": "pg_proc",
+          "member_count": 3
+        }
+      ],
+      "dependencyInventorySha256": "247daafda48d1a86c9543675a4310152df378a6332819f92295cd70cf2d67a54",
+      "bootstrapOid": 10,
+      "profileApproval": "PENDING OWNER APPROVAL; independently generated, not adopted from DEV"
+    },
+    "sourceSha": "563fb0e9b79a838a5f394abaffb2f7dc743fc571",
+    "sourceTree": "324c50a60e2cb0639ba920488a150c6531968374",
+    "historicalSource": "d18f635a41f092e9e86aa6f53518f9c28992b0d2",
+    "postgresVersion": "160015",
+    "imageDigest": "postgres@sha256:ca0bd484cb98bf4b24eb1010e73fb3fcbd6714d240fbc1a10eea5b7dbecb641d",
+    "workflowSha": "00ab37735aef222a270c98e414343b5e590e8cac",
+    "run": "38372116422",
+    "rawChecksum": "5d3d7649f85702c0bd8940fcb9c8b66e9255be32a4f869aab0855934cf65155a",
+    "counts": {
+      "tables": 227,
+      "rls": 218,
+      "force": 219
+    },
+    "triggers": {
+      "total": 16,
+      "disabled": 0
+    },
+    "policies": 226,
+    "bootstrapRole": "uvanoo_dev",
+    "provisioningContract": "historical scripts/cluster/provision.sql before historical migration runner and RLS installer",
+    "ledgerVerification": "58 exact ordered SQL SHA256/timestamp matches",
+    "algorithmVerification": "matches candidate schemaFingerprint; mutation/ledger/truncation rejection tests passed"
+  },
+  "checkpointBase": "58ed836a55f3d978bd7fd44767802eb7671acbd9",
+  "validation": {
+    "commit": "00ab37735aef222a270c98e414343b5e590e8cac",
+    "tree": "a4ae80b6372c085611ac8b3ea64e7fc05ce2c999",
+    "run": 38372116422,
+    "job": 115211392234,
+    "publicArtifact": 11799049062,
+    "encryptedArtifact": 11799252945,
+    "publicFileSha256": "a07bf16e10fa9f2a18884dfbbf1359259ff5b39845b1244ccb7770fbb23356d9",
+    "failedRun": 38371856746,
+    "failedReason": "Harness import substitution error before migrations; corrected; failure retained"
+  },
+  "live": {
+    "role": "uvanoo_dev",
+    "bootstrapOid": 10,
+    "attributes": {
+      "superuser": true,
+      "inherit": true,
+      "createRole": true,
+      "createDb": true,
+      "login": true,
+      "replication": true,
+      "bypassRls": true
+    },
+    "memberships": [],
+    "postgresRolePresent": false,
+    "composePath": "/opt/uvanoo-dev/infra/compose.yml",
+    "composeSha256": "585d8741a4e72fcd1c1104e0500e032202d7c339da6c4d90fe186025024382bd",
+    "composePOSTGRES_USER": "uvanoo_dev",
+    "containerCreated": "2026-09-29T21:56:45.356608585Z",
+    "dependencyInventorySha256": "247daafda48d1a86c9543675a4310152df378a6332819f92295cd70cf2d67a54",
+    "dependencyInventory": "MATCH independent disposable profile, including extension member identity/catalog/owner",
+    "arrayTypeDependency": "_gtrgm has internal dependency i on gtrgm",
+    "runtimeLoginRoles": [
+      "beaconhs_app",
+      "beaconhs_super"
+    ],
+    "liveQueries": "BEGIN READ ONLY, bounded statement timeout; no mutation",
+    "metadataSha256": "51959099c665622286fc2a13bb771f64574b518f81dfcee67ea7524ed68f933d",
+    "comparison": {
+      "ledger": "58/58 PASS",
+      "sections": "18/19 MATCH against proposed DEV profile",
+      "onlyDifference": "Section 13: two additional public default ACLs",
+      "exitCode": 2,
+      "resultSha256": "89d2335ccf97301e81426f039b5eac3519996769fcbd0b2d5fbb5ffd6e37df53"
+    }
+  },
+  "decisions": {
+    "extensionOwners": "Retain; no ownership correction proposed. Technically explained bootstrap-profile variation; explicit historical owner approval not recovered. Proposed profile requires approval before gate-manifest use.",
+    "defaultPrivileges": "Actual drift relative to historical runner: two extra owner/public table and sequence default ACL records. Remove only through separately approved correction.",
+    "gate": "Unchanged. DEV observed fingerprint never adopted as trusted canonical fingerprint.",
+    "test": "Independent full provisioning plus historical runner first58 produced canonical profile. Source-derived historical grants reproduce DEV drift exactly. Two narrow revokes restore all19 sections, preserve ledger; deliberate rollback restores drift fixture. No DEV data used in fixture."
+  },
+  "approvalRequirements": [
+    "Approve bootstrap-role profile uvanoo_dev (OID10 superuser), keeping all five separate canonical beaconhs roles; no extension ownership change",
+    "Authorize writer-fenced protected encrypted backup and independent private PostgreSQL16.15 restore; current instruction does not authorize persistent backups",
+    "After backup/restore evidence review, approve only proposed-default-acl-correction.sql SHA256 7262d5c6a52d5c57f1888837eabb44e3b29fa43f253ccc1086f888d46fbe9d54, in one transaction under the canonical advisory lock and strict before/after fingerprint checks",
+    "Migration, governed merge, image/deployment and any restore/switchover remain separately approved operations"
+  ],
+  "recoveryProcedure": [
+    "Validate exact database identity/version58 ledger and unchanged before-fingerprint 0529262d8f4b1a323994e1dbeae85e70b3506cd0746c2faf3d0b4e014ccb0074 under writer fence",
+    "Preserve protected roles/schema/ACL evidence plus encrypted database/storage/queue backup and independent restore verification",
+    "As dedicated migrator SET LOCAL ROLE beaconhs_owner, obtain same canonical migration advisory transaction lock; recheck fingerprint; execute exactly two proposed ALTER DEFAULT PRIVILEGES statements",
+    "Within same transaction require corrected all19 fingerprint 730d95c22ad6914d68bcdbea46283741f24ebd21a5f609c7951a4e5f72392a7c and unchanged ledger; rollback on any failure",
+    "Commit only after all postconditions. This changes future-object defaults, not existing table/sequence/backup grants, RLS, policies, functions or data",
+    "On post-commit anomaly keep writers fenced, preserve evidence, review isolated restore/switchover. Never rerun broad provisioning, reassign extension owners, delete ledger rows or blindly restore old images"
+  ],
+  "limits": [
+    "No current DEV backup or restore performed",
+    "No DEV correction or migration executed",
+    "Profile18/19 comparison is an offline snapshot comparison; targeted role/dependency/default ACL checks were live",
+    "63-entry PG16.15 profile and real-data rehearsal remain required before release"
+  ],
+  "references": [
+    "https://www.postgresql.org/docs/16/sql-createextension.html",
+    "https://www.postgresql.org/docs/16/extend-extensions.html",
+    "https://www.postgresql.org/docs/16/sql-alterdefaultprivileges.html",
+    "https://www.postgresql.org/docs/16/app-initdb.html",
+    "docs/DEV-MIGRATION-GATE.md",
+    "scripts/cluster/local-init.sh",
+    "scripts/cluster/provision.sql",
+    "packages/db/src/migration-privileges.ts"
+  ]
+}

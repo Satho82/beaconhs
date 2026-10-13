@@ -16,7 +16,9 @@ def checked_container(name, inspect=None):
     r.require(isinstance(name, str) and r.NAME.fullmatch(name), "PG_CONTAINER_NAME_REJECTED")
     c = inspect(["docker", "inspect", name])[0]
     image = inspect(["docker", "image", "inspect", IMAGE])[0]
-    r.require(c["Image"] in (SERVER_IMAGE, image["Id"]) and c["State"]["Running"], "PINNED_PG_IMAGE_REQUIRED")
+    server_image = inspect(["docker", "image", "inspect", "postgres@"+SERVER_IMAGE])[0]
+    r.require(c["Image"] in (server_image["Id"], image["Id"]) and c["State"]["Running"],
+              "PINNED_PG_IMAGE_REQUIRED")
     r.require(not c["HostConfig"].get("PortBindings"), "PG_PUBLISHED_PORT_REJECTED")
     return c["Id"]
 

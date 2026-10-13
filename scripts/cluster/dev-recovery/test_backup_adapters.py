@@ -189,7 +189,8 @@ class SeparateClientTests(unittest.TestCase):
         def inspect(args):
             return ([{"Image":pg16_client.SERVER_IMAGE,"State":{"Running":True},
                       "HostConfig":{},"Id":"server"}] if args[1]=="inspect"
-                    else [{"Id":"different-pinned-client"}])
+                    else [{"Id":pg16_client.SERVER_IMAGE if args[-1] == "postgres@"+pg16_client.SERVER_IMAGE
+                                 else "different-pinned-client"}])
         self.assertEqual(pg16_client.checked_container("fixture",inspect),"server")
 
     def test_client_transport_is_pinned_and_socket_only(self):

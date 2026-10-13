@@ -1,0 +1,271 @@
+UVANOO V1.4 FOUNDATION RECOVERY — ISOLATED IMPLEMENTATION
+Status: preparation only; deployment and live changes remain NO-GO.
+
+1. PROVENANCE AND SCOPE
+
+Product candidate PR9: 563fb0e9b79a838a5f394abaffb2f7dc743fc571.
+Safety parent PR10: b11778aee65e3a6818fed58d4927070165746e1b.
+Isolated branch: fix/uvanoo-dev-foundation-isolated-20261013.
+No shared branch updates, pushes, workflow dispatches or merges are authorized
+by this implementation. No live credentials, raw environment files, database
+data, backups or connection URLs belong in this repository or public artifacts.
+
+DEV identity is the conjunction of compose wYb0LxLQrvj2FPI21i-Oj,
+stack uvanoo-v1-4-dev-gniriv, environment qT391QtcIqahNap5wPjif,
+domain dev.uvanoo.com -> web:3000 and disabled Auto Deploy. Names alone are
+insufficient. Legacy beaconhs-ib9ybf and BeaconHS production apps are excluded.
+
+2. IMPLEMENTED CONTROL CONTRACT
+
+deploy/dokploy-uvanoo-foundation.compose.yaml retains exactly web, worker,
+scheduler, storage-init and Collabora. Its default replicas are ALL zero:
+WEB_REPLICAS, WORKER_REPLICAS, SCHEDULER_REPLICAS, STORAGE_INIT_REPLICAS,
+COLLABORA_REPLICAS. Each control is independent. Existing application and
+Collabora image inputs remain unchanged and must render immutable SHA256 pins.
+All healthchecks, networks, commands, environment contracts and mounts remain
+unchanged from the PR10 template except the replica controls. The old template
+is byte-identical and remains selected by the normal-main/legacy workflow path.
+
+The canonical dev-writer-fence.mjs validates the exact DEV target, explicit
+single-valued controls, pinned rendered images and independent replica effects.
+It persists controls, re-reads the saved result, requests Dokploy deployment,
+then requires two complete runtime observations, including shutdown-desired
+tasks that are still active. Every service remains present: Dokploy --prune
+must NEVER be used with a partial web-only Compose document.
+
+Modes: fence; verify-zero; restore-web; restore-worker; restore-scheduler;
+restore-collabora. There is NO restore-all or storage-init admission mode.
+Each restoration requires DEV_SERVICE_AUTHORIZATION equal to that exact mode.
+Web requires all five services fenced; worker requires healthy web; scheduler
+requires web and worker; Collabora requires web. Scheduler admission requires
+a fresh successful task, not a historical completion. Collabora running-task
+proof is not a functional editor/drainage test and requires separate acceptance.
+Failed activation attempts a full compensating fence. If that cannot converge,
+ADMISSION_FAILED_FENCE_UNCONFIRMED means state is uncertain: keep external
+admission closed and require operator intervention. Never treat it as rollback.
+
+The manual candidate workflow now requires an additional false-by-default
+foundation approval and stops its restoration sequence at WEB ONLY. Existing
+readiness and failure re-fence safeguards remain. Workers, scheduler, Collabora
+and storage-init are not automatically resumed. No workflow was triggered.
+
+The legacy WRITER_REPLICAS control is deliberately rejected. This is NOT an
+automatic live upgrade: installing the new saved Compose/control format is a
+separate owner-approved bootstrap operation. Do not run the existing release
+workflow against the old format and expect it to recover the base.
+
+3. PRIVATE PREFLIGHT AND EXACT CHANGE BOUNDARY
+
+scripts/cluster/dev-foundation-preflight.mjs reads JSON from standard input;
+all output is symbolic errors or allowlisted booleans/variable/service names.
+It neither authenticates nor contacts a server. Synthetic test success is NOT
+live configuration, storage or authentication evidence.
+
+Modes and private input shapes:
+  configuration: {before: renderedCompose, after: renderedCompose,
+                  permanent: authorizedConnectionAndStorageValues}
+  runtime: {rendered: renderedCompose, services: fiveDockerServiceInspects}
+  storage: {volume: volumeInspect, legacyMounts: legacyDataMounts,
+            existingMounts: allConsumersOfRetainedVolume, compose: renderedMinio}
+
+Collect these privately using authorized read-only interfaces. Render with the
+same Compose version, project name and interpolation sources as Dokploy; include
+project/environment/application scopes and effective deployment overlays. Keep
+secrets in memory or approved encrypted ephemeral/tmpfs staging with private
+permissions, never command arguments, shell tracing, logs or repository files.
+Do not expose raw renderer errors. Stop if protected access is refused; owner
+must perform the inspection. The tool intentionally cannot manufacture proof.
+
+Before bootstrap, compare saved/effective configuration and runtime image,
+replica and complete environment parity privately. The runtime comparator
+includes credential values but reports no values or credential hashes. Mount,
+network, domain and label parity needs the separate existing spec evidence;
+do not rerun the previously accepted full Docker comparison without drift.
+
+Allowed foundation correction, without changing the deployed image:
+  web/worker DATABASE_URL -> permanent app role, same connection options;
+  web/worker SUPERADMIN_DATABASE_URL -> permanent maintenance role/options;
+  scheduler DATABASE_URL -> permanent app role/options, no new admin pool;
+  web/worker/scheduler REDIS_URL -> permanent authenticated logical DB0;
+  web/worker/storage-init R2 credential identity -> independently verified
+    application storage identity; preserve endpoint and bucket selection;
+  all five replica counts -> zero.
+Any other rendered difference fails. No healthcheck relaxation, image change,
+bucket rename, legacy mount, network change or additional scheduler privilege.
+The later candidate image rollout is a SEPARATE approved diff and gate.
+
+Private target contract: PostgreSQL uvanoo-dev-postgres:5432/beaconhs with
+beaconhs_app and beaconhs_super; Redis uvanoo-dev-redis:6379 logical DB0.
+Never select the empty alternative database. Compare complete credential
+identities privately; hostname substitution alone is insufficient. Preserve
+query options exactly; endpoint-override/unreviewed options fail closed.
+Previous authenticated read-only checks are retained, not rerun here. At the
+approved window, require fresh bounded authentication evidence (BEGIN READ ONLY,
+SELECT current_database/current_user/permissions, ROLLBACK; Redis AUTH/SELECT0/
+PING and queue inspection without consuming jobs). Never grant privileges to
+make authentication pass. Snapshot evidence is not a continuous writer fence.
+
+4. MINIO MAPPING, ISOLATION AND LIMITATIONS
+
+deploy/uvanoo-dev-minio-recovery.compose.yaml is PREPARATION ONLY, not part of
+the five-service application stack. It pins the previously declared MinIO
+digest and explicitly maps existing external uvanoo-dev-minio-data to /data,
+with volume nocopy. Missing volume or networks must fail, never create them.
+Only the existing external uvanoo-dev-private and uvanoo-dev-runtime networks
+are allowed; no host ports, privileged mode or legacy network attachment.
+
+Require exact Docker volume identity and local driver, no unreviewed driver
+options, no existing consumer, no alias/name collision, and no equal/nested
+legacy data source path. Also require owner realpath, mount-device/bind/symlink
+proof: path strings alone cannot prove physical storage separation. Record
+sanitized identities/hashes and timestamps. Require network-membership evidence
+that legacy services cannot resolve/use this DEV endpoint or storage identity.
+
+Recover the ORIGINAL MinIO administrator identity separately. Do not infer it
+from R2 application keys or silently promote an application key to administrator.
+Independently prove application principal/bucket permissions. Root credentials
+are required interpolation inputs but are not populated by this branch.
+
+Before starting any MinIO against the retained volume, preserve its raw data in
+the approved encrypted recovery window. Inspect an isolated COPY first with no
+production networks or callbacks: bucket identity, policy, lifecycle, metadata,
+object keys/sizes/checksums against attachment records, tenant prefixes and
+anonymous-access denial. MinIO startup can modify metadata: it is a separately
+approved persistent action, not a read-only inspection. A missing container,
+separate path or tiny file count is NOT proof of empty or complete storage.
+Object completeness, admin/app authentication and policy safety remain UNKNOWN.
+If the configured volume is missing/incomplete, STOP; do not initialize an empty
+replacement, create a bucket, run storage-init or borrow legacy data.
+
+5. WRITER-FENCED BACKUP AND ISOLATED RESTORE PROCEDURE (NOT EXECUTED)
+
+Retain validated executable 58975d91639e085f9d8057c7b363f36f2fdd9d71 and
+successful CI run 38399343438. Extract/run that exact revision in a separate
+approved recovery-tool directory; do not substitute the older runbook revision
+or merge its tooling into this product branch merely to obtain a newer SHA.
+
+Preconditions before any live write:
+  a. Approve a target-scoped recovery window and independent key custodian,
+     private off-host immutable destination and private isolated restore runner.
+     Never restore real tenant data on a public Actions runner or the owner Mac.
+  b. Exclude Dokploy queues/schedules/webhooks, all GitHub deploy entrypoints,
+     other operators, host jobs, direct DB/storage clients and integrations for
+     this DEV target. Preserve legacy services and data; a lock alone does not
+     stop external writers. Prove legacy has no DEV write path.
+  c. Drain active Collabora documents with owner coordination and prove no
+     sessions/in-flight WOPI saves before stopping admission. Do not infer this
+     from one historical zero-socket sample. Preserve the shared branding file.
+  d. Securely preserve current saved configuration and image/spec identities.
+     Review the zero-state bootstrap diff above; apply it only with explicit
+     approval. Keep every application service present and all five fenced.
+  e. Verify zero actual tasks twice, no external DB/storage writers, stable
+     queue/repeat schedules, and no unexpected legacy spec changes. Supervise
+     continuously throughout capture. Arrange a reviewed independent watchdog
+     for runner/controller loss; an Actions finally handler is insufficient.
+
+The validated recovery controller's built-in service fence does not cover
+scheduler/storage-init. It MUST be wrapped by the five-service/external fence
+and continuous supervisor. Its recorded initial state must be all-zero, so its
+cleanup cannot revive background processors. Do not alter its validated code
+or forge an always-successful guard. This branch supplies service proof, NOT a
+verified external-writer supervisor or installed watchdog.
+
+Capture the five encrypted components: PostgreSQL custom dump, approved
+21-document metadata set, retained object data/metadata with attachment mapping,
+Redis persistence/queue provenance, and labelled historical recovery volumes.
+Preserve original clean155/Decision149/154/155 volumes and failed capture dirs.
+Unverified objects must stay explicitly unverified; do not finalize an accepted
+release recovery set by inventing a checksum mapping or absence disposition.
+Use private bounded tmpfs/encrypted staging, approved recipient, independent key
+retrieval/decrypt proof and off-host transfer/download checksums. Preserve all
+failure artifacts privately; do not overwrite or delete originals.
+
+Use the pinned restore helper's PostgreSQL 16.15 image:
+postgres@sha256:ca0bd484cb98bf4b24eb1010e73fb3fcbd6714d240fbc1a10eea5b7dbecb641d
+Create a fresh isolated target with network none, no published ports, no app/
+worker/scheduler/Collabora, resource limits and new private restore storage.
+Reconstruct approved roles/owners/memberships/ACLs without importing live password
+hashes. The restore helper must reject existing targets. Verify ledger, all19
+schema/security sections, data hashes/counts, sequences and attachment mapping
+against the captured original, including tenant/property RBAC/RLS checks.
+
+Keep this pristine restore. On a SECOND isolated copy rehearse the proposed
+two default-privilege corrections and additive migrations with canonical locks.
+Proposal source: de8eb36d0031663a617ebd0ad941229077fc16a5,
+docs/v1.4/drift-resolution58-validation/proposed-default-acl-correction.sql,
+SHA256 7262d5c6a52d5c57f1888837eabb44e3b29fa43f253ccc1086f888d46fbe9d54.
+Both statements in one transaction: revoke future default TABLE and SEQUENCE
+grants for beaconhs_owner/public from app/super/backup roles; existing object
+ACLs remain untouched. Require exact approved before/after fingerprints, not
+just successful SQL. Do not rename/reassign the approved bootstrap role.
+Historical observed fingerprint:
+0529262d8f4b1a323994e1dbeae85e70b3506cd0746c2faf3d0b4e014ccb0074
+Canonical approved 58 DEV profile:
+730d95c22ad6914d68bcdbea46283741f24ebd21a5f609c7951a4e5f72392a7c
+These are retained evidence, NOT fresh live verification in this implementation.
+
+Any later live privilege correction needs separate owner approval. Preserve its
+pre-correction recovery set and obtain a fresh post-correction backup + independent
+restore before the release gate; its schema fingerprint is different. Enforce
+the existing one-hour backup freshness measured from original capture start.
+
+6. MODULE/MIGRATION EVIDENCE PRESERVED
+
+No product, tenant/property/user/RBAC/RLS code or migration files are changed.
+Preserve all58 existing migration identities (including historical numbering)
+and additive order:
+0059_risk_template_draft_state
+0060_risk_template_families_manual_assessments
+0061_risk_assessment_revisions_archive_signoffs
+0062_approvals_batch01
+0063_approvals_production
+Do not rebase/renumber SQL or import competing module journals.
+
+Retain combined CI 38313918871 (explicit product checkout 563fb0e9...), browser
+38318803277 and 38320812403, PR10 focused CI 38373723297, and isolated default-ACL
+CI 38372116422. Their exact source binding and prior failed runs remain intact.
+They are not relabelled as tests of this new commit. Current validation is only
+changed safety code plus affected deployment contracts, with synthetic inputs.
+Full Release/security/final visual acceptance of the eventual governed candidate
+remains required; this isolated branch is not a release freeze or deployment.
+The current dispatcher deliberately still requires the exact governed feature
+head/caller SHA. Do not bypass it to deploy an unmerged isolated branch.
+
+7. APPROVAL GATES AND SHORTEST SAFE EXECUTION ORDER
+
+[ ] Review isolated implementation and exact immutable source/image evidence.
+[ ] Approve custody, off-host destination and private restore executor.
+[ ] Approve scoped external admission exclusion, Collabora drainage and
+    zero-state control-format bootstrap; preserve rollback configuration.
+[ ] Complete actual encrypted recovery capture, independent restore, storage
+    completeness/security checks and isolated ACL + 58-to-63 rehearsal.
+[ ] Approve MinIO restoration with original volume/admin identity; do not run
+    storage-init. Confirm DEV/legacy path, identity and network isolation.
+[ ] Approve any live ACL correction and fresh recovery evidence separately.
+[ ] Approve governed integration/validation and exact live migration + candidate
+    rollout separately. Install candidate specs with ALL replicas zero.
+[ ] Approve web-only activation; verify native login, exact image/SHA, two-property
+    access, People/Approvals/Risk, tenant isolation and read/write smoke scope.
+    Web itself can write/enqueue jobs; web-only is NOT read-only application use.
+    Keep Light/Terra teal/coral branding; no gold or shared branding-file rewrite.
+[ ] Reinspect pending/delayed/repeat queues, integration transports and recipients.
+    Approve worker, then scheduler separately; scheduler registers durable jobs.
+    Explicitly approve outbound email/push and document editing before enabling.
+[ ] Approve Collabora separately and verify WOPI/editor behavior without touching
+    legacy. Storage-init remains zero unless its exact policy/lifecycle mutations
+    receive a separate reviewed implementation and owner authorization.
+
+8. ROLLBACK LIMITATIONS
+
+On drift, timeout, readiness failure or lost observation: stop progression, keep
+external admission closed, preserve evidence, and establish the full zero fence.
+A helper's verified compensation does not replace an independent watchdog; if
+API/runtime access is lost, fence state is UNKNOWN, never inferred successful.
+Before persistent app/data changes, approved configuration rollback may restore
+the recorded SAME image/settings while keeping all five services fenced. Do not
+roll back to the old auto-starting control format or stale recovery credentials.
+Do not reverse database migrations, delete ledger entries or run improvised down
+SQL. A failure may leave an earlier migration suffix committed. Require proven
+old-image/schema compatibility or separately approved restore-and-switch while
+retaining both failed and original states. Configuration rollback does not undo
+job sends, object metadata/policy changes, completed writes or migrations.

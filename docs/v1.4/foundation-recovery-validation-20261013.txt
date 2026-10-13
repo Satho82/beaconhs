@@ -1,0 +1,48 @@
+ISOLATED FOUNDATION SAFETY VALIDATION — 2026-10-13
+
+Parent: b11778aee65e3a6818fed58d4927070165746e1b (PR10).
+Product ancestor: 563fb0e9b79a838a5f394abaffb2f7dc743fc571 (PR9).
+Branch: fix/uvanoo-dev-foundation-isolated-20261013.
+Node v24.20.0; local Docker Compose v5.5.1; formatter Prettier 3.9.5.
+Synthetic inputs only; Docker Compose config rendering does not start containers.
+No live service/API/DB operations, deployments, CI dispatches or pushes.
+
+PASS, exit0:
+node --test scripts/cluster/dev-foundation-preflight.test.mjs scripts/cluster/dev-writer-fence.test.mjs
+75 tests passed, 0 failed, 0 skipped.
+Includes all32 service-control combinations; real helper rendering with synthetic
+inputs; drift/credential/option/volume rejection; explicit approval ordering;
+full-five-service zero proof; compensation and uncertain-fence failure behavior.
+
+PASS, exit0:
+bash scripts/ci/v1.4-dev-candidate-deploy-contract.test.sh
+Affected deployment workflow contract, mocked candidate-verifier scenarios,
+writer-fence tests and inherited38 native-login/readiness safety tests.
+This is local safety regression validation, not a rerun of hosted product CI.
+
+PASS, exit0:
+ruby scripts/ci/dev-foundation-safety-contract.rb
+ruby scripts/ci/dev-release-safety-contract.rb
+Approval defaults false, precedes mutation, forwards through manual dispatcher;
+workflow restores only web; all five controls persisted; legacy template unchanged;
+PR10 shared-host no-prune/no-branding and late failure re-fence preserved.
+
+PASS: Node syntax checks for both changed safety modules, Ruby syntax,
+bash syntax and git diff --check. All nine modified/new JS/TS/YAML safety files
+pass Prettier3.9.5 with repository style options (no Tailwind plugin needed for
+these non-UI files). Full application install/build/tests were not run.
+
+PASS: git diff --exit-code 563fb0e9b79a838a5f394abaffb2f7dc743fc571 -- apps packages deploy/dokploy-dev.compose.yaml
+No product source, migration1-58/additive59-63, tenant/property/user/RBAC/RLS or
+legacy template changes. Both pinned commits preserved as ancestors.
+
+PASS: proposed default-ACL correction source checksum rechecked without SQL
+execution: 7262d5c6a52d5c57f1888837eabb44e3b29fa43f253ccc1086f888d46fbe9d54.
+
+Not performed or implied: live credential authentication/revalidation, installed
+Dokploy renderer verification, protected configuration comparison, object-store
+completeness proof, storage principal/administrator recovery, live backup,
+PostgreSQL16.15 actual-data restore, default-ACL execution, migrations, web smoke,
+background execution, full release acceptance, governed merge or deployment.
+Prior passing hosted CI is retained with its original SHA binding. Deployment
+remains NO-GO; see foundation-recovery-isolated-20261013.txt for approval gates.

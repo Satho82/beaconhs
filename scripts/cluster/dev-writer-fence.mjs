@@ -6,18 +6,55 @@ import { fileURLToPath } from 'node:url'
 
 const composeId = 'wYb0LxLQrvj2FPI21i-Oj'
 const stack = 'uvanoo-v1-4-dev-gniriv'
-export const writers = ['web', 'worker', 'scheduler']
+// Include every writer: storage bootstrap mutates policies and Collabora can
+// finish WOPI saves. Keep all five services present even when fenced (--prune).
+export const writers = ['web', 'worker', 'scheduler', 'storage-init', 'collabora']
+export const controls = Object.fromEntries(
+  writers.map((role) => [role, `${role.replace('-', '_').toUpperCase()}_REPLICAS`]),
+)
+export const zero = Object.freeze(Object.fromEntries(writers.map((role) => [role, 0])))
 const terminal = new Set(['complete', 'shutdown', 'failed', 'rejected', 'remove'])
 const check = (condition, code) => {
   if (!condition) throw new Error(code)
 }
 
-export function replicas(env, value) {
+export function counts(env) {
   check(typeof env === 'string', 'ENV_MISSING')
   const lines = env.split('\n')
-  const matches = lines.filter((line) => /^\s*(?:export\s+)?WRITER_REPLICAS\s*=/.test(line))
-  check(matches.length === 1 && /^WRITER_REPLICAS=[01]\r?$/.test(matches[0]), 'FENCE_ENV_AMBIGUOUS')
-  return lines.map((line) => (line === matches[0] ? `WRITER_REPLICAS=${value}` : line)).join('\n')
+  check(
+    !lines.some((line) => /^\s*(?:export\s+)?WRITER_REPLICAS\s*=/.test(line)),
+    'LEGACY_FENCE_REQUIRES_APPROVED_BOOTSTRAP',
+  )
+  return Object.fromEntries(
+    writers.map((role) => {
+      const name = controls[role]
+      const matches = lines.filter((line) =>
+        new RegExp(`^\\s*(?:export\\s+)?${name}\\s*=`).test(line),
+      )
+      check(
+        matches.length === 1 && new RegExp(`^${name}=[01]\\r?$`).test(matches[0]),
+        'FENCE_ENV_AMBIGUOUS',
+      )
+      return [role, Number(matches[0].trim().slice(-1))]
+    }),
+  )
+}
+
+export function replicas(env, value) {
+  counts(env)
+  check(
+    value &&
+      Object.keys(value).length === writers.length &&
+      writers.every((role) => value[role] === 0 || value[role] === 1),
+    'FENCE_VALUE_INVALID',
+  )
+  return env
+    .split('\n')
+    .map((line) => {
+      const role = writers.find((role) => line.startsWith(`${controls[role]}=`))
+      return role ? `${controls[role]}=${value[role]}` : line
+    })
+    .join('\n')
 }
 
 export function target(state) {
@@ -39,7 +76,7 @@ export function target(state) {
       state.domains[0].path === '/',
     'DEV_TARGET_MISMATCH',
   )
-  replicas(state.env, 0)
+  counts(state.env)
 }
 
 export function runtimeReady(
@@ -60,8 +97,14 @@ export function runtimeReady(
       'WRITER_MODE_AMBIGUOUS',
     )
     const spec = service.Spec.TaskTemplate.ContainerSpec
-    if (image && (spec.Image !== image || !spec.Env?.includes(`APP_VERSION=${sha}`))) return false
-    if (service.Spec.Mode.Replicated.Replicas !== count) return false
+    if (
+      image &&
+      role !== 'collabora' &&
+      (spec.Image !== image ||
+        (role !== 'storage-init' && !spec.Env?.includes(`APP_VERSION=${sha}`)))
+    )
+      return false
+    if (service.Spec.Mode.Replicated.Replicas !== count[role]) return false
     if (
       ['paused', 'rollback_started', 'rollback_paused', 'rollback_completed'].includes(
         service.UpdateStatus?.State,
@@ -74,7 +117,7 @@ export function runtimeReady(
     // Inspect actual status of ALL tasks, including tasks whose desired state is
     // shutdown but which are still running. No desired-state filter is safe here.
     const active = all.filter((task) => !terminal.has(task.Status.State))
-    if (count === 0) return active.length === 0
+    if (count[role] === 0) return active.length === 0
     if (!restored) return false
     if (role === 'scheduler') {
       return (
@@ -92,10 +135,10 @@ export function runtimeReady(
     return (
       active.length === 1 &&
       active[0].Status.State === 'running' &&
-      active[0].health === 'healthy' &&
+      (role === 'collabora' || active[0].health === 'healthy') &&
       active[0].DesiredState === 'running' &&
-      active[0].Spec?.ContainerSpec?.Image === image &&
-      active[0].Spec.ContainerSpec.Env?.includes(`APP_VERSION=${sha}`)
+      active[0].Spec?.ContainerSpec?.Image === spec.Image &&
+      (role === 'collabora' || active[0].Spec.ContainerSpec.Env?.includes(`APP_VERSION=${sha}`))
     )
   })
 }
@@ -159,33 +202,57 @@ export async function runFence(mode, io, config) {
   }
   if (mode === 'fence') {
     const before = await read()
-    // Validate the CURRENT saved compose with both values before touching it.
+    // Validate each independent control in the CURRENT saved compose first.
     // Do not replace its networks, images, storage settings or other services.
     await io.validateCompose(before)
-    const fenced = await persist(before, 0)
+    const fenced = await persist(before, zero)
     await io.deploy()
-    await wait(fenced, 0, false)
+    await wait(fenced, zero, false)
   } else if (mode === 'verify-zero') {
     const state = await read()
-    check(state.env === replicas(state.env, 0), 'FENCE_NOT_PERSISTED')
-    await wait(state, 0, false)
-  } else if (mode === 'restore') {
+    check(state.env === replicas(state.env, zero), 'FENCE_NOT_PERSISTED')
+    await io.validateCompose(state)
+    await wait(state, zero, false)
+  } else if (
+    ['restore-web', 'restore-worker', 'restore-scheduler', 'restore-collabora'].includes(mode)
+  ) {
+    check(config.authorization === mode, 'SERVICE_OWNER_AUTHORIZATION_REQUIRED')
     const state = await read()
-    check(state.env === replicas(state.env, 0), 'CANDIDATE_NOT_FENCED')
+    const current = counts(state.env)
+    const role = mode.slice('restore-'.length)
+    check(current['storage-init'] === 0 && current[role] === 0, 'SERVICE_NOT_FENCED')
+    check(role !== 'web' || writers.every((r) => current[r] === 0), 'WEB_REQUIRES_FULL_FENCE')
+    check(role === 'web' || current.web === 1, 'WEB_FIRST_REQUIRED')
+    check(role !== 'scheduler' || current.worker === 1, 'WORKER_FIRST_REQUIRED')
     // Verify what the NEXT deploy would start, not just the current Swarm spec.
     // A stale saved IMAGE must never restart old writers after migration.
     await io.validateCompose(state, image, config.sha)
     // The separate candidate deployment must have installed the immutable
     // candidate specs with zero writers before we may restore replicas.
-    await wait(state, 0, true)
+    await wait(state, current, true, true)
     const oldTasks = new Set((await io.runtime()).tasks.map((task) => task.ID))
-    const restored = await persist(state, 1)
-    await io.deploy()
-    await wait(restored, 1, true, true, oldTasks)
+    const next = { ...current, [role]: 1 }
+    try {
+      const restored = await persist(state, next)
+      await io.deploy()
+      // Only a newly admitted scheduler needs a NEW successful task. Other
+      // independent transitions must not restart an already completed scheduler.
+      await wait(restored, next, true, true, role === 'scheduler' ? oldTasks : new Set())
+    } catch {
+      // A successful save followed by a failed API response may already have
+      // started tasks. Compensate with the canonical full fence, never restore.
+      // If that cannot be proven, explicitly report an UNCERTAIN live state.
+      try {
+        await runFence('fence', io, config)
+      } catch {
+        throw new Error('ADMISSION_FAILED_FENCE_UNCONFIRMED')
+      }
+      throw new Error('ADMISSION_FAILED_REFENCED')
+    }
   } else throw new Error('FENCE_MODE_INVALID')
 }
 
-function liveIO() {
+export function liveIO() {
   const helper = join(dirname(fileURLToPath(import.meta.url)), 'dokploy-curl.sh')
   const exec = (file, args, input) =>
     execFileSync(file, args, {
@@ -245,7 +312,8 @@ function liveIO() {
           task.Status?.State === 'running' &&
           services.some(
             (service) =>
-              service.ID === task.ServiceID && service.Spec.Name !== `${stack}_scheduler`,
+              service.ID === task.ServiceID &&
+              ['web', 'worker'].some((role) => service.Spec.Name === `${stack}_${role}`),
           )
         ) {
           const cid = task.Status.ContainerStatus?.ContainerID
@@ -262,7 +330,8 @@ function liveIO() {
         const file = join(dir, 'compose.yaml'),
           envFile = join(dir, 'compose.env')
         writeFileSync(file, state.composeFile, { mode: 0o600 })
-        const configs = [0, 1].map((count) => {
+        const vectors = [zero, ...writers.map((role) => ({ ...zero, [role]: 1 }))]
+        const configs = vectors.map((count) => {
           writeFileSync(envFile, replicas(state.env, count), { mode: 0o600 })
           const cleanEnv = { PATH: process.env.PATH, HOME: process.env.HOME }
           const result = execFileSync(
@@ -284,13 +353,18 @@ function liveIO() {
           )
           for (const role of writers) {
             check(
-              config.services?.[role]?.deploy?.replicas === count,
+              config.services?.[role]?.deploy?.replicas === count[role],
               'COMPOSE_WRITER_NOT_FENCEABLE',
             )
-            if (expectedImage) {
+            check(
+              /@sha256:[0-9a-f]{64}$/.test(config.services[role].image ?? ''),
+              'UNPINNED_SERVICE_IMAGE',
+            )
+            if (expectedImage && role !== 'collabora') {
               check(
                 config.services[role].image === expectedImage &&
-                  config.services[role].environment?.APP_VERSION === expectedSha &&
+                  (role === 'storage-init' ||
+                    config.services[role].environment?.APP_VERSION === expectedSha) &&
                   config.services[role].environment?.APP_ROLE === role,
                 'SAVED_CANDIDATE_IDENTITY_MISMATCH',
               )
@@ -300,7 +374,7 @@ function liveIO() {
           return config
         })
         check(
-          JSON.stringify(configs[0]) === JSON.stringify(configs[1]),
+          configs.every((config) => JSON.stringify(configs[0]) === JSON.stringify(config)),
           'COMPOSE_FENCE_CHANGES_NONWRITERS',
         )
       } finally {
@@ -319,6 +393,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     host: process.env.EXPECTED_APP_HOST,
     sha: process.env.DEPLOY_SOURCE_SHA,
     digest: process.env.IMAGE_DIGEST,
+    authorization: process.env.DEV_SERVICE_AUTHORIZATION,
   })
     .then(() => console.log(`DEV writer ${process.argv[2]} verified`))
     .catch((error) => {

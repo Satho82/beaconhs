@@ -1,0 +1,170 @@
+# UVANOO isolated foundation stack. All services retained for Dokploy --prune.
+#
+# The GitHub deploy workflow injects all ${VARS} at deploy time. The same image
+# runs web, worker, and scheduler roles selected by APP_ROLE.
+
+services:
+  web:
+    image: ${IMAGE}
+    environment:
+      APP_ROLE: web
+      NODE_ENV: production
+      # Next standalone must listen on all interfaces for the reverse proxy.
+      HOSTNAME: 0.0.0.0
+      PORT: '3000'
+      APP_VERSION: ${APP_VERSION}
+      SENTRY_DSN: ${SENTRY_DSN}
+      SENTRY_ENVIRONMENT: dev
+      DATABASE_URL: ${DATABASE_URL}
+      # Dedicated BYPASSRLS pool for super-admin / cross-tenant access.
+      SUPERADMIN_DATABASE_URL: ${SUPERADMIN_DATABASE_URL}
+      REDIS_URL: ${REDIS_URL}
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
+      ATTACHMENT_CAPABILITY_SECRET: ${ATTACHMENT_CAPABILITY_SECRET}
+      BETTER_AUTH_URL: ${APP_URL}
+      APP_URL: ${APP_URL}
+      R2_ENDPOINT: ${R2_ENDPOINT}
+      R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID}
+      R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY}
+      R2_BUCKET: ${R2_BUCKET}
+      R2_PRIVATE_BUCKET_CONFIRMED: ${R2_PRIVATE_BUCKET_CONFIRMED}
+      # Web serves the public key to the subscribe client and signs the
+      # "send test push" action, so it needs the full keypair too.
+      VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY}
+      VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY}
+      VAPID_SUBJECT: ${VAPID_SUBJECT}
+      # In-browser PowerPoint editor. Collabora is served SAME-ORIGIN on the
+      # app domain via Traefik path routes (/browser, /cool, /hosting), so the
+      # editor URL and the WOPI callback base are both just APP_URL.
+      COLLABORA_URL: ${COLLABORA_URL}
+      COLLABORA_WOPI_URL: ${COLLABORA_WOPI_URL}
+    networks: [runtime-db-network, dokploy-network]
+    healthcheck:
+      test: ['CMD', 'curl', '--fail', '--silent', 'http://127.0.0.1:3000/api/health/ready']
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    deploy:
+      # Independent, fail-closed admission; missing controls render zero.
+      replicas: ${WEB_REPLICAS:-0}
+      restart_policy:
+        condition: any
+        delay: 5s
+
+  worker:
+    image: ${IMAGE}
+    environment:
+      APP_ROLE: worker
+      NODE_ENV: production
+      APP_VERSION: ${APP_VERSION}
+      SENTRY_DSN: ${SENTRY_DSN}
+      SENTRY_ENVIRONMENT: dev
+      # The worker unseals DB-stored provider secrets (email/SMS/AI keys,
+      # connector creds) with the same key web seals them with — without this
+      # every sealed transport fails closed instead of using the configured provider.
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
+      DATABASE_URL: ${DATABASE_URL}
+      # Dedicated cross-tenant DML pool. Migration credentials are never
+      # injected into a long-running application container.
+      SUPERADMIN_DATABASE_URL: ${SUPERADMIN_DATABASE_URL}
+      REDIS_URL: ${REDIS_URL}
+      R2_ENDPOINT: ${R2_ENDPOINT}
+      R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID}
+      R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY}
+      R2_BUCKET: ${R2_BUCKET}
+      R2_PRIVATE_BUCKET_CONFIRMED: ${R2_PRIVATE_BUCKET_CONFIRMED}
+      APP_URL: ${APP_URL}
+      # Keep durable Flow dispatch on the private overlay network.
+      INTERNAL_WEB_URL: http://web:3000
+      # Worker fans push notifications out to subscribed devices.
+      VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY}
+      VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY}
+      VAPID_SUBJECT: ${VAPID_SUBJECT}
+    networks: [runtime-db-network]
+    healthcheck:
+      test: ['CMD', 'node', 'apps/worker/dist/health.js']
+      interval: 30s
+      timeout: 8s
+      retries: 3
+      start_period: 30s
+    deploy:
+      replicas: ${WORKER_REPLICAS:-0}
+      restart_policy:
+        condition: any
+        delay: 5s
+
+  # One-shot storage security bootstrap. It removes anonymous MinIO/S3 bucket
+  # policies, installs pending-upload and transient-artifact expiry, and proves
+  # anonymous reads fail.
+  # Cloudflare R2 additionally requires the explicit private-bucket
+  # confirmation after public development/custom domains have been disabled.
+  storage-init:
+    image: ${IMAGE}
+    environment:
+      APP_ROLE: storage-init
+      NODE_ENV: production
+      R2_ENDPOINT: ${R2_ENDPOINT}
+      R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID}
+      R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY}
+      R2_BUCKET: ${R2_BUCKET}
+      R2_PRIVATE_BUCKET_CONFIRMED: ${R2_PRIVATE_BUCKET_CONFIRMED}
+    networks: [runtime-db-network]
+    deploy:
+      replicas: ${STORAGE_INIT_REPLICAS:-0}
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+
+  scheduler:
+    image: ${IMAGE}
+    environment:
+      APP_ROLE: scheduler
+      NODE_ENV: production
+      APP_VERSION: ${APP_VERSION}
+      SENTRY_DSN: ${SENTRY_DSN}
+      SENTRY_ENVIRONMENT: dev
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: ${REDIS_URL}
+    networks: [runtime-db-network]
+    deploy:
+      replicas: ${SCHEDULER_REPLICAS:-0}
+      # One-shot: register BullMQ repeatable jobs, then exit.
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+
+  # In-browser PowerPoint editor for PPTX-mastered training decks. Reached by
+  # browsers and by the web app (discovery) through Traefik path routes on the
+  # app domain; Collabora itself calls back into the app's /wopi/files/* routes
+  # at APP_URL (aliasgroup1 allow-list).
+  collabora:
+    # Pin both the tested CODE release and linux/amd64 digest. `latest` can
+    # otherwise change independently of BeaconHS CI and silently break WOPI.
+    image: ${COLLABORA_IMAGE}
+    environment:
+      aliasgroup1: ${APP_URL}
+      server_name: ${COLLABORA_SERVER_NAME}
+      # TLS terminates at Traefik; frame_ancestors lets the app iframe the
+      # editor; welcome dialogs are noise inside an embedded editor. The WOPI
+      # load ceiling matches MAX_PPTX_FILE_BYTES (exactly 1 GiB).
+      extra_params: --o:ssl.enable=false --o:ssl.termination=true --o:net.frame_ancestors=${APP_URL} --o:welcome.enable=false --o:home_mode.enable=true --o:storage.wopi.max_file_size=1073741824
+    volumes:
+      # BeaconHS theme via the sanctioned branding.js hook. The deploy workflow
+      # writes this file onto the swarm manager before deploying the stack.
+      - /etc/dokploy/beaconhs/collabora-branding.js:/usr/share/coolwsd/browser/dist/branding.js:ro
+    networks: [dokploy-network]
+    deploy:
+      replicas: ${COLLABORA_REPLICAS:-0}
+      restart_policy:
+        condition: any
+        delay: 5s
+
+networks:
+  runtime-db-network:
+    name: ${RUNTIME_DB_NETWORK:?Set RUNTIME_DB_NETWORK}
+    external: true
+  infra-net:
+    external: true
+  dokploy-network:
+    external: true

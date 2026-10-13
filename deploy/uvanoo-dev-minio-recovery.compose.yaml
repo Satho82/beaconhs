@@ -1,0 +1,35 @@
+# PREPARATION ONLY. Never start without approved backup/recovery window.
+# External=true makes an absent volume/network an ERROR, not a new empty store.
+# Existing volume mapping is evidence of identity, NOT object completeness.
+services:
+  minio:
+    image: minio/minio@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e
+    container_name: uvanoo-dev-minio
+    command: server /data --console-address :9001
+    environment:
+      # Root identity is NOT inferred from application R2 credentials. Recover
+      # the original administrator identity separately; do not promote app keys.
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:?Verified existing DEV MinIO administrator identity required}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?Verified existing DEV MinIO administrator credential required}
+    volumes:
+      - type: volume
+        source: uvanoo-dev-minio-data
+        target: /data
+        volume:
+          nocopy: true
+    networks:
+      uvanoo-dev-private: {}
+      uvanoo-dev-runtime:
+        aliases: [uvanoo-dev-minio]
+    restart: 'no'
+volumes:
+  uvanoo-dev-minio-data:
+    name: uvanoo-dev-minio-data
+    external: true
+networks:
+  uvanoo-dev-private:
+    name: uvanoo-dev-private
+    external: true
+  uvanoo-dev-runtime:
+    name: uvanoo-dev-runtime
+    external: true

@@ -35,6 +35,11 @@ on:
         required: false
         type: boolean
         default: false
+      foundation_web_restore_authorized:
+        description: Owner approved recovery prerequisites, DEV migration and web-only restoration
+        required: false
+        type: boolean
+        default: false
     secrets:
       MAIN_MIGRATION_DATABASE_URL:
         description: Canonical normal-main migrator connection on infra-net
@@ -213,6 +218,13 @@ jobs:
       # The deploy runner shares storage with Dokploy. Keep stale build cache
       # and superseded images from exhausting the host and taking the Dokploy
       # API offline. Active service images and all volumes are preserved.
+      - name: Require explicit foundation approval before DEV mutation
+        if: inputs.feature_candidate_verified
+        env:
+          FOUNDATION_APPROVED: ${{ inputs.foundation_web_restore_authorized }}
+        run: |
+          set -euo pipefail
+          test "$FOUNDATION_APPROVED" = true || { echo '::error::Foundation recovery is not authorized'; exit 1; }
       - name: Check DEV free space without shared-host cleanup
         if: inputs.feature_candidate_verified
         run: |
@@ -971,6 +983,9 @@ jobs:
           trap 'rm -f "$update_response" "$compose_state" "$env_block_file"' EXIT
           IMAGE="${DEPLOY_IMAGE_NAME}@${IMAGE_DIGEST}"
           COMPOSE_FILE="$(cat .deployment-governance/deploy/dokploy-dev.compose.yaml)"
+          if [ "$FEATURE_CANDIDATE_VERIFIED" = true ]; then
+            COMPOSE_FILE="$(cat .deployment-governance/deploy/dokploy-uvanoo-foundation.compose.yaml)"
+          fi
           # Collabora is served same-origin on the app domain (Traefik path
           # routes), so both editor and WOPI-callback bases are APP_URL; the
           # server_name is the bare host for Collabora's generated URLs.
@@ -981,7 +996,7 @@ jobs:
             # Install candidate service specs while the persisted fence remains
             # closed. Only the verified restore step may start new writers.
             if [ "$FEATURE_CANDIDATE_VERIFIED" = true ]; then
-              printf 'WRITER_REPLICAS=0\n'
+              printf 'WEB_REPLICAS=0\nWORKER_REPLICAS=0\nSCHEDULER_REPLICAS=0\nSTORAGE_INIT_REPLICAS=0\nCOLLABORA_REPLICAS=0\n'
             else
               printf 'WRITER_REPLICAS=1\n'
             fi
@@ -1060,7 +1075,8 @@ jobs:
           FEATURE_CANDIDATE_VERIFIED: ${{ inputs.feature_candidate_verified }}
           DOKPLOY_URL: ${{ secrets.DOKPLOY_URL }}
           DOKPLOY_TOKEN: ${{ secrets.DOKPLOY_TOKEN }}
-        run: node .deployment-governance/scripts/cluster/dev-writer-fence.mjs restore
+          DEV_SERVICE_AUTHORIZATION: restore-web
+        run: node .deployment-governance/scripts/cluster/dev-writer-fence.mjs restore-web
 
       - name: Roll the immutable image directly on Swarm
         if: env.DOKPLOY_DEPLOY_MODE == 'direct'

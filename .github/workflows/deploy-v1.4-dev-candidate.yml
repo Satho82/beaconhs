@@ -14,6 +14,11 @@ on:
         description: SHA256 of the approved encrypted-backup, restore and schema manifest
         required: true
         type: string
+      foundation_web_restore_authorized:
+        description: Confirm separate owner approval for recovery prerequisites, migration and web-only restoration
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   actions: read
@@ -180,5 +185,6 @@ jobs:
       source_sha: ${{ needs.verify-candidate.outputs.source_sha }}
       image_digest: ${{ needs.verify-candidate.outputs.image_digest }}
       feature_candidate_verified: true
+      foundation_web_restore_authorized: ${{ inputs.foundation_web_restore_authorized }}
       release_evidence_sha256: ${{ inputs.release_evidence_sha256 }}
     secrets: inherit

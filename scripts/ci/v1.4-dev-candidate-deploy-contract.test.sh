@@ -595,7 +595,7 @@ restore = steps[positions[6]]
     step['run'].start_with?('node .deployment-governance/scripts/cluster/dev-writer-fence.mjs ')
 end
 abort 'Fence must perform persist, rollout and runtime proof' unless fence['run'].end_with?(' fence')
-abort 'Restore must validate candidate before raising replicas' unless restore['run'].end_with?(' restore')
+abort 'Restore must validate candidate before raising ONLY web replicas' unless restore['run'].end_with?(' restore-web')
 migration = steps[positions[3]]
 abort 'Migration must recheck zero writers before docker run' unless
   migration['run'].index('dev-writer-fence.mjs verify-zero') < migration['run'].index('docker run') &&
@@ -605,7 +605,7 @@ steps[positions[2]..positions[5]].each do |step|
 end
 update = steps[positions[4]]
 abort 'Candidate rollout must keep writers at zero' unless update['run'].include?(%q{if [ "$FEATURE_CANDIDATE_VERIFIED" = true ]; then}) &&
-  update['run'].include?(%q{printf 'WRITER_REPLICAS=0\n'})
+  update['run'].include?(%q{printf 'WEB_REPLICAS=0\nWORKER_REPLICAS=0\nSCHEDULER_REPLICAS=0\nSTORAGE_INIT_REPLICAS=0\nCOLLABORA_REPLICAS=0\n'})
 report = steps.find { |s| s['name'] == 'Report DEV writer recovery state' }
 abort 'Failure reporting must not restore or deploy anything' unless report && report['if'].include?('failure() || cancelled()') &&
   !report['run'].match?(/compose\.deploy|compose\.update|docker service|dev-writer-fence\.mjs restore/)

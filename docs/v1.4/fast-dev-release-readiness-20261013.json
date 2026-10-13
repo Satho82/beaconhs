@@ -1,8 +1,8 @@
 {
   "version": 1,
-  "status": "REMOTE_ACCESS_AND_KEY_VERIFICATION_PASS; BACKUP_DESTINATION_AND_FENCE_BLOCKED",
+  "status": "LOCAL_STAGING_PREPARED; STOPPED_BEFORE_SERVICE_CHANGES_ON_FENCE_RESTORATION_BOUNDARY",
   "scope": "DEV Risk Assessments, People and Approvals only",
-  "recordedAt": "2026-10-13T10:47:09.042Z",
+  "recordedAt": "2026-10-13T10:50:46.976Z",
   "product": {
     "sha": "563fb0e9b79a838a5f394abaffb2f7dc743fc571",
     "tree": "324c50a60e2cb0639ba920488a150c6531968374",
@@ -101,32 +101,55 @@
       "keyChecksRepeated": false
     },
     "previousObservationOnly": false,
-    "destinationCheck": {
-      "backupParent": {
-        "exists": true,
-        "mode": "0750",
-        "uid": 1000
+    "freeBytes": 29168275456,
+    "latestTaskEvidence": {
+      "web": {
+        "desired": 1,
+        "starting": 1,
+        "failed": 4
       },
-      "recoveryDirectoryExists": false,
-      "restoreDirectoryExists": false,
-      "defaultUbuntuAwsConfigExists": false,
-      "defaultUbuntuAwsCredentialsExists": false,
-      "defaultUbuntuRcloneConfigExists": false,
-      "awsCliPresent": false,
-      "rclonePresent": false,
-      "boundedEnvRead": "Only backup-role/password variable names found in DEV root env; no OVH/S3 destination or fencing configuration discovered in inspected DEV env files. Values not printed.",
-      "scope": "Bounded DEV configuration and default ubuntu profiles only; does not establish account-wide absence of an OVH bucket."
+      "worker": {
+        "desired": 1,
+        "starting": 1,
+        "complete": 4
+      },
+      "scheduler": {
+        "desired": 1,
+        "complete": 1
+      },
+      "storageInit": {
+        "desired": 1,
+        "complete": 5
+      },
+      "collabora": {
+        "desired": 1,
+        "running": 1
+      },
+      "interpretation": "Web/worker actively restart. Completed scheduler/storage-init tasks must not be assumed equivalent to stopped persistent services. Scaling0 then1 can create fresh job executions; safe restore cannot be inferred from saving replica counts."
     }
   },
   "backup": {
     "archive": null,
     "checksum": null,
     "actualRestore": "NOT EXECUTED",
-    "providerChoice": "OVHcloud private Object Storage; previously approved",
-    "bucketAccess": "NOT VERIFIED",
-    "privateDestination": "NOT VERIFIED",
-    "restoreDestination": "NOT ESTABLISHED. Pinned PostgreSQL16.15 image cached; resources available for further capacity/isolation assessment. No restore container or directory created while backup prerequisites remain blocked.",
-    "fencingAndSafeRestoration": "FAIL REVIEW: existing helper is candidate-deployment scoped, not a proven unchanged-state backup fence",
+    "providerChoice": "Owner superseded OVH storage requirement: temporary encrypted VPS staging and owner Mac independent encrypted-copy custody.",
+    "bucketAccess": "NOT REQUIRED FOR THIS AUTHORISED MINIMAL RECOVERY",
+    "privateDestination": {
+      "path": "/opt/uvanoo-dev/backups/recovery",
+      "mode": "0700",
+      "uid": 1000,
+      "verified": true,
+      "createdThisTurn": true
+    },
+    "restoreDestination": {
+      "path": "/opt/uvanoo-dev/backups/recovery/restore-isolated",
+      "mode": "0700",
+      "uid": 1000,
+      "directoryPrepared": true,
+      "containerCreated": false,
+      "isolation": "Pending verified execution of existing restore helper: fresh PostgreSQL16.15, network none, no published ports, separate new data directory, resource limits. Directory alone is not isolation proof."
+    },
+    "fencingAndSafeRestoration": "NOT VERIFIED; explicit owner instruction to stop before service changes followed",
     "fenceReview": {
       "sourceSha": "563fb0e9b79a838a5f394abaffb2f7dc743fc571",
       "path": "scripts/cluster/dev-writer-fence.mjs",
@@ -144,7 +167,8 @@
         "Current desired replicas1 despite actual0/1; not fenced"
       ],
       "executed": false
-    }
+    },
+    "offVpsArchiveCustody": "PENDING: no archive exists yet. Owner-held key verified; that is distinct from independent backup-copy custody."
   },
   "rehearsal": {
     "actualDev58To63": "NOT EXECUTED",
@@ -163,15 +187,15 @@
     "status": "Configured old image is not validated product. Final governed source/tree and immutable image must be bound after approved integration and authoritative build."
   },
   "blockers": [
-    "No usable protected OVH bucket endpoint/access profile discovered in bounded DEV configuration. Exact bucket/region and secure credential access are required before access/privacy/upload validation.",
-    "Existing writer-fence helper invokes a stack deployment and does not establish a complete backup-scoped fence/restoration procedure. It must not be executed as a presumed safe backup pause.",
-    "Private isolated restore destination is not established; cached PostgreSQL16.15 image is a prerequisite, not restore evidence.",
-    "Actual encrypted backup, independent restore, attachment/queue reconciliation and real-data58-to63 rehearsal remain pending these preconditions."
+    "Backup-only fencing/restoration remains unverified: web/worker restart, completed scheduler/storage-init may rerun on replica restoration, Collabora and direct/external writers require complete admission/control assessment. Existing deployment helper must not be invoked.",
+    "No encrypted recovery set or independent custody exists yet; capture cannot start before fence/restoration verification.",
+    "No actual private restore or real-data58-to63 rehearsal; attachment/Redis/clean155 contents must be reconciled without deletion."
   ],
   "preparedSequence": [
-    "Remote VPS execution, owner key custody and public recipient match PASS. Next obtain/verify protected OVH destination access, verify backup-scoped fence/restoration, and establish isolated PostgreSQL16.15 restore target.",
-    "Verify exclusive operation, DEV-only saved writer state and fencing including direct/external writers; do not infer fencing from 0/1.",
+    "Use verified public age recipient; protected local staging is prepared. Verify backup-only writer fence and safe end-state before any service change. No compose.deploy.",
+    "Preserve exact service specifications/task state privately and establish target-only control against concurrent deployments/direct writers. Do not scale completed jobs0-to1 blindly.",
     "Using existing approved backup tooling, capture one protected encrypted database plus required storage/Redis recovery evidence; independently verify encrypted archive checksums and restore.",
+    "Once an encrypted recovery set exists, transfer only ciphertext and non-sensitive checksum/manifest to owner-controlled private Mac folder using SCP. Owner verifies SHA256 against published manifest and confirms off-VPS archive custody before risky changes. Do not copy raw dump, metadata or private key into public evidence.",
     "On restored real data only, verify58 ledger/security/data identities, apply tested narrow default-ACL correction, match canonical58, rehearse0059-0063 and verify data/security/locking/rollback/retry.",
     "Resolve readiness-before-writer-activation, then seek approval of exact final integration heads/tree. PR10 targets PR9's source; integrate reviewed safety changes there before governed PR9. Recheck heads, tree, triggers and mergeability; no force push.",
     "After separate governed-merge approval, validate/build exact final governed SHA through authoritative publication-only workflow; verify OCI revision/source labels and immutable digest.",
@@ -181,11 +205,11 @@
   ],
   "approvals": {
     "backupAndIsolatedRehearsal": "Already authorised; prerequisites remain unverified. No repeat blanket approval requested.",
-    "nextOwnerAction": "Provide existing OVH private bucket name, region/endpoint and the secure credential-profile location or connected account access; never credentials in chat. Key custody/match and DEV backup/rehearsal authorisation are already complete. Backup-specific fence verification/correction remains an engineering prerequisite, not a request for deployment permission.",
+    "nextOwnerAction": "No OVH bucket or additional key check needed. Existing authorisation covers backup/rehearsal. Next engineering gate is a reviewed backup-only writer pause/resume procedure preserving completed one-shot tasks and controlling external redeployment/writers; stop before service changes until proven. If original unhealthy state cannot safely be resumed, explicitly settle a fenced end-state before capture rather than inventing successful restoration.",
     "persistentSql": "Separate exact two-statement approval after real-data rehearsal evidence",
     "governedMerge": "Separate exact PR heads/resulting tree approval",
     "deployment": "Separate final SHA/tree/image/ReleaseEvidence and precise DEV operations approval"
   },
-  "changesThisTurn": "Completed read-only live destination/service/resource checks and source review of existing fence. No key checks, completed engineering tests or full CI repeated. No service mutations, backup, restore, migrations, persistent SQL, merge, deployment, Traefik changes or original data/volume deletion.",
-  "supersedes": "18b293531bd8765d99cc7ab170d0ce9ec93f3117"
+  "changesThisTurn": "Read-only DEV service/task inspection; created exactly two private staging directories0700 under existing backup parent. No private key checks, original data changes, service scaling, compose.deploy, capture, restore, SQL, migrations, merge, deployment or Traefik changes. No passing tests repeated.",
+  "supersedes": "1720fa7c8cb3c4bdfff78289e8e81cf5663559df"
 }

@@ -174,8 +174,14 @@ OR NOT has_schema_privilege(current_user,n.oid,'USAGE'));""")
     r.require(shutil.disk_usage(work).free >= size*4+3*1024**3, "RECOVERY_SPACE_INSUFFICIENT")
     journal_dir = work/"journal"
     journal_dir.mkdir(mode=0o700)
+    sequence = 0
     def journal(name, value):
-        r.write_new(journal_dir/(name+".private.json"), r.canonical(value))
+        nonlocal sequence
+        sequence += 1
+        r.write_new(journal_dir/(str(sequence).zfill(6)+"-"+name+".private.json"),
+                    r.canonical({"event": name, "value": value}))
+    r.write_new(work/"preflight-state.private.json", r.canonical(
+        {"baseline": baseline, "window": receipt, "containers": snapshot}))
     fence = f.Fence(f.Docker(), baseline, receipt, journal)
     finished = threading.Event()
     failure = []
@@ -232,7 +238,8 @@ OR NOT has_schema_privilege(current_user,n.oid,'USAGE'));""")
         r.require(not monitor.is_alive() and not failure, "MONITOR_NOT_CLOSED")
         fence.restore(lambda drained: probe(snapshot, drained))
         r.write_new(work/"safe-closure.private.json", r.canonical(
-                    {"liveSQLChanged": False, "migrationCount": 58, "originalSpecsRestored": True}))
+                    {"liveSQLChanged": False, "migrationCount": 58, "originalSpecsRestored": True,
+                     "captureAccepted": True}))
         return sealed
     except Exception:
         finished.set()
@@ -243,9 +250,67 @@ OR NOT has_schema_privilege(current_user,n.oid,'USAGE'));""")
     finally:
         os.close(lock)
 
+def replay_owned(events):
+    owned, uncertain = {}, set()
+    for event in events:
+        name, value = event["event"], event["value"]
+        if name.startswith(("replica-intent-", "restore-intent-")):
+            uncertain.add(value["id"])
+        elif name.startswith(("replica-fenced-", "restored-")):
+            owned[value["ID"]] = value
+            uncertain.discard(value["ID"])
+        elif name == "failure-refence":
+            owned.update(value["owned"])
+            uncertain.update(value["unverifiedServiceIds"])
+    r.require(not uncertain, "UNCONFIRMED_MUTATION_REQUIRES_MANUAL_REVIEW")
+    r.require(owned, "NO_CONFIRMED_FENCE_TO_RESTORE")
+    return owned
+
+def recover(work, window_file):
+    r.require(os.geteuid() == 0, "OWNER_SUDO_SSH_REQUIRED")
+    # The capture lock is retained on disk. Its advisory lock proves no adapter
+    # process still owns this recovery directory; it does not replace the operator window.
+    descriptor = os.open(work/"operation.lock", os.O_RDWR|os.O_NOFOLLOW)
+    try:
+        fcntl.flock(descriptor, fcntl.LOCK_EX|fcntl.LOCK_NB)
+        r.require(not (work/"safe-closure.private.json").exists(), "ALREADY_RESTORED")
+        state = read(work/"preflight-state.private.json")
+        events = [read(path) for path in sorted((work/"journal").glob("*.private.json"))]
+        for directory in sorted(work.glob("recovery-*")):
+            r.private(directory, True)
+            events.extend(read(path) for path in sorted(directory.glob("*.private.json")))
+        owned = replay_owned(events)
+        client_setup(work)
+        active = r.psql("SELECT count(*) FROM pg_stat_activity WHERE datname=current_database() "
+                       "AND backend_type='client backend' AND pid<>pg_backend_pid();")
+        r.require(active == "0", "RECOVERY_DATABASE_OPERATION_STILL_ACTIVE")
+        redis_clients = components.redis_raw(REDIS, "CLIENT", "LIST")
+        r.require(not any("cmd=sync" in line or "cmd=psync" in line
+                          for line in redis_clients.splitlines()), "REDIS_CAPTURE_STILL_ACTIVE")
+        r.require(r.psql("SELECT count(*) FROM drizzle.__drizzle_migrations;") == "58",
+                  "LIVE_LEDGER_CHANGED_DO_NOT_RESUME")
+        recovery_log = work/("recovery-"+str(time.time_ns()))
+        recovery_log.mkdir(mode=0o700)
+        sequence = 0
+        def journal(name, value):
+            nonlocal sequence
+            sequence += 1
+            r.write_new(recovery_log/(str(sequence).zfill(6)+"-"+name+".private.json"),
+                        r.canonical({"event": name, "value": value}))
+        fence = f.Fence(f.Docker(), state["baseline"], f.window(read(window_file)), journal)
+        fence.owned = owned
+        fence.restore(lambda drained: probe(state["containers"], drained))
+        r.write_new(work/"safe-closure.private.json",
+                    r.canonical({"originalSpecsRestored": True, "captureAccepted": False,
+                                 "liveSQLChanged": False, "manualRecovery": True}))
+        return {"originalSpecsRestored": True, "captureAccepted": False}
+    finally:
+        os.close(descriptor)
+
 def transfer(work, digest, destination):
     work = r.private(work, True)
-    r.private(work/"safe-closure.private.json")
+    r.require(read(work/"safe-closure.private.json").get("captureAccepted") is True,
+              "CAPTURE_NOT_ACCEPTED_AFTER_RECOVERY")
     r.require(not (work/"capture-invalid.private.json").exists(), "INVALID_CAPTURE")
     r.require(read(work/"capture-valid.private.json")["sha256"] == digest, "CAPTURE_NOT_VALIDATED")
     manifest = r.verify(work, digest)
@@ -260,13 +325,15 @@ def transfer(work, digest, destination):
 def main():
     os.umask(0o077)
     parser = argparse.ArgumentParser()
-    parser.add_argument("command", choices=("capture", "guard", "transfer", "custody", "restore"))
+    parser.add_argument("command", choices=("capture", "guard", "transfer", "custody", "restore", "recover"))
     parser.add_argument("work")
     parser.add_argument("arguments", nargs="*")
     a = parser.parse_args()
     work = r.private(a.work, True)
     if a.command == "capture":
         result = capture(work, a.arguments[0])
+    elif a.command == "recover":
+        result = recover(work, a.arguments[0])
     elif a.command == "guard":
         guard_state(work)
         result = {"fence": "VERIFIED"}
@@ -279,7 +346,8 @@ def main():
         receipt = read(work/"off-vps-custody.private.json")
         components.check_custody(work, digest, receipt)
         r.require(not (work/"capture-invalid.private.json").exists(), "INVALID_CAPTURE")
-        r.private(work/"safe-closure.private.json")
+        r.require(read(work/"safe-closure.private.json").get("captureAccepted") is True,
+                  "CAPTURE_NOT_ACCEPTED")
         # The existing restore helper creates its own fresh network-none destination.
         # Host pg_restore adapter remains bound to the pinned permanent client image;
         # it only lists an archive and has no write path.

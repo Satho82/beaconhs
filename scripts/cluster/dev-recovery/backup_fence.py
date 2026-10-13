@@ -169,7 +169,7 @@ class Fence:
             except Exception:
                 failures.append(sid)
         self.journal("failure-refence", {"unverifiedServiceIds": failures,
-                     "manualReviewRequired": True})
+                     "owned": self.owned, "manualReviewRequired": True})
     def _restore(self, probe):
         # Only this instance's exact zero-replica versions can be restored.
         # Failed/abandoned operation requires reviewed journal recovery, never blind scale=1.

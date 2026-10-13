@@ -43,4 +43,5 @@ jobs:
           set -euo pipefail
           git diff --exit-code
           test -z "$(git ls-files '*.agekey' '*.dump' '*.dump.age' '*private.jsonl')"
+
 # No secrets, artifacts, self-hosted runner, deployment or persistent endpoints.

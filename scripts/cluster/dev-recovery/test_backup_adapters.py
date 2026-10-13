@@ -11,6 +11,7 @@ import dev_recovery as r
 import recovery_components as components
 import pg16_client
 import isolated_rehearsal as isolated
+import backup_controller as controller
 
 def receipt():
     return dict(operator="fixture-operator",
@@ -182,6 +183,20 @@ class AdapterTests(unittest.TestCase):
         with patch.object(r,"verify",return_value={}):
             with self.assertRaisesRegex(r.Rejected,"NOT_CONFIRMED"):
                 components.custody("/unused","a"*64,value)
+
+class JournalRecoveryTests(unittest.TestCase):
+    def test_ambiguous_crash_never_infers_update_ownership(self):
+        with self.assertRaisesRegex(r.Rejected,"UNCONFIRMED"):
+            controller.replay_owned([{"event":"replica-intent-web","value":{"id":"web"}}])
+    def test_confirmed_versions_recovered(self):
+        service=services()["web"]
+        events=[{"event":"replica-intent-web","value":{"id":"web"}},
+                {"event":"replica-fenced-web","value":service}]
+        self.assertEqual(controller.replay_owned(events),{"web":service})
+    def test_failed_refence_stops_recovery(self):
+        with self.assertRaisesRegex(r.Rejected,"UNCONFIRMED"):
+            controller.replay_owned([{"event":"failure-refence","value":
+                {"owned":{},"unverifiedServiceIds":["web"]}}])
 
 class IsolationTests(unittest.TestCase):
     def setUp(self):

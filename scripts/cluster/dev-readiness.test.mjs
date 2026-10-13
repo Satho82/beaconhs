@@ -27,7 +27,16 @@ function fixture() {
     replicas: 1,
   }
   const internal = { ready: 200, status: 'ready', sha: config.sha, login: 200 }
-  const external = { status: 401, challenge: 'Basic realm="Uvanoo Development"' }
+  const external = {
+    status: 200,
+    challenge: null,
+    protectedRoutes: ['/hospitality/risk', '/people', '/approvals'].map((path) => ({
+      path,
+      status: 307,
+      location: '/login',
+      challenge: null,
+    })),
+  }
   return {
     runtime,
     internal,
@@ -36,7 +45,7 @@ function fixture() {
   }
 }
 
-test('exact internal readiness and login plus protected public login pass without credentials', async () => {
+test('exact runtime and native public login pass while all protected modules redirect to login', async () => {
   await verifyReadiness(fixture().io, config)
 })
 for (const [field, value, code] of [
@@ -104,12 +113,16 @@ test('live probes use only exact container loopback and credential-free HTTPS, w
       return JSON.stringify(fixture().internal)
     },
     async (url, options) => {
-      assert.equal(url, 'https://dev.uvanoo.com/login')
+      assert.ok(
+        ['/login', '/hospitality/risk', '/people', '/approvals'].some(
+          (path) => url === 'https://dev.uvanoo.com' + path,
+        ),
+      )
       assert.equal(options.redirect, 'manual')
       assert.deepEqual(Object.keys(options).sort(), ['redirect', 'signal'])
       return new Response(null, {
-        status: 401,
-        headers: { 'www-authenticate': 'Basic realm="Uvanoo Development"' },
+        status: url.endsWith('/login') ? 200 : 307,
+        headers: url.endsWith('/login') ? {} : { location: '/login' },
       })
     },
   )
@@ -118,7 +131,7 @@ test('live probes use only exact container loopback and credential-free HTTPS, w
   assert.match(calls[0][1][4], /http:\/\/127\.0\.0\.1:3000\/api\/health\/ready/)
   assert.match(calls[0][1][4], /http:\/\/127\.0\.0\.1:3000\/login/)
   assert.doesNotMatch(calls[0][1][4], /Authorization|password|process.env/)
-  assert.equal((await io.external()).status, 401)
+  assert.deepEqual(await io.external(), fixture().external)
 })
 
 test('live runtime inspection binds service, container and digest without returning secrets', () => {
@@ -198,4 +211,26 @@ test('execute actual in-container probe: preserve status and SHA, reject transpo
     }),
     /probe failed/,
   )
+})
+
+for (const patch of [
+  { status: 200 },
+  { status: 401 },
+  { status: 503 },
+  { location: 'https://attacker.invalid/login' },
+  { location: '/people' },
+  { location: null },
+  { challenge: 'Basic realm="Uvanoo Development"' },
+  { path: '/unrelated' },
+  { location: 'https://user:password@dev.uvanoo.com/login' },
+])
+  test('reject protected-route failure ' + JSON.stringify(patch), async () => {
+    const f = fixture()
+    Object.assign(f.external.protectedRoutes[1], patch)
+    await assert.rejects(verifyReadiness(f.io, config), /UNAUTHENTICATED_ROUTE_EXPOSED/)
+  })
+test('reject omitted protected-route evidence', async () => {
+  const f = fixture()
+  f.external.protectedRoutes = []
+  await assert.rejects(verifyReadiness(f.io, config), /UNAUTHENTICATED_ROUTE_EXPOSED/)
 })

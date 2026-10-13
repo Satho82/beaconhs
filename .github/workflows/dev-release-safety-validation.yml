@@ -1,0 +1,42 @@
+name: DEV release safety focused validation
+on:
+  push:
+    branches: [fix/uvanoo-v1.4-dev-release-safety-20261013]
+    paths:
+      - .github/workflows/deploy-dev.yml
+      - .github/workflows/dev-release-safety-validation.yml
+      - scripts/cluster/dev-readiness*
+      - scripts/ci/dev-release-safety-contract.rb
+permissions:
+  contents: read
+concurrency:
+  group: dev-release-safety-validation
+  cancel-in-progress: false
+jobs:
+  focused:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with:
+          node-version: 24.18.0
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
+      - run: pnpm install --frozen-lockfile
+      - name: Focused formatting and syntax
+        run: |
+          pnpm exec prettier --check .github/workflows/deploy-dev.yml .github/workflows/dev-release-safety-validation.yml scripts/cluster/dev-readiness.mjs scripts/cluster/dev-readiness.test.mjs
+          node --check scripts/cluster/dev-readiness.mjs
+          ruby -c scripts/ci/dev-release-safety-contract.rb
+      - name: Native login security, writer fence and deployment contracts
+        run: |
+          node --test scripts/cluster/dev-readiness.test.mjs scripts/cluster/dev-writer-fence.test.mjs
+          bash scripts/ci/v1.4-dev-candidate-deploy-contract.test.sh
+          ruby scripts/ci/dev-release-safety-contract.rb
+      - name: Record exact tested source
+        run: |
+          git rev-parse HEAD
+          git rev-parse HEAD^{tree}
+          git diff --exit-code

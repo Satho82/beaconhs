@@ -184,6 +184,39 @@ class AdapterTests(unittest.TestCase):
             with self.assertRaisesRegex(r.Rejected,"NOT_CONFIRMED"):
                 components.custody("/unused","a"*64,value)
 
+class SeparateClientTests(unittest.TestCase):
+    def test_observed_server_is_independent_of_client(self):
+        def inspect(args):
+            return ([{"Image":pg16_client.SERVER_IMAGE,"State":{"Running":True},
+                      "HostConfig":{},"Id":"server"}] if args[1]=="inspect"
+                    else [{"Id":"different-pinned-client"}])
+        self.assertEqual(pg16_client.checked_container("fixture",inspect),"server")
+
+    def test_client_transport_is_pinned_and_socket_only(self):
+        server={"Id":"server","State":{"Pid":123}}
+        with patch.object(r,"run",return_value=json.dumps([server]).encode()), \
+             patch.object(pg16_client,"checked_container",return_value="server"):
+            cmd=pg16_client.command("psql",[],"server","beaconhs_backup","beaconhs","")
+        self.assertIn(pg16_client.IMAGE,cmd)
+        self.assertNotIn(pg16_client.SERVER_IMAGE,cmd)
+        self.assertEqual(cmd[cmd.index("--network")+1],"none")
+        self.assertIn("type=bind,src=/proc/123/root/var/run/postgresql,dst=/var/run/postgresql,readonly",cmd)
+        self.assertIn("--read-only",cmd)
+        self.assertNotIn("--privileged",cmd)
+
+    def test_invalid_server_pid_rejects_before_client_start(self):
+        with patch.object(r,"run",return_value=b'[{"Id":"server","State":{"Pid":0}}]'), \
+             patch.object(pg16_client,"checked_container",return_value="server"):
+            with self.assertRaisesRegex(r.Rejected,"SERVER_PID"):
+                pg16_client.command("psql",[],"server","beaconhs_backup","beaconhs","")
+
+    def test_spoofed_client_label_is_not_monitor_exemption(self):
+        c={"Config":{"Labels":{"uvanoo.recovery":"pg-client"},"User":"root"},
+           "Image":"wrong","HostConfig":{},"Mounts":[]}
+        with patch.object(r,"run",return_value=b'[{"Id":"pinned"}]'):
+            with self.assertRaisesRegex(r.Rejected,"CLIENT_ISOLATION"):
+                pg16_client.is_client(c,{"Id":"server","State":{"Pid":123}})
+
 class JournalRecoveryTests(unittest.TestCase):
     def test_ambiguous_crash_never_infers_update_ownership(self):
         with self.assertRaisesRegex(r.Rejected,"UNCONFIRMED"):

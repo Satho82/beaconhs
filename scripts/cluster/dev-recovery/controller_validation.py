@@ -13,6 +13,7 @@ import backup_fence as fence
 import recovery_components as components
 import restore_disposable as restore
 import isolated_rehearsal as isolated
+import pg16_client
 
 r.require(os.environ.get("GITHUB_ACTIONS") == "true" and os.geteuid() == 0, "HOSTED_ROOT_FIXTURE_ONLY")
 os.umask(0o077)
@@ -22,9 +23,16 @@ os.environ.update(GIT_CONFIG_COUNT="1", GIT_CONFIG_KEY_0="safe.directory",
 # Reuse just the existing fixture preparation, without repeating its completed tests.
 fixture_path = here/"disposable_validation.py"
 fixture = fixture_path.read_text().split("items = r.capture_pg(",1)[0]
+r.run(["docker","pull","postgres@"+pg16_client.SERVER_IMAGE])
+fixture = fixture.replace('"-e", "POSTGRES_DB=beaconhs", "-e", "POSTGRES_PASSWORD", restore.IMAGE]',
+                          '"-e", "POSTGRES_DB=beaconhs", "-e", "POSTGRES_PASSWORD", "postgres@"+__import__("pg16_client").SERVER_IMAGE]')
 ns={"__file__":str(fixture_path),"__name__":"fixture_setup"}
 exec(compile(fixture,str(fixture_path),"exec"),ns)
 source=ns["source"]
+source_id=json.loads(r.run(["docker","inspect",source]))[0]["Image"]
+client_id=json.loads(r.run(["docker","image","inspect",restore.IMAGE]))[0]["Id"]
+r.require(source_id != client_id, "DISTINCT_SERVER_CLIENT_FIXTURE_REQUIRED")
+print("DISTINCT_SERVER_AND_PINNED_CLIENT_IMAGES_VERIFIED")
 r.run(["docker","rename",source,controller.PG])
 sql=lambda statement: ns["sql"](controller.PG,statement)
 journal=json.loads((controller.ROOT/"packages/db/drizzle/meta/_journal.json").read_text())["entries"]

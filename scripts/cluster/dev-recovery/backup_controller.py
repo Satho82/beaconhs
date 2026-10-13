@@ -56,12 +56,17 @@ def fixed_container(c):
 def probe(snapshot, drained):
     pg16_client.checked_container(PG)
     live = containers()
+    server = next(c for c in live.values() if c["Name"] == "/"+PG)
+    previous_server = snapshot.get(server["Id"])
+    r.require(previous_server and previous_server["State"]["Pid"] == server["State"]["Pid"],
+              "SERVER_PROCESS_CHANGED")
     # Service task replacements are covered by service specs and actual task states.
     # Non-service containers may not appear/disappear or change config during capture.
     def ordinary(values):
         return {cid: fixed_container(c) for cid, c in values.items()
                 if not c["Config"].get("Labels", {}).get("com.docker.swarm.service.id")
-                and c["Config"].get("Labels", {}).get("uvanoo.recovery") != "redis-validation"}
+                and c["Config"].get("Labels", {}).get("uvanoo.recovery") != "redis-validation"
+                and not pg16_client.is_client(c, server)}
     r.require(ordinary(live) == ordinary(snapshot), "NON_SERVICE_CONTAINER_DRIFT")
     for c in live.values():
         if c["Name"] in ("/uvanoo-decision155-inspect", "/uvanoo-clean155-redis"):
@@ -161,7 +166,9 @@ def capture(work, window_file):
     snapshot = containers()
     r.require(r.run(["node", "--version"]).decode().startswith("v24."), "NODE_24_REQUIRED")
     r.run(["age", "--version"])
+    pg16_client.checked_container(PG)  # Preserve the specific rejection before subprocess wrapping.
     r.require(r.run(["pg_dump", "--version"]).decode().split()[2] == "16.15", "CLIENT_VERSION_REJECTED")
+    r.require(r.psql("SHOW server_version_num;") == "160015", "SERVER_VERSION_REJECTED")
     permissions = r.psql("""SELECT count(*) FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
 WHERE n.nspname NOT LIKE 'pg_%' AND n.nspname <> 'information_schema'
 AND ((c.relkind IN ('r','m') AND NOT has_table_privilege(current_user,c.oid,'SELECT'))

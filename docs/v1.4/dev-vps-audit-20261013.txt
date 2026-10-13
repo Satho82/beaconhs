@@ -1,0 +1,180 @@
+UVANOO V1.4 — DEV VPS RECOVERY & DATABASE PREFLIGHT
+13 October 2026, Europe/London
+RESULT: LIVE ACCESS BLOCKED; DATABASE COMPATIBILITY NOT VERIFIED.
+
+Candidate: 563fb0e9b79a838a5f394abaffb2f7dc743fc571
+Git tree: 324c50a60e2cb0639ba920488a150c6531968374
+Governed: d18f635a41f092e9e86aa6f53518f9c28992b0d2
+PR9 rechecked: open, draft, mergeable; expected head/base; NOT MERGED.
+
+A. VERIFIED ACCESS / VPS STATE
+Fresh inventory: vps-c54e0b88 offline, last seen 87h ago. Explicit ping to
+device cbab0184-0ddc-483a-87ac-1ba36ecbdab0 failed: no device online.
+No usable authenticated SSH connection was available. This proves a connector
+access blocker, NOT that SSH, Docker or the VPS itself is down.
+No Mac/local workaround or remote command was used.
+SSH/Docker, Traefik/TLS, task health, deployed digest/source, endpoints, DNS,
+networks, database, storage, queues and volume/backup inventory: NOT VERIFIED.
+Recorded missing clean155 dependencies explain failure if supplied facts still
+hold. Basic Auth 401 is expected, not application readiness. Do not reconnect
+an unidentified deployed image to beaconhs as a compatibility experiment.
+
+B. DATABASE COMPATIBILITY
+No live ledger retrieved. All 63 source SQL Git blobs match the retained
+canonical manifest; source preservation is not database compatibility.
+Require id/hash/created_at in ID order against exact canonical hashes/timestamps,
+strict prefix and independently trusted PREFIX schema/security fingerprints.
+Missing objects introduced by 0059–0063 are not automatically drift at prefix58.
+Inspect all roles/memberships (including legacy uvanoo_dev), ownership, ACLs,
+default/column grants, RLS/FORCE RLS, policies/functions/constraints/extensions,
+People provenance and Risk immutable-version/revision/sign-off triggers.
+Gate role/default-ACL queries filter beaconhs_%: supplement nonstandard/legacy
+principals and PostgreSQL16 inherit/set/admin membership options.
+Verify tenant/property/person/assignment/approval/risk counts, integrity and
+sequences privately. No actual counts or drift result were obtained.
+Do not invoke migrate.ts/migrate-dev.ts/provisioning/seeding diagnostically.
+
+C. CLEAN155 RECOVERY — SOURCE FINDING
+Governed deploy-dev.yml deliberately targets uvanoo-clean155-postgres,
+beaconhs_clean155_final and uvanoo-clean155-redis (lines203–204,637,756).
+It invokes verify-prepared-risk.ts as a read-only adoption gate for an
+"approved clean DEV database", requiring61 entries and a fixed inventory.
+Code expects two tenants, one active super-admin, one credential account,
+zero tenant memberships, three properties and50 Risk templates.
+These are CODE EXPECTATIONS, not observed data.
+Therefore clean155 was an intentional DEV adoption target; it is not proven
+disposable or empty. Missing-container cause, surviving volumes/backups and data
+absent from permanent DEV remain unknown. Preserve all remnants. Do not start,
+initialize, attach or delete volumes/containers to investigate in this audit.
+
+D. REDIS RECONCILIATION
+No live metadata obtained. Once access returns, use bounded read-only
+SCAN/TYPE/count/metadata inspection of queue namespaces, waiting/delayed/active/
+failed/completed jobs, repeat schedules, IDs and locks. Do not print payloads,
+dequeue, start consumers, flush, purge or replay.
+Options after authoritative database selection: retain compatible work;
+quarantine ambiguous/incompatible work; selectively replay only after proving
+idempotency and checking whether database effects already occurred.
+Stopped clean155 persistence must remain intact.
+
+E. BACKUP / STORAGE REQUIREMENTS
+No current DEV archive inventory, backup-role proof or verified restore found.
+Historical migration-safety-backup-review.txt records a synthetic16.15 drill;
+it is not a restore of present DEV. Combined candidate CI used pinned16.14.
+No new CI, backup or restore was run.
+
+Verify MinIO endpoint/bucket isolation, attachment keys/versions/checksums,
+missing/orphaned objects, tags/lifecycle/policies and multipart uploads.
+Preserve sealing-key and attachment-capability-secret continuity.
+beaconhs_backup needs cross-tenant SELECT, LOGIN/NOSUPERUSER/BYPASSRLS,
+default read-only, no ownership/DML/DDL/grant options/escalation or sequence
+UPDATE/USAGE. Test effective write denial only on a disposable restore.
+
+Future approved backup: fence all writers; consistent snapshot; age encryption;
+restricted key custody; independently verified checksum; exact16.15 restore;
+full ledger/catalogue/security/data/sequence comparison; storage/queue recovery.
+backup.sh creates a restricted plaintext temporary archive BEFORE encryption:
+require encrypted ephemeral storage/tmpfs and cleanup. No plaintext override.
+restore-verify.sh permits absent checksum/summary sidecars: require them in the
+release process. Dump/restore omits owner/ACLs, so restore the reviewed security
+contract separately. Counts alone do not prove restore integrity.
+No private archives, keys, credentials or row-level evidence in public GitHub.
+
+F. EXACT PROPOSED DEV ENDPOINTS — NOT CHANGED
+DEV_DATABASE_URL: beaconhs_app @ uvanoo-dev-postgres:5432 / beaconhs
+DEV_MIGRATION_DATABASE_URL: beaconhs_migrator @ same target
+DEV_SUPERADMIN_DATABASE_URL: beaconhs_super @ same target
+DEV_BACKUP_DATABASE_URL: beaconhs_backup @ same target
+DEV_REDIS_URL: authenticated uvanoo-dev-redis:6379; verify logical DB.
+Verify existing uvanoo-dev-private DNS/membership; no network change proposed
+without separate evidence/approval. Require NOLOGIN beaconhs_owner, reviewed
+migrator membership and non-owner/non-BYPASS application role.
+Recorded uvanoo_dev login does not prove canonical roles exist.
+Preserve DEV HTTPS/auth/storage/secrets; do not change main/staging/production.
+
+G. CONDITIONAL 58→63 RELEASE PROCEDURE
+If live58 entries are the exact prefix, pending suffix is:
+0059_risk_template_draft_state
+0060_risk_template_families_manual_assessments
+0061_risk_assessment_revisions_archive_signoffs
+0062_approvals_batch01
+0063_approvals_production
+History includes0000 and omits0033; never renumber or repair the ledger.
+Rehearse canonical convergence on the restored actual16.15 data, including new
+constraints/statuses and RLS/RBAC/data convergence, before persistent execution.
+After separate governed merge approval, require authoritative validation and
+image publication for the actual current governed SHA. Bind SHA/tree/OCI digest,
+DB name/OID/server_version_num, migration identities, trusted prefix/target
+fingerprints and verified backup/restore manifest hash. No image digest verified.
+Evidence expires after one hour; regenerate/reverify rather than edit timestamps.
+Manifest/archive path: /opt/uvanoo-dev/release-evidence/<actual-source-sha>/.
+Later approved dispatcher: deploy-v1.4-dev-candidate.yml on feature/uvanoo-v1.4,
+inputs source_sha and release_evidence_sha256. No bypass of current-head guard.
+Fence all writers; verify zero tasks/sessions; canonical locked migration;
+target ledger/security/data verification; immutable fenced rollout; approved
+writer restoration and smoke. SQL+ledger atomicity is PER MIGRATION.
+
+H. DEPLOYMENT SAFETY / ROLLBACK
+Exact candidate deploy-dev.yml findings:
+-216–225: host-wide builder/cache and unused-image prune older than168h BEFORE
+ fencing. Prove shared-host scope; retain rollback image by durable digest.
+-656–663/881: fence/verify-zero covers web/worker/scheduler, not external writers.
+ Existing saved compose must already be fenceable; live saved state unknown.
+-910–924: writes /etc/dokploy/beaconhs/collabora-branding.js and may restart DEV
+ Collabora. Shared-path consumers unverified.
+-1045–1052: restores all three writers together BEFORE external readiness.
+-1054–1065: failure reports state; no automatic re-fencing. After restoration
+ begins, writers can already be active despite failure/cancellation.
+
+storage-init calls ensureBucket, which may create a bucket, delete non-R2 bucket
+policy and replace managed lifecycle rules. lifecycle.ts expires pending and
+transient objects after ONE DAY and requests pending multipart abort after
+one day. Unrelated rules are retained. Verify provider support and real tags.
+This is not a read-only preflight operation.
+
+Staging/production isolation is NOT CONFIRMED LIVE. Separate identifiers and
+unchanged normal-main behaviour do not prove shared paths/buckets are isolated.
+Minimum corrections IF needed: candidate-only scope/exclusion of shared prune;
+DEV-exclusive branding path; verified saved-compose fenceability; explicit
+tested post-restore containment; separate worker/scheduler release if queues
+must wait for browser smoke. Proposals only; no workflow/runtime edits.
+
+Rollback: contain writers/admission; preserve failed state/logs/queues; account
+for post-backup writes/jobs; use only a proven schema-compatible image or an
+approved restore into a separate database followed by controlled switch-over.
+Never delete ledger rows, run down migrations, overwrite original volumes or
+silently discard new data. Verify digest/APP_VERSION/login, People scope,
+Approvals documents/financial/workflow/audit/export, read-only Risk protections
+and job idempotency. Synthetic mutating smoke needs later approval.
+
+I. BLOCKERS
+Access; live58 ledger/catalogue/security/data; clean155 divergence; current
+image; roles/storage/queues; fresh backup/exact16.15 restore/rollback proof;
+shared-host isolation/late-failure containment; governed merge/image binding.
+Separate visual-freeze prerequisites remain unresolved.
+
+J. OWNER APPROVALS
+No renewed permission needed for the authorized read-only audit: usable cloud
+connectivity is required. Provide an authorized VPS connection/read-only cloud
+SSH route; do not paste credentials into reports. No connector/VPS restart made.
+Later separately approve authoritative dataset/clean155/queue disposition;
+required DEV-only role/config/workflow corrections; exact governed merge;
+exact source/tree/image and fresh backup-manifest hash; fenced window, storage
+effects, migration/rollout/synthetic smoke; explicit rollback/restore-switch
+scope including any destructive step. Approval cannot substitute for evidence.
+
+IMMUTABLE REFERENCES
+Canonical manifest:
+https://github.com/Satho82/beaconhs/blob/2d5ec5246d61ef35ac86af308399cde1fd9f0cfa/docs/v1.4/overnight/migration-identity-manifest.json
+Detailed release/backup/recovery procedure:
+https://github.com/Satho82/beaconhs/blob/0a93834791fbdc4f217b1a76851430cef339dd73/docs/v1.4/final-freeze-20261013/RELEASE-PROCEDURE.md
+Product workflow:
+https://github.com/Satho82/beaconhs/blob/563fb0e9b79a838a5f394abaffb2f7dc743fc571/.github/workflows/deploy-dev.yml
+
+CLOSEOUT
+Changed only this evidence checkpoint on a dedicated audit branch.
+Verified source references,63 canonical SQL blobs, current PR heads and report
+scope. Reused prior application CI; no new CI dispatched.
+No persistent writes, backup/restore, migrations, Docker operation, network/
+service change, deployment, governed merge, Risk/People edit, credential
+disclosure, security bypass or force push. Live compatibility remains blocked.

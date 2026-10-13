@@ -36,7 +36,12 @@ try {
   const raw=execFileSync('psql',['-X','-w','-qAt','-h','127.0.0.1','-U','postgres','-d','beaconhs','-v','ON_ERROR_STOP=1','-f',resolve(control,'export-metadata.sql')],{env:{...process.env,PGPASSWORD:'postgres'},maxBuffer:32*1024*1024})
   writeFileSync(resolve(output,'canonical-private.jsonl'),raw,{mode:0o600})
   const docs=util.parseDocuments(raw.toString('utf8'))
-  const fp=await schemaFingerprint(async s=>Array.from(await client.unsafe(s)))
+  const typedSections: unknown[][]=[]
+  const fp=await schemaFingerprint(async s=>{const rows=Array.from(await client.unsafe(s)); typedSections.push(rows); return rows})
+  if(util.fingerprint(docs)!==fp) {
+    const typedDocs=[docs[0],docs[1],...typedSections.map((rows,section)=>({section,rows}))]
+    console.log('TYPE_DIAGNOSTIC '+JSON.stringify(util.compare(util.publicEvidence(typedDocs,files.slice(0,58)),docs)))
+  }
   assert.equal(util.fingerprint(docs),fp,'Offline algorithm differs from gate')
   const evidence=util.publicEvidence(docs,files.slice(0,58))
   assert.equal(util.compare(evidence,docs).match,true)

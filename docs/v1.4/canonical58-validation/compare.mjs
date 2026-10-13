@@ -24,13 +24,19 @@ export function parseDocuments(text) {
     if (quoted) { if (escaped) escaped = false; else if (c === '\\') escaped = true; else if (c === '"') quoted = false; continue }
     if (c === '"') quoted = true
     else if (c === '{' || c === '[') depth++
-    else if (c === '}' || c === ']') { depth--; if (depth === 0) out.push(JSON.parse(text.slice(start, i + 1))) }
+    else if (c === '}' || c === ']') { depth--; if (depth === 0) out.push(JSON.parse(text.slice(start, i + 1), (key, value, context) => typeof value === 'number' && !Number.isSafeInteger(value) && Number.isInteger(value) ? context.source : value)) }
   }
   assert.equal(depth, 0); assert.equal(quoted, false)
   assert.deepEqual(out.map(x => x.section), ['identity', 'ledger', ...Array.from({length:19}, (_,i)=>i)])
   assert.equal(out[0].database, 'beaconhs'); assert.equal(out[0].postgresVersion, '160015')
   assert.equal(out[1].rows.length, 58)
   for (const x of out.slice(1)) assert.ok(Array.isArray(x.rows))
+  // Match postgres.js: PostgreSQL int8 sequence catalogue values are strings.
+  // JSON.parse's source preserves int8 values beyond JavaScript's safe integer range.
+  for (const row of out[20].rows) {
+    for (const key of ['start_value','min_value','max_value','increment_by','cache_size'])
+      if (row[key] !== null && row[key] !== undefined) row[key] = String(row[key])
+  }
   return out
 }
 export function fingerprint(docs) {

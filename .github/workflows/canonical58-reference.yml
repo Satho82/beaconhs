@@ -48,8 +48,8 @@ jobs:
           mkdir -m 700 "$RUNNER_TEMP/reference58"
           echo "REFERENCE_OUT=$RUNNER_TEMP/reference58" >> "$GITHUB_ENV"
           echo "CONTROL_DIR=$GITHUB_WORKSPACE/control/docs/v1.4/canonical58-validation" >> "$GITHUB_ENV"
-          docker pull postgres:16.15
-          image=$(docker image inspect postgres:16.15 --format '{{index .RepoDigests 0}}')
+          image=postgres@sha256:ca0bd484cb98bf4b24eb1010e73fb3fcbd6714d240fbc1a10eea5b7dbecb641d
+          docker pull "$image"
           [[ "$image" =~ ^postgres@sha256:[a-f0-9]{64}$ ]]
           echo "POSTGRES_IMAGE=$image" >> "$GITHUB_ENV"
           docker run -d --name canonical58 -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=beaconhs -p 127.0.0.1:5432:5432 "$image"

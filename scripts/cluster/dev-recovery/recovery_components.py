@@ -138,7 +138,7 @@ def capture_redis(container, directory, recipient, guard):
             plain.unlink()  # Only this invocation's temporary plaintext archive.
     return dict(item, kind="redis")
 
-def custody(directory, digest, receipt):
+def check_custody(directory, digest, receipt):
     manifest = r.verify(directory, digest)
     r.require(set(receipt) == {"manifestSha256", "location", "verifiedAt", "allChecksumsMatch",
                               "independentHost", "attestedBy"},
@@ -152,6 +152,10 @@ def custody(directory, digest, receipt):
     verified = dt.datetime.fromisoformat(receipt["verifiedAt"].replace("Z", "+00:00"))
     r.require(created.tzinfo and verified.tzinfo and
               created <= verified <= dt.datetime.now(dt.timezone.utc), "CUSTODY_TIME_REJECTED")
+    return receipt
+
+def custody(directory, digest, receipt):
+    check_custody(directory, digest, receipt)
     # This is an explicit owner attestation, not a claim of remote machine inspection.
     r.write_new(Path(directory)/"off-vps-custody.private.json", r.canonical(receipt))
     return {"manifestSha256": digest, "custody": "OWNER_ATTESTED",

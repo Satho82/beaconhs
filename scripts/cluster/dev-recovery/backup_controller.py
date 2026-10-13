@@ -159,6 +159,15 @@ def capture(work, window_file):
     baseline = f.Docker().services()
     source = identity(baseline)
     snapshot = containers()
+    r.require(r.run(["node", "--version"]).decode().startswith("v24."), "NODE_24_REQUIRED")
+    r.run(["age", "--version"])
+    r.require(r.run(["pg_dump", "--version"]).decode().split()[2] == "16.15", "CLIENT_VERSION_REJECTED")
+    permissions = r.psql("""SELECT count(*) FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+WHERE n.nspname NOT LIKE 'pg_%' AND n.nspname <> 'information_schema'
+AND ((c.relkind IN ('r','m') AND NOT has_table_privilege(current_user,c.oid,'SELECT'))
+OR (c.relkind='S' AND NOT has_sequence_privilege(current_user,c.oid,'SELECT'))
+OR NOT has_schema_privilege(current_user,n.oid,'USAGE'));""")
+    r.require(permissions == "0", "BACKUP_READ_PRIVILEGES_MISSING")
     # Enough for all retained offline recovery trees plus dump/restore headroom.
     paths = components.volume_paths((components.MINIO,)+components.VOLUMES)
     size = sum(sum(x["size"] for x in components.tree_manifest(p)) for p in paths.values())
@@ -268,8 +277,9 @@ def main():
     else:
         digest, identity_file, parent, roles, roles_sha = a.arguments
         receipt = read(work/"off-vps-custody.private.json")
-        r.require(receipt["manifestSha256"] == digest and receipt["independentHost"] is True and
-                  receipt["allChecksumsMatch"] is True, "OFF_VPS_CUSTODY_REQUIRED")
+        components.check_custody(work, digest, receipt)
+        r.require(not (work/"capture-invalid.private.json").exists(), "INVALID_CAPTURE")
+        r.private(work/"safe-closure.private.json")
         # The existing restore helper creates its own fresh network-none destination.
         # Host pg_restore adapter remains bound to the pinned permanent client image;
         # it only lists an archive and has no write path.

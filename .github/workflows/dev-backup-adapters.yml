@@ -24,6 +24,9 @@ jobs:
           set -euo pipefail
           git diff --exit-code 3043a489171face85cf2331c7ea45a2a09ab5a2e HEAD -- apps packages scripts/cluster/dev-writer-fence.mjs .github/workflows/deploy-dev.yml .github/workflows/deploy-v1.4-dev-candidate.yml
           python3 -m py_compile scripts/cluster/dev-recovery/*.py
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with:
+          node-version: 24.18.0
       - name: Focused adapter fault-injection contracts
         working-directory: scripts/cluster/dev-recovery
         run: python3 -m unittest -v test_backup_adapters.py
@@ -33,10 +36,8 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq age
           docker pull postgres@sha256:ca0bd484cb98bf4b24eb1010e73fb3fcbd6714d240fbc1a10eea5b7dbecb641d
-      - name: Redis adapter correction validation
-        env:
-          ADAPTER_PHASE: redis
-        run: python3 scripts/cluster/dev-recovery/adapter_validation.py
+      - name: Full disposable capture controller and restore integration
+        run: sudo --preserve-env=GITHUB_ACTIONS,GITHUB_SHA,PATH python3 scripts/cluster/dev-recovery/controller_validation.py
       - name: No private files tracked
         run: |
           set -euo pipefail

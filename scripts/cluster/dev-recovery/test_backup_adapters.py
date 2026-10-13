@@ -10,6 +10,7 @@ import backup_fence as f
 import dev_recovery as r
 import recovery_components as components
 import pg16_client
+import isolated_rehearsal as isolated
 
 def receipt():
     return dict(operator="fixture-operator",
@@ -181,5 +182,49 @@ class AdapterTests(unittest.TestCase):
         with patch.object(r,"verify",return_value={}):
             with self.assertRaisesRegex(r.Rejected,"NOT_CONFIRMED"):
                 components.custody("/unused","a"*64,value)
+
+class IsolationTests(unittest.TestCase):
+    def setUp(self):
+        self.digest="a"*64
+        self.name="uvanoo-restore-"+"b"*32
+        self.receipt=dict(container=self.name,manifestSha256=self.digest,archiveRestore="PASS",
+                          workDirectory="/private/new-restore")
+        self.container={"Id":"c"*64,"Image":"pinned","State":{"Running":True},
+                        "HostConfig":{"NetworkMode":"none","PortBindings":{},"Privileged":False},
+                        "Config":{"Labels":{"uvanoo.recovery":"disposable","uvanoo.manifest":self.digest}},
+                        "Mounts":[{"Source":"/private/new-restore/pgdata",
+                                   "Destination":"/var/lib/postgresql/data"}]}
+    def inspect(self,args):
+        return [{"Id":"pinned"}] if args[1]=="image" else [self.container]
+    def test_isolated_target_accepted(self):
+        self.assertEqual(isolated.target(self.receipt,self.digest,self.inspect),"c"*64)
+    def test_persistent_name_rejected(self):
+        self.receipt["container"]="uvanoo-dev-postgres"
+        with self.assertRaisesRegex(r.Rejected,"ISOLATED_NAME"):
+            isolated.target(self.receipt,self.digest,self.inspect)
+    def test_networked_restore_rejected(self):
+        self.container["HostConfig"]["NetworkMode"]="bridge"
+        with self.assertRaisesRegex(r.Rejected,"ISOLATION"):
+            isolated.target(self.receipt,self.digest,self.inspect)
+    def test_persistent_volume_rejected(self):
+        self.container["Mounts"][0]["Source"]="/var/lib/docker/volumes/uvanoo-dev-postgres-data/_data"
+        with self.assertRaisesRegex(r.Rejected,"ISOLATION"):
+            isolated.target(self.receipt,self.digest,self.inspect)
+    def test_other_manifest_rejected(self):
+        self.container["Config"]["Labels"]["uvanoo.manifest"]="d"*64
+        with self.assertRaisesRegex(r.Rejected,"ISOLATION"):
+            isolated.target(self.receipt,self.digest,self.inspect)
+    def test_mutable_rehearsal_image_rejected(self):
+        with self.assertRaisesRegex(r.Rejected,"IMMUTABLE"):
+            isolated.migration_binding({},"node:24")
+    def test_wrong_source_image_evidence_rejected(self):
+        with self.assertRaisesRegex(r.Rejected,"SOURCE_IMAGE"):
+            isolated.migration_binding({},"example/image@sha256:"+"a"*64)
+    def test_no_fabricated_restore_url(self):
+        evidence=dict(sourceSha=isolated.PRODUCT,sourceTree=isolated.TREE,
+                      imageDigest="sha256:"+"a"*64,version=1,
+                      schemas={"58":isolated.CANONICAL58},backup={"restoreRun":"local-unverified"})
+        with self.assertRaisesRegex(r.Rejected,"GATE_EVIDENCE"):
+            isolated.migration_binding(evidence,"example/image@sha256:"+"a"*64)
 
 if __name__ == "__main__": unittest.main()

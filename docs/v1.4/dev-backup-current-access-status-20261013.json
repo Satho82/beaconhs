@@ -1,0 +1,114 @@
+{
+  "recordedAt": "2026-10-13T11:05:54.061Z",
+  "previousCheckpoint": "9cd31505eefc77f1eb336d9317aa2560d3e3a052",
+  "status": "INSPECTION_CONTAINER_STOP_CONFIRMED; PRIVILEGED_INVENTORY_ACCESS_STILL_BLOCKED",
+  "product": "563fb0e9b79a838a5f394abaffb2f7dc743fc571",
+  "backupImplementation": "e1c6a7e87e115bad10276b93b2eec6304a7d8506",
+  "liveEvidence": {
+    "decision155": {
+      "Status": "exited",
+      "Running": false,
+      "ExitCode": 0
+    },
+    "services": [
+      {
+        "name": "uvanoo-v1-4-dev-gniriv_web",
+        "replicas": 1,
+        "hosts": {
+          "DATABASE_URL": "uvanoo-clean155-postgres",
+          "R2_ENDPOINT": "uvanoo-dev-minio",
+          "REDIS_URL": "uvanoo-clean155-redis"
+        },
+        "specSha256": "91c65a23780bdd7a66cc06c2a36375a0d81b2f0d9f7eaccc29da813d0809c83e"
+      },
+      {
+        "name": "uvanoo-v1-4-dev-gniriv_worker",
+        "replicas": 1,
+        "hosts": {
+          "DATABASE_URL": "uvanoo-clean155-postgres",
+          "R2_ENDPOINT": "uvanoo-dev-minio",
+          "REDIS_URL": "uvanoo-clean155-redis"
+        },
+        "specSha256": "5f0541e11b681648d6a5f18c4513972ea42a036af0391aaf508a68425180e27f"
+      },
+      {
+        "name": "uvanoo-v1-4-dev-gniriv_scheduler",
+        "replicas": 1,
+        "hosts": {
+          "DATABASE_URL": "uvanoo-clean155-postgres",
+          "REDIS_URL": "uvanoo-clean155-redis"
+        },
+        "specSha256": "aad05ff96747b2d2cdecaf8a60cfc189236edee9737309b421096bd16a4e3097"
+      },
+      {
+        "name": "uvanoo-v1-4-dev-gniriv_storage-init",
+        "replicas": 1,
+        "hosts": {
+          "R2_ENDPOINT": "uvanoo-dev-minio"
+        },
+        "specSha256": "c2f342e702d2f5c11361790b21d218e58928ae2288ba52196b85bfef5bdf30d7"
+      },
+      {
+        "name": "uvanoo-v1-4-dev-gniriv_collabora",
+        "replicas": 1,
+        "hosts": {},
+        "specSha256": "fa9cbcdfdf03ebbb726deaa3937befafcb3bbc801821793839653376fa607aee"
+      },
+      {
+        "name": "beaconhs-ib9ybf_web",
+        "replicas": 1,
+        "hosts": {
+          "DATABASE_URL": "beaconhs-postgres",
+          "R2_ENDPOINT": "beaconhs-minio",
+          "REDIS_URL": "beaconhs-redis"
+        },
+        "specSha256": "417544ade2161c61d637127d96c0271087feb17e3b0a1c61261571755c1db855"
+      },
+      {
+        "name": "beaconhs-ib9ybf_worker",
+        "replicas": 1,
+        "hosts": {
+          "DATABASE_URL": "beaconhs-postgres",
+          "R2_ENDPOINT": "beaconhs-minio",
+          "REDIS_URL": "beaconhs-redis"
+        },
+        "specSha256": "23a8be171d83471c71421b1aee4b7f17652511d03e279fe5c9340230887b0dc3"
+      }
+    ],
+    "privilegedInventoryAccess": {
+      "rootCrontabReadable": false,
+      "minioVolumeReadable": false
+    }
+  },
+  "actionsInProgress": 0,
+  "interpretation": {
+    "inspectionWriter": "Resolved: not running, exit0; no restart attempted.",
+    "stackSeparation": "DEV endpoints are clean155/DEV MinIO; separate BeaconHS endpoints are beaconhs-postgres/beaconhs-redis/beaconhs-minio. Endpoint separation verified, not a blanket proof about all external clients.",
+    "replicas": "All inspected DEV service desired counts remain1. Original service spec hashes preserved; scheduler/storage-init not restarted.",
+    "remainingAccess": "Root cron file metadata/content and recovery storage not accessible through current account. False os.access does not distinguish inaccessible from absent. Prior privileged read was rejected Command not allowed; no retry or alternative privilege route attempted."
+  },
+  "backup": {
+    "captured": false,
+    "checksum": null,
+    "offVpsCustody": "Key PASS; archive custody pending; no ciphertext exists for SCP"
+  },
+  "restore": {
+    "executed": false
+  },
+  "rehearsal": {
+    "executed": false
+  },
+  "fencing": {
+    "applied": false,
+    "verified": false,
+    "composeDeploy": false,
+    "reason": "Complete privileged host-writer inventory and consistent readable recovery-component inventory remain unverified; stop-before-mutation instruction followed."
+  },
+  "requiredEvidence": [
+    "Administrator-confirmed root-owned scheduled/direct DEV writer inventory, with absence explicitly verified where applicable; no secrets or full command arguments in public evidence.",
+    "Read access and byte-size inventory for MinIO and preserved recovery volumes through an approved execution path.",
+    "After inventory, verified direct-service pause/resume and concurrent-writer prevention leaving completed one-shot jobs untouched."
+  ],
+  "ownerAction": "Existing backup authorisation stands. Provide approved privileged read-only access or sanitized administrator inventory; do not repeat key verification, broad permission, inspection-container stop, or full CI.",
+  "changes": "Read-only inspections and non-sensitive GitHub checkpoint only. No service/network changes, live SQL, backup capture, volume deletion, queue replay, merge, deployment or Traefik changes."
+}

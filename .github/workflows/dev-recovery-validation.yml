@@ -1,0 +1,51 @@
+name: DEV encrypted recovery disposable contracts
+on:
+  push:
+    branches: [feat/uvanoo-v1.4-secure-dev-backup-20261013]
+    paths:
+      - scripts/cluster/dev-recovery/**
+      - .github/workflows/dev-recovery-validation.yml
+permissions:
+  contents: read
+concurrency:
+  group: uvanoo-dev-recovery-disposable
+  cancel-in-progress: false
+jobs:
+  disposable:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Check protected product and migration files unchanged
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --exit-code 23210119d7a0d2f33f78fd86e4107e2df8b0620d HEAD -- apps packages scripts/cluster/backup.sh scripts/cluster/restore-verify.sh scripts/cluster/dev-writer-fence.mjs .github/workflows/deploy-dev.yml .github/workflows/deploy-v1.4-dev-candidate.yml
+          python3 -m py_compile scripts/cluster/dev-recovery/*.py
+      - name: Prepare disposable tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq age
+          docker pull postgres@sha256:ca0bd484cb98bf4b24eb1010e73fb3fcbd6714d240fbc1a10eea5b7dbecb641d
+      - name: Archive and failure contract tests
+        working-directory: scripts/cluster/dev-recovery
+        run: python3 -m unittest -v test_dev_recovery.py
+      - name: Private disposable capture and restore rehearsal
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/cluster/dev-recovery/disposable_validation.py
+      - name: Confirm no private material entered tracked sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --exit-code
+          test -z "$(git ls-files '*.agekey' '*.dump' '*.dump.age' '*private.jsonl' '*restore-receipt.private.json')"
+# Deliberately no upload-artifact step, no DEV/staging/production credentials,
+# no persistent/self-hosted runner, no schedule and no deploy/merge operation.
+# The hosted runner is discarded after the job. Only redacted test results remain.

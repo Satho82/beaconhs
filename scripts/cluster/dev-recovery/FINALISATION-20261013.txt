@@ -1,0 +1,221 @@
+MINIO RECOVERY AND BACKUP FINALISATION — ISOLATED ENGINEERING
+
+LIVE STATUS: NO-GO. No tool in this checkout was executed against live data.
+This is a conditional execution procedure, not a claim that missing custody,
+storage completeness, identities or writer exclusions have been established.
+
+SOURCE / PRESERVATION
+Base: validated recovery tools 58975d91639e085f9d8057c7b363f36f2fdd9d71.
+Separate local branch: fix/uvanoo-dev-backup-finalisation-20261013.
+PR11 foundation controls remain at 86db6a4cb7c31272b6865d79e1c18eada379a1c6.
+Neither PR11 nor any remote branch is changed. No workflow dispatch or push.
+Original backup CI38399343438 and PR11 validation keep original SHA bindings.
+Application, migration, image pins and deployment workflow files are unchanged.
+
+OWNER EVIDENCE ACCEPTED, NOT RE-SCANNED
+Retained DEV MinIO tree: 59 directories, 36 files, 231965 bytes; 31 files <4KB,
+5 files 4KB–1MB; no reported scan errors or file symlinks. Different DEV/legacy
+directory inodes, same filesystem device2049, neither a separate mountpoint;
+no consumer of DEV volume. These are filesystem counts, NOT S3 object counts.
+Additional read-only /proc/self/mountinfo inspection: both paths covered by the
+same ext4 root mount (device8:1), zero nested mounts, no exact mountpoint. No file
+scan or protected-access workaround was performed. Directory-level separation
+is supported, but there is NO separate disk/failure domain. Parent symlink,
+hardlink and other-mount-namespace exposure are not certified by these facts.
+Legacy MinIO remains /opt/beaconhs/minio/data on infra-net. DEV retained volume
+is /var/lib/docker/volumes/uvanoo-dev-minio-data/_data. Never replace either.
+
+STORAGE VERIFICATION METHOD — DO NOT START ORIGINAL MINIO TO INSPECT IT
+1. At the approved fenced capture only, create a private file-level manifest
+   (relative path, type, size, mode, owner, timestamp, file hash, device/inode and
+   link count); encrypt it with the raw retained tree. Treat paths as private.
+   Reject special files, directory/file symlinks, unexpected mount boundaries,
+   hardlinked payload files or inode overlap with legacy; resolve ancestor paths
+   and inspect Docker/container mount namespaces. Existing scan is not repeated
+   now; this additional manifest belongs to the future preservation operation.
+   Source reads must use no-atime access where required; do not remount live data.
+2. Verify all encrypted component checksums after independent download. Extract
+   ONLY into a new private disposable destination, with path-traversal/symlink/
+   hardlink rejection. Never extract over /var/lib/docker/volumes or legacy.
+   Before any MinIO startup, compare the copy against the encrypted manifest.
+3. Preserve one untouched verified copy. On a SECOND writable isolated copy,
+   start the exact pinned MinIO image with network none/no host ports, no legacy
+   mounts, no application/worker/scheduler/storage-init and no outbound callbacks.
+   Startup may alter copy metadata; this is a separately approved disposable
+   operation, not a non-mutating original-volume inspection. Keep both copies.
+4. Recover original MinIO administrator identity from approved secret custody;
+   never infer/promote the application R2 access key. No credential values in
+   arguments, logs, repo or receipts. If credentials/KMS material are unavailable,
+   STOP; do not reset root identity, rotate keys, initialize buckets or repair
+   metadata to make inspection pass. Retained bytes alone may not include all
+   required administrator/KMS secrets.
+5. Use authenticated read-only S3/admin requests on the isolated copy: enumerate
+   all bucket/version-list pages (including delete markers), bucket policy,
+   lifecycle/versioning and encryption metadata; stat/download each required
+   version and compute an actual SHA256. Multipart ETag is NOT a content hash.
+   Record policy/settings privately; do not change policy, heal or resync data.
+   Test application identity with read-only list/head/get and anonymous-denial
+   checks; validate effective write permissions by policy review, not Put/Delete.
+   Distinguish admin/root from restricted application principal and DEV bucket.
+6. From the independently restored DB, enumerate every storage-bearing model,
+   not just attachments: private scope review must cover documents, revisions,
+   pending/deleted records and transient artifacts. Reconcile exact bucket/key/
+   version, length and cryptographic content digest. Preserve unresolved/orphaned
+   objects; no cleanup. If stored hashes or a trustworthy reference set are absent,
+   byte preservation may PASS while logical completeness remains UNKNOWN.
+7. storage_reconcile.py accepts private JSON on stdin, reports counts only, and
+   fails on missing/mismatched/unexplained objects or incomplete inventory inputs.
+   expected/actual rows: {bucket,key,version,bytes,sha256}; version='null' only for
+   genuinely unversioned objects. Additional fields: scopeReceiptSha256,
+   allPagesCollected=true, bucketMetadataVerified=true. PASS proves comparison,
+   NOT independent provenance/completeness. Empty references need explicit scope
+   review; a boolean/hash supplied by an operator is not an inventory collector.
+
+MINIO LIVE RECONCILIATION — FUTURE SEPARATE APPROVAL
+Only after preserved bytes, isolated copy and identity/bucket acceptance: reuse
+PR11's external existing-volume template. Assert exact volume identity, no driver
+options/consumers, nocopy /data, exact pinned image, no published ports, external
+uvanoo-dev-private and uvanoo-dev-runtime only, no alias/container-name collision.
+Prove legacy lacks this network and application credential/policy write path.
+Same physical disk is not isolation from disk loss: independent backup required.
+Use original admin identity and verified app principal; preserve endpoint/bucket.
+Never run storage-init automatically; it changes policy/lifecycle settings.
+
+NEW POLICY / CUSTODY CONTRACT
+execution-policy.private.json contains only these fields:
+sourceHostSha256, restoreHostSha256, destinationId, recipientSha256,
+keyReceiptSha256, externalGuardSha256, expiresAt, privateRestoreHost,
+immutableRetention, separateDeleteAuthority.
+Host digests are SHA256 of stripped /etc/machine-id bytes; they must differ.
+destinationId is an owner-approved opaque provider/account/bucket/versioning
+mapping retained privately. The three boolean decisions must be true. New capture
+policy expires within two hours; expired capture policy can still verify/restore
+its historical backup, with the original owner-approved digest, never recapture.
+UVANOO_RECOVERY_POLICY_SHA256 must be supplied from independent owner approval,
+not calculated blindly from an unreviewed policy immediately before execution.
+
+key-custody.private.json fields: recipientSha256, retrievalHostSha256,
+vaultVersionId, verifiedAt, challengeDecryptPassed, attestedBy. Bind its exact file
+SHA in policy. Require retrieval/decrypt within24h for new capture; historical
+restore retains original receipt plus actual archive decrypt. No generated
+OWNER_CONFIRMED assertion exists. Independently retrieve identity from vault,
+derive public recipient, compare approved fingerprint and encrypt/decrypt a random
+non-sensitive challenge. Evidence stays private; report fingerprint/result only.
+Current approved recipient fingerprint is retained unchanged:
+138aa3b6a8f40c219b5d69a30357cf5ac9971c9523c87c04e42fc43c5434727f.
+
+off-vps custody receipt fields: manifestSha256, location (=destinationId),
+hostSha256 (=restoreHostSha256), verifiedAt, allChecksumsMatch, independentHost,
+attestedBy. This is an explicit attestation. Actual upload/download/retention and
+independent host/account inspection must substantiate it. No provider uploader or
+vault integration is fabricated before owner selects those services.
+Export includes encrypted components, manifest and private non-secret policy,
+custody, collector and closure metadata. Never includes the private age identity.
+Pin manifest/policy hashes independently outside VPS; transfer over approved
+secure channel with separate delete authority and immutable retention.
+
+INDEPENDENT SUPERVISOR / NO AUTO RESUME
+Before capture, PR11 bootstrap must persist ALL FIVE replica controls at zero;
+all actual tasks must be terminal in two observations. Saved Dokploy controls
+and external exclusion are checked by separately reviewed external-writer-guard.
+No default-success guard exists. Bind the exact executable digest in policy.
+Guard must check: exact DEV record/domain; all five saved zero controls; disabled
+DEV deployment triggers and no pending/running deployments or schedules; valid
+exclusive owner window; no external DB/Redis/storage writers; no active WOPI
+sessions/saves; host/operator/integration admission remains closed. Output/error
+must be sanitized. Receipt/absence of connections is not a durable admission lock.
+
+uvanoo-dev-recovery-watchdog.service.in is an UNINSTALLED systemd template.
+After separate approval, pin tool directory and private environment file containing
+UVANOO_RECOVERY_WORK and approved UVANOO_RECOVERY_POLICY_SHA256. It runs outside
+the capture process's cgroup and survives controller/SSH loss. No Restart and no
+stop action resumes writers. The watchdog checks all services/spec drift, five
+zero replicas, actual tasks, external guard and capture probes. It writes a bound
+heartbeat every2s; controller rejects age>10s, PID reuse, incorrect system unit,
+policy/guard mismatch or invalidation. Failure latches invalid status. Existing
+controller monitoring is additional, not a substitute for this system service.
+No service mutations are issued by this watchdog. Persisted zero controls plus
+external deployment exclusion prevent restart on controller loss. If another
+operator defeats those controls, invalidate capture and STOP; automatic overwrite
+of that operator's configuration is deliberately not authorized or implemented.
+
+Must acceptance-test on an isolated Linux/systemd Docker host: kill controller,
+kill watchdog, stale/reused PID, policy expiry, denied API, paused guard, external
+writer, saved-control drift and scheduler/storage-init admission. Verify no data
+set gets promoted and nothing auto-resumes. Current unit tests mock systemd;
+they do NOT supply this operational proof. Old cloud fixture has been adapted to
+the zero/custody contract with an explicitly SYNTHETIC watchdog seam; it cannot
+prove independent systemd operation and has not been rerun in this task.
+
+COMMAND INTERFACES — NOT EXECUTED, PLACEHOLDERS MUST BE OWNER-BOUND
+Use the exact new reviewed commit checkout, not a changed live checkout.
+All private files/parents require correct owner and0600/0700 protections.
+
+On source VPS, AFTER approved external exclusion, drainage, all-zero bootstrap
+and independent watchdog start:
+  python3 scripts/cluster/dev-recovery/backup_controller.py capture CAPTURE_DIR WINDOW_JSON
+  python3 scripts/cluster/dev-recovery/backup_controller.py transfer CAPTURE_DIR MANIFEST_SHA NEW_EXPORT_DIR
+WINDOW_JSON preserves original fields: operator, expiresAt, noConcurrentDeployers,
+externalWritersExcluded, collaboraSessionsDrained, restoreOriginalRestartingWriters.
+All flags true only after actual verification; original state must be ALL ZERO,
+so last flag means preserving that zero baseline, never restarting processors.
+No automatic recover mode is available; failures require owner evidence review.
+
+On approved private restore host, after independent upload/download checks and
+private vault retrieval; use local pg_restore16.15, age, Docker and Node24:
+  python3 scripts/cluster/dev-recovery/dev_recovery.py verify DOWNLOADED_SET MANIFEST_SHA
+  python3 scripts/cluster/dev-recovery/backup_controller.py custody DOWNLOADED_SET MANIFEST_SHA CUSTODY_JSON
+  python3 scripts/cluster/dev-recovery/backup_controller.py restore DOWNLOADED_SET MANIFEST_SHA PRIVATE_IDENTITY NEW_PRIVATE_PARENT PRIVATE_ROLES_SQL ROLES_SHA
+No source-container adapter is initialized by restore. The helper creates a
+unique new network-none PostgreSQL16.15 target, no ports, fresh private data,
+2GiB RAM/1CPU/256PID limits. Pinned image remains:
+postgres@sha256:ca0bd484cb98bf4b24eb1010e73fb3fcbd6714d240fbc1a10eea5b7dbecb641d.
+Bootstrap SQL SHA256: 79a4482f4b9facd33c6538112ed2d7bd90ebb3aba05a66c779d72a93dcfd8974.
+Retain pristine restore; compare58 ledger hashes,19 sections, table counts/hashes,
+sequences, role/ACL and tenant/property/RLS plus storage reconciliation. Separate
+second copy for default-ACL correction and additive59–63, never original DEV.
+Raw archive restore PASS is not full acceptance. Private executor evidence bridge
+to the existing release gate remains needed; do not invent an Actions restore URL.
+
+SMALLEST SAFE WINDOW / OWNER GATES
+Pre-stage tools, keys, recipient proof, destination retention/upload adapter,
+private restore executor, capacity and isolated systemd acceptance BEFORE outage.
+1. Approve exact tools/control bootstrap and scoped DEV exclusion/drainage.
+2. Persist all-five zero, verify twice and start independent supervision.
+3. Capture all five encrypted components and independently verify downloaded set.
+   Retain all originals and failed artifacts; do not restart MinIO beforehand.
+4. Verify isolated DB/storage copies, credentials, bucket/data integrity and the
+   ACL/migration rehearsal. Keep DEV fenced; source need not be restarted for this.
+5. Separate approval: restore original DEV MinIO using retained volume and verified
+   identities; read-only storage checks, no storage-init, no legacy modifications.
+6. Separate approval: exact permanent PG/Redis/app-storage configuration correction
+   at existing image; web-only restoration only after schema compatibility and
+   backup acceptance. Web can write/enqueue; workers/scheduler/Collabora remain0.
+7. Product candidate migration/image rollout is a later distinct approval. Any
+   live ACL change needs another fresh capture/restore; retain one-hour release
+   freshness from original capture start, never reset timestamps.
+No defensible minutes estimate exists until capture/restore throughput and object
+coverage are proven. Two-hour policy is an expiry bound, not a promised outage.
+
+ROLLBACK: keep all five fenced on uncertainty. No automatic scale/restart, key
+rotation, metadata repair, rollback migration or overwrite of originals. Config
+rollback cannot undo object writes, jobs, schema changes or MinIO startup effects.
+
+EXACT REMAINING BLOCKERS
+Owner vault/destination/runner selection and real custody/retention proofs;
+reviewed external-writer guard + isolated independent-watchdog fault acceptance;
+owner-approved all-zero bootstrap and Collabora drainage; preserved-copy object/
+bucket/principal/KMS and logical completeness proof; private real-data restore and
+canonical security/ACL rehearsal; owner-approved MinIO/config/web activation.
+No code or receipt can remove these missing physical/operational facts.
+
+VALIDATION THIS CHANGE ONLY
+PASS19 new unittest methods (policy/key custody, historical restore, every service
+zero gate, actual shutdown-task state, watchdog freshness/PID/policy binding,
+invalidation, pre-mutation rejection, no automatic resume, off-host restore call
+path, private inventory matching/missing/mismatch/extra/duplicate cases).
+PASS2 affected custody rejection tests; rerun required by changed contract only.
+PASS changed Python AST syntax and git diff --check.
+PASS protected product/migration/deploy/workflow paths unchanged from base.
+No Docker/systemd integration, live credential/S3 tests, full CI, capture, restore,
+MinIO startup or migration executed. Mocked tests do not prove external exclusion.

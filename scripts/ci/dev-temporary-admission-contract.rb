@@ -30,8 +30,22 @@ Dir.mktmpdir('dev-web-admission-failure-') do |dir|
   _,_,status=Open3.capture3({'PATH'=>"#{dir}:#{ENV['PATH']}", 'FEATURE_CANDIDATE_VERIFIED'=>'true', 'DEV_RELEASE_ENVIRONMENT'=>'production', 'MUTATION_MARKER'=>"#{dir}/mutation"},'bash','-c',restore['run'])
   abort 'Failed web admission reached service mutation' if status.success? || File.exist?("#{dir}/mutation")
 end
-original,status=Open3.capture2('git','show','bc7b03c602886e2b64ec7746156f7e7ea8611e8c:packages/db/src/dev-migration-identities.json')
 require 'json'
-before=JSON.parse(original); after=JSON.parse(File.read('packages/db/src/dev-migration-identities.json'))
-abort 'Historical lock changed' unless status.success? && before.length==after.length && before.zip(after).each_with_index.all? { |(a,b),i| [59,60].include?(i) ? a.reject { |k,_| k=='blob' }==b.reject { |k,_| k=='blob' } : a==b }
+require 'digest'
+# bc7b03c reviewed lock, omitting ONLY the two subsequently corrected pending
+# blob fields. Embedded fingerprint works in shallow CI without a mutable fetch.
+def valid_lock?(value)
+  return false unless value.is_a?(Array) && value.length == 63 && value.all? { |v| v.is_a?(Hash) }
+  return false unless value[59]['blob'] == 'db94bc3de15440d128ca503dfb6e869417083176' &&
+    value[60]['blob'] == '31b96cfaca083b7494572f0b85bf7c521aff3493'
+  historical = value.each_with_index.map { |v,i| [59,60].include?(i) ? v.reject { |k,_| k=='blob' } : v }
+  Digest::SHA256.hexdigest(JSON.generate(historical)) == '624fa47e3bb95c2d7bd740c617f780b46971ddc15d5b52b47154f3f2e3f90b2f'
+end
+after=JSON.parse(File.read('packages/db/src/dev-migration-identities.json'))
+abort 'Historical or corrected pending lock changed' unless valid_lock?(after)
+# Negative fixtures keep the historical and pending correction checks strict.
+[[0,'blob'],[58,'tag'],[59,'blob'],[59,'when'],[60,'blob'],[61,'blob']].each do |index,field|
+  altered=Marshal.load(Marshal.dump(after)); altered[index][field]='incorrect'
+  abort 'Lock drift fixture admitted' if valid_lock?(altered)
+end
 puts 'PASS DEV-only early/web boundaries, exact migration mount, owner pin, immutable historical lock and unrelated preflight isolation'

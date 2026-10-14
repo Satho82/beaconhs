@@ -45,7 +45,10 @@ export type TemporaryApproval = {
   restoreHostSha256: string
   recipientSha256: string
   monitorId: string
-  safetyPublicKeyDer: string
+  // Required for the normal independent Ed25519 monitor path. The strictly
+  // DEV-only documented path must omit it, so it cannot be mistaken for an
+  // independently attested admission.
+  safetyPublicKeyDer?: string
   capabilities: AdmissionPhase[]
   acceptedRisks: ['non-immutable', 'owner-device-loss', 'post-snapshot-write-loss']
   // Optional exact-DEV alternative, covered by the existing owner approval pin.
@@ -56,6 +59,13 @@ export type TemporaryApproval = {
     startsAt: string
     expiresAt: string
     receiptSha256: string
+  }
+  // An explicit, deliberately weaker DEV-only alternative to the independent
+  // monitor signature. It is valid only together with maintenanceHold and is
+  // still pinned by the existing private owner-approval bytes.
+  operationalEvidence?: {
+    mode: 'documented-operational'
+    independentAttestation: false
   }
 }
 export type PrivateRestoreReceipt = {
@@ -102,6 +112,7 @@ export const WEB_CHECKS = [
 ] as const
 export type SafetyReceipt = {
   version: 1
+  attestation: 'ed25519' | 'documented-operational'
   target: typeof DEV_TARGET
   approvalSha256: string
   sourceSha: string
@@ -120,6 +131,18 @@ function requireValue(ok: unknown): asserts ok {
 }
 function exactTarget(target: unknown) {
   requireValue(canonical(target) === canonical(DEV_TARGET))
+}
+export function usesDocumentedOperationalEvidence(approval: TemporaryApproval) {
+  const evidence = approval.operationalEvidence
+  if (evidence === undefined) return false
+  requireValue(
+    approval.maintenanceHold !== undefined &&
+      approval.safetyPublicKeyDer === undefined &&
+      canonical(Object.keys(evidence).sort()) === canonical(['independentAttestation', 'mode']) &&
+      evidence.mode === 'documented-operational' &&
+      evidence.independentAttestation === false,
+  )
+  return true
 }
 export function admissionChecks(phase: AdmissionPhase, approval: TemporaryApproval): string[] {
   return (phase === 'web' ? WEB_CHECKS : MIGRATION_CHECKS).map((check) =>
@@ -244,6 +267,7 @@ export function validateTemporaryAdmission(
   exactTarget(receipt.target)
   exactTarget(safety.payload.target)
   const holdExpires = maintenanceHoldExpiry(approval, now)
+  const documentedOperational = usesDocumentedOperationalEvidence(approval)
   if (approval.maintenanceHold !== undefined)
     requireValue(Date.parse(approval.maintenanceHold.startsAt) <= Date.parse(e.backup.createdAt))
   const created = Date.parse(e.backup.createdAt),
@@ -312,6 +336,7 @@ export function validateTemporaryAdmission(
     validUntil = Date.parse(p.expiresAt)
   requireValue(
     p.version === 1 &&
+      p.attestation === (documentedOperational ? 'documented-operational' : 'ed25519') &&
       p.approvalSha256 === pinnedApproval &&
       p.phase === phase &&
       p.sourceSha === e.sourceSha &&
@@ -332,15 +357,23 @@ export function validateTemporaryAdmission(
   requireValue(
     checks.every((k) => p.checks[k]?.passed === true && hash(p.checks[k]?.evidenceSha256)),
   )
-  const key = createPublicKey({
-    key: Buffer.from(approval.safetyPublicKeyDer, 'base64'),
-    format: 'der',
-    type: 'spki',
-  })
-  requireValue(
-    key.asymmetricKeyType === 'ed25519' &&
-      verify(null, Buffer.from(canonical(p)), key, Buffer.from(safety.signature, 'base64')),
-  )
+  if (documentedOperational) {
+    // This is intentionally not described as independent: a privileged DEV
+    // operator can alter operational evidence. The exact target, short hold,
+    // owner pin and every live data/safety check remain mandatory.
+    requireValue(safety.signature === '')
+  } else {
+    requireValue(typeof approval.safetyPublicKeyDer === 'string')
+    const key = createPublicKey({
+      key: Buffer.from(approval.safetyPublicKeyDer, 'base64'),
+      format: 'der',
+      type: 'spki',
+    })
+    requireValue(
+      key.asymmetricKeyType === 'ed25519' &&
+        verify(null, Buffer.from(canonical(p)), key, Buffer.from(safety.signature, 'base64')),
+    )
+  }
 }
 export function checkTemporaryFiles(
   e: ReleaseEvidence,

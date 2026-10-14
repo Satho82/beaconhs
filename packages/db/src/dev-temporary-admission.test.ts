@@ -136,6 +136,7 @@ function fixture(phase: AdmissionPhase = 'migration', maintenance = false) {
   }
   const p: SafetyReceipt = {
     version: 1,
+    attestation: 'ed25519',
     target: DEV_TARGET,
     approvalSha256: pin,
     sourceSha: e.sourceSha,
@@ -160,6 +161,72 @@ function fixture(phase: AdmissionPhase = 'migration', maintenance = false) {
   return { e, a, r, safety, pin, check, keys }
 }
 describe('exact DEV temporary admission', () => {
+  it('accepts documented operational evidence only for the exact DEV maintenance hold', () => {
+    const f = fixture('migration', true)
+    delete f.a.safetyPublicKeyDer
+    f.a.operationalEvidence = {
+      mode: 'documented-operational',
+      independentAttestation: false,
+    }
+    f.pin = digest(JSON.stringify(f.a))
+    f.e.admission!.approvalSha256 = f.pin
+    f.safety.payload.approvalSha256 = f.pin
+    f.safety.payload.attestation = 'documented-operational'
+    f.safety.signature = ''
+    expect(() =>
+      validateTemporaryAdmission(f.e, f.a, f.r, f.safety, f.pin, 'migration', env, now),
+    ).not.toThrow()
+  })
+  it.each(['signature', 'target', 'production', 'hold', 'claim'])(
+    'rejects documented operational evidence with %s safety defect',
+    (kind) => {
+      const f = fixture('migration', true)
+      delete f.a.safetyPublicKeyDer
+      f.a.operationalEvidence = {
+        mode: 'documented-operational',
+        independentAttestation: false,
+      }
+      f.pin = digest(JSON.stringify(f.a))
+      f.e.admission!.approvalSha256 = f.pin
+      f.safety.payload.approvalSha256 = f.pin
+      f.safety.payload.attestation = 'documented-operational'
+      f.safety.signature = ''
+      if (kind === 'signature') f.safety.signature = 'not-independent'
+      if (kind === 'target')
+        f.a.target = { ...DEV_TARGET, host: 'legacy.uvanoo.com' } as unknown as typeof DEV_TARGET
+      if (kind === 'hold') delete f.a.maintenanceHold
+      if (kind === 'claim') f.a.operationalEvidence.independentAttestation = true as false
+      expect(() =>
+        validateTemporaryAdmission(
+          f.e,
+          f.a,
+          f.r,
+          f.safety,
+          f.pin,
+          'migration',
+          kind === 'production' ? { ...env, DEV_RELEASE_ENVIRONMENT: 'production' } : env,
+          now,
+        ),
+      ).toThrow()
+    },
+  )
+  it('does not waive a web safety check for documented operational evidence', () => {
+    const f = fixture('web', true)
+    delete f.a.safetyPublicKeyDer
+    f.a.operationalEvidence = {
+      mode: 'documented-operational',
+      independentAttestation: false,
+    }
+    f.pin = digest(JSON.stringify(f.a))
+    f.e.admission!.approvalSha256 = f.pin
+    f.safety.payload.approvalSha256 = f.pin
+    f.safety.payload.attestation = 'documented-operational'
+    f.safety.signature = ''
+    delete f.safety.payload.checks.crossStoreConsistency
+    expect(() =>
+      validateTemporaryAdmission(f.e, f.a, f.r, f.safety, f.pin, 'web', env, now),
+    ).toThrow()
+  })
   it('pins maintenance acceptance to the existing private owner approval bytes', () => {
     const f = fixture('migration', true),
       directory = realpathSync(mkdtempSync(join(tmpdir(), 'dev-hold-pin-')))

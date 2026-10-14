@@ -34,6 +34,16 @@ const digest = (v: unknown) => typeof v === 'string' && /^[a-f0-9]{64}$/.test(v)
 function requireValue(value: unknown): asserts value {
   if (!value) throw new Error('DEV_MONITOR_REJECTED')
 }
+export function requireMonitorService(hostIdentity: string, cgroup: string, approvedHost: string) {
+  requireValue(
+    hash(hostIdentity.trim()) === approvedHost &&
+      cgroup
+        .split('\n')
+        .some((line) =>
+          /^\d+:[^:]*:\/system.slice\/uvanoo-dev-release-monitor\.service$/.test(line),
+        ),
+  )
+}
 export type ProbeSpec = {
   executable: string
   sha256: string
@@ -396,9 +406,11 @@ export async function runMonitor(
   )
   const evidence = JSON.parse(manifest.toString()) as ReleaseEvidence
   const approval = JSON.parse(approvalBytes.toString()) as TemporaryApproval
-  requireValue(
-    process.platform === 'linux' &&
-      hash(readFileSync('/etc/machine-id').toString().trim()) === approval.sourceHostSha256,
+  requireValue(process.platform === 'linux')
+  requireMonitorService(
+    readFileSync('/etc/machine-id', 'utf8'),
+    readFileSync('/proc/self/cgroup', 'utf8'),
+    approval.sourceHostSha256,
   )
   const restoreBytes = privateBytes(join(directory, 'private-restore.json'))
   requireValue(hash(restoreBytes) === evidence.admission?.restoreReceiptSha256)

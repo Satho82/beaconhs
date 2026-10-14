@@ -8,6 +8,14 @@ producer. It requires four explicit paths/digests, with no default live target:
 The deployment application never starts it. Use a separately reviewed Linux
 service with private key custody outside the evidence mount. The service host's
 machine-id digest must equal the source-host identity approved in the receipt.
+The process must also belong to the exact independent system.slice service
+uvanoo-dev-release-monitor.service; shell/runner/watchdog cgroups are rejected.
+The non-installed scripts/cluster/uvanoo-dev-release-monitor.service.in template
+requires the already-active watchdog (does not start it), has Restart=no, a5second
+stop timeout/control-group kill and private systemd credential loading. Render
+exact code/runtime/policy/key identity paths under independent review. Unit
+installation and real Linux systemd integration remain live/isolated-runner gates,
+not claimed by a pure cgroup-string unit test. The template contains no secrets.
 No production key or live receipt is created by these changes.
 
 The checksum-pinned MonitorPolicy binds the exact DEV target/source/phase,
@@ -104,3 +112,10 @@ shared PR branches and feature/main are not advanced by this task.
 Known limits: remote runner/registry quota may block CI independently; no paid
 capacity is authorized. No live signing service, hold, drainage, MinIO proof or
 release acceptance is claimed by the isolated bridge tests or a green build.
+
+Local validation:30 focused monitor tests passed (29 initial cases plus the
+affected independent-service case); DB typecheck; changed-file formatting/diff;
+build-only publication/immutability and affected Fast DEV static contracts.
+Earlier84 gate tests,8 PostgreSQL checks and real-data rehearsal preserved, not
+rerun locally. Full exact-source cloud CI is separately required, not inferred
+from those local passes. CI/image status belongs in the final checkpoint receipt.

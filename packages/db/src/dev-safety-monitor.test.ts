@@ -16,6 +16,7 @@ import {
   latchMonitor,
   monitorOnce,
   prepareMonitorDirectory,
+  requireMonitorService,
   runProbe,
   validateObservation,
   type MonitorPolicy,
@@ -194,6 +195,19 @@ function fixture() {
   }
 }
 describe('independent DEV observation/signing adapter', () => {
+  it('requires the bound host and independent Linux system-service cgroup', () => {
+    const host = 'synthetic-host',
+      cgroup = '0::/system.slice/uvanoo-dev-release-monitor.service'
+    expect(() => requireMonitorService(host, cgroup, sha(host))).not.toThrow()
+    for (const value of [
+      '0::/user.slice/uvanoo-dev-release-monitor.service',
+      '0::/system.slice/github-runner.service',
+      '0::/system.slice/uvanoo-dev-release-monitor.service/child',
+      '0::/system.slice/uvanoo-dev-recovery-watchdog.service',
+    ])
+      expect(() => requireMonitorService(host, value, sha(host))).toThrow()
+    expect(() => requireMonitorService(host, cgroup, sha('wrong-host'))).toThrow()
+  })
   it('prepares a new exact-SHA private bundle without keys or successful safety evidence', () => {
     const f = fixture()
     const files = Object.fromEntries(

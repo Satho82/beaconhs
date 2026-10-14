@@ -1,0 +1,33 @@
+# NOT INSTALLED. Render/review all placeholders and checksum-bind before use.
+[Unit]
+Description=Exact DEV release safety evidence signer (no deployment authority)
+Requisite=uvanoo-dev-recovery-watchdog.service
+After=uvanoo-dev-recovery-watchdog.service
+
+[Service]
+Type=exec
+User=root
+Group=root
+UMask=0077
+WorkingDirectory=/opt/uvanoo-dev/release-code/@@SOURCE_SHA@@
+LoadCredential=signing-key:/opt/uvanoo-dev/monitor-keys/@@MONITOR_ID@@.pem
+ExecStart=@@PINNED_TSX_EXECUTABLE@@ /opt/uvanoo-dev/release-code/@@SOURCE_SHA@@/packages/db/src/run-dev-safety-monitor.ts /opt/uvanoo-dev/release-evidence/@@SOURCE_SHA@@ /opt/uvanoo-dev/release-evidence/@@SOURCE_SHA@@/monitor-policy.json @@POLICY_SHA256@@ %d/signing-key
+Restart=no
+TimeoutStopSec=5
+KillMode=control-group
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+ReadWritePaths=/opt/uvanoo-dev/release-evidence/@@SOURCE_SHA@@
+StandardOutput=null
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

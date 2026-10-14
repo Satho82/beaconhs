@@ -6,7 +6,7 @@ import { join } from 'node:path'
 import { canonical, LOGICAL_SCHEMA_PROFILE } from './dev-logical-catalog'
 import {
   DEV_TARGET,
-  MIGRATION_CHECKS,
+  admissionChecks,
   TEMPORARY_CLASS,
   type PrivateRestoreReceipt,
   type TemporaryApproval,
@@ -29,7 +29,7 @@ const paths: string[] = []
 afterEach(() => {
   for (const path of paths.splice(0)) rmSync(path, { recursive: true, force: true })
 })
-function fixture() {
+function fixture(maintenance = false) {
   const directory = realpathSync(mkdtempSync(join(tmpdir(), 'dev-monitor-test-')))
   paths.push(directory)
   const key = generateKeyPairSync('ed25519')
@@ -110,6 +110,14 @@ function fixture() {
     capabilities: ['migration', 'web'],
     acceptedRisks: ['non-immutable', 'owner-device-loss', 'post-snapshot-write-loss'],
   }
+  if (maintenance)
+    approval.maintenanceHold = {
+      technicalExclusion: false,
+      privilegedOperatorRiskAccepted: true,
+      startsAt: evidence.backup.createdAt,
+      expiresAt: approval.expiresAt,
+      receiptSha256: h,
+    }
   const pin = sha(canonical(approval))
   evidence.admission = {
     class: TEMPORARY_CLASS,
@@ -129,10 +137,26 @@ function fixture() {
     approvalSha256: pin,
     manifestSha256: sha(canonical(evidence)),
     probes: Object.fromEntries(
-      MIGRATION_CHECKS.map((c) => [c, { executable: c, args: [], dependencies: {}, sha256: h }]),
+      admissionChecks('migration', approval).map((c) => [
+        c,
+        { executable: c, args: [], dependencies: {}, sha256: h },
+      ]),
     ),
   }
   const facts: Record<string, Record<string, unknown>> = {
+    ownerMaintenanceHold: {
+      technicalExclusion: false,
+      ownerHoldActive: true,
+      workflow373396385Disabled: true,
+      unapprovedDeployments: 0,
+      queuedDeployments: 0,
+      unexpectedSpecChanges: 0,
+      unapprovedPostgresClients: 0,
+      unapprovedRedisClients: 0,
+      storageWriters: 0,
+      holdReceiptSha256: h,
+      allowedMigrationConnectionsSha256: h,
+    },
     writerExclusion: {
       exclusiveHoldActive: true,
       authenticatedDeployersExcluded: true,
@@ -195,6 +219,61 @@ function fixture() {
   }
 }
 describe('independent DEV observation/signing adapter', () => {
+  it('signs truthful maintenance observations using the existing owner pin and monitor key', async () => {
+    const f = fixture(true),
+      result = await monitorOnce(f)
+    expect(result.payload.checks.writerExclusion).toBeUndefined()
+    expect(result.payload.checks.ownerMaintenanceHold?.passed).toBe(true)
+    expect(
+      JSON.parse(
+        readFileSync(
+          join(
+            f.directory,
+            'observations',
+            result.payload.checks.ownerMaintenanceHold!.evidenceSha256 + '.json',
+          ),
+          'utf8',
+        ),
+      ).facts.technicalExclusion,
+    ).toBe(false)
+  })
+  it.each([
+    'technicalExclusion',
+    'ownerHoldActive',
+    'workflow373396385Disabled',
+    'unapprovedDeployments',
+    'queuedDeployments',
+    'unexpectedSpecChanges',
+    'unapprovedPostgresClients',
+    'unapprovedRedisClients',
+    'storageWriters',
+    'holdReceiptSha256',
+    'missing',
+  ])('latches maintenance stop on %s drift', async (field) => {
+    const f = fixture(true)
+    await monitorOnce(f)
+    const facts = f.facts.ownerMaintenanceHold!
+    if (field === 'missing') delete f.policy.probes.ownerMaintenanceHold
+    else
+      facts[field] =
+        typeof facts[field] === 'boolean'
+          ? !facts[field]
+          : typeof facts[field] === 'number'
+            ? 1
+            : '0'.repeat(64)
+    await expect(monitorOnce(f)).rejects.toThrow()
+    expect(existsSync(join(f.directory, 'safety.json'))).toBe(false)
+    expect(existsSync(join(f.directory, 'monitor-stopped.json'))).toBe(true)
+  })
+  it('caps receipt lifetime at the hold expiry and fails closed at expiry', async () => {
+    const f = fixture(true)
+    f.approval.maintenanceHold!.expiresAt = new Date(now + 1000).toISOString()
+    const result = await monitorOnce(f)
+    expect(result.payload.expiresAt).toBe(f.approval.maintenanceHold!.expiresAt)
+    f.now = () => now + 1000
+    await expect(monitorOnce(f)).rejects.toThrow()
+    expect(existsSync(join(f.directory, 'safety.json'))).toBe(false)
+  })
   it('requires the bound host and independent Linux system-service cgroup', () => {
     const host = 'synthetic-host',
       cgroup = '0::/system.slice/uvanoo-dev-release-monitor.service'

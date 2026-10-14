@@ -1,0 +1,160 @@
+EXACT-DEV MAINTENANCE HOLD — MINIMAL RELEASE AMENDMENT
+14 October 2026. Isolated implementation, NOT live admission or execution evidence.
+
+SOURCE AND SCOPE
+Branch: fix/uvanoo-dev-maintenance-hold-20261014, based directly on
+185f4740057fa8dc0a62622abaec21952d01f662. The final commit is the Git identity
+of this document; never substitute the old image's source label for that commit.
+The f680e8e/fc77155 roster/signature work remains on its separate branch and is
+not included. No WOPI telemetry, product, auth, schema or migration changes.
+Target ONLY Satho82/beaconhs, dev.uvanoo.com, Compose wYb0LxLQrvj2FPI21i-Oj,
+stack uvanoo-v1-4-dev-gniriv, database beaconhs on uvanoo-dev-postgres,
+network uvanoo-dev-private. Legacy BeaconHS and production are excluded.
+
+ONE OPTIONAL FIELD, EXISTING APPROVAL/AUDIT MECHANISM
+The existing private owner-approval.json may contain maintenanceHold with exactly:
+technicalExclusion=false; privilegedOperatorRiskAccepted=true; startsAt;
+expiresAt (at most two hours after startsAt); receiptSha256.
+Use the existing owner and auditId, existing independently pinned approval-byte
+checksum, and existing monitor signing key. No operator roster, additional key,
+signature workflow or account is introduced. No actual approval is synthesized.
+The receipt is the private documented owner-controlled maintenance decision:
+DEV identity, allowed ordered changes, time interval and explicit acceptance that
+root/Docker/Dokploy operators are coordinated, NOT technically excluded. Its
+checksum must match the continuously observed hold receipt. Changing it requires
+new owner approval/pin; timestamps cannot silently renew the window.
+
+Only writerExclusion is replaced by ownerMaintenanceHold for this explicit mode.
+Absent that field, existing technical-exclusion behavior is unchanged. Production,
+other targets, malformed approvals, >2h intervals, expired/future intervals,
+missing risk acceptance and claims of technical exclusion are rejected.
+The hold must start no later than the encrypted backup snapshot. Existing one-hour
+backup freshness remains mandatory at admission, even if the hold lasts two hours.
+Temporary Mac custody remains non-immutable, non-production and not certified DR.
+
+EXISTING MONITOR CONTRACT, NO CLAIM OF LIVE COVERAGE
+The existing checksum-pinned probe must emit aggregate ownerMaintenanceHold facts:
+technicalExclusion=false; ownerHoldActive=true; workflow373396385Disabled=true;
+unapprovedDeployments=0; queuedDeployments=0; unexpectedSpecChanges=0;
+unapprovedPostgresClients=0; unapprovedRedisClients=0; storageWriters=0;
+holdReceiptSha256=<approved receipt hash>; allowedMigrationConnectionsSha256.
+These are fresh observations and coordination evidence, not proof that a root
+operator cannot act between observations. Unknown/inaccessible sources must FAIL,
+not be hardcoded as zero. Existing probe executable/dependency checksum pinning,
+five-second collection bound and ten-second signed-receipt freshness remain.
+Receipt expiry is additionally capped at hold expiry. Failure revokes safety.json
+and latches STOPPED; gate consumption now also rejects an existing stop latch.
+No auto re-arm, writer resumption or workflow re-enable. Monitor signs/revokes
+admission only; do not describe it as an installed service stopper. The separate
+reviewed watchdog/stop hook must be installed and its behavior independently proven.
+
+All other migration/web checks remain: authenticated complete Collabora drainage,
+independent watchdog, all-five persistent zero, legacy isolation, MinIO contents
+and credentials, object references, no-writer cross-store interval, queue safety,
+logical catalog/restore identity, exact source/image and historical migration lock.
+The web check is PRE-ACTIVATION admission, not a claim that web remains zero after
+activation. Review the existing watchdog's explicitly authorized web-only transition
+before execution; a stale all-zero policy must not be presented as post-start health.
+
+VALIDATION AND IMAGE BINDING
+Focused admission/monitor tests and database typecheck cover changed behavior.
+Existing source-proof and publication contracts verify unchanged product/auth,
+all migration SQL, corrected 0060/0061 hashes and non-deploying CI entry.
+The isolated CI wrapper now accepts only this branch and invokes the unchanged
+full cloud validation/image workflow with github.sha. No inherited secrets,
+deployment job, DEV environment or self-hosted runner is added.
+Publication has NOT been performed by this amendment. Before publishing, refresh
+exact branch/event/Dokploy receiver safety and concurrent-writer checks. Publish
+only this review branch; never silently update feature or close/merge PRs.
+Collect a successful exact-commit run and image manifest digest plus OCI source
+label. Existing image b59ca3b13b16ee128746fd023192fd4a0cb22fd173c3e0d78d3f2688cf03a80b
+and CI38551771893/38551772165 remain evidence for BASE185 only, not this amendment.
+The current governed feature must separately admit the corrected exact commit
+before the existing deployment workflow can accept it. No automatic promotion.
+Workflow373396385 stays disabled throughout; do not dispatch or re-enable it.
+
+MINIMAL EXECUTION PACKAGE — SUBJECT TO ONE SEPARATE OWNER AUTHORIZATION
+Preparation before starting the <=2h maintenance clock:
+1. Complete safe isolated publication, exact-source CI/image binding and governed
+   promotion approval. Pin final SHA/digest, tools, rendered complete Compose and
+   private evidence directory. Privately validate GHCR access; no credential output.
+2. Reconfirm exact current DEV service IDs/specs and separate legacy baseline.
+   Review private sanitized dependency diff and reviewed monitor/watchdog stop-hook
+   checksums. No live baseline or successful probe receipt has been invented here.
+3. Resolve OLD Collabora documents with their owners and existing supported audit
+   evidence; preserve unsaved content and verify final object/save outcomes. Prevent
+   new DEV editor admissions using the reviewed DEV-only control while retaining
+   callbacks/retries. Do NOT stop Collabora to discover whether it was drained.
+   Existing evidence: admin credentials unavailable; old WOPI reports successes,
+   not complete pending/failed coverage. Zero sockets/kits or a fresh empty ledger
+   cannot close this gap. Unaccounted sessions/saves remain a stop condition.
+   Do not edit live coolwsd XML: stop_on_config_change=true. Any required admin
+   activation is an offline minimal private config diff and separately reviewed
+   cutover AFTER old-save reconciliation. No telemetry deployment is assumed.
+
+Authorized window, only after those conditions are proven:
+4. Record owner maintenance acceptance and start/end in existing audit/approval.
+   Coordinate all authorized DEV Dokploy/API/SSH/Docker actors; keep workflow
+   373396385 disabled, no DEV queued actions, AutoDeploy off. Leave shared Dokploy,
+   Traefik and global Docker permissions untouched. Observe privileged drift;
+   acknowledge monitoring cannot prevent malicious or mistaken root activity.
+5. Install reviewed DEV-only monitor/watchdog controls and verify isolated failure
+   behavior, independent heartbeat and no auto-resume before disruptive actions.
+   After complete old-save drainage, persist all five DEV replica controls at zero,
+   retain all services in Compose (--prune safe), apply through exact DEV record,
+   and verify desired=0 AND no active tasks. Bootstrap is a separately approved
+   live step: do not pretend migration admission with five-zero proves bootstrap.
+6. Under the no-writer interval capture current PostgreSQL16.15 using consistent
+   read-only pg_dump; encrypt with the previously verified owner-Mac age recipient.
+   Reverify private decryption challenge, authenticated SSH and disk capacity.
+   Transfer ciphertext and retain matching independent checksums/receipt on Mac.
+   Preserve original encrypted backup; fresh capture does not replace prior evidence.
+   Verify current 58-prefix/catalog/data against a pristine network-isolated,
+   resource-limited Mac restore. Preserve it; disposable rehearsal copy is separate.
+   Reuse unchanged migration SQL/rehearsal proof, but validate any changed source
+   data/security/catalog rather than claiming the October13 snapshot is current.
+7. Reconcile current DB references with retained MinIO logical objects/versions and
+   bucket/IAM identity on a copy. Preserve existing successful app-principal and
+   attachment-read evidence. Close outstanding admin/bucket semantics and prove
+   complete no-writer cross-store consistency; independently retain the storage
+   recovery copy/receipt. Never modify the original to make verification pass.
+   If restore/verification exceeds the one-hour freshness window, STOP/re-admit;
+   neither an old checksum nor the two-hour hold extends backup freshness.
+8. Bind current private restore/owner/monitor receipts to final SHA/digest and DEV.
+   Run scripts/cluster/verify-dev-release-admission.sh migration; retain read-only
+   evidence mount in actual migration container. Apply ONLY src/migrate-dev.ts
+   guarded additive59–63 as reviewed in .github/workflows/deploy-dev.yml. No seed,
+   journal rewrite or RLS bypass. Verify all63 identities and preserved user,
+   tenant/property/people/attachment data and security contracts.
+9. Apply only reviewed DEV settings: runtime PostgreSQL
+   uvanoo-dev-postgres:5432/beaconhs with verified role-specific private credentials;
+   Redis uvanoo-dev-redis:6379/0; retained uvanoo-dev-minio-data with verified original
+   identity and endpoint. Preserve auth secrets, unrelated settings, routes,
+   Basic Auth, all Compose services and legacy networks/volumes. Never create an
+   empty replacement. Install pinned candidate specs with all writers still zero.
+10. Run the existing web admission check immediately before explicit restore-web.
+    Only WEB_REPLICAS becomes1. Worker/scheduler/storage-init/Collabora remain0.
+    Validate health/source digest, native login using existing approved test access,
+    two approved demo properties, People/Approvals/Risk read/write authorization,
+    cross-tenant denial/RBAC/RLS and Light/Terra teal/coral branding. Use designated
+    disposable acceptance records only if explicitly included in owner approval.
+    No password reset, Basic Auth removal or background-service resumption.
+
+ROLLBACK / STOP BOUNDARIES
+Before migrations: keep writers fenced; retain previous saved specs and all data;
+no automatic restart. After any migration: image rollback does not undo SQL or
+external effects; stop, preserve evidence and require explicit reviewed database
+recovery if needed. No destructive reset/automatic downgrade. Stop on save/data/
+credential/identity drift, absent observation, expiry or failed checks. A monitor
+cannot undo root actions or restore an unsaved document buffer.
+
+ONE OWNER DECISION TO REQUEST AFTER LOCAL AMENDMENT REVIEW
+Approve this exact corrected commit for non-deploying CI/image publication and
+subsequent separately verified exact governed promotion; authorize ONE <=2h DEV
+execution window for steps4–10 only once the exact resulting source/image binding,
+old-save reconciliation, fresh backup/storage evidence and monitor checks pass.
+Accept coordinated privileged access (technicalExclusion=false), temporary Mac
+custody and rollback limits explicitly. Keep all stated exclusions. Any unresolved
+save coverage, missing credential/observation or source mismatch means NO execution,
+not an implied exception or another governance project. This file is a proposed
+execution package, not owner acceptance or proof that those live conditions pass.

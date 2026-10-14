@@ -2,7 +2,7 @@ name: Isolated DEV execution gates and image (no deployment)
 
 on:
   push:
-    branches: [fix/uvanoo-dev-release-admission-20261014]
+    branches: [fix/uvanoo-dev-maintenance-hold-20261014]
 
 permissions:
   contents: read
@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   validate-and-build:
-    if: github.repository == 'Satho82/beaconhs' && github.ref == 'refs/heads/fix/uvanoo-dev-release-admission-20261014'
+    if: github.repository == 'Satho82/beaconhs' && github.ref == 'refs/heads/fix/uvanoo-dev-maintenance-hold-20261014'
     uses: ./.github/workflows/uvanoo-v1.4-cloud-build.yml
     with:
       source_sha: ${{ github.sha }}

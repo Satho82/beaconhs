@@ -19,8 +19,8 @@ import { canonical } from './dev-logical-catalog'
 import type { ReleaseEvidence } from './dev-migration-gate'
 import {
   DEV_TARGET,
-  MIGRATION_CHECKS,
-  WEB_CHECKS,
+  admissionChecks,
+  maintenanceHoldExpiry,
   validateTemporaryAdmission,
   type AdmissionPhase,
   type PrivateRestoreReceipt,
@@ -71,7 +71,20 @@ type Observation = {
   facts: Record<string, unknown>
 }
 // Aggregate-only protocol. No URL, account, object name, credential or document content.
-const contracts: Record<string, Record<string, 'zero' | 'true' | 'hash'>> = {
+const contracts: Record<string, Record<string, 'zero' | 'true' | 'false' | 'hash'>> = {
+  ownerMaintenanceHold: {
+    technicalExclusion: 'false',
+    ownerHoldActive: 'true',
+    workflow373396385Disabled: 'true',
+    unapprovedDeployments: 'zero',
+    queuedDeployments: 'zero',
+    unexpectedSpecChanges: 'zero',
+    unapprovedPostgresClients: 'zero',
+    unapprovedRedisClients: 'zero',
+    storageWriters: 'zero',
+    holdReceiptSha256: 'hash',
+    allowedMigrationConnectionsSha256: 'hash',
+  },
   writerExclusion: {
     exclusiveHoldActive: 'true',
     authenticatedDeployersExcluded: 'true',
@@ -159,7 +172,15 @@ export function validateObservation(
   keys(value.facts, Object.keys(contract))
   for (const [field, type] of Object.entries(contract)) {
     const v = value.facts[field]
-    requireValue(type === 'zero' ? v === 0 : type === 'true' ? v === true : digest(v))
+    requireValue(
+      type === 'zero'
+        ? v === 0
+        : type === 'true'
+          ? v === true
+          : type === 'false'
+            ? v === false
+            : digest(v),
+    )
   }
   if (check === 'legacyIsolation')
     requireValue(value.facts.baselineSha256 === value.facts.observedSha256)
@@ -313,7 +334,8 @@ export async function monitorOnce(options: {
         policy.monitorId === approval.monitorId &&
         (policy.phase === 'migration' || policy.phase === 'web'),
     )
-    const checks = policy.phase === 'web' ? WEB_CHECKS : MIGRATION_CHECKS
+    const holdExpires = maintenanceHoldExpiry(approval, started)
+    const checks = admissionChecks(policy.phase, approval)
     keys(policy.probes, [...checks])
     const key = createPrivateKey(options.key)
     requireValue(
@@ -325,6 +347,8 @@ export async function monitorOnce(options: {
       checks.map(async (check) => {
         const value = await (options.probe ?? runProbe)(policy.probes[check]!)
         const stamp = validateObservation(value, check, policy, started, now())
+        if (check === 'ownerMaintenanceHold')
+          requireValue(value.facts.holdReceiptSha256 === approval.maintenanceHold?.receiptSha256)
         return { check, stamp, bytes: canonical(value) }
       }),
     )
@@ -341,9 +365,7 @@ export async function monitorOnce(options: {
       monitorId: policy.monitorId,
       phase: policy.phase,
       observedAt: new Date(observed).toISOString(),
-      expiresAt: new Date(
-        Math.min(observed + 10_000, Date.parse(approval.expiresAt)),
-      ).toISOString(),
+      expiresAt: new Date(Math.min(observed + 10_000, holdExpires)).toISOString(),
       checks: Object.fromEntries(
         observations.map((v) => [v.check, { passed: true, evidenceSha256: hash(v.bytes) }]),
       ),

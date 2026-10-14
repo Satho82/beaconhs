@@ -1,5 +1,5 @@
 import { createHash, createPublicKey, verify } from 'node:crypto'
-import { lstatSync, readFileSync, realpathSync } from 'node:fs'
+import { existsSync, lstatSync, readFileSync, realpathSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { canonical, LOGICAL_SCHEMA_PROFILE } from './dev-logical-catalog'
 import type { ReleaseEvidence } from './dev-migration-gate'
@@ -48,6 +48,15 @@ export type TemporaryApproval = {
   safetyPublicKeyDer: string
   capabilities: AdmissionPhase[]
   acceptedRisks: ['non-immutable', 'owner-device-loss', 'post-snapshot-write-loss']
+  // Optional exact-DEV alternative, covered by the existing owner approval pin.
+  // The owner/auditId above authorize coordination, NOT exclusion of privileged operators.
+  maintenanceHold?: {
+    technicalExclusion: false
+    privilegedOperatorRiskAccepted: true
+    startsAt: string
+    expiresAt: string
+    receiptSha256: string
+  }
 }
 export type PrivateRestoreReceipt = {
   version: 1
@@ -111,6 +120,45 @@ function requireValue(ok: unknown): asserts ok {
 }
 function exactTarget(target: unknown) {
   requireValue(canonical(target) === canonical(DEV_TARGET))
+}
+export function admissionChecks(phase: AdmissionPhase, approval: TemporaryApproval): string[] {
+  return (phase === 'web' ? WEB_CHECKS : MIGRATION_CHECKS).map((check) =>
+    check === 'writerExclusion' && approval.maintenanceHold !== undefined
+      ? 'ownerMaintenanceHold'
+      : check,
+  )
+}
+/** Reuse the existing pinned owner/audit decision; no roster or additional signing system. */
+export function maintenanceHoldExpiry(approval: TemporaryApproval, now: number): number {
+  if (approval.maintenanceHold === undefined) return Date.parse(approval.expiresAt)
+  const hold = approval.maintenanceHold
+  exactTarget(approval.target)
+  requireValue(hold && typeof hold === 'object')
+  requireValue(
+    canonical(Object.keys(hold).sort()) ===
+      canonical(
+        [
+          'technicalExclusion',
+          'privilegedOperatorRiskAccepted',
+          'startsAt',
+          'expiresAt',
+          'receiptSha256',
+        ].sort(),
+      ),
+  )
+  const starts = Date.parse(hold.startsAt),
+    expires = Date.parse(hold.expiresAt)
+  requireValue(
+    hold.technicalExclusion === false &&
+      hold.privilegedOperatorRiskAccepted === true &&
+      hash(hold.receiptSha256) &&
+      Number.isFinite(starts) &&
+      Number.isFinite(expires) &&
+      starts <= now &&
+      now < expires &&
+      expires - starts <= 2 * 3600_000,
+  )
+  return Math.min(expires, Date.parse(approval.expiresAt))
 }
 function requireDevContext(env: NodeJS.ProcessEnv) {
   requireValue(
@@ -195,6 +243,9 @@ export function validateTemporaryAdmission(
   exactTarget(approval.target)
   exactTarget(receipt.target)
   exactTarget(safety.payload.target)
+  const holdExpires = maintenanceHoldExpiry(approval, now)
+  if (approval.maintenanceHold !== undefined)
+    requireValue(Date.parse(approval.maintenanceHold.startsAt) <= Date.parse(e.backup.createdAt))
   const created = Date.parse(e.backup.createdAt),
     issued = Date.parse(approval.issuedAt),
     expires = Date.parse(approval.expiresAt)
@@ -273,9 +324,10 @@ export function validateTemporaryAdmission(
       now - observed <= 10_000 &&
       now < validUntil &&
       validUntil - observed <= 10_000 &&
-      validUntil <= expires,
+      validUntil <= expires &&
+      validUntil <= holdExpires,
   )
-  const checks = phase === 'web' ? WEB_CHECKS : MIGRATION_CHECKS
+  const checks = admissionChecks(phase, approval)
   requireValue(canonical(Object.keys(p.checks).sort()) === canonical([...checks].sort()))
   requireValue(
     checks.every((k) => p.checks[k]?.passed === true && hash(p.checks[k]?.evidenceSha256)),
@@ -298,6 +350,7 @@ export function checkTemporaryFiles(
   now = Date.now(),
 ) {
   try {
+    requireValue(!existsSync(resolve(directory, 'monitor-stopped.json')))
     const a = e.admission
     requireValue(
       a &&

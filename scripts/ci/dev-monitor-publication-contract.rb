@@ -24,12 +24,12 @@ check(Digest::SHA256.hexdigest(JSON.generate(current)) == '5a564a85e5b30d71db277
 
 wrapper = load_yaml(File.read('.github/workflows/dev-execution-gates.yml'))
 check((wrapper['on'] || wrapper[true]) == {
-  'push' => { 'branches' => ['fix/uvanoo-dev-release-admission-20261014'] }
+  'push' => { 'branches' => ['fix/uvanoo-dev-maintenance-hold-20261014'] }
 }, 'Only isolated branch pushes may start this workflow')
 check(wrapper['permissions'] == { 'contents' => 'read', 'packages' => 'write' }, 'Image-only write authority')
 check(wrapper['jobs'] == {
   'validate-and-build' => {
-    'if' => "github.repository == 'Satho82/beaconhs' && github.ref == 'refs/heads/fix/uvanoo-dev-release-admission-20261014'",
+    'if' => "github.repository == 'Satho82/beaconhs' && github.ref == 'refs/heads/fix/uvanoo-dev-maintenance-hold-20261014'",
     'uses' => './.github/workflows/uvanoo-v1.4-cloud-build.yml',
     'with' => { 'source_sha' => '${{ github.sha }}' }
   }

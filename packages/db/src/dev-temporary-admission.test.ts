@@ -7,8 +7,8 @@ import { canonical, LOGICAL_SCHEMA_PROFILE } from './dev-logical-catalog'
 import {
   DEV_TARGET,
   TEMPORARY_CLASS,
-  MIGRATION_CHECKS,
   WEB_CHECKS,
+  admissionChecks,
   checkTemporaryFiles,
   validateTemporaryAdmission,
   requireTemporaryDatabaseTarget,
@@ -37,7 +37,7 @@ const env = {
   EXPECTED_MIGRATION_HOST: DEV_TARGET.databaseHost,
   MIGRATION_DOCKER_NETWORK: DEV_TARGET.network,
 }
-function fixture(phase: AdmissionPhase = 'migration') {
+function fixture(phase: AdmissionPhase = 'migration', maintenance = false) {
   const keys = generateKeyPairSync('ed25519')
   const e: ReleaseEvidence = {
     version: 2,
@@ -116,6 +116,14 @@ function fixture(phase: AdmissionPhase = 'migration') {
     capabilities: ['migration', 'web'],
     acceptedRisks: ['non-immutable', 'owner-device-loss', 'post-snapshot-write-loss'],
   }
+  if (maintenance)
+    a.maintenanceHold = {
+      technicalExclusion: false,
+      privilegedOperatorRiskAccepted: true,
+      startsAt: e.backup.createdAt,
+      expiresAt: a.expiresAt,
+      receiptSha256: hash,
+    }
   const pin = digest(JSON.stringify(a))
   e.admission = {
     class: TEMPORARY_CLASS,
@@ -138,10 +146,7 @@ function fixture(phase: AdmissionPhase = 'migration') {
     observedAt: new Date(now - 1000).toISOString(),
     expiresAt: new Date(now + 5000).toISOString(),
     checks: Object.fromEntries(
-      (phase === 'web' ? WEB_CHECKS : MIGRATION_CHECKS).map((k) => [
-        k,
-        { passed: true, evidenceSha256: hash },
-      ]),
+      admissionChecks(phase, a).map((k) => [k, { passed: true, evidenceSha256: hash }]),
     ),
   }
   const safety = {
@@ -155,6 +160,85 @@ function fixture(phase: AdmissionPhase = 'migration') {
   return { e, a, r, safety, pin, check, keys }
 }
 describe('exact DEV temporary admission', () => {
+  it('pins maintenance acceptance to the existing private owner approval bytes', () => {
+    const f = fixture('migration', true),
+      directory = realpathSync(mkdtempSync(join(tmpdir(), 'dev-hold-pin-')))
+    try {
+      const put = (name: string, value: unknown) =>
+        writeFileSync(join(directory, name), JSON.stringify(value), { mode: 0o600 })
+      put('owner-approval.json', f.a)
+      put('private-restore.json', f.r)
+      put('safety.json', f.safety)
+      const context = { ...env, DEV_TEMPORARY_APPROVAL_SHA256: f.pin }
+      expect(() => checkTemporaryFiles(f.e, directory, 'migration', context, now)).not.toThrow()
+      put('owner-approval.json', {
+        ...f.a,
+        maintenanceHold: { ...f.a.maintenanceHold, receiptSha256: '0'.repeat(64) },
+      })
+      expect(() => checkTemporaryFiles(f.e, directory, 'migration', context, now)).toThrow()
+      put('owner-approval.json', f.a)
+      expect(() => checkTemporaryFiles(f.e, directory, 'migration', env, now)).toThrow()
+    } finally {
+      rmSync(directory, { recursive: true, force: true })
+    }
+  })
+  it.each(['migration', 'web'] as const)(
+    'accepts an explicit owner maintenance hold for %s only',
+    (phase) => {
+      const f = fixture(phase, true)
+      expect(() => f.check()).not.toThrow()
+      expect(f.safety.payload.checks.writerExclusion).toBeUndefined()
+      expect(f.safety.payload.checks.ownerMaintenanceHold?.passed).toBe(true)
+    },
+  )
+  it.each([
+    'risk',
+    'claim',
+    'expired',
+    'future',
+    'long',
+    'late-start',
+    'hash',
+    'extra',
+    'missing',
+    'wrong-target',
+    'production',
+    'unsigned',
+    'overrun',
+  ])('rejects maintenance hold %s', (kind) => {
+    const f = fixture('migration', true),
+      hold = f.a.maintenanceHold!
+    if (kind === 'risk') hold.privilegedOperatorRiskAccepted = false as true
+    if (kind === 'claim') hold.technicalExclusion = true as false
+    if (kind === 'expired') hold.expiresAt = new Date(now).toISOString()
+    if (kind === 'future') hold.startsAt = new Date(now + 1).toISOString()
+    if (kind === 'long')
+      hold.expiresAt = new Date(Date.parse(hold.startsAt) + 7200_001).toISOString()
+    if (kind === 'late-start') hold.startsAt = new Date(now - 1).toISOString()
+    if (kind === 'hash') hold.receiptSha256 = ''
+    if (kind === 'extra') Object.assign(hold, { operators: [] })
+    if (kind === 'missing') delete f.a.maintenanceHold
+    if (kind === 'wrong-target')
+      f.a.target = { ...DEV_TARGET, composeId: 'legacy' } as unknown as typeof DEV_TARGET
+    if (kind === 'unsigned') f.safety.signature = ''
+    if (kind === 'overrun') hold.expiresAt = new Date(now + 1000).toISOString()
+    expect(() =>
+      f.check(kind === 'production' ? { ...env, DEV_RELEASE_ENVIRONMENT: 'production' } : env),
+    ).toThrow()
+  })
+  it.each(WEB_CHECKS.filter((key) => key !== 'writerExclusion'))(
+    'maintenance does not waive %s',
+    (key) => {
+      const f = fixture('web', true)
+      delete f.safety.payload.checks[key]
+      f.safety.signature = sign(
+        null,
+        Buffer.from(canonical(f.safety.payload)),
+        f.keys.privateKey,
+      ).toString('base64')
+      expect(() => f.check()).toThrow()
+    },
+  )
   it('binds the actual connection rather than trusting environment target labels', () => {
     const url = 'postgresql://beaconhs_backup:synthetic@uvanoo-dev-postgres:5432/beaconhs'
     expect(() => requireTemporaryDatabaseTarget(url, 'beaconhs_backup')).not.toThrow()
@@ -277,6 +361,9 @@ describe('exact DEV temporary admission', () => {
       put('safety.json', f.safety)
       const e = { ...env, DEV_TEMPORARY_APPROVAL_SHA256: f.pin }
       expect(() => checkTemporaryFiles(f.e, directory, 'migration', e, now)).not.toThrow()
+      put('monitor-stopped.json', { status: 'STOPPED' })
+      expect(() => checkTemporaryFiles(f.e, directory, 'migration', e, now)).toThrow()
+      rmSync(join(directory, 'monitor-stopped.json'))
       expect(() => checkTemporaryFiles(f.e, directory, 'migration', env, now)).toThrow()
       put('private-restore.json', { ...f.r, runId: 'tampered' })
       expect(() => checkTemporaryFiles(f.e, directory, 'migration', e, now)).toThrow()

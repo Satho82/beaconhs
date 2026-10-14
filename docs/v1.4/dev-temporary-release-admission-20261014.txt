@@ -1,4 +1,8 @@
 DEV TEMPORARY RELEASE ADMISSION — ISOLATED CORRECTION PACKAGE
+AMENDMENT: dev-maintenance-hold-release-20261014.txt defines the optional exact-DEV
+owner-maintenance alternative. Only its explicit pinned approval substitutes
+ownerMaintenanceHold for writerExclusion; other requirements below are unchanged.
+
 14 October 2026. Parent product candidate bc7b03c602886e2b64ec7746156f7e7ea8611e8c.
 This document is NOT a live approval, filled receipt, installed watchdog or claim
 that MinIO/Collabora/access prerequisites have passed. No production exception.

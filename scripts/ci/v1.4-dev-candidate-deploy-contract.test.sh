@@ -348,7 +348,7 @@ migration_step = core_deploy.fetch('steps').find { |step| step['name'] == 'Run d
 selection = migration_step['run'][/migration_entrypoint=src\/migrate\.ts\n.*?\nfi/m]
 abort 'Missing explicit prepared Risk / ordinary migration routing' unless selection
 {'true' => 'src/migrate-dev.ts', 'false' => 'src/migrate.ts'}.each do |flag, expected|
-  result, status = Open3.capture2({'FEATURE_CANDIDATE_VERIFIED' => flag}, 'bash', '-eu', '-c', selection + '\nprintf "%s" "$migration_entrypoint"'.gsub('\\n', "\n"))
+  result, status = Open3.capture2({'FEATURE_CANDIDATE_VERIFIED' => flag, 'DEPLOY_SOURCE_SHA' => 'a' * 40}, 'bash', '-eu', '-c', selection + '\nprintf "%s" "$migration_entrypoint"'.gsub('\\n', "\n"))
   abort 'Unsafe migration entrypoint selection' unless status.success? && result == expected
 end
 abort 'Selected entrypoint must reach the pinned container' unless migration_step['run'].include?('exec tsx "$migration_entrypoint"') && migration_step['run'].include?('-e FEATURE_CANDIDATE_VERIFIED="$FEATURE_CANDIDATE_VERIFIED"')
@@ -592,10 +592,11 @@ restore = steps[positions[6]]
   abort 'Fence/restore must use only the verified DEV API path under default success gating' unless
     step['if'] == 'inputs.feature_candidate_verified' &&
     !step.key?('continue-on-error') &&
-    step['run'].start_with?('node .deployment-governance/scripts/cluster/dev-writer-fence.mjs ')
+    (step == fence ? step['run'] == 'node .deployment-governance/scripts/cluster/dev-writer-fence.mjs fence' :
+      step['run'].lines.map(&:strip) == ['set -euo pipefail', 'bash scripts/cluster/verify-dev-release-admission.sh web', 'node .deployment-governance/scripts/cluster/dev-writer-fence.mjs restore-web'])
 end
 abort 'Fence must perform persist, rollout and runtime proof' unless fence['run'].end_with?(' fence')
-abort 'Restore must validate candidate before raising ONLY web replicas' unless restore['run'].end_with?(' restore-web')
+abort 'Restore must validate candidate before raising ONLY web replicas' unless restore['run'].rstrip.end_with?(' restore-web')
 migration = steps[positions[3]]
 abort 'Migration must recheck zero writers before docker run' unless
   migration['run'].index('dev-writer-fence.mjs verify-zero') < migration['run'].index('docker run') &&
@@ -744,4 +745,5 @@ Dir.mktmpdir('dev-fence-contract-') do |dir|
 end
 RUBY
 
+ruby scripts/ci/dev-temporary-admission-contract.rb
 echo 'PASS V1.4 candidate deployment is manual, DEV-only, digest-bound and writer-fenced'

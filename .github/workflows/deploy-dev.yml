@@ -35,6 +35,11 @@ on:
         required: false
         type: boolean
         default: false
+      temporary_dev_approval_sha256:
+        description: Separately owner-approved temporary DEV policy checksum; never used by main
+        required: false
+        type: string
+        default: ''
       foundation_web_restore_authorized:
         description: Owner approved recovery prerequisites, DEV migration and web-only restoration
         required: false
@@ -214,6 +219,9 @@ jobs:
       REDIS_URL: ${{ inputs.feature_candidate_verified && secrets.DEV_REDIS_URL || secrets.MAIN_REDIS_URL }}
       EXPECTED_MIGRATION_HOST: ${{ inputs.feature_candidate_verified && 'uvanoo-dev-postgres' || 'beaconhs-postgres' }}
       EXPECTED_DATABASE_NAME: ${{ inputs.feature_candidate_verified && 'beaconhs' || 'beaconhs' }}
+      DEV_RELEASE_ENVIRONMENT: ${{ inputs.feature_candidate_verified && 'dev' || 'production' }}
+      DEV_TEMPORARY_APPROVAL_SHA256: ${{ inputs.temporary_dev_approval_sha256 }}
+      DEV_RELEASE_EVIDENCE_SHA256: ${{ inputs.release_evidence_sha256 }}
     steps:
       # The deploy runner shares storage with Dokploy. Keep stale build cache
       # and superseded images from exhausting the host and taking the Dokploy
@@ -675,6 +683,13 @@ jobs:
             console.log("Selected Redis credential matches the deployment topology");
           '
 
+      - name: Verify DEV admission before writer mutations
+        if: inputs.feature_candidate_verified
+        env:
+          FEATURE_CANDIDATE_VERIFIED: ${{ inputs.feature_candidate_verified }}
+          DEV_BACKUP_DATABASE_URL: ${{ secrets.DEV_BACKUP_DATABASE_URL }}
+        run: bash scripts/cluster/verify-dev-release-admission.sh migration
+
       - name: Persist apply and verify DEV writer fence
         if: inputs.feature_candidate_verified
         id: writer-fence
@@ -692,12 +707,7 @@ jobs:
           DATABASE_URL: ${{ env.DATABASE_URL }}
           SUPERADMIN_DATABASE_URL: ${{ env.SUPERADMIN_DATABASE_URL }}
         run: |
-          evidence_mount=()
-          if [ "$FEATURE_CANDIDATE_VERIFIED" = true ]; then
-            evidence_mount=(-v "/opt/uvanoo-dev/release-evidence/$DEPLOY_SOURCE_SHA:/release-evidence:ro")
-          fi
           docker run --rm --pull=never --network "$MIGRATION_DOCKER_NETWORK" \
-            "${evidence_mount[@]}" \
             -v "$GITHUB_WORKSPACE:/workspace" \
             -v "$MIGRATION_PNPM_TOOLCHAIN_ROOT:/pnpm-toolchain:ro" \
             -w /workspace \
@@ -905,10 +915,13 @@ jobs:
           # DEV requires strict source-prefix, schema/security and verified backup evidence.
           # Ordinary main routing remains unchanged.
           migration_entrypoint=src/migrate.ts
+          evidence_mount=()
           if [ "$FEATURE_CANDIDATE_VERIFIED" = true ]; then
             migration_entrypoint=src/migrate-dev.ts
+            evidence_mount=(-v "/opt/uvanoo-dev/release-evidence/$DEPLOY_SOURCE_SHA:/release-evidence:ro")
           fi
           docker run --rm --pull=never --network "$MIGRATION_DOCKER_NETWORK" \
+            "${evidence_mount[@]}" \
             -v "$GITHUB_WORKSPACE:/workspace" \
             -v "$MIGRATION_PNPM_TOOLCHAIN_ROOT:/pnpm-toolchain:ro" \
             -w /workspace \
@@ -921,6 +934,10 @@ jobs:
             -e FEATURE_CANDIDATE_VERIFIED="$FEATURE_CANDIDATE_VERIFIED" \
             -e DEV_RELEASE_EVIDENCE_PATH=/release-evidence/manifest.json \
             -e DEV_RELEASE_EVIDENCE_SHA256 \
+            -e DEV_TEMPORARY_APPROVAL_SHA256 \
+            -e DEV_RELEASE_ENVIRONMENT -e GITHUB_REPOSITORY \
+            -e DOKPLOY_COMPOSE_ID -e EXPECTED_DOKPLOY_STACK -e EXPECTED_APP_HOST \
+            -e EXPECTED_MIGRATION_HOST -e MIGRATION_DOCKER_NETWORK \
             -e DEV_BACKUP_DATABASE_URL \
             -e DEPLOY_SOURCE_SHA \
             -e IMAGE_DIGEST \
@@ -1076,7 +1093,11 @@ jobs:
           DOKPLOY_URL: ${{ secrets.DOKPLOY_URL }}
           DOKPLOY_TOKEN: ${{ secrets.DOKPLOY_TOKEN }}
           DEV_SERVICE_AUTHORIZATION: restore-web
-        run: node .deployment-governance/scripts/cluster/dev-writer-fence.mjs restore-web
+          DEV_BACKUP_DATABASE_URL: ${{ secrets.DEV_BACKUP_DATABASE_URL }}
+        run: |
+          set -euo pipefail
+          bash scripts/cluster/verify-dev-release-admission.sh web
+          node .deployment-governance/scripts/cluster/dev-writer-fence.mjs restore-web
 
       - name: Roll the immutable image directly on Swarm
         if: env.DOKPLOY_DEPLOY_MODE == 'direct'

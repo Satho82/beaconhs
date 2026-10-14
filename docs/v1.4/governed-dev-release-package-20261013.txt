@@ -1,6 +1,12 @@
 UVANOO V1.4 — governed DEV release integration and approval package
 Preparation only. No live execution is authorized by this document.
 
+HISTORICAL SNAPSHOT: the source-identity/build statements below describe
+bc7b03c602886e2b64ec7746156f7e7ea8611e8c, not its later admission corrections.
+For the14 October correction branch, use dev-temporary-release-admission-20261014.txt.
+Product SQL is preserved; admission/runner/workflow code and its identity lock
+have changed and require their own exact-source validation/publication.
+
 SOURCE / BOUNDARIES
 Release branch: release/uvanoo-v1.4-dev-governed-20261013.
 Base PR11:86db6a4cb7c31272b6865d79e1c18eada379a1c6, which includes

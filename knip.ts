@@ -7,6 +7,7 @@ const config: KnipConfig = {
       entry: [
         'deploy/collabora-branding.js',
         'scripts/check-sanitizer-boundary.mjs',
+        'scripts/ci/governed-release-source-proof.mjs',
         // Executed by the shell deployment-contract suite in both CI lanes.
         'scripts/cluster/dev-writer-fence.test.mjs',
         'scripts/cluster/dev-foundation-preflight.test.mjs',
@@ -54,6 +55,8 @@ const config: KnipConfig = {
         'src/forward-migration-cli.ts',
         'src/migrate-dev.ts',
         'src/dev-migration-gate.integration.ts',
+        'src/dev-logical-catalog.disposable.ts',
+        'src/verify-dev-release-admission.ts',
       ],
     },
     'packages/sync': {

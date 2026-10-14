@@ -440,7 +440,8 @@ async function main() {
   const maintenanceClient = postgres(maintenanceUrl, { max: 1, prepare: false })
   // Keep SET ROLE and the advisory lock on one reserved physical connection.
   const reserved = await migrationClient.reserve()
-  const migrationDb = pinnedMigrationDatabase(reserved)
+  const pinnedDb = pinnedMigrationDatabase(reserved)
+  const migrationDb = devGate ? devGate.guard(pinnedDb) : pinnedDb
   const runtimeDb = drizzle(runtimeClient)
   const maintenanceDb = drizzle(maintenanceClient)
   let lockAcquired = false
@@ -521,7 +522,7 @@ async function main() {
   } finally {
     if (lockAcquired) {
       try {
-        await migrationDb.execute(
+        await pinnedDb.execute(
           sql`select pg_advisory_unlock(hashtext('beaconhs:schema-migration'))`,
         )
       } catch (error) {

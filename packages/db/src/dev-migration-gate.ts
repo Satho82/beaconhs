@@ -8,11 +8,22 @@ import { sql } from 'drizzle-orm'
 import type { MigrationDatabase } from './migration-connection'
 import { readMigrationFiles, type MigrationFile } from './migration-state'
 import identities from './dev-migration-identities.json'
+import { admissionConnection } from './dev-admission-connection'
+import { LOGICAL_SCHEMA_PROFILE, logicalCatalog } from './dev-logical-catalog'
+import {
+  checkTemporaryFiles,
+  privateEvidenceFile,
+  requireTemporaryDatabaseTarget,
+  type AdmissionPhase,
+  type TemporaryAdmission,
+} from './dev-temporary-admission'
 
 export type Query = (statement: string) => Promise<Record<string, unknown>[]>
 export type LedgerRow = { id: number; hash: string; created_at: string | number }
 export type ReleaseEvidence = {
-  version: 1
+  version: 1 | 2
+  schemaProfile?: typeof LOGICAL_SCHEMA_PROFILE
+  admission?: TemporaryAdmission
   sourceSha: string
   sourceTree: string
   imageDigest: string
@@ -107,7 +118,11 @@ export function validateEvidence(
   now = Date.now(),
 ): void {
   if (
-    evidence.version !== 1 ||
+    ![1, 2].includes(evidence.version) ||
+    (evidence.version === 1 &&
+      (evidence.admission !== undefined || evidence.schemaProfile !== undefined)) ||
+    (evidence.version === 2 &&
+      (evidence.schemaProfile !== LOGICAL_SCHEMA_PROFILE || !evidence.admission)) ||
     !/^[a-f0-9]{40}$/.test(expected.sourceSha) ||
     !/^[a-f0-9]{40}$/.test(expected.sourceTree) ||
     !/^sha256:[a-f0-9]{64}$/.test(expected.imageDigest) ||
@@ -134,7 +149,9 @@ export function validateEvidence(
     b.restoredLedgerHash !== b.ledgerHash ||
     b.restoredDataHash !== b.dataHash ||
     b.restoredSchemaHash !== b.schemaHash ||
-    !/^https:\/\/github\.com\/Satho82\/beaconhs\/actions\/runs\/[0-9]+$/.test(b.restoreRun) ||
+    !(evidence.version === 1
+      ? /^https:\/\/github\.com\/Satho82\/beaconhs\/actions\/runs\/[0-9]+$/.test(b.restoreRun)
+      : /^private:[a-zA-Z0-9_-]{8,100}$/.test(b.restoreRun)) ||
     !/^sha256:[a-f0-9]{64}$/.test(b.rollbackImageDigest)
   )
     throw new Error('DEV verified encrypted backup/restore readiness rejected')
@@ -146,7 +163,10 @@ export function validateEvidence(
 }
 const userSchema = "n.nspname NOT LIKE 'pg_%' AND n.nspname <> 'information_schema'"
 /** Catalogue only. No pg_dump, DDL, seed, grants, or application changes. */
-export async function schemaFingerprint(query: Query): Promise<string> {
+export async function schemaFingerprint(
+  query: Query,
+  profile?: typeof LOGICAL_SCHEMA_PROFILE,
+): Promise<string> {
   const sections = [
     'SELECT pg_get_userbyid(datdba) owner,datacl::text acl,datconnlimit,datallowconn FROM pg_database WHERE datname=current_database()',
     'SELECT n.nspname,pg_get_userbyid(n.nspowner) owner,n.nspacl::text acl FROM pg_namespace n WHERE ' +
@@ -179,9 +199,17 @@ export async function schemaFingerprint(query: Query): Promise<string> {
     'SELECT extname,extversion,pg_get_userbyid(extowner) owner FROM pg_extension',
     "SELECT schemaname,sequencename,sequenceowner,data_type,start_value,min_value,max_value,increment_by,cycle,cache_size FROM pg_sequences WHERE schemaname NOT LIKE 'pg_%'",
   ]
-  const results = []
-  for (const statement of sections) results.push((await query(statement)).map(stable).sort())
-  return digest(stable(results))
+  const results: Record<string, unknown>[][] = []
+  for (const statement of sections) results.push(await query(statement))
+  if (profile !== undefined && profile !== LOGICAL_SCHEMA_PROFILE)
+    throw new Error('DEV schema profile rejected')
+  return digest(
+    stable(
+      profile === LOGICAL_SCHEMA_PROFILE
+        ? logicalCatalog(results)
+        : results.map((rows) => rows.map(stable).sort()),
+    ),
+  )
 }
 export async function dataFingerprint(query: Query): Promise<string> {
   const tables = await query(
@@ -237,7 +265,7 @@ export async function verifyState(
   const rows = await readLedger(query)
   const prefix = strictPrefix(files, rows)
   if (complete && prefix !== files.length) throw new Error('DEV target migration suffix incomplete')
-  const actual = await schemaFingerprint(query)
+  const actual = await schemaFingerprint(query, evidence.schemaProfile)
   if (actual !== evidence.schemas[String(prefix)])
     throw new Error('DEV schema/security drift rejected')
   if (
@@ -268,7 +296,7 @@ export function validateBackupTarget(backupUrl: string, migrationUrl: string): v
     throw new Error('DEV backup connection target rejected')
 }
 
-export async function loadDevMigrationGate(folder: string) {
+export async function loadDevMigrationGate(folder: string, phase: AdmissionPhase = 'migration') {
   const evidencePath = process.env.DEV_RELEASE_EVIDENCE_PATH
   const expectedDigest = process.env.DEV_RELEASE_EVIDENCE_SHA256 ?? ''
   if (!evidencePath || !hashPattern.test(expectedDigest))
@@ -276,6 +304,14 @@ export async function loadDevMigrationGate(folder: string) {
   const bytes = readFileSync(evidencePath)
   if (digest(bytes) !== expectedDigest) throw new Error('DEV evidence checksum mismatch')
   const evidence = JSON.parse(bytes.toString('utf8')) as ReleaseEvidence
+  if (evidence.version === 1 && process.env.DEV_TEMPORARY_APPROVAL_SHA256)
+    throw new Error('DEV temporary approval cannot downgrade the evidence contract')
+  const directory = resolve(evidencePath, '..')
+  if (
+    evidence.version === 2 &&
+    privateEvidenceFile(directory, 'manifest.json').compare(bytes) !== 0
+  )
+    throw new Error('DEV evidence path rejected')
   const files = sourceMigrations(folder)
   const git = (arg: string) =>
     execFileSync('git', ['-c', 'safe.directory=/workspace', 'rev-parse', arg], {
@@ -288,13 +324,20 @@ export async function loadDevMigrationGate(folder: string) {
   const sourceSha = git('HEAD')
   const sourceTree = git('HEAD^{tree}')
   if (sourceSha !== process.env.DEPLOY_SOURCE_SHA) throw new Error('DEV checkout source mismatch')
-  validateEvidence(evidence, files, {
-    sourceSha,
-    sourceTree,
-    imageDigest: process.env.IMAGE_DIGEST ?? '',
-  })
+  const admit = () => {
+    validateEvidence(evidence, files, {
+      sourceSha,
+      sourceTree,
+      imageDigest: process.env.IMAGE_DIGEST ?? '',
+    })
+    if (evidence.version === 2) checkTemporaryFiles(evidence, directory, phase)
+  }
+  admit()
   if (evidence.database !== 'beaconhs') throw new Error('DEV persistent database must be beaconhs')
-  const archive = readFileSync(resolve(evidencePath, '..', evidence.backup.file))
+  const archive =
+    evidence.version === 2
+      ? privateEvidenceFile(directory, evidence.backup.file)
+      : readFileSync(resolve(directory, evidence.backup.file))
   if (
     !archive.toString('utf8', 0, 32).startsWith('age-encryption.org/v1\n') ||
     digest(archive) !== evidence.backup.sha256
@@ -303,13 +346,29 @@ export async function loadDevMigrationGate(folder: string) {
   const backupUrl = process.env.DEV_BACKUP_DATABASE_URL
   if (!backupUrl) throw new Error('DEV backup-role connection required')
   validateBackupTarget(backupUrl, process.env.MIGRATION_DATABASE_URL ?? '')
+  if (evidence.version === 2) {
+    requireTemporaryDatabaseTarget(backupUrl, 'beaconhs_backup')
+    requireTemporaryDatabaseTarget(process.env.MIGRATION_DATABASE_URL ?? '', 'beaconhs_migrator')
+  }
   return {
+    guard: (db: MigrationDatabase) =>
+      evidence.version === 2 ? admissionConnection(db, admit) : db,
+    verifyWeb: async () => {
+      if (phase !== 'web') throw new Error('DEV web admission phase required')
+      const client = postgres(backupUrl, { max: 1, prepare: false, onnotice: () => undefined })
+      try {
+        await client.begin('isolation level repeatable read read only', async (tx) => {
+          const query: Query = async (statement) =>
+            Array.from(await tx.unsafe(statement)) as Record<string, unknown>[]
+          await verifyState(query, evidence, files, true)
+        })
+      } finally {
+        await client.end()
+      }
+      admit()
+    },
     before: async (db: MigrationDatabase) => {
-      validateEvidence(evidence, files, {
-        sourceSha,
-        sourceTree,
-        imageDigest: process.env.IMAGE_DIGEST ?? '',
-      })
+      admit()
       const query: Query = async (statement) =>
         Array.from(await db.execute(sql.raw(statement))) as Record<string, unknown>[]
       await verifyState(query, evidence, files, false)
@@ -334,11 +393,13 @@ export async function loadDevMigrationGate(folder: string) {
       } finally {
         await backup.end()
       }
+      admit()
     },
     after: async (db: MigrationDatabase) => {
       const query: Query = async (statement) =>
         Array.from(await db.execute(sql.raw(statement))) as Record<string, unknown>[]
       await verifyState(query, evidence, files, true)
+      admit()
     },
   }
 }

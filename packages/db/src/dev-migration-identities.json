@@ -357,13 +357,13 @@
     "tag": "0060_risk_template_families_manual_assessments",
     "idx": 59,
     "when": 1791542400003,
-    "blob": "ad7f54f883ee62c4522709bfa03c8b58205ef22a"
+    "blob": "db94bc3de15440d128ca503dfb6e869417083176"
   },
   {
     "tag": "0061_risk_assessment_revisions_archive_signoffs",
     "idx": 60,
     "when": 1791542400004,
-    "blob": "ce9a4ae38b221b21c81849811bfe9fa8b1e8e4e6"
+    "blob": "31b96cfaca083b7494572f0b85bf7c521aff3493"
   },
   {
     "tag": "0062_approvals_batch01",

@@ -17,7 +17,7 @@ dispatch = caller.fetch(true).fetch('workflow_dispatch').fetch('inputs')
 abort 'Manual owner approval missing' unless dispatch.dig('foundation_web_restore_authorized', 'default') == false
 abort 'Caller failed to forward approval' unless caller.dig('jobs', 'deploy-dev', 'with', 'foundation_web_restore_authorized') == '${{ inputs.foundation_web_restore_authorized }}'
 restore = steps.find { |s| s['id'] == 'writer-restore' }
-abort 'Workflow may only admit web' unless restore['run'].end_with?(' restore-web') && restore.dig('env', 'DEV_SERVICE_AUTHORIZATION') == 'restore-web'
+abort 'Workflow may only admit web' unless restore['run'].rstrip.end_with?(' restore-web') && restore.dig('env', 'DEV_SERVICE_AUTHORIZATION') == 'restore-web'
 abort 'Background admission forbidden in release workflow' if steps.any? { |s| s['run'].to_s.match?(/dev-writer-fence\.mjs restore-(worker|scheduler|collabora|storage-init)/) }
 update = steps.find { |s| s['run'].to_s.include?('COMPOSE_FILE="$(cat') }
 abort 'DEV-specific template missing' unless update['run'].include?('dokploy-uvanoo-foundation.compose.yaml')

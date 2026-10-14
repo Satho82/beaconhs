@@ -11,14 +11,41 @@ const git = (...args) => execFileSync('git', args, { encoding: 'utf8' }).trim()
 const unchanged = (ref, paths) => assert.equal(git('diff', '--name-only', ref, '--', ...paths), '')
 git('merge-base', '--is-ancestor', product, foundation)
 git('merge-base', '--is-ancestor', foundation, 'HEAD')
-unchanged(rehearsal, ['packages/db'])
+const admissionChanges = new Set(
+  [
+    'dev-migration-identities.json',
+    'dev-migration-gate.ts',
+    'dev-logical-catalog.ts',
+    'dev-logical-catalog.test.ts',
+    'dev-logical-catalog.disposable.ts',
+    'dev-temporary-admission.ts',
+    'dev-temporary-admission.test.ts',
+    'dev-admission-connection.ts',
+    'dev-admission-connection.test.ts',
+    'migrate.ts',
+    'verify-dev-release-admission.ts',
+  ].map((name) => `packages/db/src/${name}`),
+)
+for (const path of git('diff', '--name-only', rehearsal, '--', 'packages/db')
+  .split('\n')
+  .filter(Boolean))
+  assert.ok(admissionChanges.has(path), `Unreviewed database source change: ${path}`)
+unchanged(rehearsal, ['packages/db/drizzle'])
+for (const path of git('diff', '--name-only', foundation, '--', '.github')
+  .split('\n')
+  .filter(Boolean))
+  assert.ok(
+    [
+      '.github/workflows/deploy-dev.yml',
+      '.github/workflows/deploy-v1.4-dev-candidate.yml',
+    ].includes(path),
+  )
 unchanged(foundation, [
   'apps',
   'packages/auth',
   'packages/tenant',
   'packages/ui',
   'deploy',
-  '.github',
   'Dockerfile',
   'pnpm-lock.yaml',
 ])
@@ -53,10 +80,11 @@ console.log(
       rehearsal,
       historicalThrough0059Unchanged: true,
       correctedPendingHashes: corrected,
-      rehearsalDatabaseSourceIdentical: true,
+      rehearsalMigrationSqlIdentical: true,
       productAndAuthUnchanged: true,
       unrelatedWopiTelemetryExcluded: true,
-      foundationControlsUnchanged: true,
+      foundationRuntimeTemplatesUnchanged: true,
+      releaseAdmissionChangedRequiresNewValidation: true,
       releaseEvidenceEligible: false,
     },
     null,

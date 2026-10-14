@@ -1,0 +1,209 @@
+DEV TEMPORARY RELEASE ADMISSION — ISOLATED CORRECTION PACKAGE
+14 October 2026. Parent product candidate bc7b03c602886e2b64ec7746156f7e7ea8611e8c.
+This document is NOT a live approval, filled receipt, installed watchdog or claim
+that MinIO/Collabora/access prerequisites have passed. No production exception.
+
+IMPLEMENTED SCOPE
+1. Only pending0060/0061 entries in dev-migration-identities.json are corrected to
+   validated Git blob IDs db94bc3de15440d128ca503dfb6e869417083176 and
+   31b96cfaca083b7494572f0b85bf7c521aff3493. All SQL/journal bytes, original0001-0059
+   identities and the historical applied-ledger fixture remain unchanged.
+2. The actual DEV migration container receives the exact SHA-scoped evidence
+   directory read-only. It is removed from the unrelated role preflight. No app,
+   legacy or ordinary-main service receives this evidence mount.
+3. Evidence version1 remains the original raw-catalog/Actions-restore contract.
+   Temporary metadata cannot be attached to it, nor can a temporary owner pin
+   silently downgrade to it. Original immutable recovery tooling is unchanged.
+4. Version2 uses DEV_TEMPORARY_RECOVERY_V1, immutable=false,
+   productionEligible=false and pg16-logical-schema-v1. This is a distinct
+   owner-authorized DEV risk class, NOT IMMUTABLE_INDEPENDENT_CUSTODY. Existing
+   Mac receipts retain their non-release-eligible labels; no field is flipped.
+5. Checks run before workflow writer mutations, at migration entry, under the
+   migration lock, before/after guarded statements and transaction completion,
+   after migration, and before web admission. Expired/missing evidence rejects
+   further admission. It never deletes a backup or auto-resumes a service.
+   An already-running PostgreSQL statement is not asynchronously killed; failure
+   at the next guarded boundary rolls back its current transaction. Earlier
+   committed migrations remain committed. Cleanup/unlock is unconditional.
+
+EXACT TARGET AND OPERATION BINDING
+Repository Satho82/beaconhs; environment dev; compose wYb0LxLQrvj2FPI21i-Oj;
+stack uvanoo-v1-4-dev-gniriv; host dev.uvanoo.com; database beaconhs;
+database host uvanoo-dev-postgres; network uvanoo-dev-private; PostgreSQL160015.
+The workflow must be a verified feature candidate. NODE_ENV=production alone is
+not a target identity; these exact context values AND actual connection URLs
+must match. Migration/backup roles are beaconhs_migrator/beaconhs_backup, port5432;
+endpoint-override query parameters and URL fragments are rejected. Ordinary-main
+and legacy routing/controls remain unchanged. Wrong environment/target fails.
+
+REQUIRED PRIVATE INPUTS — NONE CREATED OR APPROVED FOR LIVE USE
+Place under /opt/uvanoo-dev/release-evidence/EXACT_NEW_SOURCE_SHA, owned/protected,
+no symlinked directory/files, no group/world-writable receipt files. The evidence
+is mounted read-only; an independent monitor updates safety.json atomically on
+the host. Do not mount a signing private key in migration, application or CI jobs.
+
+manifest.json:
+  Existing exact sourceSha/sourceTree/imageDigest/databaseOid/version/migrations,
+  schemas and encrypted backup fields; version2; schemaProfile
+  pg16-logical-schema-v1; admission.class DEV_TEMPORARY_RECOVERY_V1;
+  admission.immutable=false; admission.productionEligible=false;
+  approvalFile owner-approval.json and exact bytes approvalSha256;
+  restoreReceiptFile private-restore.json and exact bytes restoreReceiptSha256.
+  backup.restoreRun is private:REAL_RUN_ID, never a fabricated Actions URL.
+  backup.file is the existing approved filename of the fresh .dump.age ciphertext.
+  release_evidence_sha256 binds the exact manifest bytes through dispatch.
+
+owner-approval.json:
+  Exact TemporaryApproval type in dev-temporary-admission.ts. Owner identity and
+  auditId, issuedAt/expiresAt, explicit accepted risks, exact target/DB OID,
+  source/tree/image/ciphertext and private-restore receipt SHA256, independent
+  source/restore host hashes, age-recipient hash, monitorId, Ed25519 public SPKI
+  DER(base64), and permitted capabilities migration and/or web. No private key.
+  The combined deployment workflow requires both capabilities; a migration-only
+  approval deliberately stops before web admission, not at an implicit fallback.
+  Explicit immutable=false and productionEligible=false. Approval follows actual
+  restore; expiry is at most72h from original capture. The separate workflow input
+  temporary_dev_approval_sha256 must independently pin these exact approval bytes.
+  A checksum proves integrity/binding, not provider custody facts: owner review of
+  the receipt and underlying evidence remains necessary. Protected workflow access
+  and the DEV operator hold are prerequisites, not replaced by a caller checkbox.
+
+private-restore.json:
+  Exact PrivateRestoreReceipt type: real run ID, target and source/host/recipient
+  bindings; capture/restore timestamps; PostgreSQL16.15; pristineRetained=true;
+  19 catalog sections; source/restored raw-catalog hashes; matching logical-schema,
+  ledger and data fingerprints. The approved receipt SHA256 binds this record.
+  Preserve original raw metadata and actual collector output privately; do not
+  synthesize a successful record from these type declarations or test fixtures.
+  Use the exported release-gate schemaFingerprint(query,LOGICAL_SCHEMA_PROFILE),
+  readLedger/ledgerFingerprint and dataFingerprint for actual source/restore
+  evidence. Fingerprint queries are SELECT-only. Do not relabel old Python
+  pg16-logical-catalog-v1 hashes: that older profile hashes21 documents including
+  the ledger, while this profile hashes19 schema sections separately. Recompute
+  affected fingerprints from actual data under the approved capture/restore run.
+  Preserve column/enum ordering and every type/default/constraint/dependency,
+  ownership/ACL/default-privilege/RLS field. Only physical numbering is ranked.
+
+safety.json:
+  {payload:SafetyReceipt,signature:base64 Ed25519 signature}. Sign the UTF-8 bytes
+  of canonical(payload) exported by dev-logical-catalog.ts. The independently
+  operated monitor's public key is pinned in the owner approval, never trusted
+  from the safety envelope itself. Payload binds target, source/image/backup,
+  approval checksum, monitorId and phase. observedAt may be at most10s old;
+  expiresAt must be in the future, within10s of observation and within approval
+  expiry. The signing process must not post-date a slow/incomplete observation.
+  Each named check requires passed=true and the SHA256 of retained underlying
+  evidence. Missing/failed checks, extra check names, stale signatures or changed
+  bindings fail closed. A signature authenticates the observer, not its truth;
+  the observer/probes and protected key custody require separate operational
+  review before the owner pins that key. No default-success observer is supplied.
+  No production signing key, credential or actual safety receipt was generated.
+
+Migration checks: writerExclusion,collaboraDrainage,independentWatchdog,
+persistentFiveZero,legacyIsolation.
+Web checks: ALL migration checks PLUS minioContents,minioCredentials,
+objectReferences,crossStoreConsistency,queueSafety.
+The preserved external-writer/watchdog probes supply operational observations,
+not an automatically valid envelope. Live integration must prove they distinguish
+the specifically authorized migration connections from external writers, track
+the reviewed configuration/image transition without silently resetting a drift
+baseline, and stop signing on probe failure/controller loss. The observation/
+signing adapter and independent key/service identity must be reviewed and tested
+in the installation rehearsal. Their live installation/availability is UNKNOWN.
+This release gate rejects an absent feed; no fake baseline or unattended admission
+is claimed by the isolated implementation.
+
+FRESHNESS AND STORAGE ARE NOT WAIVED
+The encrypted capture must still be <=1hour old at admission. Fresh signatures,
+fresh approvals or a re-restore do not refresh an old capture. Current DB identity,
+ledger/schema/data must match the approved pre-migration snapshot. The13 October
+21:20 UTC Mac archive is preserved rehearsal evidence, not a fresh release backup.
+Mac remains a temporary non-immutable private recovery point, never certified DR.
+
+Before any writable web admission: verify retained DEV volume/realpath/mount and
+network isolation; preserve encrypted raw storage before original startup; inspect
+an isolated copy; verify original admin and application principals separately;
+collect every object/version and content hash, bucket policies/encryption/lifecycle
+dependencies and all relevant DB key references (not only the two attachments).
+Explain preserved unreferenced objects; never delete objects or initialize an
+empty bucket to pass reconciliation. Prove same no-writer interval or unchanged
+storage state across the DB snapshot. Establish supported Collabora session and
+pending/failed WOPI-save status plus completion watermark. Inspect queue/outbound
+state without consuming jobs. Missing facts cannot be replaced by signed claims.
+
+EVIDENCE REUSE AND NEW SOURCE IDENTITY
+The prior bc7b03c image/build/route proof and f8934085 real-data SQL rehearsal are
+preserved. Product app/auth/UI, SQL and runtime Compose templates are unchanged;
+new admission/runner/workflow code has separate focused validation. The previous
+image is not relabelled as the new SHA. Exact-source Full Release governance and
+new correctly labelled image publication remain required before execution. No
+push, merge, workflow dispatch or image publication is authorized by this patch.
+The source-proof utility now distinguishes unchanged rehearsal SQL from changed
+admission code; it no longer claims the entire database package is identical.
+
+CONDITIONAL LIVE ORDER — REQUIRES A SEPARATE EXACT OWNER APPROVAL
+1. Review this correction commit and new evidence schema. Approve governed branch
+   publication/build after branch/event safety review. Obtain exact new SHA/tree,
+   Full Release success and registry digest; preserve all prior PRs/checkpoints.
+2. Review private source/legacy identities, rendered DEV-only configuration diff,
+   custody/age retrieval and destination capacity, pinned images, rollback plan,
+   owner approval/monitor public key and tested signing/observation adapter. Do
+   not create an apparently valid receipt before the underlying work is done.
+3. Under the approved window, establish DEV-only operator/deployment exclusion,
+   safely drain Collabora/WOPI, persist all five replicas0, verify actual zero tasks
+   twice and independent watchdog/failure behavior. Never affect legacy. Retain
+   all five Compose entries for --prune and original settings/spec evidence.
+4. Take the fresh encrypted DB/cross-store capture and independent Mac checksum
+   receipt; verify decryption/pristine PG16.15 restore and current fingerprints.
+   Preserve separate pristine/disposable copies. Reuse unchanged migration SQL
+   evidence where justified; changed data must be checked, not presumed identical.
+5. Verify the isolated MinIO copy and every storage/credential/reference gate;
+   start the original retained DEV store only with separately bound authority.
+   No new empty volume, storage-init or legacy storage attachment.
+6. Correct only DEV PostgreSQL/Redis/MinIO settings with all app replicas0 and the
+   old pinned image until admitted. PG:uvanoo-dev-postgres:5432/beaconhs using the
+   verified runtime/superadmin/migrator roles; Redis:uvanoo-dev-redis:6379/0.
+   Preserve unrelated configuration and verify the private before/after renderer.
+7. Produce/pin truthful receipts and current migration-phase signed observations.
+   The governed workflow rechecks admission before mutations and throughout the
+   actual59-63 run. Verify63 identities, data/security and trusted logical schema.
+8. Prepare the exact candidate with all app roles0. Provide fresh web-phase signed
+   observations. Read-only post-migration schema/ledger verification must pass
+   before restore-web can raise ONLY web1; other four remain0.
+9. Verify native login, two approved properties, People/Approvals/Risk, RLS/RBAC,
+   cross-tenant denial and Light/Terra acceptance. Basic Auth removal remains a
+   separately authorized DEV-only action after native route protection passes.
+   Background workers/scheduler/Collabora and storage-init have no admission here.
+
+ROLLBACK LIMITS / MINIMUM OWNER AUTHORIZATION
+Earlier migrations can commit before a later rejection. On failure keep all five
+fenced, retain diagnostics and require reviewed forward repair or restore/switch.
+Do not edit historical ledgers, force down-migrations, restore replicas as if that
+undoes data changes, or assume the old image works with schema63. Restoring58 loses
+later writes and must align with storage/queues; MinIO startup can change metadata.
+Admission expiry does not delete retained data, kill an already-running SQL
+statement or auto-revert live configuration. It blocks subsequent guarded work.
+
+Request one conditional approval covering the exact new SHA/digest and private
+rendered diff; reviewed monitor/key installation and exclusion/drainage/fencing;
+fresh encrypted temporary-Mac capture/restore; verified retained-MinIO recovery;
+validated59-63 migration; web-only activation and native/module acceptance.
+Every prerequisite must be evidenced first. No Basic Auth removal, background
+resume, password reset, merge, paid resource or legacy change is included in this
+correction's authorization. Missing signing/access/storage facts remain NO-GO.
+
+ISOLATED VALIDATION RECORD
+PASS84 focused tests across the gate, temporary admission, logical catalog and
+guarded connection suites (latest affected files retested; unchanged passes reused).
+PASS PostgreSQL16.15 synthetic integration: raw numbering differs while19-section
+logical fingerprints match; seven independent nullability/ACL/owner/RLS/default-
+privilege/constraint/enum drift cases rejected. New no-network tmpfs container
+removed; no retained restore volume or real-data database was used.
+PASS database typecheck; changed-file Prettier and shell syntax/diff checks.
+PASS temporary admission workflow contract, foundation/release safety contracts
+and the affected candidate verifier/routing contract blocks, including15 verifier
+scenarios. Failed intermediate fixtures were corrected; no false green retained.
+No hosted Full Release run, new product image build or live installation is claimed.
+Review performed by the existing primary worker only; no second worker or claim
+of independent human security approval. Owner/independent operational review of
+the private receipt, monitor and live change manifest remains required.

@@ -30,7 +30,7 @@ import {
 } from './dev-temporary-admission'
 
 const execute = promisify(execFile)
-export const DOCUMENTED_OPERATIONAL_KEY_ARGUMENT = '--documented-operational'
+const DOCUMENTED_OPERATIONAL_KEY_ARGUMENT = '--documented-operational'
 const hash = (bytes: string | Buffer) => createHash('sha256').update(bytes).digest('hex')
 const digest = (v: unknown) => typeof v === 'string' && /^[a-f0-9]{64}$/.test(v)
 function requireValue(value: unknown): asserts value {

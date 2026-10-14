@@ -1,0 +1,115 @@
+name: Canonical PostgreSQL 16.15 prefix 58 only
+on:
+  push:
+    branches: [audit/uvanoo-v1.4-canonical58-cloud-20261013]
+    paths:
+      - .github/workflows/canonical58-reference.yml
+      - docs/v1.4/canonical58-validation/**
+permissions:
+  contents: read
+concurrency:
+  group: canonical58-reference
+  cancel-in-progress: false
+jobs:
+  reference:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      CI: 'true'
+      CANONICAL_DISPOSABLE: 'true'
+      DATABASE_URL: postgresql://beaconhs_app:beaconhs_app@127.0.0.1:5432/beaconhs
+      MIGRATION_DATABASE_URL: postgresql://beaconhs_migrator:beaconhs_migrator@127.0.0.1:5432/beaconhs
+      SUPERADMIN_DATABASE_URL: postgresql://beaconhs_super:beaconhs_super@127.0.0.1:5432/beaconhs
+      DATABASE_OWNER_ROLE: beaconhs_owner
+      DATABASE_BACKUP_ROLE: beaconhs_backup
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          path: control
+          persist-credentials: false
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          ref: 563fb0e9b79a838a5f394abaffb2f7dc743fc571
+          path: source
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
+        with:
+          package_json_file: source/package.json
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with:
+          node-version: 24.18.0
+      - name: Prepare isolated tools and immutable PostgreSQL
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-client age
+          mkdir -m 700 "$RUNNER_TEMP/reference58"
+          echo "REFERENCE_OUT=$RUNNER_TEMP/reference58" >> "$GITHUB_ENV"
+          echo "CONTROL_DIR=$GITHUB_WORKSPACE/control/docs/v1.4/canonical58-validation" >> "$GITHUB_ENV"
+          image=postgres@sha256:ca0bd484cb98bf4b24eb1010e73fb3fcbd6714d240fbc1a10eea5b7dbecb641d
+          docker pull "$image"
+          [[ "$image" =~ ^postgres@sha256:[a-f0-9]{64}$ ]]
+          echo "POSTGRES_IMAGE=$image" >> "$GITHUB_ENV"
+          docker run -d --name canonical58 -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=beaconhs -p 127.0.0.1:5432:5432 "$image"
+          for i in $(seq 1 30); do
+            if docker exec canonical58 pg_isready -U postgres -d beaconhs >/dev/null; then break; fi
+            sleep 1
+          done
+          test "$(docker exec canonical58 psql -U postgres -d beaconhs -Atc 'SHOW server_version_num')" = 160015
+      - name: Install locked dependencies
+        working-directory: source
+        run: pnpm install --frozen-lockfile
+      - name: Provision disposable canonical roles
+        env:
+          PGPASSWORD: postgres
+        run: psql -X -h 127.0.0.1 -U postgres -d postgres -v ON_ERROR_STOP=1 -f control/docs/v1.4/canonical58-validation/provision.sql
+      - name: Validate collector and offline utility syntax
+        run: |
+          node --check control/docs/v1.4/canonical58-validation/compare.mjs
+          cmp control/docs/v1.4/canonical58-validation/export-metadata.sql control/docs/v1.4/canonical-preflight-20261013/export-metadata.sql
+      - name: Build exactly 58 and fingerprint
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp "$CONTROL_DIR/reference.ts" source/packages/db/src/_canonical_reference.ts
+          cd source/packages/db
+          node --import tsx src/_canonical_reference.ts
+      - name: Encrypt canonical metadata to repository owner's SSH keys
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          curl --fail --silent --show-error --proto '=https' https://github.com/Satho82.keys > "$RUNNER_TEMP/owner.keys"
+          args=()
+          while IFS= read -r key; do
+            case "$key" in
+              ssh-ed25519\ *|ssh-rsa\ *) args+=(-r "$key");;
+            esac
+          done < "$RUNNER_TEMP/owner.keys"
+          if [ "${#args[@]}" -eq 0 ]; then
+            echo "PRIVATE_RETENTION_BLOCKED: no supported public SSH recipient on owner GitHub profile"
+            exit 1
+          fi
+          age "${args[@]}" -o "$REFERENCE_OUT/canonical-private.jsonl.age" "$REFERENCE_OUT/canonical-private.jsonl"
+          ssh-keygen -lf "$RUNNER_TEMP/owner.keys" > "$REFERENCE_OUT/recipient-fingerprints.txt"
+          rm "$REFERENCE_OUT/canonical-private.jsonl"
+      - name: Retain non-sensitive reference
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: canonical58-public
+          path: ${{ runner.temp }}/reference58/reference-public.json
+          if-no-files-found: error
+          retention-days: 30
+      - name: Retain encrypted metadata only
+        if: success()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: canonical58-encrypted
+          path: |
+            ${{ runner.temp }}/reference58/canonical-private.jsonl.age
+            ${{ runner.temp }}/reference58/recipient-fingerprints.txt
+          if-no-files-found: error
+          retention-days: 30

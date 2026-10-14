@@ -1,0 +1,170 @@
+{
+  "schemaVersion": 1,
+  "status": "BLOCKED_BEFORE_FENCING",
+  "scope": "DEV-only protected backup and isolated restore/rehearsal; no live correction, migration, merge, deployment or Traefik change",
+  "authorization": "Owner authorised backup capture, controlled DEV writer fencing/restoration and correction/migrations on isolated restored data only. Phase 1 explicitly forbids proceeding without verified encryption, destination, fencing and isolation.",
+  "candidate": "563fb0e9b79a838a5f394abaffb2f7dc743fc571",
+  "governedHeadVerified": "d18f635a41f092e9e86aa6f53518f9c28992b0d2",
+  "priorCheckpoint": "5e0b62e357083d9d63465e69bee99b7653aa51c9",
+  "observedAtUtc": "2026-10-13T09:31:36Z",
+  "observationWindow": "Subsequent read-only checks in same session; not a transaction-consistent backup",
+  "live": {
+    "postgres": "16.15 (Debian 16.15-1.pgdg13+2)",
+    "database": "beaconhs",
+    "ledgerEntries": 58,
+    "properties": 5,
+    "tenants": 2,
+    "attachments": 2,
+    "lifecycleEvents": 968,
+    "riskAssessments": 0,
+    "riskHazards": 0,
+    "riskTemplates": 1,
+    "riskSignoffs": 0,
+    "postgresHealthy": true,
+    "redisHealthy": true,
+    "hostPortsPublishedForPostgresRedis": false,
+    "backupRole": {
+      "localSocketConnection": "PASS",
+      "role": "beaconhs_backup",
+      "superuser": false,
+      "bypassRls": true,
+      "defaultReadOnly": true,
+      "missingSelectAcrossPublicDrizzleEtlRelations": 0,
+      "tcpCredentialVerification": "NOT VERIFIED"
+    },
+    "existingMetadataSha256": "51959099c665622286fc2a13bb771f64574b518f81dfcee67ea7524ed68f933d",
+    "existingMetadataMode": "0600",
+    "metadataReexported": false,
+    "otherDatabaseSessionsAtObservation": 0,
+    "writerFence": "NOT ESTABLISHED; absence of sessions is not a fence",
+    "redis": {
+      "authenticatedInfoKeyspace": "PASS",
+      "databasesWithKeys": 0,
+      "persistenceArchive": "NOT CAPTURED",
+      "clean155QueueContents": "NOT VERIFIED"
+    },
+    "devDesiredReplicas": {
+      "web": 1,
+      "worker": 1,
+      "scheduler": 1,
+      "storageInit": 1,
+      "collabora": 1
+    },
+    "devObservedReplicas": {
+      "web": "0/1",
+      "worker": "0/1",
+      "scheduler": "0/1",
+      "storageInit": "0/1",
+      "collabora": "1/1"
+    },
+    "devImageDigest": "sha256:a043f96d8c6b453d9df3e4b38b402963e6e3c0705c4ffb1aed19d6566cdfbec3",
+    "preservedVolumes": [
+      "uvanoo-dev-postgres-data",
+      "uvanoo-dev-minio-data",
+      "uvanoo-clean155-redis-data",
+      "uvanoo-decision149-restore-data",
+      "uvanoo-decision154-clean-data",
+      "uvanoo-decision155-clean-data"
+    ],
+    "minio": "No DEV MinIO container observed; retained volume exists; attachment-object reconciliation not verified"
+  },
+  "preflight": {
+    "age": "/usr/bin/age",
+    "ageKeygen": "/usr/bin/age-keygen",
+    "availableBytes": 29104758784,
+    "existingBackupDirectory": {
+      "path": "/opt/uvanoo-dev/backups",
+      "mode": "0750",
+      "ownerUid": 1000,
+      "groupGid": 1000
+    },
+    "existingProtectedDirectory": {
+      "path": "/home/ubuntu/uvanoo-preflight",
+      "mode": "0700",
+      "ownerUid": 1000,
+      "groupGid": 1000
+    },
+    "approvedRecipient": "NOT RECOVERED",
+    "cloudDecryptionCustody": "NOT VERIFIED",
+    "identityPathChecks": {
+      "ubuntuDefaultAgeIdentity": "not found",
+      "rootDefaultAgeIdentity": "permission denied; presence unknown"
+    },
+    "priorEncryption": "Synthetic canonical metadata encrypted to owner GitHub SSH public keys does not prove private-key availability for confidential real-data restore.",
+    "proposedPrivateDestination": "New dedicated 0700 subdirectory under /opt/uvanoo-dev/backups; archives/manifests 0600. Not created. Requires approved recipient/custody and retention/recovery destination.",
+    "isolatedRestore": "Not provisioned. Require pinned PostgreSQL16.15 digest, uvanoo_dev bootstrap, independent empty disposable storage, no host ports, no attachment to live application/database networks and no production/staging mounts.",
+    "postgresImage": "postgres@sha256:ca0bd484cb98bf4b24eb1010e73fb3fcbd6714d240fbc1a10eea5b7dbecb641d"
+  },
+  "fencingReview": {
+    "source": "scripts/cluster/dev-writer-fence.mjs at product candidate",
+    "findings": [
+      "Helper persists WRITER_REPLICAS and invokes compose.deploy; this is a candidate deployment helper, not a verified unchanged-state backup suspend/resume path.",
+      "Restore requires candidate image/source in saved Compose and zero-replica runtime, then health convergence. Current unhealthy old-source state does not satisfy that recovery contract.",
+      "Saved Dokploy control-plane configuration and credentials have not been verified. No bypass via unreviewed direct scaling was attempted.",
+      "Writer inventory must cover web, worker, scheduler, storage-init/policy changes, Collabora callbacks, external integrations/direct clients, host scheduled jobs and concurrent control-plane deploys. Inventory is incomplete.",
+      "Zero sessions and empty Redis at one observation do not prevent reconnection or new jobs."
+    ],
+    "stateChanged": false
+  },
+  "evidenceReused": {
+    "databaseRun": "https://github.com/Satho82/beaconhs/actions/runs/38372116422",
+    "canonical58Fingerprint": "730d95c22ad6914d68bcdbea46283741f24ebd21a5f609c7951a4e5f72392a7c",
+    "observedSnapshotFingerprint": "0529262d8f4b1a323994e1dbeae85e70b3506cd0746c2faf3d0b4e014ccb0074",
+    "comparison": "58/58 ledger; 18/19 schema/security sections; two extra public default-ACL rows",
+    "isolatedCorrectionSqlSha256": "7262d5c6a52d5c57f1888837eabb44e3b29fa43f253ccc1086f888d46fbe9d54",
+    "syntheticCorrectionAndRollback": "Prior passing evidence only; not real-data rehearsal"
+  },
+  "results": {
+    "encryptedBackup": "NOT EXECUTED",
+    "archiveChecksum": null,
+    "independentRestore": "NOT EXECUTED",
+    "realDataMigrationRehearsal": "NOT EXECUTED",
+    "moduleSecurityRehearsal": "NOT EXECUTED",
+    "writerRestoration": "NOT NEEDED; writers never changed",
+    "persistentSqlChanges": false,
+    "serviceChanges": false,
+    "queueReplayOrDeletion": false,
+    "stagingProductionChanges": false,
+    "fullCiRepeated": false,
+    "rawMetadataPublished": false
+  },
+  "unblockRequest": {
+    "requiredInformation": [
+      "Approved age public recipient or fingerprint with secure recipient-file location",
+      "Cloud-accessible private identity/secret reference and custodian; do not provide private keys in chat",
+      "Approved private archive and isolated restore destinations, including recoverable key custody"
+    ],
+    "engineeringBeforeFence": [
+      "Verify encryption/decryption round-trip on non-sensitive probe without printing keys",
+      "Verify private destination permissions, retention and space",
+      "Complete writer/control-plane inventory and reviewed unchanged-state suspend/restore plan",
+      "Validate isolated restore boundaries before confidential capture"
+    ],
+    "authorizationAlreadyGranted": "Do not request the same general backup/fencing/rehearsal permission again. Live ACL correction, live migrations, governed merge and deployment remain excluded."
+  },
+  "releaseCaveats": [
+    "Current Risk assessment/hazard/signoff counts are zero; do not claim real-data coverage of populated Risk backfills. Existing synthetic Risk tests remain necessary.",
+    "Repository backup omits ownership/ACLs; restore must reconstruct exact reviewed security state before applying isolated two-statement correction, without broad provisioning grants.",
+    "After any separately approved live ACL correction, release gate requires fresh matching post-correction backup/restore evidence within its one-hour window.",
+    "Readiness-before-writer-release deployment sequence and final source/image validation remain outstanding."
+  ],
+  "inspectionLimitation": "An initial read-only count query used public.properties and failed. Corrected after catalogue discovery to public.hospitality_properties; backup-role query then passed. No failed query wrote data.",
+  "continuation": {
+    "previousWorker": "Same active conversation worker; no recovery operation started",
+    "githubActionsInProgress": 0,
+    "githubActionsQueued": 0,
+    "vpsConnector": "ONLINE",
+    "hostRecoveryProcessNames": [],
+    "externalWorkerInventory": "Codex list_threads failed (MCP -32000); external worker status NOT VERIFIED",
+    "repeatedDatabaseInspections": false,
+    "unfinishedOperations": "No partial backup/restore/migration to resume. Evidence tree was prepared and is being committed.",
+    "releaseRequirements": [
+      "Risk Assessments",
+      "People",
+      "Approvals",
+      "DEV-only removal of initial Traefik Basic Auth during separately authorised release",
+      "Native login, RBAC, RLS, tenant/property isolation",
+      "Desktop and mobile authenticated browser acceptance"
+    ]
+  }
+}

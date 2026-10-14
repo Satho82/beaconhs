@@ -85,7 +85,7 @@ export type PrivateRestoreReceipt = {
   postgresVersion: '160015'
   pristineRetained: true
 }
-export const MIGRATION_CHECKS = [
+const MIGRATION_CHECKS = [
   'writerExclusion',
   'collaboraDrainage',
   'independentWatchdog',

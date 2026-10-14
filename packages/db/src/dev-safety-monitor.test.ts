@@ -219,6 +219,20 @@ function fixture(maintenance = false) {
   }
 }
 describe('independent DEV observation/signing adapter', () => {
+  it('marks the approved documented DEV path as non-independent and never signs it', async () => {
+    const f = fixture(true)
+    delete f.approval.safetyPublicKeyDer
+    f.approval.operationalEvidence = {
+      mode: 'documented-operational',
+      independentAttestation: false,
+    }
+    const approvalSha = sha(canonical(f.approval))
+    f.evidence.admission!.approvalSha256 = approvalSha
+    f.policy.approvalSha256 = approvalSha
+    const result = await monitorOnce({ ...f, key: undefined })
+    expect(result.payload.attestation).toBe('documented-operational')
+    expect(result.signature).toBe('')
+  })
   it('signs truthful maintenance observations using the existing owner pin and monitor key', async () => {
     const f = fixture(true),
       result = await monitorOnce(f)

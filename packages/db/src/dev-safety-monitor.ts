@@ -21,6 +21,7 @@ import {
   DEV_TARGET,
   admissionChecks,
   maintenanceHoldExpiry,
+  usesDocumentedOperationalEvidence,
   validateTemporaryAdmission,
   type AdmissionPhase,
   type PrivateRestoreReceipt,
@@ -29,6 +30,7 @@ import {
 } from './dev-temporary-admission'
 
 const execute = promisify(execFile)
+export const DOCUMENTED_OPERATIONAL_KEY_ARGUMENT = '--documented-operational'
 const hash = (bytes: string | Buffer) => createHash('sha256').update(bytes).digest('hex')
 const digest = (v: unknown) => typeof v === 'string' && /^[a-f0-9]{64}$/.test(v)
 function requireValue(value: unknown): asserts value {
@@ -307,7 +309,7 @@ export async function monitorOnce(options: {
   evidence: ReleaseEvidence
   approval: TemporaryApproval
   restore: PrivateRestoreReceipt
-  key: Buffer
+  key?: Buffer
   probe?: typeof runProbe
   now?: () => number
 }) {
@@ -337,12 +339,15 @@ export async function monitorOnce(options: {
     const holdExpires = maintenanceHoldExpiry(approval, started)
     const checks = admissionChecks(policy.phase, approval)
     keys(policy.probes, [...checks])
-    const key = createPrivateKey(options.key)
-    requireValue(
-      key.asymmetricKeyType === 'ed25519' &&
-        createPublicKey(key).export({ format: 'der', type: 'spki' }).toString('base64') ===
-          approval.safetyPublicKeyDer,
-    )
+    const documentedOperational = usesDocumentedOperationalEvidence(approval)
+    const key = documentedOperational ? undefined : createPrivateKey(options.key!)
+    if (documentedOperational) requireValue(options.key === undefined)
+    else
+      requireValue(
+        key?.asymmetricKeyType === 'ed25519' &&
+          createPublicKey(key).export({ format: 'der', type: 'spki' }).toString('base64') ===
+            approval.safetyPublicKeyDer,
+      )
     const observations = await Promise.all(
       checks.map(async (check) => {
         const value = await (options.probe ?? runProbe)(policy.probes[check]!)
@@ -357,6 +362,7 @@ export async function monitorOnce(options: {
     const observed = Math.min(...observations.map((v) => v.stamp))
     const payload: SafetyReceipt = {
       version: 1,
+      attestation: documentedOperational ? 'documented-operational' : 'ed25519',
       target: DEV_TARGET,
       approvalSha256: policy.approvalSha256,
       sourceSha: evidence.sourceSha,
@@ -372,7 +378,9 @@ export async function monitorOnce(options: {
     }
     const envelope = {
       payload,
-      signature: sign(null, Buffer.from(canonical(payload)), key).toString('base64'),
+      signature: documentedOperational
+        ? ''
+        : sign(null, Buffer.from(canonical(payload)), key!).toString('base64'),
     }
     // Reuse the exact consumer validation before publishing, including one-hour capture freshness.
     validateTemporaryAdmission(
@@ -428,6 +436,12 @@ export async function runMonitor(
   )
   const evidence = JSON.parse(manifest.toString()) as ReleaseEvidence
   const approval = JSON.parse(approvalBytes.toString()) as TemporaryApproval
+  const documentedOperational = usesDocumentedOperationalEvidence(approval)
+  requireValue(
+    documentedOperational
+      ? keyPath === DOCUMENTED_OPERATIONAL_KEY_ARGUMENT
+      : keyPath !== DOCUMENTED_OPERATIONAL_KEY_ARGUMENT,
+  )
   requireValue(process.platform === 'linux')
   requireMonitorService(
     readFileSync('/etc/machine-id', 'utf8'),
@@ -437,7 +451,7 @@ export async function runMonitor(
   const restoreBytes = privateBytes(join(directory, 'private-restore.json'))
   requireValue(hash(restoreBytes) === evidence.admission?.restoreReceiptSha256)
   const restore = JSON.parse(restoreBytes.toString()) as PrivateRestoreReceipt
-  const key = privateBytes(keyPath, 16384)
+  const key = documentedOperational ? undefined : privateBytes(keyPath, 16384)
   // Exclusive persistent lock: after crash/stop an operator must review and re-arm, never auto-resume.
   const lock = openSync(join(directory, 'monitor.lock'), 'wx', 0o600)
   closeSync(lock)
@@ -465,7 +479,7 @@ export async function runMonitor(
       await new Promise((done) => setTimeout(done, 1000))
     }
   } finally {
-    key.fill(0)
+    key?.fill(0)
     process.removeListener('SIGTERM', stop)
     process.removeListener('SIGINT', stop)
     latchMonitor(directory)

@@ -98,8 +98,11 @@ Authorized window, only after those conditions are proven:
    373396385 disabled, no DEV queued actions, AutoDeploy off. Leave shared Dokploy,
    Traefik and global Docker permissions untouched. Observe privileged drift;
    acknowledge monitoring cannot prevent malicious or mistaken root activity.
-5. Install reviewed DEV-only monitor/watchdog controls and verify isolated failure
-   behavior, independent heartbeat and no auto-resume before disruptive actions.
+5. Stage checksum-bound DEV-only monitor controls. Install the reviewed independent
+   bootstrap watchdog/observer and verify isolated failure behavior, heartbeat and
+   no auto-resume before disruptive actions. The release receipt signer cannot
+   claim admission yet: it needs the NEW backup/restore and owner approval from
+   steps6–8. Do not feed old or synthetic evidence to bootstrap live admission.
    After complete old-save drainage, persist all five DEV replica controls at zero,
    retain all services in Compose (--prune safe), apply through exact DEV record,
    and verify desired=0 AND no active tasks. Bootstrap is a separately approved
@@ -121,6 +124,8 @@ Authorized window, only after those conditions are proven:
    If restore/verification exceeds the one-hour freshness window, STOP/re-admit;
    neither an old checksum nor the two-hour hold extends backup freshness.
 8. Bind current private restore/owner/monitor receipts to final SHA/digest and DEV.
+   Prepare the private release-evidence bundle, start the reviewed independent
+   receipt signer and prove current observations/signatures/failure behavior.
    Run scripts/cluster/verify-dev-release-admission.sh migration; retain read-only
    evidence mount in actual migration container. Apply ONLY src/migrate-dev.ts
    guarded additive59–63 as reviewed in .github/workflows/deploy-dev.yml. No seed,

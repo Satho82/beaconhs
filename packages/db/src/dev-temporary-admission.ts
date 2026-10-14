@@ -112,7 +112,7 @@ function requireValue(ok: unknown): asserts ok {
 function exactTarget(target: unknown) {
   requireValue(canonical(target) === canonical(DEV_TARGET))
 }
-export function requireDevContext(env: NodeJS.ProcessEnv) {
+function requireDevContext(env: NodeJS.ProcessEnv) {
   requireValue(
     env.FEATURE_CANDIDATE_VERIFIED === 'true' &&
       env.DEV_RELEASE_ENVIRONMENT === 'dev' &&

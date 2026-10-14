@@ -26,6 +26,13 @@ import {
 } from '@/lib/request-body'
 import { tenantIsActive } from '@/lib/active-tenant'
 import { isUuid } from '@/lib/list-params'
+import {
+  beginSave,
+  commitSave,
+  failSave,
+  settleSave,
+  type SaveAttempt,
+} from '@/lib/wopi-save-telemetry'
 
 export const dynamic = 'force-dynamic'
 
@@ -37,11 +44,13 @@ class WopiSaveConflict extends Error {
   override readonly name = 'WopiSaveConflict'
 }
 
-async function cleanupObject(key: string, reason: string): Promise<void> {
+async function cleanupObject(key: string, reason: string): Promise<boolean> {
   try {
     await deleteObject({ key })
+    return true
   } catch (error) {
     console.error(`[wopi] failed to delete ${reason} object ${key}`, error)
+    return false
   }
 }
 
@@ -97,6 +106,36 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ fileId: st
   }
   if (!grant.canWrite) return new NextResponse('Read-only token', { status: 403 })
 
+  let attempt: SaveAttempt | null
+  try {
+    attempt = await beginSave(grant)
+  } catch {
+    return new NextResponse('Save safety status unavailable; retry without closing the editor', {
+      status: 503,
+    })
+  }
+  if (!attempt) return saveFile(req, grant, fileId, null)
+  try {
+    const response = await saveFile(req, grant, fileId, attempt)
+    if (!response.ok) await failSave(attempt)
+    return response
+  } catch {
+    // Failure to write a terminal event leaves the durable BEGIN unresolved.
+    try {
+      await failSave(attempt)
+    } catch {
+      /* Deliberately not reported as drained. */
+    }
+    return new NextResponse('Save could not be confirmed; keep the editor open', { status: 503 })
+  }
+}
+
+async function saveFile(
+  req: NextRequest,
+  grant: WopiGrant,
+  fileId: string,
+  attempt: SaveAttempt | null,
+) {
   const override = req.headers.get('x-wopi-override')
   if (override && override !== 'PUT') {
     // Locks are declared unsupported in CheckFileInfo; PutRelativeFile is
@@ -261,6 +300,7 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ fileId: st
             : `Saved PowerPoint "${att.filename}" in the editor`,
         metadata: { attachmentId: fileId, sizeBytes: body.length },
       })
+      await commitSave(tx, attempt)
     })
   } catch (error) {
     await cleanupObject(stagedKey, 'uncommitted staged')
@@ -273,7 +313,15 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ fileId: st
   // The DB now points exclusively at stagedKey. Failure to remove the old
   // object must not turn a committed save into a false failure; log it with the
   // exact key so operators can retry cleanup without risking live data.
-  await cleanupObject(att.key, 'superseded')
+  const cleaned = await cleanupObject(att.key, 'superseded')
+  try {
+    if (cleaned) await settleSave(attempt)
+    else await failSave(attempt, true)
+  } catch {
+    // COMMITTED without SETTLED stays in flight for recovery admission. Do not
+    // misreport a confirmed attachment commit as a failed editor save.
+    console.error('[wopi] recovery cleanup status unresolved')
+  }
 
   return NextResponse.json({ LastModifiedTime: savedAt.toISOString() })
 }

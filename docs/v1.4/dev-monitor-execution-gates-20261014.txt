@@ -1,0 +1,106 @@
+DEV MONITOR / EXACT-SOURCE CI — 14 October 2026
+Parent c34a1b5adda8505d1aca57c88189dd8ec14cb156. Isolated work, NOT live approval.
+
+COMPLETED BRIDGE
+packages/db/src/run-dev-safety-monitor.ts runs the independently operated receipt
+producer. It requires four explicit paths/digests, with no default live target:
+  tsx src/run-dev-safety-monitor.ts EVIDENCE_DIR POLICY_PATH POLICY_SHA KEY_PATH
+The deployment application never starts it. Use a separately reviewed Linux
+service with private key custody outside the evidence mount. The service host's
+machine-id digest must equal the source-host identity approved in the receipt.
+No production key or live receipt is created by these changes.
+
+The checksum-pinned MonitorPolicy binds the exact DEV target/source/phase,
+manifest/owner approval digests, monitor ID and exact probe set. Each executable,
+its interpreter/imported sources and private probe configuration must be covered
+by the reviewed dependency hashes. Probe code is trusted reviewed code, not a
+sandbox: same-UID/root code must not be considered isolated from the signing key.
+Each probe is executed without shell or inherited environment, within2.5seconds,
+with16KiB output bound. Authentication material belongs in separately approved
+private configuration paths, never argv values or inherited session credentials.
+No credential discovery, scraping, key derivation or login side effects exist.
+
+Observation protocol: version1, exact target/source/phase/check, observedAt and
+the exact aggregate-only facts defined in dev-safety-monitor.ts. Exit0 alone is
+not evidence. Missing facts, extra fields, nonzero counters, unknown status,
+wrong identity, stale/future samples and non-DEV drift reject the whole round.
+All samples must originate during that round; total collection <=5seconds.
+The oldest observation sets the <=10second signature expiry. Probe implementations
+must date actual observations, not freshen cached receipts or unknown facts.
+
+Successful aggregate observations are retained under observations/SHA256.json.
+The signed envelope is validated through the existing temporary-admission
+consumer before atomic/fsynced publication of safety.json. The one-hour backup
+limit is unchanged. Private approvals/manifest/restore bytes are rechecked every
+round. Missing/changed data, stop signals or failed probes remove safety.json and
+write a persistent stop latch. An exclusive persistent lock prevents concurrent
+monitors and automatic crash restart. On SIGKILL/power loss the last receipt can
+remain valid only until its <=10second expiry; the gate then rejects it. No
+monitor action deploys, fences, restores, captures or changes a database.
+
+Re-arming requires independent review of the failure and current facts; do not
+delete the latch/lock in an automatic systemd Restart hook. Keep Restart=no. The
+separate existing watchdog remains required; this signer is not its replacement.
+Pin the executable/runtime/checkouts and key public identity before installation.
+
+ISOLATED EVIDENCE DIRECTORY PREPARATION
+  tsx src/run-dev-safety-monitor.ts --prepare PARENT STAGING_DIR POLICY_SHA
+PARENT must already be an owned, canonical, non-group/world-writable directory.
+The four staging files are monitor-policy.json, manifest.json, owner-approval.json
+and private-restore.json. Their approved checksums and exact DEV/source binding
+must match. This creates a NEW source-SHA child0700 and files0600 atomically; no
+overwrite, key, capture or fabricated safety.json. Under live installation the
+parent must be /opt/uvanoo-dev/release-evidence, separately approved. Synthetic
+tests use only a temporary local parent. Copy verified ciphertext separately
+only after authorized capture; preparation alone grants no admission.
+
+READ-ONLY PROBE INTEGRATION / EXTERNAL REQUIREMENTS
+The preserved f8934085 recovery source contains external_writer_probe.py,
+external_writer_guard.py, collabora_drain_probe.py and collect_collabora_counts.mjs.
+Those original probes remain preserved, not silently relabelled as new evidence.
+Their old successful output alone is NOT the new aggregate protocol.
+
+Writer exclusion requires actual exclusive hold enforcement across authenticated
+Dokploy API/UI, GitHub and direct Docker operators. AutoDeployOFF blocks the
+webhook route, not authenticated operators. The original direct-PG probe rejects
+every other client: it cannot simply be allowed to ignore all migrators. The
+reviewed live probe must bind only the exact authorized migration session set and
+approved service-spec transitions. Missing enforcement or scope remains UNKNOWN.
+
+Collabora supported adminws uses the preserved version-specific authenticated
+aggregate-count collector. No approved admin credential is supplied in this
+workspace. Application-side WOPI coverage/watermark requires its authenticated
+read-only status source and complete producer coverage. The excluded WOPI branch
+contains that implementation, but it is not deployed or part of this module
+candidate. Neither TCP/kit counts nor past successful saves prove drainage.
+Without supported access/coverage, a truthful probe must reject; no default-success
+wrapper is provided. An owner statement alone is not a current observation.
+
+MinIO admission still needs authorized read-only original/app credential checks,
+full object/version inventory, all DB reference reconciliation and a consistent
+no-writer interval. No credential is extracted from protected environments and
+no retained volume is modified or captured here. A live metadata listing cannot
+prove cross-store consistency while writers are admitted. That operational proof
+must be collected in the separately approved window, not forged by this signer.
+
+PUBLICATION AND CI
+Authenticated exact DEV Raw Compose UI was rechecked: AutoDeployOFF. GitHub
+repository webhook inventory was empty. Current main and correction-branch
+workflow triggers were reviewed: correction push does not match main/feature
+deployment triggers; no workflow_run/repository_dispatch deployment chain found.
+New dev-execution-gates.yml is exact-branch push-only and invokes the existing
+full validation/image workflow at github.sha without secrets inheritance. Only
+contents:read/packages:write. Existing CI/image jobs and feature triggers are
+fingerprint-identical; workflow_call is the sole added build entry. It does not
+dispatch ci.yml (whose manual run could deploy), merge or call a deploy workflow.
+The structural contract runs in the existing deployment-contract test bundle.
+
+This isolated CI/image evidence is NOT silently substituted for the candidate
+verifier's authoritative feature-head rule. That verifier remains unchanged and
+will reject an isolated-branch SHA outside governed feature history. A reviewed
+integration/authority decision remains necessary before a future deployment;
+shared PR branches and feature/main are not advanced by this task.
+
+Known limits: remote runner/registry quota may block CI independently; no paid
+capacity is authorized. No live signing service, hold, drainage, MinIO proof or
+release acceptance is claimed by the isolated bridge tests or a green build.

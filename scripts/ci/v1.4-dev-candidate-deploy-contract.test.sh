@@ -746,4 +746,5 @@ end
 RUBY
 
 ruby scripts/ci/dev-temporary-admission-contract.rb
+ruby scripts/ci/dev-monitor-publication-contract.rb
 echo 'PASS V1.4 candidate deployment is manual, DEV-only, digest-bound and writer-fenced'

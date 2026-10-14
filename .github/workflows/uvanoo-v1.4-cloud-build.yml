@@ -3,6 +3,12 @@ name: Uvanoo V1.4 cloud validation and DEV image
 # Cloud-only validation and image publication for the frozen V1.4 source.
 # This workflow has no SSH, VPS, Dokploy, staging, production, or deployment path.
 on:
+  workflow_call:
+    inputs:
+      source_sha:
+        description: Exact isolated source to validate and publish; never deploys
+        required: true
+        type: string
   push:
     branches: [feature/uvanoo-v1.4]
     paths:

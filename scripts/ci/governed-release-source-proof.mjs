@@ -24,6 +24,9 @@ const admissionChanges = new Set(
     'dev-admission-connection.test.ts',
     'migrate.ts',
     'verify-dev-release-admission.ts',
+    'dev-safety-monitor.ts',
+    'dev-safety-monitor.test.ts',
+    'run-dev-safety-monitor.ts',
   ].map((name) => `packages/db/src/${name}`),
 )
 for (const path of git('diff', '--name-only', rehearsal, '--', 'packages/db')
@@ -38,6 +41,8 @@ for (const path of git('diff', '--name-only', foundation, '--', '.github')
     [
       '.github/workflows/deploy-dev.yml',
       '.github/workflows/deploy-v1.4-dev-candidate.yml',
+      '.github/workflows/uvanoo-v1.4-cloud-build.yml',
+      '.github/workflows/dev-execution-gates.yml',
     ].includes(path),
   )
 unchanged(foundation, [

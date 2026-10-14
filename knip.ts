@@ -57,6 +57,7 @@ const config: KnipConfig = {
         'src/dev-migration-gate.integration.ts',
         'src/dev-logical-catalog.disposable.ts',
         'src/verify-dev-release-admission.ts',
+        'src/run-dev-safety-monitor.ts',
       ],
     },
     'packages/sync': {

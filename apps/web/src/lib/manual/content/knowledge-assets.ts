@@ -485,6 +485,8 @@ After the published PDF finishes preparing, **Send email** sends that exact publ
 
 If the editor says the workspace is unavailable, a platform administrator must restore the workspace before the editor can open or save the file.
 
+In a DEV recovery window, a save may report that its safety status is unavailable or that the save could not be confirmed. Keep the editor open and contact the recovery operator. Do not assume the file was saved or close the editor to clear the message.
+
 The editor is blocked while an administrator is using **View as user**. Exit that session and open the document as yourself.
 
 ## Publish a version

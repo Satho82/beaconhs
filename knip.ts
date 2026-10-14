@@ -23,6 +23,9 @@ const config: KnipConfig = {
         'src/**/*.test.{ts,tsx}',
         'scripts/**/*.test.ts',
         'scripts/i18n-runtime-audit.ts',
+        // Explicit entrypoints for the isolated PostgreSQL WOPI safety harness.
+        'scripts/verify-wopi-save-telemetry.ts',
+        'scripts/wopi-db-test-entry.ts',
         'scripts/backfill-credential-outputs.ts',
         'scripts/cleanup-rassaun-credential-designs.ts',
         'scripts/backfill-private-attachment-urls.ts',

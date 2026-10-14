@@ -5,12 +5,15 @@ permissions:
 
 on:
   push:
-    branches: [feature/uvanoo-phase-1-foundation, feature/uvanoo-v1.2]
+    branches:
+      - feature/uvanoo-phase-1-foundation
+      - feature/uvanoo-v1.2
+      - fix/uvanoo-dev-wopi-bootstrap58-20261014
   workflow_dispatch:
 
 jobs:
   ci:
-    if: github.ref == 'refs/heads/feature/uvanoo-phase-1-foundation' || github.ref == 'refs/heads/feature/uvanoo-v1.2'
+    if: github.ref == 'refs/heads/feature/uvanoo-phase-1-foundation' || github.ref == 'refs/heads/feature/uvanoo-v1.2' || github.ref == 'refs/heads/fix/uvanoo-dev-wopi-bootstrap58-20261014'
     runs-on: ubuntu-latest
     timeout-minutes: 90
     services:
@@ -126,7 +129,7 @@ jobs:
   image:
     name: Build staging image
     needs: ci
-    if: github.ref == 'refs/heads/feature/uvanoo-phase-1-foundation' || github.ref == 'refs/heads/feature/uvanoo-v1.2'
+    if: github.ref == 'refs/heads/feature/uvanoo-phase-1-foundation' || github.ref == 'refs/heads/feature/uvanoo-v1.2' || github.ref == 'refs/heads/fix/uvanoo-dev-wopi-bootstrap58-20261014'
     runs-on: ubuntu-latest
     timeout-minutes: 90
     permissions:

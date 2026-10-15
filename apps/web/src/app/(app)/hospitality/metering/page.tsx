@@ -34,6 +34,10 @@ const BASE = '/hospitality/metering'
 const tabs = ['overview', 'enter-reading', 'history', 'analytics', 'setup'] as const
 type Tab = (typeof tabs)[number]
 const meterTypes: MeterType[] = ['electricity', 'gas', 'water', 'custom']
+const currencyOptions =
+  typeof Intl.supportedValuesOf === 'function'
+    ? Intl.supportedValuesOf('currency')
+    : ['GBP', 'EUR', 'USD', 'CAD', 'AUD', 'AED']
 
 function text(form: FormData, key: string) {
   return String(form.get(key) ?? '').trim()
@@ -845,12 +849,13 @@ export default async function MeteringPage({
                 </label>
                 <label className="space-y-1 text-sm">
                   <span>{t('Currency')}</span>
-                  <Input
-                    name="currency"
-                    defaultValue={operationalDefaults.currencyCode}
-                    maxLength={3}
-                    required
-                  />
+                  <Select name="currency" defaultValue={operationalDefaults.currencyCode} required>
+                    {currencyOptions.map((currency) => (
+                      <option key={currency} value={currency}>
+                        {currency}
+                      </option>
+                    ))}
+                  </Select>
                 </label>
                 <label className="space-y-1 text-sm">
                   <span>{t('Effective from')}</span>

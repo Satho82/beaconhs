@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { revalidatePath } from 'next/cache'
 import { Button, Card, CardContent, Input, PageHeader, Select, Textarea } from '@beaconhs/ui'
 import { can } from '@beaconhs/tenant'
+import { Droplets, Flame, Leaf, Plus, Zap } from 'lucide-react'
 import { PageContainer } from '@/components/page-layout'
 import { SearchInput } from '@/components/search-input'
 import { requireRequestContext } from '@/lib/auth'
@@ -280,6 +281,20 @@ export default async function MeteringPage({
     ...new Set(analyticsReadings.map((reading) => reading.currency).filter(Boolean)),
   ]
   const expenditureUnit = currencies.length === 1 ? currencies[0]! : 'mixed currencies'
+  const utilitySummary = (type: MeterType) => {
+    const meters = data.meters.filter((meter) => meter.meterType === type)
+    const meterIds = new Set(meters.map((meter) => meter.id))
+    const readings = analyticsReadings.filter((reading) => meterIds.has(reading.meterId))
+    return {
+      consumption: readings.reduce((total, reading) => total + Number(reading.consumption ?? 0), 0),
+      expenditure: readings.reduce((total, reading) => total + Number(reading.expenditure ?? 0), 0),
+      unit: meters.length === 1 ? meters[0]?.measurementUnit ?? '' : t('mixed units'),
+      currency: [...new Set(readings.map((reading) => reading.currency).filter(Boolean))].at(0) ?? null,
+    }
+  }
+  const electricity = utilitySummary('electricity')
+  const water = utilitySummary('water')
+  const gas = utilitySummary('gas')
 
   return (
     <PageContainer>
@@ -308,7 +323,64 @@ export default async function MeteringPage({
 
       {tab === 'overview' && (
         <div className="space-y-4">
-          <SearchInput placeholder={t('Search meter, Serial Number or MPAN')} />
+          <div className="flex flex-col gap-3 rounded-xl border border-[#e7d9d2] bg-[#fffaf8] p-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-sm font-semibold text-slate-900">{t('Utility performance')}</p>
+              <p className="text-muted-foreground text-sm">
+                {t('Recorded consumption and estimated cost for your authorised properties.')}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <SearchInput placeholder={t('Search meter, Serial Number or MPAN')} />
+              <Button asChild className="bg-teal-700 hover:bg-teal-800">
+                <Link href={`${BASE}?tab=enter-reading`}>
+                  <Plus size={16} aria-hidden="true" /> {t('Add reading')}
+                </Link>
+              </Button>
+            </div>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {[
+              { label: t('Electricity'), icon: Zap, summary: electricity, tone: 'bg-teal-50 text-teal-700' },
+              { label: t('Water'), icon: Droplets, summary: water, tone: 'bg-sky-50 text-sky-700' },
+              { label: t('Gas'), icon: Flame, summary: gas, tone: 'bg-[#fff1ed] text-[#c45536]' },
+              {
+                label: t('Active meters'),
+                icon: Leaf,
+                summary: {
+                  consumption: data.meters.filter((meter) => meter.active).length,
+                  expenditure: 0,
+                  unit: t('meters'),
+                  currency: null,
+                },
+                tone: 'bg-[#fff1ed] text-[#c45536]',
+              },
+            ].map(({ label, icon: Icon, summary, tone }) => (
+              <Card key={label} className="border-slate-200 shadow-sm">
+                <CardContent className="p-5">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-muted-foreground text-sm">{label}</p>
+                      <p className="mt-2 text-2xl font-semibold tracking-tight text-slate-950">
+                        {summary.consumption.toLocaleString(operationalDefaults.locale, {
+                          maximumFractionDigits: 2,
+                        })}{' '}
+                        <span className="text-sm font-medium text-slate-500">{summary.unit}</span>
+                      </p>
+                      {summary.currency ? (
+                        <p className="mt-1 text-sm text-slate-600">
+                          {money(summary.expenditure, summary.currency, operationalDefaults.locale)} {t('estimated')}
+                        </p>
+                      ) : null}
+                    </div>
+                    <span className={`rounded-lg p-2.5 ${tone}`}>
+                      <Icon size={20} aria-hidden="true" />
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
           {!data.meters.length ? (
             <Card>
               <CardContent className="text-muted-foreground py-10 text-center">

@@ -2,6 +2,17 @@ import Link from 'next/link'
 import { revalidatePath } from 'next/cache'
 import { Button, Card, CardContent, Input, PageHeader, Select, Textarea } from '@beaconhs/ui'
 import { can } from '@beaconhs/tenant'
+import {
+  Activity,
+  AlertTriangle,
+  ArrowDownRight,
+  ArrowUpRight,
+  BarChart3,
+  Droplets,
+  Flame,
+  Plus,
+  Zap,
+} from 'lucide-react'
 import { PageContainer } from '@/components/page-layout'
 import { SearchInput } from '@/components/search-input'
 import { requireRequestContext } from '@/lib/auth'
@@ -280,6 +291,39 @@ export default async function MeteringPage({
     ...new Set(analyticsReadings.map((reading) => reading.currency).filter(Boolean)),
   ]
   const expenditureUnit = currencies.length === 1 ? currencies[0]! : 'mixed currencies'
+  const utilitySummary = (type: MeterType) => {
+    const meters = data.meters.filter((meter) => meter.meterType === type)
+    const meterIds = new Set(meters.map((meter) => meter.id))
+    const readings = analyticsReadings.filter((reading) => meterIds.has(reading.meterId))
+    return {
+      consumption: readings.reduce((total, reading) => total + Number(reading.consumption ?? 0), 0),
+      expenditure: readings.reduce((total, reading) => total + Number(reading.expenditure ?? 0), 0),
+      unit: meters.length === 1 ? meters[0]?.measurementUnit ?? '' : t('mixed units'),
+      currency: [...new Set(readings.map((reading) => reading.currency).filter(Boolean))].at(0) ?? null,
+    }
+  }
+  const electricity = utilitySummary('electricity')
+  const water = utilitySummary('water')
+  const gas = utilitySummary('gas')
+  const monthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1))
+  const previousMonthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 1, 1))
+  const priorPeriod = (type: MeterType) => {
+    const meterIds = new Set(data.meters.filter((meter) => meter.meterType === type).map((meter) => meter.id))
+    return data.readings
+      .filter((item) => item.readAt >= previousMonthStart && item.readAt < monthStart && meterIds.has(item.meterId))
+      .reduce((total, item) => total + Number(item.consumption ?? 0), 0)
+  }
+  const meterRows = data.meters
+    .map((meter) => {
+      const readings = data.readings.filter((item) => item.meterId === meter.id)
+      const consumption = readings.reduce((total, item) => total + Number(item.consumption ?? 0), 0)
+      const expenditure = readings.reduce((total, item) => total + Number(item.expenditure ?? 0), 0)
+      return { meter, consumption, expenditure, tariff: data.tariffs.find((item) => item.meterId === meter.id) }
+    })
+    .sort((a, b) => b.consumption - a.consumption)
+  const latestReadings = [...data.readings].sort((a, b) => b.readAt.getTime() - a.readAt.getTime()).slice(0, 5)
+  const inactiveMeters = data.meters.filter((meter) => !meter.active)
+  const monthLabel = now.toLocaleDateString(operationalDefaults.locale, { month: 'long', year: 'numeric' })
 
   return (
     <PageContainer>
@@ -307,148 +351,180 @@ export default async function MeteringPage({
       </nav>
 
       {tab === 'overview' && (
-        <div className="space-y-4">
-          <SearchInput placeholder={t('Search meter, Serial Number or MPAN')} />
-          {!data.meters.length ? (
-            <Card>
-              <CardContent className="text-muted-foreground py-10 text-center">
-                {t('No meters found for the selected property context.')}
+        <div className="space-y-6">
+          <div className="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm">
+            <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-700">
+                  {t('Metering')} · {t('Overview')}
+                </p>
+                <p className="mt-1 text-sm text-slate-500">
+                  {t('Monitor utility consumption, cost and operational performance across your authorised properties.')}
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700">
+                  {monthLabel}
+                </span>
+                <SearchInput placeholder={t('Search meter, Serial Number or MPAN')} />
+                <Button asChild className="bg-teal-700 text-white hover:bg-teal-800">
+                  <Link href={`${BASE}?tab=enter-reading`}>
+                    <Plus size={16} aria-hidden="true" /> {t('Add reading')}
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {[
+              { label: t('Electricity'), icon: Zap, summary: electricity, prior: priorPeriod('electricity'), tone: 'bg-teal-50 text-teal-700' },
+              { label: t('Water'), icon: Droplets, summary: water, prior: priorPeriod('water'), tone: 'bg-sky-50 text-sky-700' },
+              { label: t('Gas'), icon: Flame, summary: gas, prior: priorPeriod('gas'), tone: 'bg-orange-50 text-orange-700' },
+              { label: t('Active meters'), icon: Activity, summary: { consumption: data.meters.filter((meter) => meter.active).length, expenditure: 0, unit: t('meters'), currency: null }, prior: 0, tone: 'bg-violet-50 text-violet-700' },
+            ].map(({ label, icon: Icon, summary, prior, tone }) => {
+              const change = prior ? ((summary.consumption - prior) / prior) * 100 : null
+              const improving = change != null && change <= 0
+              return (
+                <Card key={label} className="overflow-hidden border-slate-200 shadow-sm">
+                  <CardContent className="p-5">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-sm font-medium text-slate-600">{label}</p>
+                        <p className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">
+                          {summary.consumption.toLocaleString(operationalDefaults.locale, { maximumFractionDigits: 2 })}
+                          <span className="ml-1 text-sm font-medium text-slate-500">{summary.unit}</span>
+                        </p>
+                      </div>
+                      <span className={`rounded-xl p-3 ${tone}`}><Icon size={20} aria-hidden="true" /></span>
+                    </div>
+                    <div className="mt-4 flex items-center justify-between text-xs">
+                      {summary.currency ? <span className="font-medium text-slate-700">{money(summary.expenditure, summary.currency, operationalDefaults.locale)}</span> : <span className="text-slate-400">{t('No cost recorded')}</span>}
+                      {change != null ? (
+                        <span className={`inline-flex items-center gap-1 font-semibold ${improving ? 'text-teal-700' : 'text-orange-700'}`}>
+                          {improving ? <ArrowDownRight size={14} /> : <ArrowUpRight size={14} />}{Math.abs(change).toFixed(1)}% {t('vs previous month')}
+                        </span>
+                      ) : <span className="text-slate-400">{t('No prior period')}</span>}
+                    </div>
+                  </CardContent>
+                </Card>
+              )
+            })}
+          </div>
+          <div className="grid gap-4 xl:grid-cols-[minmax(0,1.7fr)_minmax(300px,0.9fr)]">
+            <Card className="border-slate-200 shadow-sm">
+              <CardContent className="p-5">
+                <div className="mb-4 flex items-center justify-between">
+                  <div>
+                    <h2 className="font-semibold text-slate-950">{t('Consumption trend')}</h2>
+                    <p className="text-sm text-slate-500">{t('Recorded consumption by reporting period')}</p>
+                  </div>
+                  <BarChart3 className="text-teal-700" size={20} aria-hidden="true" />
+                </div>
+                <div className="text-teal-700">
+                  <Chart series={consumptionSeries} label={t('All utilities')} emptyLabel={t('No recorded consumption for this period.')} unit={consumptionUnit} axisLabel={t('Consumption trend')} dateLabel={t('Date')} />
+                </div>
               </CardContent>
             </Card>
-          ) : (
-            <div className="grid gap-4 lg:grid-cols-2">
-              {data.meters.map((meter) => {
-                const latest = latestByMeter.get(meter.id)
-                const currentTariff = data.tariffs.find((item) => item.meterId === meter.id)
-                const meterReadings = data.readings.filter((item) => item.meterId === meter.id)
-                const total = meterReadings.reduce(
-                  (sum, item) => sum + Number(item.consumption ?? 0),
-                  0,
-                )
-                const spend = meterReadings.reduce(
-                  (sum, item) => sum + Number(item.expenditure ?? 0),
-                  0,
-                )
-                const since = (days: number) =>
-                  meterReadings
-                    .filter((item) => item.readAt >= new Date(now.getTime() - days * 86_400_000))
-                    .reduce((sum, item) => sum + Number(item.consumption ?? 0), 0)
-                const weekly = since(7)
-                const monthly = since(30)
-                const annual = since(365)
-                const previousMonth = meterReadings
-                  .filter(
-                    (item) =>
-                      item.readAt < new Date(now.getTime() - 30 * 86_400_000) &&
-                      item.readAt >= new Date(now.getTime() - 60 * 86_400_000),
-                  )
-                  .reduce((sum, item) => sum + Number(item.consumption ?? 0), 0)
-                const activeDays = meterReadings.length
-                  ? Math.max(
-                      1,
-                      Math.ceil(
-                        (now.getTime() -
-                          Math.min(...meterReadings.map((item) => item.readAt.getTime()))) /
-                          86_400_000,
-                      ),
-                    )
-                  : 0
-                return (
-                  <Card key={meter.id}>
-                    <CardContent className="space-y-2 pt-6">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <h2 className="font-semibold">{meter.name}</h2>
-                          <p className="text-muted-foreground text-sm">
-                            {meter.propertyName} {meter.meterType}
-                          </p>
-                        </div>
-                        <span className="text-xs">
-                          {meter.active ? t('Active') : t('Inactive')}
-                        </span>
-                      </div>
-                      <dl className="grid grid-cols-2 gap-2 text-sm">
-                        <div>
-                          <dt className="text-muted-foreground">{t('Serial Number')}</dt>
-                          <dd>{meter.serialNumber}</dd>
-                        </div>
-                        <div>
-                          <dt className="text-muted-foreground">{t('MPAN')}</dt>
-                          <dd>{meter.mpan ?? t('Not applicable')}</dd>
-                        </div>
-                        <div>
-                          <dt className="text-muted-foreground">{t('Location')}</dt>
-                          <dd>{meter.location}</dd>
-                        </div>
-                        <div>
-                          <dt className="text-muted-foreground">{t('Latest reading')}</dt>
-                          <dd>
-                            {latest ? `${latest.readingValue} ${meter.measurementUnit}` : '-'}
-                          </dd>
-                        </div>
-                        <div>
-                          <dt className="text-muted-foreground">{t('Recorded consumption')}</dt>
-                          <dd>
-                            {total.toFixed(2)} {meter.measurementUnit}
-                          </dd>
-                        </div>
-                        <div>
-                          <dt className="text-muted-foreground">{t('Estimated expenditure')}</dt>
-                          <dd>
-                            {money(
-                              spend,
-                              currentTariff?.currency ?? null,
-                              operationalDefaults.locale,
-                            )}
-                          </dd>
-                        </div>
-                        <div>
-                          <dt className="text-muted-foreground">{t('Weekly consumption')}</dt>
-                          <dd>
-                            {weekly.toFixed(2)} {meter.measurementUnit}
-                          </dd>
-                        </div>
-                        <div>
-                          <dt className="text-muted-foreground">{t('Monthly consumption')}</dt>
-                          <dd>
-                            {monthly.toFixed(2)} {meter.measurementUnit}
-                          </dd>
-                        </div>
-                        <div>
-                          <dt className="text-muted-foreground">{t('Annual consumption')}</dt>
-                          <dd>
-                            {annual.toFixed(2)} {meter.measurementUnit}
-                          </dd>
-                        </div>
-                        <div>
-                          <dt className="text-muted-foreground">
-                            {t('Average daily consumption')}
-                          </dt>
-                          <dd>
-                            {activeDays ? (total / activeDays).toFixed(2) : '-'}{' '}
-                            {meter.measurementUnit}
-                          </dd>
-                        </div>
-                        <div>
-                          <dt className="text-muted-foreground">
-                            {t('Previous-period comparison')}
-                          </dt>
-                          <dd>
-                            {previousMonth
-                              ? (((monthly - previousMonth) / previousMonth) * 100).toFixed(1) + '%'
-                              : '-'}
-                          </dd>
-                        </div>
-                      </dl>
-                    </CardContent>
-                  </Card>
-                )
-              })}
+            <Card className="border-slate-200 shadow-sm">
+              <CardContent className="p-5">
+                <div className="mb-5 flex items-center justify-between">
+                  <div>
+                    <h2 className="font-semibold text-slate-950">{t('Cost trend')}</h2>
+                    <p className="text-sm text-slate-500">{t('Estimated expenditure from recorded tariffs')}</p>
+                  </div>
+                  <span className="rounded-lg bg-orange-50 p-2 text-orange-700"><Activity size={18} aria-hidden="true" /></span>
+                </div>
+                <div className="text-orange-700">
+                  <Chart series={spendSeries} label={t('Recorded cost')} emptyLabel={t('No cost data for this period.')} unit={expenditureUnit} axisLabel={t('Cost trend')} dateLabel={t('Date')} />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="grid gap-4 xl:grid-cols-[minmax(0,1.7fr)_minmax(300px,0.9fr)]">
+            <Card className="border-slate-200 shadow-sm">
+              <CardContent className="p-0">
+                <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+                  <div>
+                    <h2 className="font-semibold text-slate-950">{t('Latest readings')}</h2>
+                    <p className="text-sm text-slate-500">{t('Most recent readings across your authorised properties')}</p>
+                  </div>
+                  <Link className="text-sm font-semibold text-teal-700 hover:text-teal-800" href={`${BASE}?tab=history`}>{t('View all')}</Link>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full min-w-[640px] text-left text-sm">
+                    <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+                      <tr><th className="px-5 py-3">{t('Date')}</th><th className="px-5 py-3">{t('Meter')}</th><th className="px-5 py-3">{t('Property')}</th><th className="px-5 py-3 text-right">{t('Reading')}</th></tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {latestReadings.map((item) => {
+                        const meter = data.meters.find((candidate) => candidate.id === item.meterId)
+                        return <tr key={item.id} className="text-slate-700">
+                          <td className="px-5 py-3 whitespace-nowrap">{item.readAt.toLocaleDateString(operationalDefaults.locale)}</td>
+                          <td className="px-5 py-3 font-medium text-slate-950">{meter?.name ?? t('Meter')}</td>
+                          <td className="px-5 py-3">{meter?.propertyName ?? '-'}</td>
+                          <td className="px-5 py-3 text-right font-semibold">{item.readingValue} {meter?.measurementUnit}</td>
+                        </tr>
+                      })}
+                      {!latestReadings.length && <tr><td colSpan={4} className="px-5 py-8 text-center text-slate-500">{t('No readings have been recorded yet.')}</td></tr>}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+            <div className="space-y-4">
+              <Card className="border-slate-200 shadow-sm">
+                <CardContent className="p-5">
+                  <div className="flex items-center justify-between">
+                    <div><h2 className="font-semibold text-slate-950">{t('Unit costs')}</h2><p className="text-sm text-slate-500">{t('Current recorded tariffs')}</p></div>
+                    <Link className="text-sm font-semibold text-teal-700 hover:text-teal-800" href={`${BASE}?tab=setup`}>{t('Manage')}</Link>
+                  </div>
+                  <div className="mt-4 divide-y divide-slate-100">
+                    {meterRows.slice(0, 4).map(({ meter, tariff }) => <div key={meter.id} className="flex items-center justify-between py-3 text-sm">
+                      <span className="font-medium text-slate-700">{meter.name}</span>
+                      <span className="text-slate-950">{tariff ? `${tariff.unitCost} ${tariff.currency} / ${meter.measurementUnit}` : t('No tariff')}</span>
+                    </div>)}
+                    {!meterRows.length && <p className="py-4 text-sm text-slate-500">{t('No meters configured.')}</p>}
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="border-slate-200 shadow-sm">
+                <CardContent className="p-5">
+                  <div className="flex items-center justify-between">
+                    <div><h2 className="font-semibold text-slate-950">{t('Alerts & exceptions')}</h2><p className="text-sm text-slate-500">{t('Operational items requiring review')}</p></div>
+                    <span className={`rounded-lg p-2 ${inactiveMeters.length ? 'bg-orange-50 text-orange-700' : 'bg-teal-50 text-teal-700'}`}><AlertTriangle size={18} aria-hidden="true" /></span>
+                  </div>
+                  <div className="mt-4">
+                    {inactiveMeters.length ? inactiveMeters.slice(0, 3).map((meter) => <div key={meter.id} className="border-b border-slate-100 py-3 last:border-0">
+                      <p className="text-sm font-semibold text-slate-900">{meter.name}</p>
+                      <p className="mt-1 text-xs text-slate-500">{t('Meter inactive')} · {meter.propertyName}</p>
+                    </div>) : <p className="rounded-xl bg-teal-50 px-3 py-4 text-sm text-teal-800">{t('No exceptions are currently detected from the available meter status.')}</p>}
+                  </div>
+                </CardContent>
+              </Card>
             </div>
-          )}
+          </div>
+
+          <Card className="border-slate-200 shadow-sm">
+            <CardContent className="p-0">
+              <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+                <div><h2 className="font-semibold text-slate-950">{t('Top meters by consumption')}</h2><p className="text-sm text-slate-500">{t('Ranked from recorded consumption and cost')}</p></div>
+                <Link className="text-sm font-semibold text-teal-700 hover:text-teal-800" href={`${BASE}?tab=analytics`}>{t('Analytics')}</Link>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[720px] text-left text-sm">
+                  <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500"><tr><th className="px-5 py-3">#</th><th className="px-5 py-3">{t('Meter')}</th><th className="px-5 py-3">{t('Property')}</th><th className="px-5 py-3 text-right">{t('Consumption')}</th><th className="px-5 py-3 text-right">{t('Cost')}</th></tr></thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {meterRows.slice(0, 5).map(({ meter, consumption, expenditure, tariff }, index) => <tr key={meter.id}><td className="px-5 py-3 text-slate-500">{index + 1}</td><td className="px-5 py-3 font-semibold text-slate-950">{meter.name}</td><td className="px-5 py-3 text-slate-600">{meter.propertyName}</td><td className="px-5 py-3 text-right font-medium">{consumption.toLocaleString(operationalDefaults.locale, { maximumFractionDigits: 2 })} {meter.measurementUnit}</td><td className="px-5 py-3 text-right">{money(expenditure, tariff?.currency ?? null, operationalDefaults.locale)}</td></tr>)}
+                    {!meterRows.length && <tr><td colSpan={5} className="px-5 py-8 text-center text-slate-500">{t('No meters found for the selected property context.')}</td></tr>}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       )}
-
       {tab === 'enter-reading' && (
         <Card>
           <CardContent className="pt-6">

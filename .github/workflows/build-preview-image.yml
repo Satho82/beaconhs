@@ -1,6 +1,12 @@
 name: Build preview image
 
 on:
+  pull_request:
+    branches:
+      - feature/uvanoo-v1.4
+    paths:
+      - 'apps/web/src/app/(app)/hospitality/metering/page.tsx'
+      - '.github/workflows/build-preview-image.yml'
   workflow_dispatch:
     inputs:
       preview_slug:
@@ -13,7 +19,7 @@ permissions:
   packages: write
 
 concurrency:
-  group: preview-image-${{ inputs.preview_slug }}
+  group: preview-image-${{ inputs.preview_slug || 'metering' }}
   cancel-in-progress: false
 
 jobs:
@@ -55,7 +61,7 @@ jobs:
       - name: Set image metadata
         id: meta
         run: |
-          preview_slug="${{ inputs.preview_slug }}"
+          preview_slug="${{ inputs.preview_slug || 'metering' }}"
           case "$preview_slug" in
             *[!a-z0-9-]*|'') echo "preview_slug must be lowercase alphanumeric or hyphen" >&2; exit 1 ;;
           esac

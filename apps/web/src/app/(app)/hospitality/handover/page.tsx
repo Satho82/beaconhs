@@ -16,6 +16,7 @@ import { SearchInput } from '@/components/search-input'
 import { TableToolbar } from '@/components/table-toolbar'
 import { PhotoUploaderSection } from '@/components/photo-uploader-section'
 import { requireRequestContext } from '@/lib/auth'
+import { createRoomMaintenanceIssue } from '@/lib/hospitality/maintenance'
 import { getGeneratedValueTranslations } from '@/i18n/generated.server'
 import { parseListParams } from '@/lib/list-params'
 import {
@@ -53,23 +54,39 @@ async function createEntry(form: FormData) {
     throw new Error('Invalid handover selection.')
   const occurredAt = new Date(text(form, 'occurredAt'))
   const propertyId = text(form, 'propertyId')
+  const roomId = text(form, 'roomId') || undefined
+  const department = text(form, 'department')
+  const note = text(form, 'note')
   const requiredPropertyId = await requireAuthoringProperty(ctx)
   if (requiredPropertyId && propertyId !== requiredPropertyId) {
     throw new Error('Create this Handover entry in the property selected in the Property Switcher.')
+  }
+  let maintenanceIssueId = text(form, 'maintenanceIssueId') || undefined
+  if (form.get('createMaintenanceIssue') === 'on') {
+    if (!roomId) throw new Error('Choose a room before creating a maintenance defect.')
+    const issue = await createRoomMaintenanceIssue(
+      ctx,
+      roomId,
+      `Handover defect: ${department}`,
+      note,
+      priority === 'urgent' ? 'critical' : priority === 'important' ? 'high' : 'medium',
+      'manager',
+    )
+    maintenanceIssueId = issue.id
   }
   await createHandover(ctx, {
     propertyId,
     occurredAt,
     shift,
     customShift: text(form, 'customShift') || undefined,
-    department: text(form, 'department'),
-    note: text(form, 'note'),
+    department,
+    note,
     priority,
-    roomId: text(form, 'roomId') || undefined,
+    roomId,
     location: text(form, 'location') || undefined,
     followUpRequired: form.get('followUpRequired') === 'on',
     followUpOwnerId: text(form, 'followUpOwnerId') || undefined,
-    maintenanceIssueId: text(form, 'maintenanceIssueId') || undefined,
+    maintenanceIssueId,
     createCorrectiveAction: form.get('createCorrectiveAction') === 'on',
   })
   revalidatePath(BASE)
@@ -257,6 +274,10 @@ export default async function HandoverPage({
                     </option>
                   ))}
                 </Select>
+              </label>
+              <label className="flex items-center gap-2 text-sm">
+                <input name="createMaintenanceIssue" type="checkbox" />
+                {t('Create a maintenance defect from this handover')}
               </label>
               <label className="space-y-1 text-sm">
                 <span>{t('Existing maintenance issue (optional)')}</span>

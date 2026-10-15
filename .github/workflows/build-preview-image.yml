@@ -5,7 +5,14 @@ on:
     branches:
       - feature/uvanoo-v1.4
     paths:
-      - 'apps/web/src/app/(app)/hospitality/metering/page.tsx'
+      - 'apps/web/src/app/(app)/hospitality/**'
+      - 'apps/web/src/app/(app)/inspections/**'
+      - 'apps/web/src/app/(app)/equipment/**'
+      - 'apps/web/src/app/platform-branding/**'
+      - 'apps/web/src/components/app-sidebar.tsx'
+      - 'apps/web/src/components/brand-logo.tsx'
+      - 'apps/web/src/lib/hospitality/**'
+      - 'apps/web/src/lib/platform-brand*.ts'
       - '.github/workflows/build-preview-image.yml'
   workflow_dispatch:
     inputs:

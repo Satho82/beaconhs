@@ -167,6 +167,12 @@ export default async function HandoverPage({
   const localNow = new Date(now.getTime() - now.getTimezoneOffset() * 60_000)
     .toISOString()
     .slice(0, 16)
+  const openFollowUps = data.rows.filter(
+    ({ handover }) => handover.followUpRequired && handover.followUpStatus !== 'completed',
+  )
+  const urgentEntries = data.rows.filter(({ handover }) => handover.priority === 'urgent')
+  const linkedMaintenance = data.rows.filter(({ handover }) => handover.maintenanceIssueId)
+  const latestShift = data.rows[0]?.handover
 
   return (
     <PageContainer>
@@ -176,6 +182,53 @@ export default async function HandoverPage({
           'A chronological shift record across the properties you are authorised to access.',
         )}
       />
+
+      <section className="mt-5 rounded-2xl border border-teal-100 bg-gradient-to-br from-teal-50 via-white to-white p-5">
+        <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-700">
+              {t('Hotel operations')} · {t('Shift control')}
+            </p>
+            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-slate-950">
+              {t('Handover overview')}
+            </h2>
+            <p className="mt-1 max-w-2xl text-sm text-slate-600">
+              {t('Track operational notes, outstanding follow-ups and linked maintenance in one accountable shift record.')}
+            </p>
+          </div>
+          <div className="rounded-xl border border-teal-100 bg-white px-4 py-3 text-sm shadow-sm">
+            <p className="text-xs font-medium uppercase tracking-wide text-slate-500">{t('Latest shift')}</p>
+            <p className="mt-1 font-semibold text-slate-900">
+              {latestShift
+                ? `${latestShift.shift === 'custom' ? latestShift.customShift : latestShift.shift.toUpperCase()} · ${latestShift.occurredAt.toLocaleString('en-GB')}`
+                : t('No handover recorded')}
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="rounded-xl border border-white bg-white p-4 shadow-sm">
+            <p className="text-sm font-medium text-slate-600">{t('Handover entries')}</p>
+            <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{data.total}</p>
+            <p className="mt-1 text-xs text-teal-700">{t('Within the current property and search scope')}</p>
+          </div>
+          <div className="rounded-xl border border-white bg-white p-4 shadow-sm">
+            <p className="text-sm font-medium text-slate-600">{t('Open follow-ups')}</p>
+            <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{openFollowUps.length}</p>
+            <p className="mt-1 text-xs text-coral-700">{t('Require owner attention')}</p>
+          </div>
+          <div className="rounded-xl border border-white bg-white p-4 shadow-sm">
+            <p className="text-sm font-medium text-slate-600">{t('Urgent notes')}</p>
+            <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{urgentEntries.length}</p>
+            <p className="mt-1 text-xs text-coral-700">{t('Shown in this handover view')}</p>
+          </div>
+          <div className="rounded-xl border border-white bg-white p-4 shadow-sm">
+            <p className="text-sm font-medium text-slate-600">{t('Maintenance linked')}</p>
+            <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{linkedMaintenance.length}</p>
+            <p className="mt-1 text-xs text-teal-700">{t('Defects retained with their source handover')}</p>
+          </div>
+        </div>
+      </section>
 
       {mayManage ? (
         <Card className="mt-5">

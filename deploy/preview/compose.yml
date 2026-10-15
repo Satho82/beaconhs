@@ -1,0 +1,70 @@
+# Isolated Uvanoo module preview stack.
+# Deploy only via the Preview Platform workflow; never attach this stack to a
+# DEV or production runtime network.
+#
+# Required external resources, created by the platform bootstrap:
+# - ${PREVIEW_RUNTIME_NETWORK}: preview-only overlay network
+# - dokploy-network: Traefik ingress network
+# - ${PREVIEW_RUNTIME_SECRET}: env file pointing only to preview DB/Redis/storage
+#
+# This stack intentionally has no worker, scheduler, or storage-init service.
+# A preview is web-only and must use a short-lived cloned data plane.
+services:
+  web:
+    image: ${IMAGE:?Set immutable preview image digest}
+    entrypoint:
+      - /bin/sh
+      - -ec
+      - set -a; . /run/secrets/preview-runtime; set +a; exec /entrypoint.sh
+    secrets:
+      - source: preview-runtime
+        target: preview-runtime
+        uid: "1000"
+        gid: "1000"
+        mode: 0400
+    environment:
+      APP_ROLE: web
+      NODE_ENV: production
+      HOSTNAME: 0.0.0.0
+      PORT: "3000"
+      APP_VERSION: ${APP_VERSION:?Set source commit SHA}
+      APP_URL: https://${PREVIEW_HOST:?Set preview host}
+      BETTER_AUTH_URL: https://${PREVIEW_HOST:?Set preview host}
+      SENTRY_ENVIRONMENT: preview
+    networks:
+      - preview-runtime
+      - dokploy-network
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://127.0.0.1:3000/api/health/ready"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+        delay: 5s
+      labels:
+        - traefik.enable=true
+        - traefik.swarm.network=dokploy-network
+        - traefik.http.routers.uvanoo-preview-web.rule=Host(`${PREVIEW_HOST}`)
+        - traefik.http.routers.uvanoo-preview-web.entrypoints=web
+        - traefik.http.routers.uvanoo-preview-web.middlewares=redirect-to-https@file
+        - traefik.http.routers.uvanoo-preview-websecure.rule=Host(`${PREVIEW_HOST}`)
+        - traefik.http.routers.uvanoo-preview-websecure.entrypoints=websecure
+        - traefik.http.routers.uvanoo-preview-websecure.tls.certresolver=letsencrypt
+        - traefik.http.routers.uvanoo-preview-websecure.service=uvanoo-preview-web
+        - traefik.http.services.uvanoo-preview-web.loadbalancer.server.port=3000
+
+networks:
+  preview-runtime:
+    name: ${PREVIEW_RUNTIME_NETWORK:?Set preview-only network}
+    external: true
+  dokploy-network:
+    external: true
+
+secrets:
+  preview-runtime:
+    external: true
+    name: ${PREVIEW_RUNTIME_SECRET:?Set preview runtime secret}

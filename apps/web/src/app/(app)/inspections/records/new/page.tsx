@@ -32,6 +32,7 @@ export default async function NewInspectionConfirmPage({
   const tGenerated = await getGeneratedTranslations()
   const sp = await searchParams
   const typeId = pickString(sp.typeId)
+  const propertyId = pickString(sp.propertyId)
   if (!typeId) redirect('/inspections/records?drawer=new')
 
   const ctx = await requireRequestContext()
@@ -76,6 +77,7 @@ export default async function NewInspectionConfirmPage({
             </p>
             <form action={startInspection}>
               <input type="hidden" name="typeId" value={type.id} />
+              {propertyId ? <input type="hidden" name="propertyId" value={propertyId} /> : null}
               <Button type="submit">
                 <ClipboardCheck size={14} /> <GeneratedText id="m_050ae31d3122aa" />
               </Button>

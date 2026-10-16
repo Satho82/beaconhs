@@ -4,6 +4,8 @@ import { redirect } from 'next/navigation'
 import { and, asc, count, desc, eq, ilike, or, type SQL } from 'drizzle-orm'
 import {
   Badge,
+  Card,
+  CardContent,
   DetailHeader,
   EmptyState,
   Table,
@@ -98,6 +100,64 @@ export default async function AuditLogPage({
           title={tGenerated('m_19635ea35a756a')}
           subtitle={tGenerated('m_1d95d3a826b700')}
         />
+        <section className="rounded-2xl border border-teal-100 bg-gradient-to-br from-teal-50 via-white to-white p-5">
+          <div className="flex flex-col justify-between gap-3 lg:flex-row lg:items-end">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-700">
+                Governance · traceable operations
+              </p>
+              <h2 className="mt-1 text-2xl font-semibold tracking-tight text-slate-950">
+                Audit overview
+              </h2>
+              <p className="mt-1 max-w-2xl text-sm text-slate-600">
+                Review attributable changes, signatures and publishing activity across your permitted
+                scope.
+              </p>
+            </div>
+            <p className="text-sm text-slate-600">
+              Latest event:{' '}
+              <span className="font-semibold text-slate-950">
+                {rows[0]?.log.summary ?? 'No events recorded'}
+              </span>
+            </p>
+          </div>
+          <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <Card className="border-white bg-white shadow-sm">
+              <CardContent className="p-4">
+                <p className="text-sm font-medium text-slate-600">Events in scope</p>
+                <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{total}</p>
+                <p className="mt-1 text-xs text-teal-700">Current access and filters</p>
+              </CardContent>
+            </Card>
+            <Card className="border-white bg-white shadow-sm">
+              <CardContent className="p-4">
+                <p className="text-sm font-medium text-slate-600">Entity types</p>
+                <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
+                  {entityTypes.length}
+                </p>
+                <p className="mt-1 text-xs text-teal-700">Audited operational surfaces</p>
+              </CardContent>
+            </Card>
+            <Card className="border-white bg-white shadow-sm">
+              <CardContent className="p-4">
+                <p className="text-sm font-medium text-slate-600">Events on this page</p>
+                <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
+                  {rows.length}
+                </p>
+                <p className="mt-1 text-xs text-teal-700">Newest first</p>
+              </CardContent>
+            </Card>
+            <Card className="border-white bg-white shadow-sm">
+              <CardContent className="p-4">
+                <p className="text-sm font-medium text-slate-600">Active filter</p>
+                <p className="mt-2 text-xl font-semibold tracking-tight text-slate-950">
+                  {actionFilter ?? entityFilter ?? 'All activity'}
+                </p>
+                <p className="mt-1 text-xs text-teal-700">Refine below by action or entity</p>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
         <TableToolbar>
           <SearchInput placeholder={tGenerated('m_0548446a641230')} />
           <FilterChips

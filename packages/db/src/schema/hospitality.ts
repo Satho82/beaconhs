@@ -18,6 +18,7 @@ import { id, softDelete, timestamps } from './_helpers'
 import { tenants, tenantUsers } from './core'
 import { equipmentItems } from './equipment'
 import { attachments } from './attachments'
+import { inspectionTypes } from './inspection-types'
 
 export const hospitalityRoomStatus = pgEnum('hospitality_room_status', [
   'available',
@@ -394,6 +395,9 @@ export const operationalTaskSchedules = pgTable(
       .references(() => tenants.id, { onDelete: 'cascade' }),
     templateId: uuid('template_id').notNull(),
     propertyId: uuid('property_id').notNull(),
+    // When set, this recurring operational task is an inspection appointment.
+    // The worker still owns occurrence generation and reminder/escalation timing.
+    inspectionTypeId: uuid('inspection_type_id'),
     timezone: text('timezone').notNull(),
     recurrence: jsonb('recurrence').$type<Record<string, unknown>>().notNull(),
     startsAt: timestamp('starts_at', { withTimezone: true }).notNull(),
@@ -413,6 +417,16 @@ export const operationalTaskSchedules = pgTable(
       columns: [t.tenantId, t.propertyId],
       foreignColumns: [hospitalityProperties.tenantId, hospitalityProperties.id],
     }),
+    inspectionTypeFk: foreignKey({
+      name: 'operational_task_schedules_tenant_inspection_type_fk',
+      columns: [t.tenantId, t.inspectionTypeId],
+      foreignColumns: [inspectionTypes.tenantId, inspectionTypes.id],
+    }).onDelete('restrict'),
+    inspectionCalendarIdx: index('operational_task_schedules_inspection_calendar_idx').on(
+      t.tenantId,
+      t.inspectionTypeId,
+      t.propertyId,
+    ),
     assigneeFk: foreignKey({
       name: 'operational_task_schedules_tenant_assignee_fk',
       columns: [t.tenantId, t.assignedToTenantUserId],

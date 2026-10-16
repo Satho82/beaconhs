@@ -36,6 +36,12 @@ export type CreateHandoverInput = {
   department: string
   note: string
   priority: HandoverPriority
+  occupancyPercent?: number
+  adr?: number
+  arrivalsCount?: number
+  departuresCount?: number
+  vipGuestCount?: number
+  peepGuestCount?: number
   roomId?: string
   location?: string
   followUpRequired?: boolean
@@ -50,6 +56,14 @@ function required(value: string | undefined, label: string, max = 10_000) {
   if (!clean) throw new Error(`${label} is required.`)
   if (clean.length > max) throw new Error(`${label} is too long.`)
   return clean
+}
+
+function optionalMetric(value: number | undefined, label: string, maximum?: number) {
+  if (value === undefined) return null
+  if (!Number.isFinite(value) || value < 0 || (maximum !== undefined && value > maximum)) {
+    throw new Error(`${label} is invalid.`)
+  }
+  return value
 }
 
 function memberId(ctx: RequestContext) {
@@ -207,6 +221,12 @@ export async function createHandover(ctx: RequestContext, input: CreateHandoverI
     input.shift === 'custom' ? required(input.customShift, 'Custom shift', 100) : null
   const location = input.location?.trim() || null
   const followUpRequired = Boolean(input.followUpRequired)
+  const occupancyPercent = optionalMetric(input.occupancyPercent, 'Occupancy', 100)
+  const adr = optionalMetric(input.adr, 'ADR')
+  const arrivalsCount = optionalMetric(input.arrivalsCount, 'Arrivals')
+  const departuresCount = optionalMetric(input.departuresCount, 'Departures')
+  const vipGuestCount = optionalMetric(input.vipGuestCount, 'VIP guest count')
+  const peepGuestCount = optionalMetric(input.peepGuestCount, 'PEEP guest count')
   return ctx.db(async (tx) => {
     const roomId = await assertRoomForProperty(tx, ctx.tenantId, input.roomId, input.propertyId)
     const ownerId = followUpRequired
@@ -229,6 +249,12 @@ export async function createHandover(ctx: RequestContext, input: CreateHandoverI
         department,
         note,
         priority: input.priority,
+        occupancyPercent,
+        adr,
+        arrivalsCount,
+        departuresCount,
+        vipGuestCount,
+        peepGuestCount,
         authorId,
         roomId,
         location,

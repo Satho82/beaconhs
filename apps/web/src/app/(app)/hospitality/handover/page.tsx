@@ -45,6 +45,14 @@ function text(form: FormData, key: string) {
   return String(form.get(key) ?? '').trim()
 }
 
+function optionalNumber(form: FormData, key: string) {
+  const raw = text(form, key)
+  if (!raw) return undefined
+  const value = Number(raw)
+  if (!Number.isFinite(value)) throw new Error(`${key} must be a number.`)
+  return value
+}
+
 async function createEntry(form: FormData) {
   'use server'
   const ctx = await requireRequestContext()
@@ -82,6 +90,12 @@ async function createEntry(form: FormData) {
     department,
     note,
     priority,
+    occupancyPercent: optionalNumber(form, 'occupancyPercent'),
+    adr: optionalNumber(form, 'adr'),
+    arrivalsCount: optionalNumber(form, 'arrivalsCount'),
+    departuresCount: optionalNumber(form, 'departuresCount'),
+    vipGuestCount: optionalNumber(form, 'vipGuestCount'),
+    peepGuestCount: optionalNumber(form, 'peepGuestCount'),
     roomId,
     location: text(form, 'location') || undefined,
     followUpRequired: form.get('followUpRequired') === 'on',
@@ -173,6 +187,7 @@ export default async function HandoverPage({
   const urgentEntries = data.rows.filter(({ handover }) => handover.priority === 'urgent')
   const linkedMaintenance = data.rows.filter(({ handover }) => handover.maintenanceIssueId)
   const latestShift = data.rows[0]?.handover
+  const metricValue = (value: number | null) => (value === null ? '—' : String(value))
 
   return (
     <PageContainer>
@@ -207,6 +222,12 @@ export default async function HandoverPage({
         </div>
 
         <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="rounded-xl border border-white bg-white p-4 shadow-sm"><p className="text-sm font-medium text-slate-600">{t('Occupancy')}</p><p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{latestShift?.occupancyPercent === null || latestShift?.occupancyPercent === undefined ? '—' : `${latestShift.occupancyPercent}%`}</p><p className="mt-1 text-xs text-teal-700">{t('Latest recorded shift')}</p></div>
+          <div className="rounded-xl border border-white bg-white p-4 shadow-sm"><p className="text-sm font-medium text-slate-600">{t('ADR')}</p><p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{latestShift?.adr === null || latestShift?.adr === undefined ? '—' : `£${latestShift.adr.toFixed(2)}`}</p><p className="mt-1 text-xs text-teal-700">{t('Latest recorded shift')}</p></div>
+          <div className="rounded-xl border border-white bg-white p-4 shadow-sm"><p className="text-sm font-medium text-slate-600">{t('VIP / PEEP')}</p><p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{metricValue(latestShift?.vipGuestCount ?? null)} / {metricValue(latestShift?.peepGuestCount ?? null)}</p><p className="mt-1 text-xs text-teal-700">{t('Count only — controlled guest records remain separate')}</p></div>
+          <div className="rounded-xl border border-white bg-white p-4 shadow-sm"><p className="text-sm font-medium text-slate-600">{t('Arrivals / departures')}</p><p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{metricValue(latestShift?.arrivalsCount ?? null)} / {metricValue(latestShift?.departuresCount ?? null)}</p><p className="mt-1 text-xs text-teal-700">{t('Latest recorded shift')}</p></div>
+        </div>
+        <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           <div className="rounded-xl border border-white bg-white p-4 shadow-sm">
             <p className="text-sm font-medium text-slate-600">{t('Handover entries')}</p>
             <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{data.total}</p>
@@ -275,6 +296,16 @@ export default async function HandoverPage({
                 <span>{t('Custom shift name')}</span>
                 <Input name="customShift" placeholder={t('Only needed for a custom shift')} />
               </label>
+              <div className="grid gap-3 rounded-xl border border-teal-100 bg-teal-50/50 p-3 md:col-span-2 md:grid-cols-3">
+                <p className="text-sm font-semibold md:col-span-3">{t('Hotel metrics at handover')}</p>
+                <label className="space-y-1 text-sm"><span>{t('Occupancy %')}</span><Input name="occupancyPercent" type="number" min="0" max="100" step="0.01" /></label>
+                <label className="space-y-1 text-sm"><span>{t('ADR')}</span><Input name="adr" type="number" min="0" step="0.01" /></label>
+                <label className="space-y-1 text-sm"><span>{t('Arrivals')}</span><Input name="arrivalsCount" type="number" min="0" step="1" /></label>
+                <label className="space-y-1 text-sm"><span>{t('Departures')}</span><Input name="departuresCount" type="number" min="0" step="1" /></label>
+                <label className="space-y-1 text-sm"><span>{t('VIP guests in house')}</span><Input name="vipGuestCount" type="number" min="0" step="1" /></label>
+                <label className="space-y-1 text-sm"><span>{t('PEEP guests in house')}</span><Input name="peepGuestCount" type="number" min="0" step="1" /></label>
+                <p className="text-xs text-slate-600 md:col-span-3">{t('PEEP is recorded only as a count here; sensitive arrangements remain in controlled records.')}</p>
+              </div>
               <label className="space-y-1 text-sm">
                 <span>{t('Department')}</span>
                 <Input

@@ -12,6 +12,12 @@ const nextConfig: NextConfig = {
     // Keep the Webpack production build below GitHub Actions' practical memory ceiling.
     // Next documents this as a low-risk peak-memory reduction with a small compile-time tradeoff.
     webpackMemoryOptimizations: true,
+    // Branding assets are validated again at 2 MB in the upload boundary. The
+    // Server Action envelope needs a little headroom for multipart metadata.
+    serverActions: {
+      bodySizeLimit: '3mb',
+      allowedOrigins: ['dev.uvanoo.com', 'preview.uvanoo.com', 'metering-preview.dev.uvanoo.com'],
+    },
   },
   deploymentId: process.env.DEPLOYMENT_VERSION,
   reactStrictMode: true,

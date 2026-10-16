@@ -140,6 +140,12 @@ export default async function MaintenanceQueue({
       .where(where)
     return { rows, total: total?.value ?? 0 }
   })
+  const activeIssues = data.rows.filter(
+    ({ issue }) => issue.status !== 'completed' && issue.status !== 'closed',
+  )
+  const criticalIssues = data.rows.filter(({ issue }) => issue.priority === 'critical')
+  const handoverIssues = data.rows.filter(({ issue }) => issue.source === 'manager')
+
   return (
     <PageContainer>
       <PageHeader
@@ -155,6 +161,36 @@ export default async function MaintenanceQueue({
           ) : undefined
         }
       />
+
+      <section className="mt-5 rounded-2xl border border-teal-100 bg-gradient-to-br from-teal-50 via-white to-white p-5">
+        <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-700">
+              {translateValue('Hotel operations')} · {translateValue('Maintenance control')}
+            </p>
+            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-slate-950">
+              {translateValue('Maintenance overview')}
+            </h2>
+            <p className="mt-1 max-w-2xl text-sm text-slate-600">
+              {translateValue('Guest defects, handover-created issues and the active maintenance queue in one accountable workspace.')}
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2 text-sm">
+            <Link className="rounded-lg border border-teal-200 bg-white px-3 py-2 font-semibold text-teal-700" href="/equipment">
+              {translateValue('Asset register & PPM')}
+            </Link>
+            <Link className="rounded-lg border border-teal-200 bg-white px-3 py-2 font-semibold text-teal-700" href="/hospitality/maintenance/report">
+              {translateValue('Report issue')}
+            </Link>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="rounded-xl border border-white bg-white p-4 shadow-sm"><p className="text-sm font-medium text-slate-600">{translateValue('All issues')}</p><p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{data.total}</p><p className="mt-1 text-xs text-teal-700">{translateValue('Within the current property and search scope')}</p></div>
+          <div className="rounded-xl border border-white bg-white p-4 shadow-sm"><p className="text-sm font-medium text-slate-600">{translateValue('Active in this view')}</p><p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{activeIssues.length}</p><p className="mt-1 text-xs text-teal-700">{translateValue('Excludes completed and closed records')}</p></div>
+          <div className="rounded-xl border border-white bg-white p-4 shadow-sm"><p className="text-sm font-medium text-slate-600">{translateValue('Critical')}</p><p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{criticalIssues.length}</p><p className="mt-1 text-xs text-rose-700">{translateValue('Requires priority review')}</p></div>
+          <div className="rounded-xl border border-white bg-white p-4 shadow-sm"><p className="text-sm font-medium text-slate-600">{translateValue('Handover linked')}</p><p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{handoverIssues.length}</p><p className="mt-1 text-xs text-teal-700">{translateValue('Created from the operational handover')}</p></div>
+        </div>
+      </section>
       <p className="text-muted-foreground mt-3 text-sm">
         {translateValue('Property')}:{' '}
         {propertyContext.properties.find(

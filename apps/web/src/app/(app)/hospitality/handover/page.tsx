@@ -16,6 +16,7 @@ import { SearchInput } from '@/components/search-input'
 import { TableToolbar } from '@/components/table-toolbar'
 import { PhotoUploaderSection } from '@/components/photo-uploader-section'
 import { requireRequestContext } from '@/lib/auth'
+import { createRoomMaintenanceIssue } from '@/lib/hospitality/maintenance'
 import { getGeneratedValueTranslations } from '@/i18n/generated.server'
 import { parseListParams } from '@/lib/list-params'
 import {
@@ -44,6 +45,14 @@ function text(form: FormData, key: string) {
   return String(form.get(key) ?? '').trim()
 }
 
+function optionalNumber(form: FormData, key: string) {
+  const raw = text(form, key)
+  if (!raw) return undefined
+  const value = Number(raw)
+  if (!Number.isFinite(value)) throw new Error(`${key} must be a number.`)
+  return value
+}
+
 async function createEntry(form: FormData) {
   'use server'
   const ctx = await requireRequestContext()
@@ -53,23 +62,45 @@ async function createEntry(form: FormData) {
     throw new Error('Invalid handover selection.')
   const occurredAt = new Date(text(form, 'occurredAt'))
   const propertyId = text(form, 'propertyId')
+  const roomId = text(form, 'roomId') || undefined
+  const department = text(form, 'department')
+  const note = text(form, 'note')
   const requiredPropertyId = await requireAuthoringProperty(ctx)
   if (requiredPropertyId && propertyId !== requiredPropertyId) {
     throw new Error('Create this Handover entry in the property selected in the Property Switcher.')
+  }
+  let maintenanceIssueId = text(form, 'maintenanceIssueId') || undefined
+  if (form.get('createMaintenanceIssue') === 'on') {
+    if (!roomId) throw new Error('Choose a room before creating a maintenance defect.')
+    const issue = await createRoomMaintenanceIssue(
+      ctx,
+      roomId,
+      `Handover defect: ${department}`,
+      note,
+      priority === 'urgent' ? 'critical' : priority === 'important' ? 'high' : 'medium',
+      'manager',
+    )
+    maintenanceIssueId = issue.id
   }
   await createHandover(ctx, {
     propertyId,
     occurredAt,
     shift,
     customShift: text(form, 'customShift') || undefined,
-    department: text(form, 'department'),
-    note: text(form, 'note'),
+    department,
+    note,
     priority,
-    roomId: text(form, 'roomId') || undefined,
+    occupancyPercent: optionalNumber(form, 'occupancyPercent'),
+    adr: optionalNumber(form, 'adr'),
+    arrivalsCount: optionalNumber(form, 'arrivalsCount'),
+    departuresCount: optionalNumber(form, 'departuresCount'),
+    vipGuestCount: optionalNumber(form, 'vipGuestCount'),
+    peepGuestCount: optionalNumber(form, 'peepGuestCount'),
+    roomId,
     location: text(form, 'location') || undefined,
     followUpRequired: form.get('followUpRequired') === 'on',
     followUpOwnerId: text(form, 'followUpOwnerId') || undefined,
-    maintenanceIssueId: text(form, 'maintenanceIssueId') || undefined,
+    maintenanceIssueId,
     createCorrectiveAction: form.get('createCorrectiveAction') === 'on',
   })
   revalidatePath(BASE)
@@ -150,6 +181,13 @@ export default async function HandoverPage({
   const localNow = new Date(now.getTime() - now.getTimezoneOffset() * 60_000)
     .toISOString()
     .slice(0, 16)
+  const openFollowUps = data.rows.filter(
+    ({ handover }) => handover.followUpRequired && handover.followUpStatus !== 'completed',
+  )
+  const urgentEntries = data.rows.filter(({ handover }) => handover.priority === 'urgent')
+  const linkedMaintenance = data.rows.filter(({ handover }) => handover.maintenanceIssueId)
+  const latestShift = data.rows[0]?.handover
+  const metricValue = (value: number | null) => (value === null ? '—' : String(value))
 
   return (
     <PageContainer>
@@ -159,6 +197,59 @@ export default async function HandoverPage({
           'A chronological shift record across the properties you are authorised to access.',
         )}
       />
+
+      <section className="mt-5 rounded-2xl border border-teal-100 bg-gradient-to-br from-teal-50 via-white to-white p-5">
+        <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-700">
+              {t('Hotel operations')} · {t('Shift control')}
+            </p>
+            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-slate-950">
+              {t('Handover overview')}
+            </h2>
+            <p className="mt-1 max-w-2xl text-sm text-slate-600">
+              {t('Track operational notes, outstanding follow-ups and linked maintenance in one accountable shift record.')}
+            </p>
+          </div>
+          <div className="rounded-xl border border-teal-100 bg-white px-4 py-3 text-sm shadow-sm">
+            <p className="text-xs font-medium uppercase tracking-wide text-slate-500">{t('Latest shift')}</p>
+            <p className="mt-1 font-semibold text-slate-900">
+              {latestShift
+                ? `${latestShift.shift === 'custom' ? latestShift.customShift : latestShift.shift.toUpperCase()} · ${latestShift.occurredAt.toLocaleString('en-GB')}`
+                : t('No handover recorded')}
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="rounded-xl border border-white bg-white p-4 shadow-sm"><p className="text-sm font-medium text-slate-600">{t('Occupancy')}</p><p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{latestShift?.occupancyPercent === null || latestShift?.occupancyPercent === undefined ? '—' : `${latestShift.occupancyPercent}%`}</p><p className="mt-1 text-xs text-teal-700">{t('Latest recorded shift')}</p></div>
+          <div className="rounded-xl border border-white bg-white p-4 shadow-sm"><p className="text-sm font-medium text-slate-600">{t('ADR')}</p><p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{latestShift?.adr === null || latestShift?.adr === undefined ? '—' : `£${latestShift.adr.toFixed(2)}`}</p><p className="mt-1 text-xs text-teal-700">{t('Latest recorded shift')}</p></div>
+          <div className="rounded-xl border border-white bg-white p-4 shadow-sm"><p className="text-sm font-medium text-slate-600">{t('VIP / PEEP')}</p><p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{metricValue(latestShift?.vipGuestCount ?? null)} / {metricValue(latestShift?.peepGuestCount ?? null)}</p><p className="mt-1 text-xs text-teal-700">{t('Count only — controlled guest records remain separate')}</p></div>
+          <div className="rounded-xl border border-white bg-white p-4 shadow-sm"><p className="text-sm font-medium text-slate-600">{t('Arrivals / departures')}</p><p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{metricValue(latestShift?.arrivalsCount ?? null)} / {metricValue(latestShift?.departuresCount ?? null)}</p><p className="mt-1 text-xs text-teal-700">{t('Latest recorded shift')}</p></div>
+        </div>
+        <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="rounded-xl border border-white bg-white p-4 shadow-sm">
+            <p className="text-sm font-medium text-slate-600">{t('Handover entries')}</p>
+            <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{data.total}</p>
+            <p className="mt-1 text-xs text-teal-700">{t('Within the current property and search scope')}</p>
+          </div>
+          <div className="rounded-xl border border-white bg-white p-4 shadow-sm">
+            <p className="text-sm font-medium text-slate-600">{t('Open follow-ups')}</p>
+            <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{openFollowUps.length}</p>
+            <p className="mt-1 text-xs text-coral-700">{t('Require owner attention')}</p>
+          </div>
+          <div className="rounded-xl border border-white bg-white p-4 shadow-sm">
+            <p className="text-sm font-medium text-slate-600">{t('Urgent notes')}</p>
+            <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{urgentEntries.length}</p>
+            <p className="mt-1 text-xs text-coral-700">{t('Shown in this handover view')}</p>
+          </div>
+          <div className="rounded-xl border border-white bg-white p-4 shadow-sm">
+            <p className="text-sm font-medium text-slate-600">{t('Maintenance linked')}</p>
+            <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{linkedMaintenance.length}</p>
+            <p className="mt-1 text-xs text-teal-700">{t('Defects retained with their source handover')}</p>
+          </div>
+        </div>
+      </section>
 
       {mayManage ? (
         <Card className="mt-5">
@@ -205,6 +296,16 @@ export default async function HandoverPage({
                 <span>{t('Custom shift name')}</span>
                 <Input name="customShift" placeholder={t('Only needed for a custom shift')} />
               </label>
+              <div className="grid gap-3 rounded-xl border border-teal-100 bg-teal-50/50 p-3 md:col-span-2 md:grid-cols-3">
+                <p className="text-sm font-semibold md:col-span-3">{t('Hotel metrics at handover')}</p>
+                <label className="space-y-1 text-sm"><span>{t('Occupancy %')}</span><Input name="occupancyPercent" type="number" min="0" max="100" step="0.01" /></label>
+                <label className="space-y-1 text-sm"><span>{t('ADR')}</span><Input name="adr" type="number" min="0" step="0.01" /></label>
+                <label className="space-y-1 text-sm"><span>{t('Arrivals')}</span><Input name="arrivalsCount" type="number" min="0" step="1" /></label>
+                <label className="space-y-1 text-sm"><span>{t('Departures')}</span><Input name="departuresCount" type="number" min="0" step="1" /></label>
+                <label className="space-y-1 text-sm"><span>{t('VIP guests in house')}</span><Input name="vipGuestCount" type="number" min="0" step="1" /></label>
+                <label className="space-y-1 text-sm"><span>{t('PEEP guests in house')}</span><Input name="peepGuestCount" type="number" min="0" step="1" /></label>
+                <p className="text-xs text-slate-600 md:col-span-3">{t('PEEP is recorded only as a count here; sensitive arrangements remain in controlled records.')}</p>
+              </div>
               <label className="space-y-1 text-sm">
                 <span>{t('Department')}</span>
                 <Input
@@ -257,6 +358,10 @@ export default async function HandoverPage({
                     </option>
                   ))}
                 </Select>
+              </label>
+              <label className="flex items-center gap-2 text-sm">
+                <input name="createMaintenanceIssue" type="checkbox" />
+                {t('Create a maintenance defect from this handover')}
               </label>
               <label className="space-y-1 text-sm">
                 <span>{t('Existing maintenance issue (optional)')}</span>

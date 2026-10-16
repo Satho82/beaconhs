@@ -20,6 +20,7 @@ export default async function PlatformLayout({ children }: { children: React.Rea
     <ThemeProvider>
       <NavigationProvider>
         <PlatformShell
+          key={`${branding.logoUrl ?? ''}:${branding.productName ?? ''}:${branding.primaryColor ?? ''}`}
           operator={operator}
           branding={branding}
           defaultCollapsed={cookieStore.get('sidebar_collapsed')?.value === '1'}

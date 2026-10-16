@@ -14,6 +14,10 @@ const rlsFixture = readFileSync(
   new URL('./hospitality-handover-rls.integration.sql', import.meta.url),
   'utf8',
 )
+const metricsMigration = readFileSync(
+  new URL('../drizzle/0065_handover_operational_metrics.sql', import.meta.url),
+  'utf8',
+)
 
 describe('Hotel Handover database foundation', () => {
   it('is the next forward migration with required integrity constraints', () => {
@@ -25,6 +29,15 @@ describe('Hotel Handover database foundation', () => {
     expect(migration).toContain('"handover_action_fk"')
     expect(migration).toContain('"handover_carried_from_fk"')
     expect(migration).toContain('"handover_attachment_ux"')
+  })
+
+  it('adds optional, count-only operational metrics without rewriting existing handovers', () => {
+    expect(metricsMigration).toContain('ADD COLUMN occupancy_percent')
+    expect(metricsMigration).toContain('ADD COLUMN adr')
+    expect(metricsMigration).toContain('ADD COLUMN vip_guest_count')
+    expect(metricsMigration).toContain('ADD COLUMN peep_guest_count')
+    expect(metricsMigration).toContain('handover_metrics_check')
+    expect(metricsMigration).not.toContain('UPDATE hospitality_handovers')
   })
 
   it('adds every tenant-owned Handover table to RLS', () => {

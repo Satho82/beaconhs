@@ -164,6 +164,12 @@ export default async function CorrectiveActionsPage({
   })
 
   const today = new Date().toISOString().slice(0, 10)
+  const openActions =
+    (statusCounts.open ?? 0) +
+    (statusCounts.in_progress ?? 0) +
+    (statusCounts.pending_verification ?? 0)
+  const priorityActions = (sevCounts.high ?? 0) + (sevCounts.critical ?? 0)
+  const dueInView = rows.filter(({ ca }) => ca.dueOn && ca.dueOn <= today && ca.status !== 'closed').length
 
   const tableRows: RecordsTableRow[] = rows.map(({ ca, site, owner, ownerAccount }) => ({
     id: ca.id,
@@ -212,6 +218,25 @@ export default async function CorrectiveActionsPage({
             }
           />
           <CorrectiveActionsSubNav active="records" />
+          <section className="mt-5 rounded-2xl border border-teal-100 bg-gradient-to-br from-teal-50 via-white to-white p-5">
+            <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-700">Assurance · action control</p>
+                <h2 className="mt-1 text-2xl font-semibold tracking-tight text-slate-950">Action plan overview</h2>
+                <p className="mt-1 max-w-2xl text-sm text-slate-600">Turn inspection findings, incident outcomes and operational observations into owned, auditable actions.</p>
+              </div>
+              <div className="flex flex-wrap gap-2 text-sm">
+                <Link className="rounded-lg border border-teal-200 bg-white px-3 py-2 font-semibold text-teal-700" href="/corrective-actions/new">Create action</Link>
+                <Link className="rounded-lg border border-teal-200 bg-white px-3 py-2 font-semibold text-teal-700" href="/incidents">Incident log</Link>
+              </div>
+            </div>
+            <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              <div className="rounded-xl border border-white bg-white p-4 shadow-sm"><p className="text-sm font-medium text-slate-600">Actions in scope</p><p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{total}</p><p className="mt-1 text-xs text-teal-700">Current access and filters</p></div>
+              <div className="rounded-xl border border-white bg-white p-4 shadow-sm"><p className="text-sm font-medium text-slate-600">Open actions</p><p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{openActions}</p><p className="mt-1 text-xs text-coral-700">Open, in progress or pending verification</p></div>
+              <div className="rounded-xl border border-white bg-white p-4 shadow-sm"><p className="text-sm font-medium text-slate-600">High priority</p><p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{priorityActions}</p><p className="mt-1 text-xs text-coral-700">High and critical severity actions</p></div>
+              <div className="rounded-xl border border-white bg-white p-4 shadow-sm"><p className="text-sm font-medium text-slate-600">Due in this view</p><p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{dueInView}</p><p className="mt-1 text-xs text-teal-700">Due today or overdue in loaded records</p></div>
+            </div>
+          </section>
           <TableToolbar>
             <SearchInput placeholder={tGenerated('m_1ae990361ad66e')} />
             <FilterChips

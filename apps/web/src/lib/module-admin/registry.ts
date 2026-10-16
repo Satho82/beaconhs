@@ -154,7 +154,10 @@ export const MODULE_ADMIN: ModuleAdmin[] = [
     managePath: '/inspections/manage',
     iconKey: 'clipboard',
     permission: 'inspections.manage',
-    tabs: [{ key: 'records', label: 'Site Inspections', href: '/inspections/records' }],
+    tabs: [
+      { key: 'records', label: 'Site Inspections', href: '/inspections/records' },
+      { key: 'calendar', label: 'Calendar', href: '/inspections/calendar' },
+    ],
     sections: [
       {
         key: 'types',

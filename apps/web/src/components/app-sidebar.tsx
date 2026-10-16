@@ -85,7 +85,13 @@ export function AppSidebar({
       >
         <GeneratedValue
           value={
-            collapsed ? null : (
+            collapsed ? (
+              <Logo
+                className="h-8 max-w-8 object-contain"
+                branding={platformBranding}
+                aria-label={platformBranding?.productName ?? 'Home'}
+              />
+            ) : (
               <Logo
                 className="h-9 w-auto max-w-[10rem] overflow-hidden rounded-lg bg-white px-2 py-1 dark:text-slate-900"
                 branding={platformBranding}

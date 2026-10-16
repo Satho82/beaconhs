@@ -190,6 +190,15 @@ export default async function IncidentsPage({
     locked: incident.locked,
     involved: involvedByIncident.get(incident.id) ?? [],
   }))
+  const openIncidents =
+    (statusCounts.reported ?? 0) +
+    (statusCounts.under_investigation ?? 0) +
+    (statusCounts.pending_review ?? 0) +
+    (statusCounts.reopened ?? 0)
+  const investigationCount = statusCounts.under_investigation ?? 0
+  const priorityInView = rows.filter(
+    ({ incident }) => incident.severity === 'fatality' || incident.severity === 'lost_time',
+  ).length
 
   return (
     <ListPageLayout
@@ -220,6 +229,25 @@ export default async function IncidentsPage({
             }
           />
           <IncidentsSubNav active="records" />
+          <section className="mt-5 rounded-2xl border border-teal-100 bg-gradient-to-br from-teal-50 via-white to-white p-5">
+            <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-700">Safety & operations · incident control</p>
+                <h2 className="mt-1 text-2xl font-semibold tracking-tight text-slate-950">Incident overview</h2>
+                <p className="mt-1 max-w-2xl text-sm text-slate-600">Report, investigate and learn from incidents while retaining a clear, property-scoped audit trail.</p>
+              </div>
+              <div className="flex flex-wrap gap-2 text-sm">
+                <Link className="rounded-lg border border-teal-200 bg-white px-3 py-2 font-semibold text-teal-700" href="/incidents/new">Report incident</Link>
+                <Link className="rounded-lg border border-teal-200 bg-white px-3 py-2 font-semibold text-teal-700" href="/corrective-actions">View action plans</Link>
+              </div>
+            </div>
+            <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              <div className="rounded-xl border border-white bg-white p-4 shadow-sm"><p className="text-sm font-medium text-slate-600">Incidents in scope</p><p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{total}</p><p className="mt-1 text-xs text-teal-700">Current access and filters</p></div>
+              <div className="rounded-xl border border-white bg-white p-4 shadow-sm"><p className="text-sm font-medium text-slate-600">Open incidents</p><p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{openIncidents}</p><p className="mt-1 text-xs text-coral-700">Require operational follow-through</p></div>
+              <div className="rounded-xl border border-white bg-white p-4 shadow-sm"><p className="text-sm font-medium text-slate-600">Under investigation</p><p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{investigationCount}</p><p className="mt-1 text-xs text-teal-700">Evidence and review still active</p></div>
+              <div className="rounded-xl border border-white bg-white p-4 shadow-sm"><p className="text-sm font-medium text-slate-600">Serious impact in this view</p><p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{priorityInView}</p><p className="mt-1 text-xs text-coral-700">Lost-time or fatality outcome records</p></div>
+            </div>
+          </section>
 
           <TableToolbar>
             <SearchInput placeholder={tGenerated('m_1ae990361ad66e')} />

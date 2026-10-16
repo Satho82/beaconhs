@@ -17,7 +17,8 @@ import {
   TableHeader,
   TableRow,
 } from '@beaconhs/ui'
-import { inspectionTypeCriteria, inspectionTypes } from '@beaconhs/db/schema'
+import { inspectionTypeCriteria, inspectionTypeGroups, inspectionTypes } from '@beaconhs/db/schema'
+import { auditTemplates } from '@/lib/operations/audit-template-library'
 import { requireRequestContext } from '@/lib/auth'
 import { formatDate } from '@/lib/datetime'
 import { requireModuleManage, assertCanManageModule } from '@/lib/module-admin/guard'
@@ -88,6 +89,72 @@ async function createTypeAction(input: {
   })
   revalidatePath('/inspections/types')
   return { ok: true, id: row.id }
+}
+
+async function installAuditTemplateAction(formData: FormData) {
+  'use server'
+  const ctx = await requireRequestContext()
+  assertCanManageModule(ctx, 'inspections')
+  const template = auditTemplates.find((candidate) => candidate.key === formData.get('template'))
+  if (!template) throw new Error('Unknown audit template.')
+
+  const type = await ctx.db(async (tx) => {
+    const [existing] = await tx
+      .select({ id: inspectionTypes.id })
+      .from(inspectionTypes)
+      .where(and(eq(inspectionTypes.tenantId, ctx.tenantId), eq(inspectionTypes.name, template.name)))
+      .limit(1)
+    if (existing) return existing
+
+    const [created] = await tx
+      .insert(inspectionTypes)
+      .values({
+        tenantId: ctx.tenantId,
+        name: template.name,
+        description: template.description,
+        defaultCadence: template.cadence,
+        enableCorrectiveActions: true,
+        isPublished: true,
+        createdBy: ctx.userId,
+      })
+      .returning({ id: inspectionTypes.id })
+    if (!created) throw new Error('Unable to install audit template.')
+
+    for (const [groupIndex, section] of template.sections.entries()) {
+      const [group] = await tx
+        .insert(inspectionTypeGroups)
+        .values({
+          tenantId: ctx.tenantId,
+          typeId: created.id,
+          sequence: groupIndex,
+          label: section.label,
+        })
+        .returning({ id: inspectionTypeGroups.id })
+      if (!group) throw new Error('Unable to create audit section.')
+      await tx.insert(inspectionTypeCriteria).values(
+        section.questions.map((text, sequence) => ({
+          tenantId: ctx.tenantId,
+          typeId: created.id,
+          groupId: group.id,
+          sequence,
+          text,
+          responseType: 'pass_fail_na' as const,
+          requiresComment: true,
+        })),
+      )
+    }
+    return created
+  })
+
+  await recordAudit(ctx, {
+    entityType: 'inspection_type',
+    entityId: type.id,
+    action: 'create',
+    summary: `Installed audit template "${template.name}"`,
+    after: { cadence: template.cadence, auditTemplate: template.key },
+  })
+  revalidatePath('/inspections/types')
+  revalidatePath('/inspections/records')
 }
 
 const SORTS = ['name', 'created_at', 'status'] as const
@@ -182,6 +249,39 @@ export default async function InspectionTypesPage({
             }
           />
           <InspectionsSubNav active="types" />
+          <section className="rounded-2xl border border-teal-100 bg-gradient-to-br from-teal-50 via-white to-white p-5">
+            <div className="flex flex-col gap-1">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-700">
+                Audit programme · hotel and apartments
+              </p>
+              <h2 className="text-2xl font-semibold tracking-tight text-slate-950">
+                Install an operational audit template
+              </h2>
+              <p className="max-w-2xl text-sm text-slate-600">
+                Each template creates real sections and scored Pass / Fail / N-A questions. Failed
+                responses can use the existing corrective-action workflow.
+              </p>
+            </div>
+            <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+              {auditTemplates.map((template) => (
+                <form
+                  key={template.key}
+                  action={installAuditTemplateAction}
+                  className="rounded-xl border border-white bg-white p-4 shadow-sm"
+                >
+                  <input type="hidden" name="template" value={template.key} />
+                  <p className="text-sm font-semibold text-slate-950">{template.name}</p>
+                  <p className="mt-1 text-sm text-slate-600">{template.description}</p>
+                  <p className="mt-3 text-xs font-medium text-teal-700">
+                    {template.sections.length} sections · {template.sections.reduce((count, section) => count + section.questions.length, 0)} questions · {template.cadence}
+                  </p>
+                  <Button className="mt-4 w-full" type="submit" variant="outline">
+                    Install template
+                  </Button>
+                </form>
+              ))}
+            </div>
+          </section>
           <TableToolbar>
             <SearchInput placeholder={tGenerated('m_17162c28f0af92')} />
             <FilterChips

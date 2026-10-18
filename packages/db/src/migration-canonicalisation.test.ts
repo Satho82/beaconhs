@@ -13,7 +13,7 @@ const recorded = JSON.parse(
 describe('canonical chain against independently recorded DEV ledger', () => {
   it('preserves historical 0059 and earlier and explicitly binds pending 0060/0061 corrections', () => {
     const files = readMigrationFiles(folder)
-    expect(files).toHaveLength(63)
+    expect(files).toHaveLength(65)
     expect(
       files
         .slice(0, 59)

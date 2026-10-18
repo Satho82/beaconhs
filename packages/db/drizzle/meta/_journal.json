@@ -442,6 +442,20 @@
       "when": 1791831600000,
       "tag": "0063_approvals_production",
       "breakpoints": true
+    },
+    {
+      "idx": 63,
+      "version": "7",
+      "when": 1791831600001,
+      "tag": "0064_inspection_calendar_schedules",
+      "breakpoints": true
+    },
+    {
+      "idx": 64,
+      "version": "7",
+      "when": 1791831600002,
+      "tag": "0065_handover_operational_metrics",
+      "breakpoints": true
     }
   ]
 }

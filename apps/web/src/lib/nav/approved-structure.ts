@@ -15,7 +15,7 @@ export const APPROVED_APPLICATION_GROUPS = [
   'Training',
   'People',
   'Handover',
-  'Assets & PPM',
+  'Assets & Reminders',
   'Metering',
   'Reporting',
   'Reports',
@@ -484,7 +484,7 @@ const APPROVED_DESTINATIONS: readonly ApprovedDestination[] = [
   },
   {
     id: 'A110',
-    group: 'Assets & PPM',
+    group: 'Assets & Reminders',
     label: 'Asset Register',
     href: '/equipment',
     source: '/equipment',
@@ -494,7 +494,7 @@ const APPROVED_DESTINATIONS: readonly ApprovedDestination[] = [
   },
   {
     id: 'A111',
-    group: 'Assets & PPM',
+    group: 'Assets & Reminders',
     label: 'Asset Categories',
     href: '/equipment/categories',
     source: '/equipment',
@@ -503,8 +503,8 @@ const APPROVED_DESTINATIONS: readonly ApprovedDestination[] = [
   },
   {
     id: 'A112',
-    group: 'Assets & PPM',
-    label: 'PPM Schedule',
+    group: 'Assets & Reminders',
+    label: 'Schedule',
     href: '/equipment/maintenance',
     source: '/equipment',
     permission: null,
@@ -513,7 +513,7 @@ const APPROVED_DESTINATIONS: readonly ApprovedDestination[] = [
   },
   {
     id: 'A118',
-    group: 'Assets & PPM',
+    group: 'Assets & Reminders',
     label: 'Settings',
     href: '/equipment/manage',
     source: '/equipment',
@@ -742,7 +742,7 @@ const PRESENTATION: Record<string, { iconKey: string; colour: SidebarNavItem['co
     iconKey: 'journal',
     colour: 'emerald',
   },
-  'Assets & PPM': {
+  'Assets & Reminders': {
     iconKey: 'layers',
     colour: 'orange',
   },
@@ -793,7 +793,7 @@ function destinationParent(item: SidebarNavItem): (typeof APPROVED_APPLICATION_G
     ['/documents', 'Compliance'],
     ['/people', 'People'],
     ['/approvals', 'Approvals'],
-    ['/equipment', 'Assets & PPM'],
+    ['/equipment', 'Assets & Reminders'],
     ['/compliance', 'Compliance'],
     ['/reports', 'Reports'],
     ['/insights', 'Reports'],

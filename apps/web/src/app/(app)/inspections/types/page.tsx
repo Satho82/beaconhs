@@ -242,9 +242,7 @@ export default async function InspectionTypesPage({
             description={tGenerated('m_1171eac37d70af')}
             actions={
               <Link href="/inspections/types?drawer=new-type" scroll={false}>
-                <Button>
-                  <GeneratedText id="m_1271751c2db342" />
-                </Button>
+                <Button>Create bespoke inspection</Button>
               </Link>
             }
           />

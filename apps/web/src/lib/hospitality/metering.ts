@@ -301,14 +301,15 @@ export async function addReading(
         )
         .limit(1)
       if (!replaced) throw new Error('The reading being corrected is unavailable.')
-      if (replaced.readAt.getTime() !== input.readAt.getTime())
-        throw new Error('A correction must retain the original reading date.')
     }
+    // A correction always takes the original reading's timestamp. The form can
+    // therefore be used safely without asking the operator to reproduce it.
+    const effectiveReadAt = replaced?.readAt ?? input.readAt
     const previous = await latestReadingBefore(
       tx,
       ctx.tenantId,
       meter.id,
-      input.readAt,
+      effectiveReadAt,
       input.replacesReadingId,
     )
     if (kind === 'normal' && previous && previous.readAt.getTime() === input.readAt.getTime())
@@ -318,7 +319,7 @@ export async function addReading(
       input.readingValue,
       kind,
     )
-    const tariff = await latestEffectiveTariff(tx, ctx.tenantId, meter.id, input.readAt)
+    const tariff = await latestEffectiveTariff(tx, ctx.tenantId, meter.id, effectiveReadAt)
     const cost = tariff ? estimatedExpenditure(consumption, Number(tariff.unitCost)) : null
     const [reading] = await tx
       .insert(hospitalityMeterReadings)
@@ -326,7 +327,7 @@ export async function addReading(
         tenantId: ctx.tenantId,
         meterId: meter.id,
         readingValue: input.readingValue,
-        readAt: input.readAt,
+        readAt: effectiveReadAt,
         readingType: kind,
         replacesReadingId: input.replacesReadingId ?? null,
         notes: input.notes?.trim() || null,

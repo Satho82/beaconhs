@@ -62,7 +62,7 @@ The light left menu lists everything you can use. **Search menu** finds permitte
 
 - **Dashboard** — overview, activity feed, inbox, assistant, help and saved custom workspace links.
 - **Diary & Tasks** — your [Workspace](/my), tasks, journals and pinned operational forms. Property Diary and Manager Sign-off appear only for the selected property when entitled.
-- **Maintenance**, **Compliance**, **Risk**, **Inspections**, **Incidents**, **Action Plans**, **Training**, **People**, **Handover**, **Assets & PPM**, and **Metering** are separate expandable modules. Documents sit under Compliance; authorised Toolbox Talk pins sit under Training.
+- **Maintenance**, **Compliance**, **Risk**, **Inspections**, **Incidents**, **Action Plans**, **Training**, **People**, **Handover**, **Assets & Reminders**, and **Metering** are separate expandable modules. Documents sit under Compliance; authorised Toolbox Talk pins sit under Training.
 - **Reports** — the reports hub, permitted report tools and Insights. Reports is not merged with the separately documented Reporting module.
 - **Tenant Settings** — properties, users, general settings, branding, modules, integrations, templates, import/export and permitted administration tools.
 

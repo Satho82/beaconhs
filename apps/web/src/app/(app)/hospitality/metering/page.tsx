@@ -849,7 +849,7 @@ export default async function MeteringPage({
                 </label>
                 <label className="space-y-1 text-sm">
                   <span>{t('Currency')}</span>
-                  <Select name="currency" defaultValue={operationalDefaults.currencyCode} required>
+                  <Select name="currency" defaultValue="GBP" required>
                     {currencyOptions.map((currency) => (
                       <option key={currency} value={currency}>
                         {currency}

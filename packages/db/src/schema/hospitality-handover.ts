@@ -4,6 +4,8 @@ import {
   check,
   foreignKey,
   index,
+  integer,
+  numeric,
   pgTable,
   text,
   timestamp,
@@ -31,6 +33,13 @@ export const hospitalityHandovers = pgTable(
     department: text('department').notNull(),
     note: text('note').notNull(),
     priority: text('priority').$type<'routine' | 'important' | 'urgent'>().notNull(),
+    // Captured at handover time. These are operational snapshots, never PMS-derived values.
+    occupancyPercent: numeric('occupancy_percent', { precision: 5, scale: 2, mode: 'number' }),
+    adr: numeric('adr', { precision: 12, scale: 2, mode: 'number' }),
+    arrivalsCount: integer('arrivals_count'),
+    departuresCount: integer('departures_count'),
+    vipGuestCount: integer('vip_guest_count'),
+    peepGuestCount: integer('peep_guest_count'),
     authorId: uuid('author_id').notNull(),
     roomId: uuid('room_id'),
     location: text('location'),
@@ -101,6 +110,15 @@ export const hospitalityHandovers = pgTable(
     priorityCheck: check(
       'handover_priority_check',
       sql`${t.priority} IN ('routine','important','urgent')`,
+    ),
+    metricsCheck: check(
+      'handover_metrics_check',
+      sql`(${t.occupancyPercent} IS NULL OR (${t.occupancyPercent} >= 0 AND ${t.occupancyPercent} <= 100))
+        AND (${t.adr} IS NULL OR ${t.adr} >= 0)
+        AND (${t.arrivalsCount} IS NULL OR ${t.arrivalsCount} >= 0)
+        AND (${t.departuresCount} IS NULL OR ${t.departuresCount} >= 0)
+        AND (${t.vipGuestCount} IS NULL OR ${t.vipGuestCount} >= 0)
+        AND (${t.peepGuestCount} IS NULL OR ${t.peepGuestCount} >= 0)`,
     ),
     noteCheck: check(
       'handover_note_check',

@@ -15,6 +15,7 @@ import { recordModuleFlowEvent } from '@beaconhs/events'
 import { materializeEvidenceTargetObligations } from '@beaconhs/compliance'
 import { requireRequestContext } from '@/lib/auth'
 import { requireAuthoringProperty } from '@/lib/hospitality/property-context'
+import { assertCanAccessProperty } from '@/lib/hospitality/property-access'
 import { recordAuditInTransaction } from '@/lib/audit'
 import { isUuid } from '@/lib/list-params'
 import { assertCanManageModule } from '@/lib/module-admin/guard'
@@ -32,7 +33,17 @@ import {
 export async function startInspection(formData: FormData) {
   const ctx = await requireRequestContext()
   assertCan(ctx, 'inspections.create')
-  const propertyId = await requireAuthoringProperty(ctx)
+  // A calendar occurrence supplies its own property. It is still treated as
+  // untrusted input and must pass the same server-side assignment boundary.
+  const requestedPropertyId = String(formData.get('propertyId') ?? '').trim()
+  let propertyId: string | null
+  if (requestedPropertyId) {
+    if (!isUuid(requestedPropertyId)) throw new Error('Inspection property is invalid')
+    assertCanAccessProperty(ctx, requestedPropertyId)
+    propertyId = requestedPropertyId
+  } else {
+    propertyId = await requireAuthoringProperty(ctx)
+  }
   const typeId = String(formData.get('typeId') ?? '').trim()
   if (!isUuid(typeId)) throw new Error('Inspection type is invalid')
 

@@ -51,6 +51,11 @@ try {
       execFileSync('git', ['show', source + ':packages/db/drizzle/' + file], { cwd: repo }),
     )
   }
+  // This disposable fixture is intentionally frozen at the governed 0063 source.
+  // Remove later candidate migrations copied with the working tree before
+  // validating that historical source and journal together.
+  rmSync(resolve(work, 'drizzle', '0064_inspection_calendar_schedules.sql'))
+  rmSync(resolve(work, 'drizzle', '0065_handover_operational_metrics.sql'))
   const folder = resolve(work, 'drizzle')
   const fullJournal = readFileSync(resolve(folder, 'meta/_journal.json'), 'utf8')
   const all = sourceMigrations(folder)

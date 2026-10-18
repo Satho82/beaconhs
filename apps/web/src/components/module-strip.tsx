@@ -39,7 +39,7 @@ const MODULES = {
   Training: { icon: GraduationCap, colour: '#8560b5' },
   People: { icon: Users, colour: '#0765ae' },
   Handover: { icon: ArrowLeftRight, colour: '#009eb9' },
-  'Assets & PPM': { icon: Layers, colour: '#2eb5a5' },
+  'Assets & Reminders': { icon: Layers, colour: '#2eb5a5' },
   Metering: { icon: Gauge, colour: '#c59b47' },
   Reporting: { icon: Gauge, colour: '#2993da' },
   Reports: { icon: BarChart3, colour: '#65869c' },

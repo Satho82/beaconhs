@@ -16,7 +16,7 @@ const icons: Record<string, string> = {
   Training: 'grad',
   People: 'users',
   Handover: 'journal',
-  'Assets & PPM': 'layers',
+  'Assets & Reminders': 'layers',
   Metering: 'gauge',
   Reporting: 'file',
   Approvals: 'check',

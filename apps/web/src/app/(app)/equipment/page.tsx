@@ -224,11 +224,16 @@ export default async function EquipmentPage({
                 <GeneratedValue
                   value={
                     canManageEquipment ? (
-                      <Link href="/equipment/new">
-                        <Button>
-                          <GeneratedText id="m_105ebaff0d3ac5" />
-                        </Button>
-                      </Link>
+                      <>
+                        <Link href="/equipment/import">
+                          <Button variant="outline">Import CSV</Button>
+                        </Link>
+                        <Link href="/equipment/new">
+                          <Button>
+                            <GeneratedText id="m_105ebaff0d3ac5" />
+                          </Button>
+                        </Link>
+                      </>
                     ) : null
                   }
                 />

@@ -102,7 +102,9 @@ async function installAuditTemplateAction(formData: FormData) {
     const [existing] = await tx
       .select({ id: inspectionTypes.id })
       .from(inspectionTypes)
-      .where(and(eq(inspectionTypes.tenantId, ctx.tenantId), eq(inspectionTypes.name, template.name)))
+      .where(
+        and(eq(inspectionTypes.tenantId, ctx.tenantId), eq(inspectionTypes.name, template.name)),
+      )
       .limit(1)
     if (existing) return existing
 
@@ -271,7 +273,12 @@ export default async function InspectionTypesPage({
                   <p className="text-sm font-semibold text-slate-950">{template.name}</p>
                   <p className="mt-1 text-sm text-slate-600">{template.description}</p>
                   <p className="mt-3 text-xs font-medium text-teal-700">
-                    {template.sections.length} sections · {template.sections.reduce((count, section) => count + section.questions.length, 0)} questions · {template.cadence}
+                    {template.sections.length} sections ·{' '}
+                    {template.sections.reduce(
+                      (count, section) => count + section.questions.length,
+                      0,
+                    )}{' '}
+                    questions · {template.cadence}
                   </p>
                   <Button className="mt-4 w-full" type="submit" variant="outline">
                     Install template
@@ -359,7 +366,7 @@ export default async function InspectionTypesPage({
                             }
                           />
                         </TableCell>
-                        <TableCell className="text-slate-600 tabular-nums dark:text-slate-400">
+                        <TableCell className="tabular-nums text-slate-600 dark:text-slate-400">
                           <GeneratedValue value={criteriaCount} />
                         </TableCell>
                         <TableCell>

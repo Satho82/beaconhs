@@ -3,7 +3,11 @@ import { getPlatformBranding } from '@/lib/platform-branding-config'
 import { readPlatformBrandAsset } from '@/lib/platform-brand-assets'
 import type { PlatformBrandAssetKind } from '@/lib/platform-brand-asset-url'
 
-function assetContentType(kind: PlatformBrandAssetKind, key: string | undefined, faviconType?: string) {
+function assetContentType(
+  kind: PlatformBrandAssetKind,
+  key: string | undefined,
+  faviconType?: string,
+) {
   if (kind === 'favicon') return faviconType ?? 'image/png'
   if (key?.endsWith('.jpg')) return 'image/jpeg'
   if (key?.endsWith('.webp')) return 'image/webp'

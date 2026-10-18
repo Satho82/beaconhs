@@ -110,8 +110,8 @@ export default async function AuditLogPage({
                 Audit overview
               </h2>
               <p className="mt-1 max-w-2xl text-sm text-slate-600">
-                Review attributable changes, signatures and publishing activity across your permitted
-                scope.
+                Review attributable changes, signatures and publishing activity across your
+                permitted scope.
               </p>
             </div>
             <p className="text-sm text-slate-600">

@@ -172,23 +172,67 @@ export default async function MaintenanceQueue({
               {translateValue('Maintenance overview')}
             </h2>
             <p className="mt-1 max-w-2xl text-sm text-slate-600">
-              {translateValue('Guest defects, handover-created issues and the active maintenance queue in one accountable workspace.')}
+              {translateValue(
+                'Guest defects, handover-created issues and the active maintenance queue in one accountable workspace.',
+              )}
             </p>
           </div>
           <div className="flex flex-wrap gap-2 text-sm">
-            <Link className="rounded-lg border border-teal-200 bg-white px-3 py-2 font-semibold text-teal-700" href="/equipment">
+            <Link
+              className="rounded-lg border border-teal-200 bg-white px-3 py-2 font-semibold text-teal-700"
+              href="/equipment"
+            >
               {translateValue('Asset register & PPM')}
             </Link>
-            <Link className="rounded-lg border border-teal-200 bg-white px-3 py-2 font-semibold text-teal-700" href="/hospitality/maintenance/report">
+            <Link
+              className="rounded-lg border border-teal-200 bg-white px-3 py-2 font-semibold text-teal-700"
+              href="/hospitality/maintenance/report"
+            >
               {translateValue('Report issue')}
             </Link>
           </div>
         </div>
         <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <div className="rounded-xl border border-white bg-white p-4 shadow-sm"><p className="text-sm font-medium text-slate-600">{translateValue('All issues')}</p><p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{data.total}</p><p className="mt-1 text-xs text-teal-700">{translateValue('Within the current property and search scope')}</p></div>
-          <div className="rounded-xl border border-white bg-white p-4 shadow-sm"><p className="text-sm font-medium text-slate-600">{translateValue('Active in this view')}</p><p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{activeIssues.length}</p><p className="mt-1 text-xs text-teal-700">{translateValue('Excludes completed and closed records')}</p></div>
-          <div className="rounded-xl border border-white bg-white p-4 shadow-sm"><p className="text-sm font-medium text-slate-600">{translateValue('Critical')}</p><p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{criticalIssues.length}</p><p className="mt-1 text-xs text-rose-700">{translateValue('Requires priority review')}</p></div>
-          <div className="rounded-xl border border-white bg-white p-4 shadow-sm"><p className="text-sm font-medium text-slate-600">{translateValue('Handover linked')}</p><p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{handoverIssues.length}</p><p className="mt-1 text-xs text-teal-700">{translateValue('Created from the operational handover')}</p></div>
+          <div className="rounded-xl border border-white bg-white p-4 shadow-sm">
+            <p className="text-sm font-medium text-slate-600">{translateValue('All issues')}</p>
+            <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
+              {data.total}
+            </p>
+            <p className="mt-1 text-xs text-teal-700">
+              {translateValue('Within the current property and search scope')}
+            </p>
+          </div>
+          <div className="rounded-xl border border-white bg-white p-4 shadow-sm">
+            <p className="text-sm font-medium text-slate-600">
+              {translateValue('Active in this view')}
+            </p>
+            <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
+              {activeIssues.length}
+            </p>
+            <p className="mt-1 text-xs text-teal-700">
+              {translateValue('Excludes completed and closed records')}
+            </p>
+          </div>
+          <div className="rounded-xl border border-white bg-white p-4 shadow-sm">
+            <p className="text-sm font-medium text-slate-600">{translateValue('Critical')}</p>
+            <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
+              {criticalIssues.length}
+            </p>
+            <p className="mt-1 text-xs text-rose-700">
+              {translateValue('Requires priority review')}
+            </p>
+          </div>
+          <div className="rounded-xl border border-white bg-white p-4 shadow-sm">
+            <p className="text-sm font-medium text-slate-600">
+              {translateValue('Handover linked')}
+            </p>
+            <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
+              {handoverIssues.length}
+            </p>
+            <p className="mt-1 text-xs text-teal-700">
+              {translateValue('Created from the operational handover')}
+            </p>
+          </div>
         </div>
       </section>
       <p className="text-muted-foreground mt-3 text-sm">

@@ -22,13 +22,18 @@ export const assetImportDataset = {
   columns: COLUMNS,
   requiredColumns: ['asset_tag', 'name'] as const,
   map: (row: Record<string, string>): AssetImportRow =>
-    Object.fromEntries(COLUMNS.map((column) => [column, (row[column] ?? '').trim()])) as AssetImportRow,
+    Object.fromEntries(
+      COLUMNS.map((column) => [column, (row[column] ?? '').trim()]),
+    ) as AssetImportRow,
   validate: (row: AssetImportRow): ImportIssue[] => {
     const issues: ImportIssue[] = []
     if (!row.asset_tag) issues.push({ severity: 'error', message: 'Asset tag is required.' })
     if (!row.name) issues.push({ severity: 'error', message: 'Asset name is required.' })
     if (row.status && !statuses.has(row.status))
-      issues.push({ severity: 'error', message: 'Status must be in_service, out_of_service, in_repair, lost, or retired.' })
+      issues.push({
+        severity: 'error',
+        message: 'Status must be in_service, out_of_service, in_repair, lost, or retired.',
+      })
     if (row.purchase_date && !/^\\d{4}-\\d{2}-\\d{2}$/.test(row.purchase_date))
       issues.push({ severity: 'error', message: 'Purchase date must use YYYY-MM-DD.' })
     return issues
@@ -36,10 +41,12 @@ export const assetImportDataset = {
 } as const
 
 export function assetImportTemplateCsv(): string {
-  return [
-    COLUMNS.join(','),
-    'ASSET-001,Example pump,Plant,Mechanical,Main Site,in_service,SN-001,Example Co,MX-1,2026-01-15',
-  ].join('\\r\\n') + '\\r\\n'
+  return (
+    [
+      COLUMNS.join(','),
+      'ASSET-001,Example pump,Plant,Mechanical,Main Site,in_service,SN-001,Example Co,MX-1,2026-01-15',
+    ].join('\\r\\n') + '\\r\\n'
+  )
 }
 
 export function assetImportBatchIssues(rows: readonly AssetImportRow[]): ImportIssue[][] {

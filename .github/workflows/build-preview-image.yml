@@ -1,6 +1,9 @@
 name: Build preview image
 
 on:
+  push:
+    branches:
+      - feature/uvanoo-v1.4
   pull_request:
     branches:
       - feature/uvanoo-v1.4

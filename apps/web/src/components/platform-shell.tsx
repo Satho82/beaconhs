@@ -87,11 +87,10 @@ export function PlatformShell({
             </form>
             <Link
               href="/dashboard"
-              className="ml-auto flex items-center gap-2 text-sm text-blue-700 md:ml-0"
+              className="ml-auto flex shrink-0 items-center gap-2 rounded-md border border-blue-200 bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-700 hover:bg-blue-100 focus-visible:outline-2 focus-visible:outline-blue-600 md:ml-0"
             >
-              <ArrowLeft size={16} />
-              <span className="hidden sm:inline">{tBatch('m_13f8c9c1ebe799')}</span>
-              <span className="sr-only sm:hidden">{tBatch('m_13f8c9c1ebe799')}</span>
+              <ArrowLeft size={16} aria-hidden="true" />
+              <span>{tBatch('m_13f8c9c1ebe799')}</span>
             </Link>
             <details className="relative shrink-0">
               <summary

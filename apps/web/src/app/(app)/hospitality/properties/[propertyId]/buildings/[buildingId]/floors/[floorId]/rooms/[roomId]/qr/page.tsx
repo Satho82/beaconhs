@@ -96,9 +96,12 @@ export default async function RoomQrPage({
   const url = guestMaintenanceUrl(row.token)
   const svg = await QRCode.toString(url, {
     type: 'svg',
-    margin: 1,
-    width: 420,
-    color: { dark: '#062A39', light: '#ffffff' },
+    errorCorrectionLevel: 'H',
+    margin: 3,
+    width: 520,
+    // Printed/mobile QR codes need absolute contrast. Brand colours belong in
+    // the surrounding sheet, not in the encoded modules.
+    color: { dark: '#000000', light: '#ffffff' },
   })
   const back = `/hospitality/properties/${p.propertyId}/buildings/${p.buildingId}/floors/${p.floorId}/rooms/${p.roomId}`
   return (

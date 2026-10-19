@@ -38,6 +38,56 @@ export const MODULE_CATALOGUE = [
     name: 'Hospitality manager sign-off',
     description: 'Weekly and monthly operational sign-off records.',
   },
+  {
+    key: 'core.diary-tasks',
+    name: 'Diary and tasks',
+    description: 'Operational journals, recurring tasks, reminders, and handover notes.',
+  },
+  {
+    key: 'core.risk',
+    name: 'Risk',
+    description: 'Risk assessments, registers, and mitigation controls.',
+  },
+  {
+    key: 'core.inspections',
+    name: 'Inspections',
+    description: 'Inspection types, records, schedules, and evidence.',
+  },
+  {
+    key: 'core.incidents',
+    name: 'Incidents',
+    description: 'Incident reporting, classifications, and follow-up.',
+  },
+  {
+    key: 'core.action-plans',
+    name: 'Action plans',
+    description: 'Corrective actions, ownership, due dates, and verification.',
+  },
+  {
+    key: 'core.training',
+    name: 'Training',
+    description: 'Training content, assignments, records, and qualifications.',
+  },
+  {
+    key: 'core.people',
+    name: 'People',
+    description: 'People, teams, roles, and workforce records.',
+  },
+  {
+    key: 'core.handover',
+    name: 'Handover',
+    description: 'Operational handovers and shift continuity.',
+  },
+  {
+    key: 'core.assets-reminders',
+    name: 'Assets and reminders',
+    description: 'Assets, registers, files, and scheduled reminders.',
+  },
+  {
+    key: 'core.metering',
+    name: 'Metering',
+    description: 'Meters, readings, consumption, costs, and tariffs.',
+  },
 ] as const
 
 export type ModuleKey = (typeof MODULE_CATALOGUE)[number]['key']

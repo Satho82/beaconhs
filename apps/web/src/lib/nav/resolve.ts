@@ -111,21 +111,18 @@ export async function resolveNavGroups(
       effectiveUntil: tenantModuleEntitlements.effectiveUntil,
     })
     .from(tenantModuleEntitlements)
-    .where(
-      and(
-        eq(tenantModuleEntitlements.tenantId, ctx.tenantId),
-        eq(tenantModuleEntitlements.state, 'enabled'),
-        or(
-          isNull(tenantModuleEntitlements.effectiveFrom),
-          lte(tenantModuleEntitlements.effectiveFrom, now),
-        ),
-        or(
-          isNull(tenantModuleEntitlements.effectiveUntil),
-          gt(tenantModuleEntitlements.effectiveUntil, now),
-        ),
-      ),
-    )
-  const entitledModules = effectiveModuleKeys(entitlementRows.map((row) => row.moduleKey))
+    .where(eq(tenantModuleEntitlements.tenantId, ctx.tenantId))
+  const entitledModules = effectiveModuleKeys(
+    entitlementRows
+      .filter(
+        (row) =>
+          row.state === 'enabled' &&
+          (row.effectiveFrom === null || row.effectiveFrom <= now) &&
+          (row.effectiveUntil === null || row.effectiveUntil > now),
+      )
+      .map((row) => row.moduleKey),
+  )
+  const configuredModules = effectiveModuleKeys(entitlementRows.map((row) => row.moduleKey))
 
   // Batch-resolve pinned form templates → name / icon.
   const formIds = [
@@ -161,7 +158,7 @@ export async function resolveNavGroups(
     const items: SidebarNavItem[] = []
     for (const item of g.items) {
       if (item.hidden) continue
-      const resolved = resolveItem(item, ctx, formMeta, entitledModules)
+      const resolved = resolveItem(item, ctx, formMeta, entitledModules, configuredModules)
       if (resolved) items.push(resolved)
     }
     if (items.length > 0) {
@@ -185,11 +182,12 @@ function resolveItem(
   ctx: RequestContext,
   formMeta: Map<string, { name: string; iconKey: string | null; key: string | null }>,
   entitledModules: Set<ModuleKey>,
+  configuredModules: Set<ModuleKey>,
 ): SidebarNavItem | null {
   if (item.kind === 'module') {
     const mod = moduleByKey(item.moduleKey)
     if (!mod || mod.boardHidden) return null // stale/removed module key
-    if (!isNavModuleEntitled(mod.key, entitledModules)) return null
+    if (!isNavModuleEntitled(mod.key, entitledModules, configuredModules)) return null
     if (mod.requiredPermission && !can(ctx, mod.requiredPermission)) return null
     if (mod.requiredAnyPermission?.length && !mod.requiredAnyPermission.some((p) => can(ctx, p))) {
       return null

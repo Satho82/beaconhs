@@ -61,7 +61,10 @@ export async function savePlatformBrandingAction(formData: FormData) {
     analytics: { enabled: analyticsEnabled, ...(analyticsEnabled ? { googleTagId } : {}) },
   })
 
-  await Promise.all([
+  // The new identity is already committed. Removing a superseded private
+  // object is housekeeping only; a transient storage error must not make the
+  // form report a failed save or discard the Google tracking configuration.
+  await Promise.allSettled([
     logo && previous.logoKey ? deletePlatformBrandAsset(previous.logoKey) : undefined,
     favicon && previous.faviconKey ? deletePlatformBrandAsset(previous.faviconKey) : undefined,
     resetLogo ? deletePlatformBrandAsset(previous.logoKey) : undefined,

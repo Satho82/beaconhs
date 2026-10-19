@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { and, asc, eq, gte, isNull, lte } from 'drizzle-orm'
-import { Badge, Button, EmptyState, PageHeader } from '@beaconhs/ui'
+import { Badge, Button, EmptyState, PageHeader, Select } from '@beaconhs/ui'
 import {
   hospitalityProperties,
   inspectionTypes,
@@ -176,7 +176,7 @@ export default async function InspectionCalendarPage() {
           <form action={createInspectionSchedule} className="mt-5 grid gap-3 md:grid-cols-3">
             <label className="text-sm font-medium">
               Inspection type
-              <select
+              <Select
                 name="typeId"
                 required
                 className="mt-1 block w-full rounded-md border border-slate-300 bg-white p-2"
@@ -188,11 +188,11 @@ export default async function InspectionCalendarPage() {
                     {type.defaultCadence ? ` · ${type.defaultCadence}` : ''}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
             <label className="text-sm font-medium">
               Property
-              <select
+              <Select
                 name="propertyId"
                 required
                 className="mt-1 block w-full rounded-md border border-slate-300 bg-white p-2"
@@ -203,11 +203,11 @@ export default async function InspectionCalendarPage() {
                     {property.name}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
             <label className="text-sm font-medium">
               Frequency
-              <select
+              <Select
                 name="recurrence"
                 defaultValue="weekly"
                 className="mt-1 block w-full rounded-md border border-slate-300 bg-white p-2"
@@ -217,7 +217,7 @@ export default async function InspectionCalendarPage() {
                 <option value="monthly">Monthly</option>
                 <option value="quarterly">Quarterly</option>
                 <option value="yearly">Yearly</option>
-              </select>
+              </Select>
             </label>
             <label className="text-sm font-medium">
               Due time
@@ -263,7 +263,7 @@ export default async function InspectionCalendarPage() {
             </label>
             <label className="text-sm font-medium">
               Assigned to
-              <select
+              <Select
                 name="assigneeId"
                 className="mt-1 block w-full rounded-md border border-slate-300 bg-white p-2"
               >
@@ -273,7 +273,7 @@ export default async function InspectionCalendarPage() {
                     {member.name}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
             <div className="flex items-end">
               <Button type="submit">Create recurring schedule</Button>

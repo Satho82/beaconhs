@@ -25,7 +25,11 @@ export function validateReservedUpload(
   object: UploadObjectMetadata,
   expected: { tokenHash: string; sizeBytes: number; contentType: string },
 ): string | null {
-  if (!uploadTokenMatches(object.metadata['upload-token'], expected.tokenHash)) {
+  const proxyVerificationHash = object.metadata['upload-token-sha256']
+  if (
+    proxyVerificationHash !== expected.tokenHash &&
+    !uploadTokenMatches(object.metadata['upload-token'], expected.tokenHash)
+  ) {
     return 'Uploaded object could not be verified'
   }
   if (object.contentLength !== expected.sizeBytes) {

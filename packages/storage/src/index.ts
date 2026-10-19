@@ -301,6 +301,7 @@ export async function putObject(args: {
   contentType: string
   contentDisposition?: 'inline' | 'attachment'
   lifecycle?: StorageObjectLifecycle
+  metadata?: Record<string, string>
 }): Promise<void> {
   if (shouldUseMultipartUpload(args.body.byteLength)) {
     const uploadId = await createMultipartUpload({
@@ -350,6 +351,7 @@ export async function putObject(args: {
       Body: args.body,
       ContentType: args.contentType,
       ContentDisposition: args.contentDisposition ?? 'attachment',
+      Metadata: args.metadata,
       Tagging: storageObjectTagging(args.lifecycle),
     }),
   )

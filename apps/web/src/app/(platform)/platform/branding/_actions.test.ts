@@ -91,4 +91,17 @@ describe('platform branding action', () => {
       expect.objectContaining({ summary: 'm_f3a6b9d4e7c581' }),
     )
   })
+
+  it('keeps a saved logo update successful if removal of the old asset fails', async () => {
+    mocks.getBranding.mockResolvedValue({ logoKey: 'platform/branding/logo/old.png' })
+    mocks.storeAsset.mockResolvedValue('platform/branding/logo/new.png')
+    mocks.deleteAsset.mockRejectedValue(new Error('storage cleanup unavailable'))
+    const data = form()
+    data.set('logo', new File(['png'], 'logo.png', { type: 'image/png' }))
+
+    await expect(savePlatformBrandingAction(data)).resolves.toBeUndefined()
+    expect(mocks.saveBranding).toHaveBeenCalledWith(
+      expect.objectContaining({ logoKey: 'platform/branding/logo/new.png' }),
+    )
+  })
 })

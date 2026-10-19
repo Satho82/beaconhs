@@ -26,6 +26,15 @@ describe('upload reservation verification', () => {
     expect(normalizedContentType('IMAGE/PNG; charset=binary')).toBe('image/png')
   })
 
+  it('accepts the server-side relay verification hash', () => {
+    expect(
+      validateReservedUpload(
+        { ...object, metadata: { 'upload-token-sha256': tokenHash } },
+        { tokenHash, sizeBytes: 42, contentType: 'image/png' },
+      ),
+    ).toBeNull()
+  })
+
   it('rejects token substitution, size changes, and type changes', () => {
     expect(uploadTokenMatches('wrong', tokenHash)).toBe(false)
     expect(

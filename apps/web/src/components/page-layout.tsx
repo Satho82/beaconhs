@@ -27,9 +27,9 @@ export function PageContainer({
 }
 
 /**
- * List page layout — header (title/actions/search/filter chips) is sticky;
- * only the table area scrolls. The header fades in on mount; the body
- * fades in slightly behind it.
+ * List page layout — header (title/actions/search/filter chips) and results
+ * flow in one scroll region. This keeps long lists usable on desktop and
+ * mobile without a fixed top/bottom split.
  *
  *   <ListPageLayout
  *     header={...}        // PageHeader, search/filter row, etc
@@ -66,9 +66,8 @@ export function ListPageLayout({
 }
 
 /**
- * Detail page layout — fixed header (DetailHeader + optional alerts) and a
- * horizontal subtab strip; tab content fills the remaining space and scrolls
- * internally.
+ * Detail page layout — header (DetailHeader + optional alerts), subtab strip,
+ * and content flow in one scroll region so every section remains reachable.
  *
  *   <DetailPageLayout
  *     header={<DetailHeader … />}

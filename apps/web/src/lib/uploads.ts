@@ -18,7 +18,6 @@ import {
   newAttachmentKey,
   newPendingUploadKey,
   presignMultipartPart,
-  presignPut,
   promoteObject,
   putObject,
   shouldUseMultipartUpload,
@@ -222,13 +221,9 @@ export async function requestUpload(input: z.infer<typeof requestSchema>): Promi
           partUrls,
         }
       }
-      const putUrl = await presignPut({
-        key: stagingKey,
-        contentType: parsed.data.contentType,
-        uploadToken,
-        expiresInSeconds: 300,
-      })
-      return { ok: true, uploadId, mode: 'single', putUrl }
+      // Keep the object store private. Browser uploads use this authenticated
+      // same-origin endpoint rather than receiving an internal MinIO URL.
+      return { ok: true, uploadId, mode: 'single', putUrl: `/api/uploads/${uploadId}` }
     } catch (error) {
       if (multipartUploadId) {
         await abortMultipartUpload({ key: stagingKey, uploadId: multipartUploadId }).catch(

@@ -16,6 +16,10 @@ import { getObject } from '@beaconhs/storage'
 import { assertCan } from '@beaconhs/tenant'
 import { recordAuditInTransaction } from '@/lib/audit'
 import { requireRequestContext } from '@/lib/auth'
+import {
+  applyActiveHospitalityPropertyScope,
+  resolveHospitalityPropertyContext,
+} from '@/lib/hospitality/property-context'
 import type { AssetImportRow } from './assets-import'
 
 const inputSchema = z.object({ batchId: z.string().uuid(), acknowledged: z.literal(true) })
@@ -52,9 +56,11 @@ export async function confirmAssetImport(input: z.infer<typeof inputSchema>) {
   if (!parsed.success) return { ok: false as const, error: 'Confirmation is required.' }
   const ctx = await requireRequestContext()
   assertCan(ctx, 'equipment.manage')
+  const propertyContext = await resolveHospitalityPropertyContext(ctx)
 
   try {
     const result = await ctx.db(async (tx) => {
+      await applyActiveHospitalityPropertyScope(ctx, tx, propertyContext.activePropertyId)
       const [batch] = await tx
         .select()
         .from(bulkImportBatches)
@@ -134,11 +140,17 @@ export async function confirmAssetImport(input: z.infer<typeof inputSchema>) {
           : []
         const [site] = row.site
           ? await tx
-              .select({ id: orgUnits.id })
+              .select({ id: orgUnits.id, metadata: orgUnits.metadata })
               .from(orgUnits)
               .where(and(eq(orgUnits.tenantId, ctx.tenantId), eq(orgUnits.name, row.site)))
               .limit(1)
           : []
+        const sitePropertyId =
+          typeof site?.metadata?.hospitalityPropertyId === 'string'
+            ? site.metadata.hospitalityPropertyId
+            : null
+        if (propertyContext.activePropertyId && sitePropertyId !== propertyContext.activePropertyId)
+          throw new Error('Every imported asset must use a site within the selected property.')
         await tx.insert(equipmentItems).values({
           tenantId: ctx.tenantId,
           assetTag: row.asset_tag,

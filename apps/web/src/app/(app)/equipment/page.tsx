@@ -23,6 +23,10 @@ import { FilterChips } from '@/components/filter-bar'
 import { ListPageLayout } from '@/components/page-layout'
 import { TableToolbar } from '@/components/table-toolbar'
 import { EquipmentSubNav } from '@/components/equipment-sub-nav'
+import {
+  applyActiveHospitalityPropertyScope,
+  resolveHospitalityPropertyContext,
+} from '@/lib/hospitality/property-context'
 import { EquipmentRecordsTable, type EquipmentTableRow } from './_records-table'
 import { EquipmentTypeCategoryFilters } from './_filters'
 
@@ -77,11 +81,13 @@ export default async function EquipmentPage({
   const typeFilter = pickString(sp.type)
   const categoryFilter = pickString(sp.category)
   const ctx = await requireRequestContext()
+  const propertyContext = await resolveHospitalityPropertyContext(ctx)
   const canManageEquipment = can(ctx, 'equipment.manage')
   const canExport = can(ctx, 'admin.data.export') && can(ctx, 'equipment.read.site')
 
   const { rows, total, statusCounts, availabilityCounts, allTypes, allCats } = await ctx.db(
     async (tx) => {
+      await applyActiveHospitalityPropertyScope(ctx, tx, propertyContext.activePropertyId)
       const allTypes = await tx
         .select({ id: equipmentTypes.id, name: equipmentTypes.name })
         .from(equipmentTypes)
@@ -99,8 +105,15 @@ export default async function EquipmentPage({
         siteCol: equipmentItems.currentSiteOrgUnitId,
         personCol: equipmentItems.currentHolderPersonId,
       })
-      const filters: SQL<unknown>[] = [isNull(equipmentItems.deletedAt)]
-      if (vis) filters.push(vis)
+      const registerScope: SQL<unknown>[] = [isNull(equipmentItems.deletedAt)]
+      if (vis) registerScope.push(vis)
+      // A selected hospitality property is a presentation scope even for a
+      // Super Admin. Asset sites are mapped to their hotel by this metadata.
+      if (propertyContext.activePropertyId)
+        registerScope.push(
+          sql`${orgUnits.metadata}->>'hospitalityPropertyId' = ${propertyContext.activePropertyId}`,
+        )
+      const filters: SQL<unknown>[] = [...registerScope]
       if (params.q) {
         const term = `%${params.q}%`
         const cond = or(
@@ -138,7 +151,11 @@ export default async function EquipmentPage({
                       ? [dirFn(equipmentItems.purchaseDate)]
                       : [dirFn(equipmentItems.assetTag)]
 
-      const [tot] = await tx.select({ c: count() }).from(equipmentItems).where(whereClause)
+      const [tot] = await tx
+        .select({ c: count() })
+        .from(equipmentItems)
+        .leftJoin(orgUnits, eq(orgUnits.id, equipmentItems.currentSiteOrgUnitId))
+        .where(whereClause)
       const data = await tx
         .select({
           item: equipmentItems,
@@ -159,12 +176,14 @@ export default async function EquipmentPage({
       const ss = await tx
         .select({ s: equipmentItems.status, c: count() })
         .from(equipmentItems)
-        .where(and(isNull(equipmentItems.deletedAt), vis))
+        .leftJoin(orgUnits, eq(orgUnits.id, equipmentItems.currentSiteOrgUnitId))
+        .where(and(...registerScope))
         .groupBy(equipmentItems.status)
       const av = await tx
         .select({ a: equipmentItems.isAvailableForCheckout, c: count() })
         .from(equipmentItems)
-        .where(and(isNull(equipmentItems.deletedAt), vis))
+        .leftJoin(orgUnits, eq(orgUnits.id, equipmentItems.currentSiteOrgUnitId))
+        .where(and(...registerScope))
         .groupBy(equipmentItems.isAvailableForCheckout)
       return {
         rows: data,

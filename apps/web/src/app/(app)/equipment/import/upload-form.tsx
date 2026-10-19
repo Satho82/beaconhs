@@ -3,9 +3,8 @@ import { useGeneratedValueTranslations } from '@/i18n/generated'
 
 import { useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { Button, uploadReservedFile } from '@beaconhs/ui'
-import { finalizeUpload, requestUpload } from '@/lib/uploads'
-import { validateAssetImportUpload } from '@/lib/imports/assets-import-upload'
+import { Button } from '@beaconhs/ui'
+import { uploadAndValidateAssetImport } from '@/lib/imports/assets-import-upload'
 
 export function AssetImportUploadForm() {
   const tGeneratedValue = useGeneratedValueTranslations()
@@ -20,16 +19,9 @@ export function AssetImportUploadForm() {
     startTransition(async () => {
       setError(null)
       try {
-        const reservation = await requestUpload({
-          kind: 'document',
-          filename: file.name,
-          contentType: 'text/csv',
-          sizeBytes: file.size,
-        })
-        if (!reservation.ok) return setError(reservation.error)
-        const finalized = await finalizeUpload(await uploadReservedFile(reservation, file))
-        if (!finalized.ok) return setError(finalized.error)
-        const outcome = await validateAssetImportUpload({ attachmentId: finalized.attachmentId })
+        const formData = new FormData()
+        formData.set('file', file)
+        const outcome = await uploadAndValidateAssetImport(formData)
         if (!outcome.ok) return setError(outcome.error)
         router.push('/equipment/import/review/' + outcome.batchId)
       } catch {

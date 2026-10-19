@@ -4,7 +4,7 @@ import { createHash } from 'node:crypto'
 import { and, eq, inArray } from 'drizzle-orm'
 import { z } from 'zod'
 import { attachments, bulkImportBatches, bulkImportRows, equipmentItems } from '@beaconhs/db/schema'
-import { getObject } from '@beaconhs/storage'
+import { ensureBucket, getObject, newAttachmentKey, putObject } from '@beaconhs/storage'
 import { assertCan } from '@beaconhs/tenant'
 import { recordAuditInTransaction } from '@/lib/audit'
 import { requireRequestContext } from '@/lib/auth'
@@ -12,6 +12,57 @@ import { parseImportRows, previewImport, validateImportRows } from './engine'
 import { assetImportBatchIssues, assetImportDataset } from './assets-import'
 
 const inputSchema = z.object({ attachmentId: z.string().uuid() })
+const MAX_ASSET_IMPORT_BYTES = 5_000_000
+
+/**
+ * Asset imports use a server-side upload because DEV object storage is private.
+ * This keeps MinIO off the public network while preserving the same attachment
+ * and validation flow used by the review/confirm step.
+ */
+export async function uploadAndValidateAssetImport(formData: FormData) {
+  const file = formData.get('file')
+  if (!(file instanceof File) || file.size <= 0)
+    return { ok: false as const, error: 'The selected upload is invalid.' }
+  if (file.size > MAX_ASSET_IMPORT_BYTES)
+    return { ok: false as const, error: 'Import files cannot exceed 5 MB.' }
+
+  const contentType = (file.type || 'text/csv').split(';', 1)[0]!.toLowerCase()
+  if (contentType !== 'text/csv' && contentType !== 'application/vnd.ms-excel')
+    return { ok: false as const, error: 'Assets imports must be CSV files.' }
+
+  const ctx = await requireRequestContext()
+  assertCan(ctx, 'equipment.manage')
+  const body = Buffer.from(await file.arrayBuffer())
+  const r2Key = newAttachmentKey({
+    tenantId: ctx.tenantId,
+    kind: 'document',
+    filename: file.name,
+  })
+
+  try {
+    await ensureBucket()
+    await putObject({ key: r2Key, body, contentType: 'text/csv', contentDisposition: 'attachment' })
+    const [attachment] = await ctx.db((tx) =>
+      tx
+        .insert(attachments)
+        .values({
+          tenantId: ctx.tenantId,
+          uploadedBy: ctx.userId,
+          kind: 'document',
+          r2Key,
+          contentType: 'text/csv',
+          sizeBytes: body.byteLength,
+          filename: file.name,
+        })
+        .returning({ id: attachments.id }),
+    )
+    if (!attachment) throw new Error('The import attachment could not be created.')
+    return validateAssetImportUpload({ attachmentId: attachment.id })
+  } catch (error) {
+    console.error('[assets-import] server upload failed', error)
+    return { ok: false as const, error: 'The CSV could not be uploaded and validated.' }
+  }
+}
 
 export async function validateAssetImportUpload(input: z.infer<typeof inputSchema>) {
   const parsed = inputSchema.safeParse(input)

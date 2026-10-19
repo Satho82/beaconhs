@@ -279,7 +279,7 @@ export default async function InspectionRecordsPage({
             <section className="mt-5 rounded-2xl border border-teal-100 bg-gradient-to-br from-teal-50 via-white to-white p-5">
               <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-700">
+                  <p className="text-xs font-semibold tracking-[0.16em] text-teal-700 uppercase">
                     Inspection programme · recurring control
                   </p>
                   <h2 className="mt-1 text-2xl font-semibold tracking-tight text-slate-950">
@@ -612,7 +612,7 @@ export default async function InspectionRecordsPage({
                                   <GeneratedValue value={r.type.name} />
                                 </Link>
                               </TableCell>
-                              <TableCell className="text-xs tabular-nums text-slate-600 dark:text-slate-400">
+                              <TableCell className="text-xs text-slate-600 tabular-nums dark:text-slate-400">
                                 <GeneratedValue
                                   value={formatDate(
                                     new Date(r.record.occurredAt),

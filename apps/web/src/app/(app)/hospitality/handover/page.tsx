@@ -201,7 +201,7 @@ export default async function HandoverPage({
       <section className="mt-5 rounded-2xl border border-teal-100 bg-gradient-to-br from-teal-50 via-white to-white p-5">
         <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-700">
+            <p className="text-xs font-semibold tracking-[0.16em] text-teal-700 uppercase">
               {t('Hotel operations')} · {t('Shift control')}
             </p>
             <h2 className="mt-1 text-2xl font-semibold tracking-tight text-slate-950">
@@ -214,7 +214,7 @@ export default async function HandoverPage({
             </p>
           </div>
           <div className="rounded-xl border border-teal-100 bg-white px-4 py-3 text-sm shadow-sm">
-            <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
+            <p className="text-xs font-medium tracking-wide text-slate-500 uppercase">
               {t('Latest shift')}
             </p>
             <p className="mt-1 font-semibold text-slate-900">
@@ -485,7 +485,7 @@ export default async function HandoverPage({
                       {handover.priority}
                     </span>
                   </div>
-                  <p className="whitespace-pre-wrap text-sm">{handover.note}</p>
+                  <p className="text-sm whitespace-pre-wrap">{handover.note}</p>
                   {roomCode || handover.location ? (
                     <div className="text-muted-foreground text-sm">
                       {[roomCode ? `Room ${roomCode}` : null, handover.location]

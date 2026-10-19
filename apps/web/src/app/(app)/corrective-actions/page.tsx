@@ -223,7 +223,7 @@ export default async function CorrectiveActionsPage({
           <section className="mt-5 rounded-2xl border border-teal-100 bg-gradient-to-br from-teal-50 via-white to-white p-5">
             <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-700">
+                <p className="text-xs font-semibold tracking-[0.16em] text-teal-700 uppercase">
                   Assurance · action control
                 </p>
                 <h2 className="mt-1 text-2xl font-semibold tracking-tight text-slate-950">

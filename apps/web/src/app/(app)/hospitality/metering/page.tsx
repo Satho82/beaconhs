@@ -377,7 +377,7 @@ export default async function MeteringPage({
           <div className="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm">
             <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-700">
+                <p className="text-xs font-semibold tracking-[0.16em] text-teal-700 uppercase">
                   {t('Metering')} · {t('Overview')}
                 </p>
                 <p className="mt-1 text-sm text-slate-500">
@@ -551,7 +551,7 @@ export default async function MeteringPage({
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full min-w-[640px] text-left text-sm">
-                    <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+                    <thead className="bg-slate-50 text-xs tracking-wide text-slate-500 uppercase">
                       <tr>
                         <th className="px-5 py-3">{t('Date')}</th>
                         <th className="px-5 py-3">{t('Meter')}</th>
@@ -564,7 +564,7 @@ export default async function MeteringPage({
                         const meter = data.meters.find((candidate) => candidate.id === item.meterId)
                         return (
                           <tr key={item.id} className="text-slate-700">
-                            <td className="whitespace-nowrap px-5 py-3">
+                            <td className="px-5 py-3 whitespace-nowrap">
                               {item.readAt.toLocaleDateString(operationalDefaults.locale)}
                             </td>
                             <td className="px-5 py-3 font-medium text-slate-950">
@@ -681,7 +681,7 @@ export default async function MeteringPage({
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[720px] text-left text-sm">
-                  <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+                  <thead className="bg-slate-50 text-xs tracking-wide text-slate-500 uppercase">
                     <tr>
                       <th className="px-5 py-3">#</th>
                       <th className="px-5 py-3">{t('Meter')}</th>

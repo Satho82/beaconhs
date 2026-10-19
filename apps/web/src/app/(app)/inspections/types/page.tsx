@@ -251,7 +251,7 @@ export default async function InspectionTypesPage({
           <InspectionsSubNav active="types" />
           <section className="rounded-2xl border border-teal-100 bg-gradient-to-br from-teal-50 via-white to-white p-5">
             <div className="flex flex-col gap-1">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-700">
+              <p className="text-xs font-semibold tracking-[0.16em] text-teal-700 uppercase">
                 Audit programme · hotel and apartments
               </p>
               <h2 className="text-2xl font-semibold tracking-tight text-slate-950">
@@ -366,7 +366,7 @@ export default async function InspectionTypesPage({
                             }
                           />
                         </TableCell>
-                        <TableCell className="tabular-nums text-slate-600 dark:text-slate-400">
+                        <TableCell className="text-slate-600 tabular-nums dark:text-slate-400">
                           <GeneratedValue value={criteriaCount} />
                         </TableCell>
                         <TableCell>

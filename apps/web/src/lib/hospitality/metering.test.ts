@@ -32,6 +32,11 @@ describe('Metering calculations and security contracts', () => {
     expect(service).toContain('estimatedExpenditure: cost')
     expect(service).toContain('lte(hospitalityMeterTariffs.effectiveFrom, at)')
   })
+  it('does not persist a partial tariff snapshot for opening or reset readings', () => {
+    expect(service).toContain('const tariffSnapshot = consumption == null ? null : tariff')
+    expect(service).toContain('tariffId: tariffSnapshot?.id ?? null')
+    expect(service).toContain('estimatedExpenditure: cost')
+  })
   it('provides one Metering workspace with required sections and searchable identifiers', () => {
     for (const value of [
       'overview',

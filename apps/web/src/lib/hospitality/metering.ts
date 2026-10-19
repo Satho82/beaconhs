@@ -320,7 +320,12 @@ export async function addReading(
       kind,
     )
     const tariff = await latestEffectiveTariff(tx, ctx.tenantId, meter.id, effectiveReadAt)
-    const cost = tariff ? estimatedExpenditure(consumption, Number(tariff.unitCost)) : null
+    // A first or reset reading has no consumption yet. Do not persist a partial
+    // tariff snapshot: the database correctly requires a complete cost snapshot.
+    const tariffSnapshot = consumption == null ? null : tariff
+    const cost = tariffSnapshot
+      ? estimatedExpenditure(consumption, Number(tariffSnapshot.unitCost))
+      : null
     const [reading] = await tx
       .insert(hospitalityMeterReadings)
       .values({
@@ -333,9 +338,9 @@ export async function addReading(
         notes: input.notes?.trim() || null,
         submittedById: memberId(ctx),
         consumption,
-        tariffId: tariff?.id ?? null,
-        unitCostSnapshot: tariff ? Number(tariff.unitCost) : null,
-        currencySnapshot: tariff?.currency ?? null,
+        tariffId: tariffSnapshot?.id ?? null,
+        unitCostSnapshot: tariffSnapshot ? Number(tariffSnapshot.unitCost) : null,
+        currencySnapshot: tariffSnapshot?.currency ?? null,
         estimatedExpenditure: cost,
       })
       .returning()

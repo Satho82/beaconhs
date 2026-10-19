@@ -276,13 +276,6 @@ export const MODULE_ADMIN: ModuleAdmin[] = [
         desc: 'When an inspection is submitted, email the result (with PDF), notify roles, raise CAPAs or call a webhook.',
       },
       {
-        key: 'vehicle-log-settings',
-        label: 'Vehicle log modes',
-        href: '/equipment/vehicle-log/settings',
-        iconKey: 'gauge',
-        desc: 'Which entry modes drivers use (destination, odometer or both) and per-driver defaults.',
-      },
-      {
         key: 'vehicle-log-flows',
         label: 'Vehicle log automations',
         href: '/equipment/vehicle-log/flows',

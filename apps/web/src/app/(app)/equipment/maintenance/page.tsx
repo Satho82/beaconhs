@@ -8,7 +8,7 @@ import {
 } from '@/i18n/generated'
 // Equipment maintenance cockpit — the fleet-wide "what should a technician be
 // doing, to which unit, when" view. One merged agenda from three sources:
-// per-unit inspection schedules, ad-hoc reminders, and oil-change tracking.
+// per-unit inspection schedules and ad-hoc reminders.
 // Overdue/today/this-week tiles up top, a month calendar in the middle
 // (desktop), and a day-grouped work list that is the primary mobile surface.
 
@@ -23,7 +23,6 @@ import {
   ChevronLeft,
   ChevronRight,
   ClipboardCheck,
-  Droplets,
   Plus,
 } from 'lucide-react'
 import {
@@ -75,7 +74,7 @@ export const dynamic = 'force-dynamic'
 const BASE = '/equipment/maintenance'
 const PER_PAGE = 15
 
-type EntryKind = 'inspection' | 'reminder' | 'oil_change'
+type EntryKind = 'inspection' | 'reminder'
 
 type Entry = {
   key: string
@@ -94,7 +93,6 @@ type Entry = {
 const KIND_META: Record<EntryKind, { label: string; dot: string }> = {
   inspection: { label: 'Inspection', dot: 'bg-teal-500' },
   reminder: { label: 'Reminder', dot: 'bg-amber-500' },
-  oil_change: { label: 'Oil change', dot: 'bg-violet-500' },
 }
 
 type UnitDrawerData = {
@@ -195,7 +193,7 @@ export default async function EquipmentMaintenancePage({
       catFilter ? eq(equipmentItems.categoryId, catFilter) : undefined,
     ]
 
-    const [scheduleRows, reminderRows, oilRows, categories] = await Promise.all([
+    const [scheduleRows, reminderRows, categories] = await Promise.all([
       tx
         .select({
           schedule: equipmentInspectionSchedules,
@@ -240,24 +238,6 @@ export default async function EquipmentMaintenancePage({
           ),
         )
         .orderBy(asc(equipmentReminders.dueOn)),
-      tx
-        .select({
-          itemId: equipmentItems.id,
-          itemName: equipmentItems.name,
-          assetTag: equipmentItems.assetTag,
-          dueOn: equipmentItems.nextOilChangeDue,
-          intervalMonths: equipmentItems.oilChangeIntervalMonths,
-        })
-        .from(equipmentItems)
-        .where(
-          and(
-            eq(equipmentItems.requiresOilChange, true),
-            sql`${equipmentItems.nextOilChangeDue} IS NOT NULL`,
-            lte(equipmentItems.nextOilChangeDue, horizon),
-            ...itemFilters,
-          ),
-        )
-        .orderBy(asc(equipmentItems.nextOilChangeDue)),
       tx
         .select({ id: equipmentCategories.id, name: equipmentCategories.name })
         .from(equipmentCategories)
@@ -369,10 +349,10 @@ export default async function EquipmentMaintenancePage({
         }
       }
     }
-    return { scheduleRows, reminderRows, oilRows, categories, unit }
+    return { scheduleRows, reminderRows, categories, unit }
   })
 
-  // ---- Merge the three sources into one agenda -------------------------------
+  // ---- Merge the maintenance sources into one agenda --------------------------
   const entries: Entry[] = [
     ...data.scheduleRows.map((r) => ({
       key: `s-${r.schedule.id}`,
@@ -405,18 +385,6 @@ export default async function EquipmentMaintenancePage({
       dueOn: r.reminder.dueOn,
       startTypeId: null,
       reminderId: r.reminder.id,
-    })),
-    ...data.oilRows.map((r) => ({
-      key: `o-${r.itemId}`,
-      kind: 'oil_change' as const,
-      itemId: r.itemId,
-      itemName: r.itemName,
-      assetTag: r.assetTag,
-      title: 'Oil change',
-      detail: r.intervalMonths ? formatInterval(r.intervalMonths, 'month') : null,
-      dueOn: r.dueOn!,
-      startTypeId: null,
-      reminderId: null,
     })),
   ]
     .filter((e) => !kindFilter || e.kind === kindFilter)
@@ -518,7 +486,6 @@ export default async function EquipmentMaintenancePage({
               options={[
                 { value: 'inspection', label: 'Inspections' },
                 { value: 'reminder', label: 'Reminders' },
-                { value: 'oil_change', label: 'Oil changes' },
               ]}
             />
             <FilterChips
@@ -880,17 +847,6 @@ function WorkList({
                       returnTo={mergeHref(BASE, sp, { drawer: undefined })}
                       tone="button"
                     />
-                  ) : null
-                }
-              />
-              <GeneratedValue
-                value={
-                  e.kind === 'oil_change' ? (
-                    <Link href={`/equipment/${e.itemId}?tab=log&drawer=add-log`}>
-                      <Button size="sm" variant="outline">
-                        <Droplets size={14} /> <GeneratedText id="m_10f6648885696d" />
-                      </Button>
-                    </Link>
                   ) : null
                 }
               />

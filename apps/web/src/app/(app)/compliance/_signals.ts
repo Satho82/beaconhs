@@ -205,18 +205,6 @@ export async function listDueSignals(
         having min(${equipmentInspectionSchedules.nextDueOn}) <= ${horizonIso}::date
 
         union all
-        select 'equipment', 'Oil change', ${equipmentItems.name} || ' (' || ${equipmentItems.assetTag} || ')',
-          nullif(trim(concat_ws(', ', ${people.lastName}, ${people.firstName})), ''),
-          ${equipmentItems.currentHolderPersonId}::text, ${equipmentItems.nextOilChangeDue}::date,
-          case when ${equipmentItems.nextOilChangeDue} < ${today}::date then 'overdue' else 'due_soon' end,
-          '/equipment/' || ${equipmentItems.id}::text, ${equipmentItems.id}::text || ':oil'
-        from ${equipmentItems}
-        left join ${people} on ${people.id} = ${equipmentItems.currentHolderPersonId}
-        where ${equipmentItems.tenantId} = ${tid} and ${equipmentItems.deletedAt} is null
-          and ${equipmentItems.status} not in ('retired','lost')
-          and ${equipmentItems.nextOilChangeDue} is not null and ${equipmentItems.nextOilChangeDue} <= ${horizonIso}::date
-
-        union all
         select 'equipment', 'Warranty', ${equipmentItems.name} || ' (' || ${equipmentItems.assetTag} || ')',
           nullif(trim(concat_ws(', ', ${people.lastName}, ${people.firstName})), ''),
           ${equipmentItems.currentHolderPersonId}::text, ${equipmentItems.warrantyExpiresOn}::date,

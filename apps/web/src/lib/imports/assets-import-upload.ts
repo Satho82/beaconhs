@@ -64,7 +64,7 @@ export async function uploadAndValidateAssetImport(formData: FormData) {
   }
 }
 
-export async function validateAssetImportUpload(input: z.infer<typeof inputSchema>) {
+async function validateAssetImportUpload(input: z.infer<typeof inputSchema>) {
   const parsed = inputSchema.safeParse(input)
   if (!parsed.success) return { ok: false as const, error: 'The selected upload is invalid.' }
 

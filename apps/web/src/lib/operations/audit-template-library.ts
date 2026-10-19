@@ -1,4 +1,4 @@
-export type AuditTemplate = {
+type AuditTemplate = {
   key: 'weekly' | 'monthly' | 'quarterly' | 'yearly'
   name: string
   description: string

@@ -89,7 +89,7 @@ export function AppSidebar({
               <Logo
                 className="h-8 max-w-8 object-contain"
                 branding={platformBranding}
-                aria-label={platformBranding?.productName ?? 'Home'}
+                aria-label={platformBranding?.productName ?? tGeneratedValue('Home')}
               />
             ) : (
               <Logo

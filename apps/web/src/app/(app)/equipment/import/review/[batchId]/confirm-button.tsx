@@ -1,4 +1,5 @@
 'use client'
+import { useGeneratedValueTranslations } from '@/i18n/generated'
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
@@ -6,6 +7,8 @@ import { Button } from '@beaconhs/ui'
 import { confirmAssetImport } from '@/lib/imports/assets-import-confirm'
 
 export function ConfirmAssetImportButton({ batchId }: { batchId: string }) {
+  const tGeneratedValue = useGeneratedValueTranslations()
+
   const router = useRouter()
   const [error, setError] = useState<string | null>(null)
   const [pending, startTransition] = useTransition()
@@ -22,7 +25,9 @@ export function ConfirmAssetImportButton({ batchId }: { batchId: string }) {
           })
         }
       >
-        {pending ? 'Creating assets…' : 'Confirm and create assets'}
+        {pending
+          ? tGeneratedValue('Creating assets…')
+          : tGeneratedValue('Confirm and create assets')}
       </Button>
       {error ? <p className="text-sm text-red-700">{error}</p> : null}
     </div>

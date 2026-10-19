@@ -280,14 +280,15 @@ export default async function InspectionRecordsPage({
               <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
                 <div>
                   <p className="text-xs font-semibold tracking-[0.16em] text-teal-700 uppercase">
-                    Inspection programme · recurring control
+                    {tGeneratedValue('Inspection programme · recurring control')}
                   </p>
                   <h2 className="mt-1 text-2xl font-semibold tracking-tight text-slate-950">
-                    Inspection overview
+                    {tGeneratedValue('Inspection overview')}
                   </h2>
                   <p className="mt-1 max-w-2xl text-sm text-slate-600">
-                    Use published inspection types, evidence and sign-off records to manage
-                    recurring operational work.
+                    {tGeneratedValue(
+                      'Use published inspection types, evidence and sign-off records to manage recurring operational work.',
+                    )}
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-2 text-sm">
@@ -295,44 +296,58 @@ export default async function InspectionRecordsPage({
                     className="rounded-lg border border-teal-200 bg-white px-3 py-2 font-semibold text-teal-700"
                     href="/inspections/types"
                   >
-                    Inspection types
+                    {tGeneratedValue('Inspection types')}
                   </Link>
                   <Link
                     className="rounded-lg border border-teal-200 bg-white px-3 py-2 font-semibold text-teal-700"
                     href="/inspections/records?drawer=new"
                   >
-                    Start inspection
+                    {tGeneratedValue('Start inspection')}
                   </Link>
                 </div>
               </div>
               <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                 <div className="rounded-xl border border-white bg-white p-4 shadow-sm">
-                  <p className="text-sm font-medium text-slate-600">Records in scope</p>
+                  <p className="text-sm font-medium text-slate-600">
+                    {tGeneratedValue('Records in scope')}
+                  </p>
                   <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
                     {total}
                   </p>
-                  <p className="mt-1 text-xs text-teal-700">Current access and filters</p>
+                  <p className="mt-1 text-xs text-teal-700">
+                    {tGeneratedValue('Current access and filters')}
+                  </p>
                 </div>
                 <div className="rounded-xl border border-white bg-white p-4 shadow-sm">
-                  <p className="text-sm font-medium text-slate-600">In progress</p>
+                  <p className="text-sm font-medium text-slate-600">
+                    {tGeneratedValue('In progress')}
+                  </p>
                   <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
                     {statusCounts.in_progress ?? 0}
                   </p>
-                  <p className="mt-1 text-xs text-teal-700">Evidence can still be added</p>
+                  <p className="mt-1 text-xs text-teal-700">
+                    {tGeneratedValue('Evidence can still be added')}
+                  </p>
                 </div>
                 <div className="rounded-xl border border-white bg-white p-4 shadow-sm">
-                  <p className="text-sm font-medium text-slate-600">Awaiting review</p>
+                  <p className="text-sm font-medium text-slate-600">
+                    {tGeneratedValue('Awaiting review')}
+                  </p>
                   <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
                     {statusCounts.submitted ?? 0}
                   </p>
-                  <p className="mt-1 text-xs text-rose-700">Submitted for manager sign-off</p>
+                  <p className="mt-1 text-xs text-rose-700">
+                    {tGeneratedValue('Submitted for manager sign-off')}
+                  </p>
                 </div>
                 <div className="rounded-xl border border-white bg-white p-4 shadow-sm">
-                  <p className="text-sm font-medium text-slate-600">Closed</p>
+                  <p className="text-sm font-medium text-slate-600">{tGeneratedValue('Closed')}</p>
                   <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
                     {statusCounts.closed ?? 0}
                   </p>
-                  <p className="mt-1 text-xs text-teal-700">Immutable operational record</p>
+                  <p className="mt-1 text-xs text-teal-700">
+                    {tGeneratedValue('Immutable operational record')}
+                  </p>
                 </div>
               </div>
             </section>

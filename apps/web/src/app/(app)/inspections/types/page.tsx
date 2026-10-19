@@ -244,7 +244,7 @@ export default async function InspectionTypesPage({
             description={tGenerated('m_1171eac37d70af')}
             actions={
               <Link href="/inspections/types?drawer=new-type" scroll={false}>
-                <Button>Create bespoke inspection</Button>
+                <Button>{tGeneratedValue('Create bespoke inspection')}</Button>
               </Link>
             }
           />
@@ -252,14 +252,15 @@ export default async function InspectionTypesPage({
           <section className="rounded-2xl border border-teal-100 bg-gradient-to-br from-teal-50 via-white to-white p-5">
             <div className="flex flex-col gap-1">
               <p className="text-xs font-semibold tracking-[0.16em] text-teal-700 uppercase">
-                Audit programme · hotel and apartments
+                {tGeneratedValue('Audit programme · hotel and apartments')}
               </p>
               <h2 className="text-2xl font-semibold tracking-tight text-slate-950">
-                Install an operational audit template
+                {tGeneratedValue('Install an operational audit template')}
               </h2>
               <p className="max-w-2xl text-sm text-slate-600">
-                Each template creates real sections and scored Pass / Fail / N-A questions. Failed
-                responses can use the existing corrective-action workflow.
+                {tGeneratedValue(
+                  'Each template creates real sections and scored Pass / Fail / N-A questions. Failed responses can use the existing corrective-action workflow.',
+                )}
               </p>
             </div>
             <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
@@ -273,15 +274,16 @@ export default async function InspectionTypesPage({
                   <p className="text-sm font-semibold text-slate-950">{template.name}</p>
                   <p className="mt-1 text-sm text-slate-600">{template.description}</p>
                   <p className="mt-3 text-xs font-medium text-teal-700">
-                    {template.sections.length} sections ·{' '}
+                    {template.sections.length} {tGeneratedValue('sections ·')}{' '}
                     {template.sections.reduce(
                       (count, section) => count + section.questions.length,
                       0,
                     )}{' '}
-                    questions · {template.cadence}
+                    {tGeneratedValue('questions ·')}
+                    {template.cadence}
                   </p>
                   <Button className="mt-4 w-full" type="submit" variant="outline">
-                    Install template
+                    {tGeneratedValue('Install template')}
                   </Button>
                 </form>
               ))}

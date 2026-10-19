@@ -1,4 +1,5 @@
 'use client'
+import { useGeneratedValueTranslations } from '@/i18n/generated'
 
 import { useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
@@ -7,6 +8,8 @@ import { finalizeUpload, requestUpload } from '@/lib/uploads'
 import { validateAssetImportUpload } from '@/lib/imports/assets-import-upload'
 
 export function AssetImportUploadForm() {
+  const tGeneratedValue = useGeneratedValueTranslations()
+
   const inputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
   const [file, setFile] = useState<File | null>(null)
@@ -53,11 +56,11 @@ export function AssetImportUploadForm() {
         disabled={pending}
         className="flex min-h-40 w-full flex-col items-center justify-center rounded-lg border border-dashed border-teal-300 bg-teal-50/40 text-sm text-slate-700"
       >
-        Select a CSV file (maximum 5 MB)
+        {tGeneratedValue('Select a CSV file (maximum 5 MB)')}
       </button>
       {file ? (
         <p className="text-sm">
-          {file.name} · {file.size.toLocaleString()} bytes
+          {file.name} · {file.size.toLocaleString()} {tGeneratedValue('bytes')}
         </p>
       ) : null}
       {error ? (
@@ -66,7 +69,7 @@ export function AssetImportUploadForm() {
         </p>
       ) : null}
       <Button type="button" onClick={submit} disabled={!file || pending}>
-        {pending ? 'Validating…' : 'Upload and validate'}
+        {pending ? tGeneratedValue('Validating…') : tGeneratedValue('Upload and validate')}
       </Button>
     </div>
   )

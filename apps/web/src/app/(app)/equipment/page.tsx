@@ -226,7 +226,7 @@ export default async function EquipmentPage({
                     canManageEquipment ? (
                       <>
                         <Link href="/equipment/import">
-                          <Button variant="outline">Import CSV</Button>
+                          <Button variant="outline">{tGeneratedValue('Import CSV')}</Button>
                         </Link>
                         <Link href="/equipment/new">
                           <Button>

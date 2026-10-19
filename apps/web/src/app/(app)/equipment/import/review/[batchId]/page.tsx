@@ -1,3 +1,5 @@
+import { getGeneratedValueTranslations } from '@/i18n/generated.server'
+import { isUuid } from '@/lib/list-params'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Button } from '@beaconhs/ui'
@@ -9,26 +11,32 @@ export default async function AssetImportReviewPage({
 }: {
   params: Promise<{ batchId: string }>
 }) {
+  const tGeneratedValue = await getGeneratedValueTranslations()
+
   const { batchId } = await params
+  if (!isUuid(batchId)) notFound()
   const review = await getAssetImportReview(batchId)
   if (!review) notFound()
   return (
     <main className="mx-auto max-w-5xl space-y-6 p-6">
       <div>
-        <h1 className="text-3xl font-bold">Review assets import</h1>
+        <h1 className="text-3xl font-bold">{tGeneratedValue('Review assets import')}</h1>
         <p className="mt-2 text-slate-600">
-          {review.rows.length} rows · {review.errors} rows with errors. Duplicates are skipped;
-          existing assets are never changed.
+          {review.rows.length} {tGeneratedValue('rows ·')}
+          {review.errors}{' '}
+          {tGeneratedValue(
+            'rows with errors. Duplicates are skipped; existing assets are never changed.',
+          )}
         </p>
       </div>
       <div className="overflow-x-auto rounded-xl border">
         <table className="w-full text-sm">
           <thead className="bg-slate-50 text-left">
             <tr>
-              <th className="p-3">Row</th>
-              <th className="p-3">Asset tag</th>
-              <th className="p-3">Name</th>
-              <th className="p-3">Result</th>
+              <th className="p-3">{tGeneratedValue('Row')}</th>
+              <th className="p-3">{tGeneratedValue('Asset tag')}</th>
+              <th className="p-3">{tGeneratedValue('Name')}</th>
+              <th className="p-3">{tGeneratedValue('Result')}</th>
             </tr>
           </thead>
           <tbody>
@@ -42,8 +50,8 @@ export default async function AssetImportReviewPage({
                   <td className="p-3">
                     {row.issues.map((issue) => issue.message).join(' ') ||
                       (row.proposedAction === 'skip'
-                        ? 'Existing asset: will be skipped'
-                        : 'Ready to create')}
+                        ? tGeneratedValue('Existing asset: will be skipped')
+                        : tGeneratedValue('Ready to create'))}
                   </td>
                 </tr>
               )
@@ -55,7 +63,7 @@ export default async function AssetImportReviewPage({
         <ConfirmAssetImportButton batchId={batchId} />
       ) : (
         <Button asChild variant="outline">
-          <Link href="/equipment/import">Upload a corrected file</Link>
+          <Link href="/equipment/import">{tGeneratedValue('Upload a corrected file')}</Link>
         </Button>
       )}
     </main>

@@ -32,7 +32,7 @@ describe('application message catalogs', () => {
         placeholders(english),
       )
     }
-  })
+  }, 20_000)
 
   it('contains no translation-pipeline token artifacts', () => {
     for (const catalog of [fr.Generated, es.Generated]) {

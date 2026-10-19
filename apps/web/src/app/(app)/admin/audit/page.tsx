@@ -1,3 +1,4 @@
+import { getGeneratedValueTranslations } from '@/i18n/generated.server'
 import { GeneratedText, GeneratedValue } from '@/i18n/generated'
 import { getGeneratedTranslations } from '@/i18n/generated.server'
 import { redirect } from 'next/navigation'
@@ -47,6 +48,8 @@ export default async function AuditLogPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
+  const tGeneratedValue = await getGeneratedValueTranslations()
+
   const tGenerated = await getGeneratedTranslations()
   const sp = await searchParams
   const params = parseListParams(sp, {
@@ -104,56 +107,71 @@ export default async function AuditLogPage({
           <div className="flex flex-col justify-between gap-3 lg:flex-row lg:items-end">
             <div>
               <p className="text-xs font-semibold tracking-[0.16em] text-teal-700 uppercase">
-                Governance · traceable operations
+                {tGeneratedValue('Governance · traceable operations')}
               </p>
               <h2 className="mt-1 text-2xl font-semibold tracking-tight text-slate-950">
-                Audit overview
+                {tGeneratedValue('Audit overview')}
               </h2>
               <p className="mt-1 max-w-2xl text-sm text-slate-600">
-                Review attributable changes, signatures and publishing activity across your
-                permitted scope.
+                {tGeneratedValue(
+                  'Review attributable changes, signatures and publishing activity across your permitted scope.',
+                )}
               </p>
             </div>
             <p className="text-sm text-slate-600">
-              Latest event:{' '}
+              {tGeneratedValue('Latest event:')}{' '}
               <span className="font-semibold text-slate-950">
-                {rows[0]?.log.summary ?? 'No events recorded'}
+                {rows[0]?.log.summary ?? tGeneratedValue('No events recorded')}
               </span>
             </p>
           </div>
           <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <Card className="border-white bg-white shadow-sm">
               <CardContent className="p-4">
-                <p className="text-sm font-medium text-slate-600">Events in scope</p>
+                <p className="text-sm font-medium text-slate-600">
+                  {tGeneratedValue('Events in scope')}
+                </p>
                 <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{total}</p>
-                <p className="mt-1 text-xs text-teal-700">Current access and filters</p>
+                <p className="mt-1 text-xs text-teal-700">
+                  {tGeneratedValue('Current access and filters')}
+                </p>
               </CardContent>
             </Card>
             <Card className="border-white bg-white shadow-sm">
               <CardContent className="p-4">
-                <p className="text-sm font-medium text-slate-600">Entity types</p>
+                <p className="text-sm font-medium text-slate-600">
+                  {tGeneratedValue('Entity types')}
+                </p>
                 <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
                   {entityTypes.length}
                 </p>
-                <p className="mt-1 text-xs text-teal-700">Audited operational surfaces</p>
+                <p className="mt-1 text-xs text-teal-700">
+                  {tGeneratedValue('Audited operational surfaces')}
+                </p>
               </CardContent>
             </Card>
             <Card className="border-white bg-white shadow-sm">
               <CardContent className="p-4">
-                <p className="text-sm font-medium text-slate-600">Events on this page</p>
+                <p className="text-sm font-medium text-slate-600">
+                  {tGeneratedValue('Events on this page')}
+                </p>
                 <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
                   {rows.length}
                 </p>
-                <p className="mt-1 text-xs text-teal-700">Newest first</p>
+                <p className="mt-1 text-xs text-teal-700">{tGeneratedValue('Newest first')}</p>
               </CardContent>
             </Card>
             <Card className="border-white bg-white shadow-sm">
               <CardContent className="p-4">
-                <p className="text-sm font-medium text-slate-600">Active filter</p>
-                <p className="mt-2 text-xl font-semibold tracking-tight text-slate-950">
-                  {actionFilter ?? entityFilter ?? 'All activity'}
+                <p className="text-sm font-medium text-slate-600">
+                  {tGeneratedValue('Active filter')}
                 </p>
-                <p className="mt-1 text-xs text-teal-700">Refine below by action or entity</p>
+                <p className="mt-2 text-xl font-semibold tracking-tight text-slate-950">
+                  {actionFilter ?? entityFilter ?? tGeneratedValue('All activity')}
+                </p>
+                <p className="mt-1 text-xs text-teal-700">
+                  {tGeneratedValue('Refine below by action or entity')}
+                </p>
               </CardContent>
             </Card>
           </div>

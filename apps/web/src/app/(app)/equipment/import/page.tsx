@@ -1,3 +1,4 @@
+import { getGeneratedValueTranslations } from '@/i18n/generated.server'
 import Link from 'next/link'
 import { Download, ArrowLeft } from 'lucide-react'
 import { Button } from '@beaconhs/ui'
@@ -6,6 +7,8 @@ import { requireRequestContext } from '@/lib/auth'
 import { AssetImportUploadForm } from './upload-form'
 
 export default async function EquipmentImportPage() {
+  const tGeneratedValue = await getGeneratedValueTranslations()
+
   const ctx = await requireRequestContext()
   assertCan(ctx, 'equipment.manage')
   return (
@@ -13,18 +16,19 @@ export default async function EquipmentImportPage() {
       <div>
         <Link href="/equipment" className="text-sm text-slate-600">
           <ArrowLeft className="mr-1 inline h-4 w-4" />
-          Assets & Reminders
+          {tGeneratedValue('Assets & Reminders')}
         </Link>
-        <h1 className="mt-4 text-3xl font-bold">Import assets</h1>
+        <h1 className="mt-4 text-3xl font-bold">{tGeneratedValue('Import assets')}</h1>
         <p className="mt-2 text-slate-600">
-          Upload a CSV, review all rows, then explicitly confirm creation. Existing asset tags are
-          skipped and never overwritten.
+          {tGeneratedValue(
+            'Upload a CSV, review all rows, then explicitly confirm creation. Existing asset tags are skipped and never overwritten.',
+          )}
         </p>
       </div>
       <Button asChild variant="outline">
         <Link href="/equipment/import/template">
           <Download />
-          Download CSV template
+          {tGeneratedValue('Download CSV template')}
         </Link>
       </Button>
       <AssetImportUploadForm />

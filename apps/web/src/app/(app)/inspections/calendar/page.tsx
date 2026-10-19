@@ -1,3 +1,4 @@
+import { getGeneratedValueTranslations } from '@/i18n/generated.server'
 import Link from 'next/link'
 import { and, asc, eq, gte, isNull, lte } from 'drizzle-orm'
 import { Badge, Button, EmptyState, PageHeader, Select } from '@beaconhs/ui'
@@ -24,6 +25,8 @@ const kindLabel = (recurrence: Record<string, unknown>) =>
   String(recurrence.kind ?? 'scheduled').replace(/^./, (value) => value.toUpperCase())
 
 export default async function InspectionCalendarPage() {
+  const tGeneratedValue = await getGeneratedValueTranslations()
+
   const ctx = await requireRequestContext()
   assertCan(ctx, 'inspections.read.self')
   await assertTenantModuleEntitled(ctx, 'hospitality.diary')
@@ -141,18 +144,20 @@ export default async function InspectionCalendarPage() {
     <PageContainer>
       <InspectionsSubNav active="calendar" />
       <PageHeader
-        title="Inspection calendar"
-        description="Schedule published inspection types by property. The operational diary creates occurrences and sends reminders from the same recurrence engine."
+        title={tGeneratedValue('Inspection calendar')}
+        description={tGeneratedValue(
+          'Schedule published inspection types by property. The operational diary creates occurrences and sends reminders from the same recurrence engine.',
+        )}
       />
       <div className="mb-6 grid gap-3 sm:grid-cols-3">
         <div className="rounded-2xl border border-teal-100 bg-teal-50 p-4">
-          <p className="text-sm text-slate-600">Active schedules</p>
+          <p className="text-sm text-slate-600">{tGeneratedValue('Active schedules')}</p>
           <p className="mt-1 text-3xl font-semibold text-teal-800">
             {schedules.filter((row) => row.schedule.isActive).length}
           </p>
         </div>
         <div className="rounded-2xl border border-orange-100 bg-orange-50 p-4">
-          <p className="text-sm text-slate-600">Due in 31 days</p>
+          <p className="text-sm text-slate-600">{tGeneratedValue('Due in 31 days')}</p>
           <p className="mt-1 text-3xl font-semibold text-orange-800">
             {
               occurrences.filter(
@@ -162,7 +167,7 @@ export default async function InspectionCalendarPage() {
           </p>
         </div>
         <div className="rounded-2xl border border-slate-200 bg-white p-4">
-          <p className="text-sm text-slate-600">Completed in view</p>
+          <p className="text-sm text-slate-600">{tGeneratedValue('Completed in view')}</p>
           <p className="mt-1 text-3xl font-semibold">
             {occurrences.filter((row) => row.occurrence.status === 'completed').length}
           </p>
@@ -171,11 +176,11 @@ export default async function InspectionCalendarPage() {
       {canManage ? (
         <details className="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <summary className="cursor-pointer font-semibold text-slate-900">
-            Schedule an inspection
+            {tGeneratedValue('Schedule an inspection')}
           </summary>
           <form action={createInspectionSchedule} className="mt-5 grid gap-3 md:grid-cols-3">
             <label className="text-sm font-medium">
-              Inspection type
+              {tGeneratedValue('Inspection type')}
               <Select
                 name="typeId"
                 required
@@ -191,7 +196,7 @@ export default async function InspectionCalendarPage() {
               </Select>
             </label>
             <label className="text-sm font-medium">
-              Property
+              {tGeneratedValue('Property')}
               <Select
                 name="propertyId"
                 required
@@ -206,7 +211,7 @@ export default async function InspectionCalendarPage() {
               </Select>
             </label>
             <label className="text-sm font-medium">
-              Frequency
+              {tGeneratedValue('Frequency')}
               <Select
                 name="recurrence"
                 defaultValue="weekly"
@@ -220,7 +225,7 @@ export default async function InspectionCalendarPage() {
               </Select>
             </label>
             <label className="text-sm font-medium">
-              Due time
+              {tGeneratedValue('Due time')}
               <input
                 name="dueTime"
                 type="time"
@@ -229,7 +234,7 @@ export default async function InspectionCalendarPage() {
               />
             </label>
             <label className="text-sm font-medium">
-              Weekday (0=Sun)
+              {tGeneratedValue('Weekday (0=Sun)')}
               <input
                 name="weekday"
                 type="number"
@@ -240,7 +245,7 @@ export default async function InspectionCalendarPage() {
               />
             </label>
             <label className="text-sm font-medium">
-              Day of month
+              {tGeneratedValue('Day of month')}
               <input
                 name="monthDay"
                 type="number"
@@ -251,7 +256,7 @@ export default async function InspectionCalendarPage() {
               />
             </label>
             <label className="text-sm font-medium">
-              Annual month
+              {tGeneratedValue('Annual month')}
               <input
                 name="annualMonth"
                 type="number"
@@ -262,7 +267,7 @@ export default async function InspectionCalendarPage() {
               />
             </label>
             <label className="text-sm font-medium">
-              Assigned to
+              {tGeneratedValue('Assigned to')}
               <Select
                 name="assigneeId"
                 className="mt-1 block w-full rounded-md border border-slate-300 bg-white p-2"
@@ -276,21 +281,23 @@ export default async function InspectionCalendarPage() {
               </Select>
             </label>
             <div className="flex items-end">
-              <Button type="submit">Create recurring schedule</Button>
+              <Button type="submit">{tGeneratedValue('Create recurring schedule')}</Button>
             </div>
           </form>
         </details>
       ) : null}
       <section className="mb-8">
         <div className="mb-3 flex items-baseline justify-between">
-          <h2 className="text-lg font-semibold">Upcoming</h2>
-          <span className="text-sm text-slate-500">Next 31 days</span>
+          <h2 className="text-lg font-semibold">{tGeneratedValue('Upcoming')}</h2>
+          <span className="text-sm text-slate-500">{tGeneratedValue('Next 31 days')}</span>
         </div>
         {occurrences.length === 0 ? (
           <EmptyState
             icon={<span>◌</span>}
-            title="No generated inspection occurrences yet"
-            description="Create a schedule; the diary worker generates the next occurrences and their reminder lifecycle."
+            title={tGeneratedValue('No generated inspection occurrences yet')}
+            description={tGeneratedValue(
+              'Create a schedule; the diary worker generates the next occurrences and their reminder lifecycle.',
+            )}
           />
         ) : (
           <div className="grid gap-3 md:grid-cols-2">
@@ -315,7 +322,7 @@ export default async function InspectionCalendarPage() {
                     className="text-sm font-medium text-teal-700 hover:underline"
                     href={`/inspections/records/new?typeId=${row.type.id}&propertyId=${row.property.id}`}
                   >
-                    Start inspection
+                    {tGeneratedValue('Start inspection')}
                   </Link>
                 </div>
               </div>
@@ -324,12 +331,14 @@ export default async function InspectionCalendarPage() {
         )}
       </section>
       <section>
-        <h2 className="mb-3 text-lg font-semibold">Recurring schedules</h2>
+        <h2 className="mb-3 text-lg font-semibold">{tGeneratedValue('Recurring schedules')}</h2>
         {schedules.length === 0 ? (
           <EmptyState
             icon={<span>◌</span>}
-            title="No inspection schedules"
-            description="Published inspection types can be scheduled for any property."
+            title={tGeneratedValue('No inspection schedules')}
+            description={tGeneratedValue(
+              'Published inspection types can be scheduled for any property.',
+            )}
           />
         ) : (
           <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
@@ -342,19 +351,21 @@ export default async function InspectionCalendarPage() {
                   <p className="font-semibold">{row.type.name}</p>
                   <p className="text-sm text-slate-500">
                     {row.property.name} · {kindLabel(row.schedule.recurrence)} ·{' '}
-                    {row.assignee ?? 'Unassigned'}
+                    {row.assignee ?? tGeneratedValue('Unassigned')}
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
                   <Badge variant={row.schedule.isActive ? 'success' : 'secondary'}>
-                    {row.schedule.isActive ? 'Active' : 'Paused'}
+                    {row.schedule.isActive ? tGeneratedValue('Active') : tGeneratedValue('Paused')}
                   </Badge>
                   {canManage ? (
                     <form action={setInspectionScheduleActive}>
                       <input type="hidden" name="scheduleId" value={row.schedule.id} />
                       <input type="hidden" name="isActive" value={String(!row.schedule.isActive)} />
                       <Button type="submit" variant="outline">
-                        {row.schedule.isActive ? 'Pause' : 'Resume'}
+                        {row.schedule.isActive
+                          ? tGeneratedValue('Pause')
+                          : tGeneratedValue('Resume')}
                       </Button>
                     </form>
                   ) : null}

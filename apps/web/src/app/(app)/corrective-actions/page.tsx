@@ -224,14 +224,15 @@ export default async function CorrectiveActionsPage({
             <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
               <div>
                 <p className="text-xs font-semibold tracking-[0.16em] text-teal-700 uppercase">
-                  Assurance · action control
+                  {tGeneratedValue('Assurance · action control')}
                 </p>
                 <h2 className="mt-1 text-2xl font-semibold tracking-tight text-slate-950">
-                  Action plan overview
+                  {tGeneratedValue('Action plan overview')}
                 </h2>
                 <p className="mt-1 max-w-2xl text-sm text-slate-600">
-                  Turn inspection findings, incident outcomes and operational observations into
-                  owned, auditable actions.
+                  {tGeneratedValue(
+                    'Turn inspection findings, incident outcomes and operational observations into owned, auditable actions.',
+                  )}
                 </p>
               </div>
               <div className="flex flex-wrap gap-2 text-sm">
@@ -239,44 +240,58 @@ export default async function CorrectiveActionsPage({
                   className="rounded-lg border border-teal-200 bg-white px-3 py-2 font-semibold text-teal-700"
                   href="/corrective-actions/new"
                 >
-                  Create action
+                  {tGeneratedValue('Create action')}
                 </Link>
                 <Link
                   className="rounded-lg border border-teal-200 bg-white px-3 py-2 font-semibold text-teal-700"
                   href="/incidents"
                 >
-                  Incident log
+                  {tGeneratedValue('Incident log')}
                 </Link>
               </div>
             </div>
             <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
               <div className="rounded-xl border border-white bg-white p-4 shadow-sm">
-                <p className="text-sm font-medium text-slate-600">Actions in scope</p>
+                <p className="text-sm font-medium text-slate-600">
+                  {tGeneratedValue('Actions in scope')}
+                </p>
                 <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{total}</p>
-                <p className="mt-1 text-xs text-teal-700">Current access and filters</p>
+                <p className="mt-1 text-xs text-teal-700">
+                  {tGeneratedValue('Current access and filters')}
+                </p>
               </div>
               <div className="rounded-xl border border-white bg-white p-4 shadow-sm">
-                <p className="text-sm font-medium text-slate-600">Open actions</p>
+                <p className="text-sm font-medium text-slate-600">
+                  {tGeneratedValue('Open actions')}
+                </p>
                 <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
                   {openActions}
                 </p>
                 <p className="text-coral-700 mt-1 text-xs">
-                  Open, in progress or pending verification
+                  {tGeneratedValue('Open, in progress or pending verification')}
                 </p>
               </div>
               <div className="rounded-xl border border-white bg-white p-4 shadow-sm">
-                <p className="text-sm font-medium text-slate-600">High priority</p>
+                <p className="text-sm font-medium text-slate-600">
+                  {tGeneratedValue('High priority')}
+                </p>
                 <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
                   {priorityActions}
                 </p>
-                <p className="text-coral-700 mt-1 text-xs">High and critical severity actions</p>
+                <p className="text-coral-700 mt-1 text-xs">
+                  {tGeneratedValue('High and critical severity actions')}
+                </p>
               </div>
               <div className="rounded-xl border border-white bg-white p-4 shadow-sm">
-                <p className="text-sm font-medium text-slate-600">Due in this view</p>
+                <p className="text-sm font-medium text-slate-600">
+                  {tGeneratedValue('Due in this view')}
+                </p>
                 <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
                   {dueInView}
                 </p>
-                <p className="mt-1 text-xs text-teal-700">Due today or overdue in loaded records</p>
+                <p className="mt-1 text-xs text-teal-700">
+                  {tGeneratedValue('Due today or overdue in loaded records')}
+                </p>
               </div>
             </div>
           </section>

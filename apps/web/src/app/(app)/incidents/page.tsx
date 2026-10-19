@@ -233,14 +233,15 @@ export default async function IncidentsPage({
             <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
               <div>
                 <p className="text-xs font-semibold tracking-[0.16em] text-teal-700 uppercase">
-                  Safety & operations · incident control
+                  {tGeneratedValue('Safety & operations · incident control')}
                 </p>
                 <h2 className="mt-1 text-2xl font-semibold tracking-tight text-slate-950">
-                  Incident overview
+                  {tGeneratedValue('Incident overview')}
                 </h2>
                 <p className="mt-1 max-w-2xl text-sm text-slate-600">
-                  Report, investigate and learn from incidents while retaining a clear,
-                  property-scoped audit trail.
+                  {tGeneratedValue(
+                    'Report, investigate and learn from incidents while retaining a clear, property-scoped audit trail.',
+                  )}
                 </p>
               </div>
               <div className="flex flex-wrap gap-2 text-sm">
@@ -248,42 +249,58 @@ export default async function IncidentsPage({
                   className="rounded-lg border border-teal-200 bg-white px-3 py-2 font-semibold text-teal-700"
                   href="/incidents/new"
                 >
-                  Report incident
+                  {tGeneratedValue('Report incident')}
                 </Link>
                 <Link
                   className="rounded-lg border border-teal-200 bg-white px-3 py-2 font-semibold text-teal-700"
                   href="/corrective-actions"
                 >
-                  View action plans
+                  {tGeneratedValue('View action plans')}
                 </Link>
               </div>
             </div>
             <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
               <div className="rounded-xl border border-white bg-white p-4 shadow-sm">
-                <p className="text-sm font-medium text-slate-600">Incidents in scope</p>
+                <p className="text-sm font-medium text-slate-600">
+                  {tGeneratedValue('Incidents in scope')}
+                </p>
                 <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{total}</p>
-                <p className="mt-1 text-xs text-teal-700">Current access and filters</p>
+                <p className="mt-1 text-xs text-teal-700">
+                  {tGeneratedValue('Current access and filters')}
+                </p>
               </div>
               <div className="rounded-xl border border-white bg-white p-4 shadow-sm">
-                <p className="text-sm font-medium text-slate-600">Open incidents</p>
+                <p className="text-sm font-medium text-slate-600">
+                  {tGeneratedValue('Open incidents')}
+                </p>
                 <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
                   {openIncidents}
                 </p>
-                <p className="text-coral-700 mt-1 text-xs">Require operational follow-through</p>
+                <p className="text-coral-700 mt-1 text-xs">
+                  {tGeneratedValue('Require operational follow-through')}
+                </p>
               </div>
               <div className="rounded-xl border border-white bg-white p-4 shadow-sm">
-                <p className="text-sm font-medium text-slate-600">Under investigation</p>
+                <p className="text-sm font-medium text-slate-600">
+                  {tGeneratedValue('Under investigation')}
+                </p>
                 <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
                   {investigationCount}
                 </p>
-                <p className="mt-1 text-xs text-teal-700">Evidence and review still active</p>
+                <p className="mt-1 text-xs text-teal-700">
+                  {tGeneratedValue('Evidence and review still active')}
+                </p>
               </div>
               <div className="rounded-xl border border-white bg-white p-4 shadow-sm">
-                <p className="text-sm font-medium text-slate-600">Serious impact in this view</p>
+                <p className="text-sm font-medium text-slate-600">
+                  {tGeneratedValue('Serious impact in this view')}
+                </p>
                 <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
                   {priorityInView}
                 </p>
-                <p className="text-coral-700 mt-1 text-xs">Lost-time or fatality outcome records</p>
+                <p className="text-coral-700 mt-1 text-xs">
+                  {tGeneratedValue('Lost-time or fatality outcome records')}
+                </p>
               </div>
             </div>
           </section>

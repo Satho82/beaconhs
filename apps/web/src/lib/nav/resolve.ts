@@ -30,6 +30,7 @@ import {
   defaultNavGroupMessageKey,
   defaultNavModuleMessageKey,
   moduleByKey,
+  NAV_MODULES,
   PINNED_FORM_DEFAULT_ICON,
   withMissingModules,
 } from './registry'
@@ -213,7 +214,18 @@ function resolveItem(
       iconKey: item.iconKey ?? meta.iconKey ?? PINNED_FORM_DEFAULT_ICON,
     }
   }
-  // link
+  // Saved links from older configurations must not bypass module permissions.
+  // If a link targets a known module, apply that module's gate exactly as for
+  // a module item. Truly custom external/internal links remain available.
+  const linkedModule = NAV_MODULES.find((mod) => mod.href === item.href)
+  if (linkedModule) {
+    if (!isNavModuleEntitled(linkedModule.key, entitledModules, configuredModules)) return null
+    if (linkedModule.requiredPermission && !can(ctx, linkedModule.requiredPermission)) return null
+    if (
+      linkedModule.requiredAnyPermission?.length &&
+      !linkedModule.requiredAnyPermission.some((permission) => can(ctx, permission))
+    ) return null
+  }
   return {
     href: item.href,
     label: item.label,

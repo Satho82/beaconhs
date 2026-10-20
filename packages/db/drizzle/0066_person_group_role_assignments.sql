@@ -12,3 +12,13 @@ CREATE TABLE "person_group_role_assignments" (
 );
 --> statement-breakpoint
 CREATE INDEX "person_group_role_assignments_tenant_idx" ON "person_group_role_assignments" USING btree ("tenant_id");
+
+--> statement-breakpoint
+ALTER TABLE "person_group_role_assignments" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "person_group_role_assignments" FORCE ROW LEVEL SECURITY;
+CREATE POLICY tenant_isolation ON "person_group_role_assignments"
+  USING (tenant_id = nullif(current_setting('app.tenant_id', true), '')::uuid)
+  WITH CHECK (tenant_id = nullif(current_setting('app.tenant_id', true), '')::uuid);
+REVOKE ALL ON "person_group_role_assignments" FROM PUBLIC;
+GRANT SELECT, INSERT, UPDATE, DELETE ON "person_group_role_assignments" TO beaconhs_app, beaconhs_super;
+GRANT SELECT ON "person_group_role_assignments" TO beaconhs_backup;

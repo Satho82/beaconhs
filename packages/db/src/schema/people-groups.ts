@@ -11,11 +11,12 @@
 // taxonomies.
 
 import { relations } from 'drizzle-orm'
-import { check, foreignKey, index, pgTable, text, uniqueIndex, uuid } from 'drizzle-orm/pg-core'
+import { check, foreignKey, index, jsonb, pgTable, text, uniqueIndex, uuid } from 'drizzle-orm/pg-core'
 import { id, softDelete, timestamps } from './_helpers'
 import { catalogNameIsNonblankSql, normalizedCatalogNameSql } from '../catalog-name'
 import { tenants } from './core'
 import { people } from './org'
+import { roles, type RoleScope } from './iam'
 
 export const personGroups = pgTable(
   'person_groups',
@@ -74,9 +75,30 @@ export const personGroupMemberships = pgTable(
   }),
 )
 
+// Roles assigned here are inherited by every active person in the group.
+// This supports reusable Manager, Staff and custom access policies.
+export const personGroupRoleAssignments = pgTable(
+  'person_group_role_assignments',
+  {
+    id: id(),
+    tenantId: uuid('tenant_id').notNull().references(() => tenants.id, { onDelete: 'cascade' }),
+    groupId: uuid('group_id').notNull(),
+    roleId: uuid('role_id').notNull(),
+    scope: jsonb('scope').$type<RoleScope>().notNull().default({ type: 'tenant' }),
+    ...timestamps,
+  },
+  (t) => ({
+    tenantIdx: index('person_group_role_assignments_tenant_idx').on(t.tenantId),
+    groupRoleUx: uniqueIndex('person_group_role_assignments_group_role_ux').on(t.tenantId, t.groupId, t.roleId),
+    groupFk: foreignKey({ name: 'person_group_role_assignments_group_fk', columns: [t.tenantId, t.groupId], foreignColumns: [personGroups.tenantId, personGroups.id] }).onDelete('cascade'),
+    roleFk: foreignKey({ name: 'person_group_role_assignments_role_fk', columns: [t.tenantId, t.roleId], foreignColumns: [roles.tenantId, roles.id] }).onDelete('cascade'),
+  }),
+)
+
 export const personGroupsRelations = relations(personGroups, ({ one, many }) => ({
   tenant: one(tenants, { fields: [personGroups.tenantId], references: [tenants.id] }),
   memberships: many(personGroupMemberships),
+  roleAssignments: many(personGroupRoleAssignments),
 }))
 
 export const personGroupMembershipsRelations = relations(personGroupMemberships, ({ one }) => ({

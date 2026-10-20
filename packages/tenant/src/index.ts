@@ -1,10 +1,14 @@
-import { eq, sql } from 'drizzle-orm'
+import { and, eq, isNull, sql } from 'drizzle-orm'
 import { type Database, withSuperAdmin, withTenant } from '@beaconhs/db'
 import type { AppLocale } from '@beaconhs/i18n'
 import {
   PERMISSION_CATALOGUE,
   roleAssignments,
   roles,
+  people,
+  personGroupMemberships,
+  personGroupRoleAssignments,
+  tenantUsers,
   userPermissionOverrides,
   type RoleScope,
 } from '@beaconhs/db/schema'
@@ -208,7 +212,7 @@ export async function resolveMembershipAccess(
   appliedRoleId: string | null
   roleKeys: Set<string>
 }> {
-  const assignments = await tx
+  const directAssignments = await tx
     .select({
       roleId: roleAssignments.roleId,
       roleKey: roles.key,
@@ -218,6 +222,20 @@ export async function resolveMembershipAccess(
     .from(roleAssignments)
     .innerJoin(roles, eq(roles.id, roleAssignments.roleId))
     .where(eq(roleAssignments.tenantUserId, membershipId))
+  const groupAssignments = await tx
+    .select({
+      roleId: personGroupRoleAssignments.roleId,
+      roleKey: roles.key,
+      permissions: roles.permissions,
+      scope: personGroupRoleAssignments.scope,
+    })
+    .from(tenantUsers)
+    .innerJoin(people, and(eq(people.tenantId, tenantUsers.tenantId), eq(people.userId, tenantUsers.userId), isNull(people.deletedAt)))
+    .innerJoin(personGroupMemberships, and(eq(personGroupMemberships.tenantId, people.tenantId), eq(personGroupMemberships.personId, people.id)))
+    .innerJoin(personGroupRoleAssignments, and(eq(personGroupRoleAssignments.tenantId, personGroupMemberships.tenantId), eq(personGroupRoleAssignments.groupId, personGroupMemberships.groupId)))
+    .innerJoin(roles, and(eq(roles.tenantId, personGroupRoleAssignments.tenantId), eq(roles.id, personGroupRoleAssignments.roleId)))
+    .where(eq(tenantUsers.id, membershipId))
+  const assignments = [...directAssignments, ...groupAssignments]
   const appliedRoleId =
     activeRoleId && assignments.some((assignment) => assignment.roleId === activeRoleId)
       ? activeRoleId

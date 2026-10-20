@@ -28,6 +28,7 @@ import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 're
 import { Presentation } from 'lucide-react'
 import { cn } from '@beaconhs/ui'
 import { LogoMark } from '@/components/brand-logo'
+import { usePlatformBranding } from '@/components/platform-branding-provider'
 import { useTheme } from '@/components/theme-provider'
 
 export type CollaboraSession =
@@ -77,6 +78,7 @@ export const CollaboraEmbed = forwardRef<
   } | null>(null)
   const fetchSessionRef = useRef(fetchSession)
   const { resolvedTheme } = useTheme()
+  const branding = usePlatformBranding()
 
   // Hosts pass small inline wrappers around server actions. Keep the current
   // wrapper available to retries without treating its render-time identity as
@@ -395,7 +397,7 @@ export const CollaboraEmbed = forwardRef<
           !loaded ? (
             <div className="absolute inset-0 z-10 grid place-items-center bg-white dark:bg-slate-950">
               <div className="flex flex-col items-center gap-3">
-                <LogoMark draw animated className="h-16 w-16" />
+                <LogoMark draw animated className="h-16 w-16" branding={branding} />
                 <span className="text-xs text-slate-500 dark:text-slate-400">
                   <GeneratedValue
                     value={

@@ -22,6 +22,7 @@ import { NavigationProvider } from '@/components/navigation-provider'
 import { RiskMatrixProvider } from '@/components/risk-matrix'
 import { BackNavProviders } from '@/components/smart-back-link'
 import { ThemeProvider } from '@/components/theme-provider'
+import { PlatformBrandingProvider } from '@/components/platform-branding-provider'
 import { ConfirmRoot } from '@/lib/confirm'
 import { WalkthroughProvider } from '@/components/walkthrough/provider.client'
 import { resolveNavGroups } from '@/lib/nav/resolve'
@@ -92,6 +93,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const navGroups = await ctx.db((tx) =>
     resolveNavGroups(ctx, tx, propertyContext.activePropertyId),
   )
+  const effectiveBranding = {
+    ...platformBranding,
+    logoUrl: isTenantBrandAssetKey(ctx.tenantId, tenant.branding.logoUrl, 'logo')
+      ? `/tenant-branding/logo?tenant=${encodeURIComponent(ctx.tenantId)}&v=${createHash('sha256').update(tenant.branding.logoUrl!).digest('hex').slice(0, 16)}`
+      : platformBranding.logoUrl,
+  }
   const themeStyle: TenantThemeStyle = {
     '--tenant-primary-action': resolveTenantPrimaryAction(
       platformBranding.primaryColor,
@@ -130,14 +137,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <ThemeProvider>
       <div style={themeStyle}>
+        <PlatformBrandingProvider branding={effectiveBranding}>
         <NavigationProvider>
           <AppShell
-            platformBranding={{
-              ...platformBranding,
-              logoUrl: isTenantBrandAssetKey(ctx.tenantId, tenant.branding.logoUrl, 'logo')
-                ? `/tenant-branding/logo?tenant=${encodeURIComponent(ctx.tenantId)}&v=${createHash('sha256').update(tenant.branding.logoUrl!).digest('hex').slice(0, 16)}`
-                : platformBranding.logoUrl,
-            }}
+            platformBranding={effectiveBranding}
             ctx={{
               isSuperAdmin: ctx.isSuperAdmin,
               membership: ctx.membership,
@@ -187,6 +190,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
             </Suspense>
           </AppShell>
         </NavigationProvider>
+        </PlatformBrandingProvider>
       </div>
     </ThemeProvider>
   )

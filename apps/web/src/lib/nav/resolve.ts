@@ -224,7 +224,8 @@ function resolveItem(
     if (
       linkedModule.requiredAnyPermission?.length &&
       !linkedModule.requiredAnyPermission.some((permission) => can(ctx, permission))
-    ) return null
+    )
+      return null
   }
   return {
     href: item.href,

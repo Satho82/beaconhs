@@ -11,7 +11,16 @@
 // taxonomies.
 
 import { relations } from 'drizzle-orm'
-import { check, foreignKey, index, jsonb, pgTable, text, uniqueIndex, uuid } from 'drizzle-orm/pg-core'
+import {
+  check,
+  foreignKey,
+  index,
+  jsonb,
+  pgTable,
+  text,
+  uniqueIndex,
+  uuid,
+} from 'drizzle-orm/pg-core'
 import { id, softDelete, timestamps } from './_helpers'
 import { catalogNameIsNonblankSql, normalizedCatalogNameSql } from '../catalog-name'
 import { tenants } from './core'
@@ -81,7 +90,9 @@ export const personGroupRoleAssignments = pgTable(
   'person_group_role_assignments',
   {
     id: id(),
-    tenantId: uuid('tenant_id').notNull().references(() => tenants.id, { onDelete: 'cascade' }),
+    tenantId: uuid('tenant_id')
+      .notNull()
+      .references(() => tenants.id, { onDelete: 'cascade' }),
     groupId: uuid('group_id').notNull(),
     roleId: uuid('role_id').notNull(),
     scope: jsonb('scope').$type<RoleScope>().notNull().default({ type: 'tenant' }),
@@ -89,9 +100,21 @@ export const personGroupRoleAssignments = pgTable(
   },
   (t) => ({
     tenantIdx: index('person_group_role_assignments_tenant_idx').on(t.tenantId),
-    groupRoleUx: uniqueIndex('person_group_role_assignments_group_role_ux').on(t.tenantId, t.groupId, t.roleId),
-    groupFk: foreignKey({ name: 'person_group_role_assignments_group_fk', columns: [t.tenantId, t.groupId], foreignColumns: [personGroups.tenantId, personGroups.id] }).onDelete('cascade'),
-    roleFk: foreignKey({ name: 'person_group_role_assignments_role_fk', columns: [t.tenantId, t.roleId], foreignColumns: [roles.tenantId, roles.id] }).onDelete('cascade'),
+    groupRoleUx: uniqueIndex('person_group_role_assignments_group_role_ux').on(
+      t.tenantId,
+      t.groupId,
+      t.roleId,
+    ),
+    groupFk: foreignKey({
+      name: 'person_group_role_assignments_group_fk',
+      columns: [t.tenantId, t.groupId],
+      foreignColumns: [personGroups.tenantId, personGroups.id],
+    }).onDelete('cascade'),
+    roleFk: foreignKey({
+      name: 'person_group_role_assignments_role_fk',
+      columns: [t.tenantId, t.roleId],
+      foreignColumns: [roles.tenantId, roles.id],
+    }).onDelete('cascade'),
   }),
 )
 

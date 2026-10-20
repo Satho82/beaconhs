@@ -222,7 +222,17 @@ export type LogoProps = SVGProps<SVGSVGElement> & {
   draw?: boolean
 }
 
-export function LogoMark({ animated, draw, className, ...rest }: LogoProps) {
+export function LogoMark({ animated, draw, branding, className, ...rest }: LogoProps) {
+  const customLogo = branding?.logoUrl?.trim()
+  if (customLogo)
+    return (
+      <img
+        src={customLogo}
+        alt={branding?.productName || PRODUCT_NAME}
+        className={cn('h-8 w-auto object-contain', className)}
+      />
+    )
+
   const mode: Mode = draw ? 'draw' : animated ? 'loop' : 'static'
   return (
     <svg

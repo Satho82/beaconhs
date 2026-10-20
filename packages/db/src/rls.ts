@@ -607,6 +607,7 @@ export const TENANT_SCOPED_TABLES = [
   // People — groups / titles assignments
   'person_groups',
   'person_group_memberships',
+  'person_group_role_assignments',
   'person_titles',
   'person_title_assignments',
   // Per-person uploaded files (resumes, certs, ID copies)

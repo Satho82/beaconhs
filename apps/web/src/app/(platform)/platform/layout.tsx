@@ -6,6 +6,7 @@ import { PlatformShell } from '@/components/platform-shell'
 import { ThemeProvider } from '@/components/theme-provider'
 import { NavigationProvider } from '@/components/navigation-provider'
 import { getPlatformBranding } from '@/lib/platform-branding-config'
+import { ConfirmRoot } from '@/lib/confirm'
 
 export const dynamic = 'force-dynamic'
 
@@ -29,6 +30,7 @@ export default async function PlatformLayout({ children }: { children: React.Rea
         >
           <GeneratedValue value={children} />
         </PlatformShell>
+        <ConfirmRoot />
       </NavigationProvider>
     </ThemeProvider>
   )

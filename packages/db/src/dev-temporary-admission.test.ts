@@ -49,7 +49,7 @@ function fixture(phase: AdmissionPhase = 'migration', maintenance = false) {
     databaseOid: 123,
     postgresVersion: '160015',
     migrations: files,
-    schemas: { 58: hash, 63: hash, 65: hash },
+    schemas: { 58: hash, 63: hash, 66: hash },
     backup: {
       file: 'backup.dump.age',
       sha256: hash,

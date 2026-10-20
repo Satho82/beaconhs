@@ -130,7 +130,7 @@ export function PlatformShell({
               </div>
             </details>
           </header>
-          <main className="flex min-h-0 flex-1 flex-col overflow-hidden bg-[rgb(var(--color-canvas))]">
+          <main className="app-scroll flex min-h-0 flex-1 flex-col overflow-y-auto bg-[rgb(var(--color-canvas))]">
             <AppScrollReset />
             <GeneratedValue value={children} />
           </main>

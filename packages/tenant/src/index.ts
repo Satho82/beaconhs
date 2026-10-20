@@ -230,10 +230,35 @@ export async function resolveMembershipAccess(
       scope: personGroupRoleAssignments.scope,
     })
     .from(tenantUsers)
-    .innerJoin(people, and(eq(people.tenantId, tenantUsers.tenantId), eq(people.userId, tenantUsers.userId), isNull(people.deletedAt)))
-    .innerJoin(personGroupMemberships, and(eq(personGroupMemberships.tenantId, people.tenantId), eq(personGroupMemberships.personId, people.id)))
-    .innerJoin(personGroupRoleAssignments, and(eq(personGroupRoleAssignments.tenantId, personGroupMemberships.tenantId), eq(personGroupRoleAssignments.groupId, personGroupMemberships.groupId)))
-    .innerJoin(roles, and(eq(roles.tenantId, personGroupRoleAssignments.tenantId), eq(roles.id, personGroupRoleAssignments.roleId)))
+    .innerJoin(
+      people,
+      and(
+        eq(people.tenantId, tenantUsers.tenantId),
+        eq(people.userId, tenantUsers.userId),
+        isNull(people.deletedAt),
+      ),
+    )
+    .innerJoin(
+      personGroupMemberships,
+      and(
+        eq(personGroupMemberships.tenantId, people.tenantId),
+        eq(personGroupMemberships.personId, people.id),
+      ),
+    )
+    .innerJoin(
+      personGroupRoleAssignments,
+      and(
+        eq(personGroupRoleAssignments.tenantId, personGroupMemberships.tenantId),
+        eq(personGroupRoleAssignments.groupId, personGroupMemberships.groupId),
+      ),
+    )
+    .innerJoin(
+      roles,
+      and(
+        eq(roles.tenantId, personGroupRoleAssignments.tenantId),
+        eq(roles.id, personGroupRoleAssignments.roleId),
+      ),
+    )
     .where(eq(tenantUsers.id, membershipId))
   const assignments = [...directAssignments, ...groupAssignments]
   const appliedRoleId =

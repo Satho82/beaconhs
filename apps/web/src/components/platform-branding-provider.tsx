@@ -12,7 +12,9 @@ export function PlatformBrandingProvider({
   branding: PlatformBranding
   children: React.ReactNode
 }) {
-  return <PlatformBrandingContext.Provider value={branding}>{children}</PlatformBrandingContext.Provider>
+  return (
+    <PlatformBrandingContext.Provider value={branding}>{children}</PlatformBrandingContext.Provider>
+  )
 }
 
 export function usePlatformBranding(): PlatformBranding | undefined {

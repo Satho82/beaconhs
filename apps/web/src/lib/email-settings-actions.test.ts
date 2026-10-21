@@ -18,7 +18,9 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }))
 vi.mock('@/lib/auth', () => ({ requireRequestContext: mocks.auth }))
-vi.mock('@beaconhs/auth/platform-branding', () => ({ getPlatformBranding: mocks.getPlatformBranding }))
+vi.mock('@beaconhs/auth/platform-branding', () => ({
+  getPlatformBranding: mocks.getPlatformBranding,
+}))
 vi.mock('@/lib/audit', () => ({ recordAudit: mocks.audit }))
 vi.mock('@beaconhs/jobs/rate-limit', () => ({ consumeRateLimit: mocks.consumeRateLimit }))
 vi.mock('@beaconhs/sync/egress', () => ({ resolvePublicHost: mocks.resolvePublicHost }))

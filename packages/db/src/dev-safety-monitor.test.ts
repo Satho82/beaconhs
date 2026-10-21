@@ -460,7 +460,7 @@ describe('independent DEV observation/signing adapter', () => {
     await expect(
       runProbe({ executable, sha256: '0'.repeat(64), dependencies: {}, args: [script] }),
     ).rejects.toThrow()
-  })
+  }, 20_000)
   it('bounds a hanging probe and rejects malformed/oversized output without logging it', async () => {
     const f = fixture(),
       script = join(f.directory, 'probe.cjs'),

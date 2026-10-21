@@ -10,20 +10,25 @@ export const dynamic = 'force-dynamic'
 /** Super-admin-only operational audit trail. Technical exception ingestion is separate. */
 export default async function PlatformActivityPage() {
   await requirePlatformOperator()
-  const [events, errors] = await Promise.all([withSuperAdmin(db, (tx) =>
-    tx
-      .select({
-        id: platformAuditLog.id,
-        action: platformAuditLog.action,
-        summary: platformAuditLog.summary,
-        occurredAt: platformAuditLog.occurredAt,
-        actor: users.email,
-      })
-      .from(platformAuditLog)
-      .leftJoin(users, eq(users.id, platformAuditLog.actorUserId))
-      .orderBy(desc(platformAuditLog.occurredAt))
-      .limit(250),
-  ), withSuperAdmin(db, (tx) => tx.select().from(platformErrorLog).orderBy(desc(platformErrorLog.occurredAt)).limit(100))])
+  const [events, errors] = await Promise.all([
+    withSuperAdmin(db, (tx) =>
+      tx
+        .select({
+          id: platformAuditLog.id,
+          action: platformAuditLog.action,
+          summary: platformAuditLog.summary,
+          occurredAt: platformAuditLog.occurredAt,
+          actor: users.email,
+        })
+        .from(platformAuditLog)
+        .leftJoin(users, eq(users.id, platformAuditLog.actorUserId))
+        .orderBy(desc(platformAuditLog.occurredAt))
+        .limit(250),
+    ),
+    withSuperAdmin(db, (tx) =>
+      tx.select().from(platformErrorLog).orderBy(desc(platformErrorLog.occurredAt)).limit(100),
+    ),
+  ])
 
   return (
     <PageContainer>
@@ -35,7 +40,20 @@ export default async function PlatformActivityPage() {
         />
         <section className="rounded-xl border border-red-200 bg-red-50 p-5 dark:bg-red-950/20">
           <h2 className="font-semibold">Platform errors</h2>
-          {errors.length ? <ul className="mt-3 space-y-3 text-sm">{errors.map((error) => <li key={error.id}><p className="font-medium">{error.message}</p><p className="text-slate-600">{error.path || error.source} · {error.occurredAt.toLocaleString()}</p></li>)}</ul> : <p className="mt-2 text-sm text-slate-600">No captured server errors.</p>}
+          {errors.length ? (
+            <ul className="mt-3 space-y-3 text-sm">
+              {errors.map((error) => (
+                <li key={error.id}>
+                  <p className="font-medium">{error.message}</p>
+                  <p className="text-slate-600">
+                    {error.path || error.source} · {error.occurredAt.toLocaleString()}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="mt-2 text-sm text-slate-600">No captured server errors.</p>
+          )}
         </section>
         {events.length ? (
           <div className="overflow-hidden rounded-xl border bg-white dark:bg-slate-900">
@@ -51,7 +69,10 @@ export default async function PlatformActivityPage() {
             </ul>
           </div>
         ) : (
-          <EmptyState title="No platform activity yet" description="Actions will appear here as they are recorded." />
+          <EmptyState
+            title="No platform activity yet"
+            description="Actions will appear here as they are recorded."
+          />
         )}
       </div>
     </PageContainer>

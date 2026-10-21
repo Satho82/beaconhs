@@ -7,7 +7,10 @@ export async function register() {
   if (process.env.NEXT_RUNTIME === 'edge') await import('./sentry.edge.config')
 }
 
-export async function onRequestError(error: unknown, request: Parameters<typeof Sentry.captureRequestError>[1]) {
+export async function onRequestError(
+  error: unknown,
+  request: Parameters<typeof Sentry.captureRequestError>[1],
+) {
   Sentry.captureRequestError(error, request)
   await recordPlatformError(error, request)
 }

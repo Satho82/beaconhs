@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Alert, AlertDescription } from '@beaconhs/ui'
 import { Logo } from '@/components/brand-logo'
 import { ResetPasswordForm } from './reset-password-form'
+import { getPlatformBranding } from '@/lib/platform-branding-config'
 
 export async function generateMetadata() {
   const tGenerated = await getGeneratedTranslations()
@@ -23,12 +24,13 @@ export default async function ResetPasswordPage({
   const token = typeof sp.token === 'string' ? sp.token : ''
   const errorParam = typeof sp.error === 'string' ? sp.error : ''
   const invalid = !token || Boolean(errorParam)
+  const branding = await getPlatformBranding()
 
   return (
     <main className="grid min-h-screen place-items-center px-4">
       <div className="w-full max-w-sm space-y-6">
         <div className="text-center">
-          <Logo animated className="mx-auto h-11 w-auto" />
+          <Logo animated className="mx-auto h-11 w-auto" branding={branding} />
           <h1 className="mt-5 text-xl font-semibold">
             <GeneratedText id="m_0480d1e9c8fd55" />
           </h1>

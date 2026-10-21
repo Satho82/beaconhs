@@ -103,7 +103,7 @@ describe('read-only prepared DEV adoption gate', () => {
 it('rejects a real later migration row instead of widening the exact-61 ledger gate', async () => {
   const actual = await vi.importActual<typeof import('./migration-state')>('./migration-state')
   const current = actual.readMigrationFiles(fileURLToPath(new URL('../drizzle', import.meta.url)))
-  expect(current).toHaveLength(66)
+  expect(current).toHaveLength(67)
   await expect(
     verifyPreparedRisk(
       fixture({

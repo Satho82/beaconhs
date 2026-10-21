@@ -13,10 +13,14 @@ const mocks = vi.hoisted(() => ({
   savePlatform: vi.fn(),
   saveTenant: vi.fn(),
   sendVia: vi.fn(),
+  getPlatformBranding: vi.fn(),
 }))
 
 vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }))
 vi.mock('@/lib/auth', () => ({ requireRequestContext: mocks.auth }))
+vi.mock('@beaconhs/auth/platform-branding', () => ({
+  getPlatformBranding: mocks.getPlatformBranding,
+}))
 vi.mock('@/lib/audit', () => ({ recordAudit: mocks.audit }))
 vi.mock('@beaconhs/jobs/rate-limit', () => ({ consumeRateLimit: mocks.consumeRateLimit }))
 vi.mock('@beaconhs/sync/egress', () => ({ resolvePublicHost: mocks.resolvePublicHost }))
@@ -110,6 +114,7 @@ beforeEach(() => {
   mocks.savePlatform.mockResolvedValue(unchanged)
   mocks.saveTenant.mockResolvedValue(unchanged)
   mocks.sendVia.mockResolvedValue({ id: 'message-1' })
+  mocks.getPlatformBranding.mockResolvedValue({ productName: 'Uvanoo' })
 })
 
 describe('email settings audit metadata', () => {
@@ -225,6 +230,19 @@ describe('testEmailConnection', () => {
     expect(auditJson).toContain('sendgrid')
     expect(auditJson).not.toContain('operator@example.com')
     expect(auditJson).not.toContain('SG.must-never-be-audited')
+  })
+
+  it('uses the configured platform name in the test email', async () => {
+    await testEmailConnection({ scope: 'platform', to: 'operator@example.com' })
+
+    expect(mocks.sendVia).toHaveBeenCalledWith(
+      transport,
+      expect.objectContaining({
+        subject: 'Uvanoo test email',
+        text: expect.stringContaining('Uvanoo'),
+        html: expect.stringContaining('Uvanoo'),
+      }),
+    )
   })
 
   it('audits and rejects a request after the Redis limit is exhausted', async () => {

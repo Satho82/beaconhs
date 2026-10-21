@@ -16,15 +16,53 @@ import {
   type RawEmailConfig,
 } from '@beaconhs/emails'
 
-async function readPlatformEmail(): Promise<PlatformEmailConfig | null> {
+type PlatformEmailAndBrand = {
+  email: PlatformEmailConfig | null
+  productName: string | null
+}
+
+const DEFAULT_PLATFORM_NAME = 'BeaconHS'
+
+function platformProductName(branding: unknown): string | null {
+  if (!branding || typeof branding !== 'object') return null
+  const productName = (branding as Record<string, unknown>).productName
+  if (typeof productName !== 'string') return null
+  const normalized = productName
+    .replace(/[\r\n<>\"]/g, '')
+    .trim()
+    .slice(0, 128)
+  return normalized || null
+}
+
+function withPlatformSenderName(
+  delivery: EffectiveEmail,
+  productName: string | null,
+): EffectiveEmail {
+  if (delivery.kind !== 'transport') return delivery
+  const from = delivery.transport.from.trim()
+  const match = /<([^<>]+)>$/.exec(from)
+  const address = (match?.[1] ?? from).trim()
+  if (!address || /[\r\n<>]/.test(address)) return delivery
+  const name = productName ?? DEFAULT_PLATFORM_NAME
+  return {
+    ...delivery,
+    transport: { ...delivery.transport, from: `${name} <${address}>` },
+  }
+}
+
+async function readPlatformEmail(): Promise<PlatformEmailAndBrand | null> {
   return withSuperAdmin(db, async (tx) => {
     const [row] = await tx
-      .select({ email: platformSettings.email })
+      .select({ email: platformSettings.email, branding: platformSettings.branding })
       .from(platformSettings)
       .where(eq(platformSettings.id, PLATFORM_SETTINGS_ID))
       .limit(1)
-    const raw = row?.email
-    return raw && typeof raw === 'object' ? (raw as PlatformEmailConfig) : null
+    if (!row) return null
+    const raw = row.email
+    return {
+      email: raw && typeof raw === 'object' ? (raw as PlatformEmailConfig) : null,
+      productName: platformProductName(row.branding),
+    }
   })
 }
 
@@ -44,7 +82,10 @@ async function readTenantEmail(tenantId: string): Promise<RawEmailConfig | null>
 export async function resolveEmailDelivery(tenantId: string | null): Promise<EffectiveEmail> {
   const platform = await readPlatformEmail()
   const tenant = tenantId ? await readTenantEmail(tenantId) : null
-  return resolveEffectiveTransport(platform, tenant, { tenantScoped: Boolean(tenantId) })
+  const delivery = resolveEffectiveTransport(platform?.email ?? null, tenant, {
+    tenantScoped: Boolean(tenantId),
+  })
+  return withPlatformSenderName(delivery, platform?.productName ?? null)
 }
 
 /** Production sends must resolve through the database-managed provider system. */

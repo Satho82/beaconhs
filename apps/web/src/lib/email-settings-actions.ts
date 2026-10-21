@@ -16,6 +16,7 @@ import { consumeRateLimit } from '@beaconhs/jobs/rate-limit'
 import { PLATFORM_SETTINGS_ID } from '@beaconhs/db/schema'
 import { resolvePublicHost } from '@beaconhs/sync/egress'
 import { requireRequestContext } from '@/lib/auth'
+import { getPlatformBranding } from '@beaconhs/auth/platform-branding'
 import { recordAudit } from '@/lib/audit'
 import {
   clearTenantEmailKey,
@@ -127,6 +128,18 @@ type EmailTestOutcome =
 
 const TEST_EMAIL_LIMIT = 5
 const TEST_EMAIL_WINDOW_SECONDS = 10 * 60
+const DEFAULT_PLATFORM_NAME = 'BeaconHS'
+
+async function getEmailBrandName(): Promise<string> {
+  try {
+    return (await getPlatformBranding()).productName?.trim() || DEFAULT_PLATFORM_NAME
+  } catch (error) {
+    console.error('[email-settings] platform branding could not be resolved for test email', {
+      errorName: error instanceof Error ? error.name : 'UnknownError',
+    })
+    return DEFAULT_PLATFORM_NAME
+  }
+}
 
 async function auditEmailTest(
   ctx: RequestContext,
@@ -276,11 +289,12 @@ export async function testEmailConnection(input: {
   }
 
   try {
+    const platformName = await getEmailBrandName()
     await sendVia(transport, {
       to,
-      subject: 'BeaconHS test email',
-      text: `This is a test email from BeaconHS, sent via ${transport.provider}. If you received it, your email provider is configured correctly.`,
-      html: `<p>This is a test email from <strong>BeaconHS</strong>, sent via <strong>${transport.provider}</strong>.</p><p>If you received it, your email provider is configured correctly.</p>`,
+      subject: `${platformName} test email`,
+      text: `This is a test email from ${platformName}, sent via ${transport.provider}. If you received it, your email provider is configured correctly.`,
+      html: `<p>This is a test email from <strong>${platformName}</strong>, sent via <strong>${transport.provider}</strong>.</p><p>If you received it, your email provider is configured correctly.</p>`,
     })
     await auditEmailTest(ctx, input.scope, 'succeeded', transport.provider)
     return { ok: true, message: `Test email sent to ${to} via ${transport.provider}.` }

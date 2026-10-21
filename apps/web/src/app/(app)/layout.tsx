@@ -1,6 +1,5 @@
 import { GeneratedValue } from '@/i18n/generated'
 import { Fragment } from 'react'
-import { createHash } from 'node:crypto'
 import type { CSSProperties } from 'react'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
@@ -31,7 +30,6 @@ import { RegulatoryTerminologyProvider } from '@/components/regulatory-terminolo
 import { getPlatformBranding } from '@/lib/platform-branding-config'
 import { resolveHospitalityPropertyContext } from '@/lib/hospitality/property-context'
 import { resolveTenantPrimaryAction } from '@/lib/theme-governance'
-import { isTenantBrandAssetKey } from '@/lib/tenant-brand-asset-url'
 
 type TenantThemeStyle = CSSProperties & Record<'--tenant-primary-action', string>
 
@@ -93,12 +91,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const navGroups = await ctx.db((tx) =>
     resolveNavGroups(ctx, tx, propertyContext.activePropertyId),
   )
-  const effectiveBranding = {
-    ...platformBranding,
-    logoUrl: isTenantBrandAssetKey(ctx.tenantId, tenant.branding.logoUrl, 'logo')
-      ? `/tenant-branding/logo?tenant=${encodeURIComponent(ctx.tenantId)}&v=${createHash('sha256').update(tenant.branding.logoUrl!).digest('hex').slice(0, 16)}`
-      : platformBranding.logoUrl,
-  }
+  // Global navigation, loaders and account chrome always use the platform
+  // identity. Tenant branding is reserved for tenant-owned PWF/PDF/report
+  // output and must never replace the platform logo in the application shell.
+  const effectiveBranding = platformBranding
   const themeStyle: TenantThemeStyle = {
     '--tenant-primary-action': resolveTenantPrimaryAction(
       platformBranding.primaryColor,

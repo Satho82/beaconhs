@@ -36,17 +36,19 @@ beforeEach(() => {
     }),
   }))
   mocks.withSuperAdmin.mockImplementation(async (_db, callback) => callback(tx))
-  mocks.resolveEffectiveTransport.mockImplementation((platform: { mode?: string; provider?: string; fromEmail?: string } | null) => {
-    if (platform?.mode === 'disabled') return { kind: 'suppressed' }
-    if (platform?.provider === 'sendgrid' && platform.fromEmail) {
-      return {
-        kind: 'transport',
-        source: 'platform',
-        transport: { provider: 'sendgrid', apiKey: 'test', from: platform.fromEmail },
+  mocks.resolveEffectiveTransport.mockImplementation(
+    (platform: { mode?: string; provider?: string; fromEmail?: string } | null) => {
+      if (platform?.mode === 'disabled') return { kind: 'suppressed' }
+      if (platform?.provider === 'sendgrid' && platform.fromEmail) {
+        return {
+          kind: 'transport',
+          source: 'platform',
+          transport: { provider: 'sendgrid', apiKey: 'test', from: platform.fromEmail },
+        }
       }
-    }
-    return { kind: 'unconfigured' }
-  })
+      return { kind: 'unconfigured' }
+    },
+  )
 })
 
 import { requireEmailTransport, resolveEmailDelivery } from './resolve-email-transport'
@@ -76,7 +78,15 @@ describe('requireEmailTransport', () => {
   })
 
   it('uses the platform product name as the sender name for every delivery', async () => {
-    mocks.rows.push({ email: { provider: 'sendgrid', enabled: true, fromName: 'Legacy name', fromEmail: 'alerts@example.test' }, branding: { productName: 'Uvanoo' } })
+    mocks.rows.push({
+      email: {
+        provider: 'sendgrid',
+        enabled: true,
+        fromName: 'Legacy name',
+        fromEmail: 'alerts@example.test',
+      },
+      branding: { productName: 'Uvanoo' },
+    })
 
     await expect(resolveEmailDelivery(null)).resolves.toMatchObject({
       kind: 'transport',

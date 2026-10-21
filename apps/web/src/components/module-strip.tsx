@@ -75,7 +75,7 @@ export function ModuleStrip({ groups }: { groups: SidebarNavGroup[] }) {
               href={item.href as never}
               aria-current={active ? 'true' : undefined}
               style={{ backgroundColor: presentation.colour }}
-              className="aria-current:shadow-[inset_0_-4px_0_#ffffff] flex min-h-16 min-w-20 flex-1 flex-col items-center justify-center gap-1 rounded px-2 py-2 text-center text-[11px] font-semibold text-white shadow-[inset_0_0_0_1px_#ffffff44] hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+              className="flex min-h-16 min-w-20 flex-1 flex-col items-center justify-center gap-1 rounded px-2 py-2 text-center text-[11px] font-semibold text-white shadow-[inset_0_0_0_1px_#ffffff44] hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 aria-current:shadow-[inset_0_-4px_0_#ffffff]"
             >
               <Icon size={23} aria-hidden />
               <span className="whitespace-nowrap">

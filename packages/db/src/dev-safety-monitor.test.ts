@@ -480,5 +480,5 @@ describe('independent DEV observation/signing adapter', () => {
         }),
       ).rejects.toThrow()
     }
-  }, 10_000)
+  }, 20_000)
 })

@@ -47,7 +47,10 @@ export default async function PlatformActivityPage() {
             </ul>
           </div>
         ) : (
-          <EmptyState title="No platform activity yet" description="Actions will appear here as they are recorded." />
+          <EmptyState
+            title="No platform activity yet"
+            description="Actions will appear here as they are recorded."
+          />
         )}
       </div>
     </PageContainer>

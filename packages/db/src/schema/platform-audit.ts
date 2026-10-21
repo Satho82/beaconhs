@@ -19,3 +19,17 @@ export const platformAuditLog = pgTable(
   },
   (table) => [index('platform_audit_log_occurred_idx').on(table.occurredAt)],
 )
+
+/** Sanitised server-side failures, visible only in Platform Admin. */
+export const platformErrorLog = pgTable(
+  'platform_error_log',
+  {
+    id: id(),
+    source: text('source').notNull(),
+    message: text('message').notNull(),
+    digest: text('digest'),
+    path: text('path'),
+    occurredAt: timestamp('occurred_at', { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [index('platform_error_log_occurred_idx').on(table.occurredAt)],
+)

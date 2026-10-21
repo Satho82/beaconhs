@@ -105,6 +105,12 @@ export const PLATFORM_NAV_GROUPS: SidebarNavGroup[] = [
         ],
       },
       {
+        href: '/platform/activity',
+        label: 'Platform Activity',
+        iconKey: 'activity',
+        exact: true,
+      },
+      {
         href: '/platform/email',
         label: 'Email & Communications',
         iconKey: 'mail',

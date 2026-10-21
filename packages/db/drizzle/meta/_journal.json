@@ -463,13 +463,6 @@
       "when": 1792503317710,
       "tag": "0066_person_group_role_assignments",
       "breakpoints": true
-    },
-    {
-      "idx": 66,
-      "version": "7",
-      "when": 1792589700000,
-      "tag": "0067_platform_error_log",
-      "breakpoints": true
     }
   ]
 }

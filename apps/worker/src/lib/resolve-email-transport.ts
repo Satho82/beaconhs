@@ -27,11 +27,17 @@ function platformProductName(branding: unknown): string | null {
   if (!branding || typeof branding !== 'object') return null
   const productName = (branding as Record<string, unknown>).productName
   if (typeof productName !== 'string') return null
-  const normalized = productName.replace(/[\r\n<>\"]/g, '').trim().slice(0, 128)
+  const normalized = productName
+    .replace(/[\r\n<>\"]/g, '')
+    .trim()
+    .slice(0, 128)
   return normalized || null
 }
 
-function withPlatformSenderName(delivery: EffectiveEmail, productName: string | null): EffectiveEmail {
+function withPlatformSenderName(
+  delivery: EffectiveEmail,
+  productName: string | null,
+): EffectiveEmail {
   if (delivery.kind !== 'transport') return delivery
   const from = delivery.transport.from.trim()
   const match = /<([^<>]+)>$/.exec(from)

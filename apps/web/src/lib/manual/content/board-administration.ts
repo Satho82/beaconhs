@@ -8,7 +8,7 @@ export const BOARD_ADMINISTRATION_ARTICLES: ManualArticle[] = [
     requiredPermission: 'admin.settings.manage',
     summary: 'Manage the selected tenant identity, regional settings and branding.',
     keywords: ['tenant', 'branding', 'settings', 'notifications', 'integrations'],
-    body: `Open [Tenant Settings](/admin/settings) in the expandable application menu. The selected tenant is named on the page; changes apply only to that tenant.
+    body: `Tenant administration is no longer shown in the workspace menu. Super admins use [Platform administration](/platform) for master platform settings and branding. Existing tenant-specific administration links continue to enforce their own permissions when opened directly. The selected tenant is named on the page; changes apply only to that tenant.
 
 ## General
 Set tenant name, locale, timezone, currency, date and number formats and languages. The tenant slug is a permanent identifier and is read-only. Expand **Regulatory terminology** for the additional terminology fields. Edit a value to enable **Save** and **Discard**. Discard restores the saved form. If saving fails, check the displayed message and keep your edits until you can save successfully.

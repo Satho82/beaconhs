@@ -64,7 +64,7 @@ The light left menu lists everything you can use. **Search menu** finds permitte
 - **Diary & Tasks** — your [Workspace](/my), tasks, journals and pinned operational forms. Property Diary and Manager Sign-off appear only for the selected property when entitled.
 - **Maintenance**, **Compliance**, **Risk**, **Inspections**, **Incidents**, **Action Plans**, **Training**, **People**, **Handover**, **Assets & Reminders**, and **Metering** are separate expandable modules. Documents sit under Compliance; authorised Toolbox Talk pins sit under Training.
 - **Reports** — the reports hub, permitted report tools and Insights. Reports is not merged with the separately documented Reporting module.
-- **Tenant Settings** — properties, users, general settings, branding, modules, integrations, templates, import/export and permitted administration tools.
+- **Platform Admin** — super admins manage master branding, tenants and platform-wide configuration in its separate navy navigation. Tenant administration is not shown in the workspace menu.
 
 There is one navigation tree, not a second set of legacy category headings. Saved links and pinned forms retain their destinations and access rules under the relevant module. Daily Hotel, Reporting and Approvals remain documented separately but are not shown as dead links when unavailable. Approvals is not Manager Sign-off.
 

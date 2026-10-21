@@ -20,14 +20,9 @@ describe('withMissingModules', () => {
     expect(moduleKeysOf(withMissingModules(config))).not.toContain('hazid')
   })
 
-  it('registers Tenant Settings as the existing permission-gated route', () => {
-    expect(NAV_MODULES).toContainEqual(
-      expect.objectContaining({
-        key: 'tenant-settings',
-        href: '/admin/settings',
-        requiredPermission: 'admin.settings.manage',
-      }),
-    )
+  it('keeps tenant administration out of the workspace module registry', () => {
+    expect(NAV_MODULES.map((module) => module.key)).not.toContain('admin')
+    expect(NAV_MODULES.map((module) => module.key)).not.toContain('tenant-settings')
   })
 
   it('keeps a deliberately deleted module deleted when the config is stamped', () => {

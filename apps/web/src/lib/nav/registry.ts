@@ -267,34 +267,10 @@ export const NAV_MODULES: NavModule[] = [
   },
 
   // Administration
-  // Library & catalogues and Navigation are intentionally NOT sidebar modules —
-  // they're surfaced as tiles on the /admin landing page to keep the sidebar lean.
-  {
-    key: 'admin',
-    href: '/admin',
-    label: 'Admin',
-    iconKey: 'settings',
-    requiredAnyPermission: [
-      'admin.users.manage',
-      'admin.roles.manage',
-      'admin.org.manage',
-      'admin.api-keys.manage',
-      'admin.settings.manage',
-      'admin.audit.read',
-      'admin.nav.manage',
-      'admin.integrations.manage',
-      'admin.data.export',
-    ],
-    group: 'Administration',
-  },
-  {
-    key: 'tenant-settings',
-    href: '/admin/settings',
-    label: 'Tenant Settings',
-    iconKey: 'settings',
-    requiredPermission: 'admin.settings.manage',
-    group: 'Administration',
-  },
+  // Tenant administration is deliberately not a workspace menu module. Platform
+  // administration, including master branding, lives under /platform and is
+  // protected by the super-admin gate. Existing tenant routes retain their
+  // own authorization for bookmarked operational links.
   // Forms = the template library + designer; a build/admin task, so it lives in
   // Administration. Crews don't need the library — they fill forms via
   // assignments, the module pages (inspections/JSHA/…), and pinned forms.

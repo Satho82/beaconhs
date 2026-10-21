@@ -9,8 +9,8 @@ const source = (href: string): SidebarNavGroup[] => [{ label: 'Existing', items:
 const flatten = (groups: SidebarNavGroup[]) =>
   groups.flatMap((g) => g.items.flatMap((i) => [i, ...(i.children ?? [])]))
 describe('approved navigation boundaries', () => {
-  it('retains all 17 groups plus Approvals in the documented order', () => {
-    expect(APPROVED_APPLICATION_GROUPS).toHaveLength(18)
+  it('retains the documented workspace groups without tenant administration', () => {
+    expect(APPROVED_APPLICATION_GROUPS).toHaveLength(17)
     expect(APPROVED_APPLICATION_GROUPS).toContain('Approvals')
     expect(APPROVED_APPLICATION_GROUPS).toContain('Reporting')
     expect(APPROVED_APPLICATION_GROUPS).toContain('Reports')
@@ -43,14 +43,16 @@ describe('approved navigation boundaries', () => {
       ),
     ).toBe(true)
   })
-  it('distinguishes module access from menu preferences and checks child permissions', () => {
+  it('does not restore retired tenant administration links from saved preferences', () => {
     const groups = source('/admin/settings')
     const result = flatten(
       approvedNavigation(groups, (p) => p === 'admin.settings.manage', new Set()),
     )
-    expect(result.find((i) => i.label === 'Modules')?.href).toBe('/admin/settings/modules')
-    expect(result.find((i) => i.label === 'Integrations')).toBeUndefined()
-    expect(result.find((i) => i.label === 'Advanced')?.href).toBe('/admin/settings/advanced')
+    expect(result).toEqual([])
+  })
+  it('does not expose the retired action-plan settings destination', () => {
+    const result = flatten(approvedNavigation(source('/corrective-actions'), () => true, new Set()))
+    expect(result.some((item) => item.href === '/corrective-actions/manage')).toBe(false)
   })
   it('uses only the resolved property and requires both sign-off entitlements', () => {
     const groups = source('/hospitality/properties')

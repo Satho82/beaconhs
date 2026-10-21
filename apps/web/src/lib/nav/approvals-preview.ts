@@ -20,7 +20,6 @@ const icons: Record<string, string> = {
   Metering: 'gauge',
   Reporting: 'file',
   Approvals: 'check',
-  'Tenant Settings': 'settings',
 }
 export const APPROVALS_PREVIEW_NAV: SidebarNavGroup[] = [
   {

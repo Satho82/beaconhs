@@ -20,7 +20,6 @@ export const APPROVED_APPLICATION_GROUPS = [
   'Reporting',
   'Reports',
   'Approvals',
-  'Tenant Settings',
 ] as const
 
 type ApprovedDestination = {
@@ -358,15 +357,6 @@ const APPROVED_DESTINATIONS: readonly ApprovedDestination[] = [
     anyPermissions: ['ca.read.self', 'ca.read.all', 'ca.read.site'],
   },
   {
-    id: 'A083',
-    group: 'Action Plans',
-    label: 'Settings',
-    href: '/corrective-actions/manage',
-    source: '/corrective-actions',
-    permission: 'ca.update',
-    entitlement: null,
-  },
-  {
     id: 'A085',
     group: 'Training',
     label: 'Training Matrix',
@@ -583,114 +573,6 @@ const APPROVED_DESTINATIONS: readonly ApprovedDestination[] = [
     permission: 'reports.schedule',
     entitlement: null,
   },
-  {
-    id: 'A152',
-    group: 'Tenant Settings',
-    label: 'General',
-    href: '/admin/settings',
-    source: '/admin/settings',
-    permission: 'admin.settings.manage',
-    entitlement: null,
-  },
-  {
-    id: 'A153',
-    group: 'Tenant Settings',
-    label: 'Properties',
-    href: '/hospitality/properties',
-    source: '/hospitality/properties',
-    permission: 'hospitality.read',
-    entitlement: 'hospitality.properties',
-  },
-  {
-    id: 'A156',
-    group: 'Tenant Settings',
-    label: 'Users & Access',
-    href: '/admin/users',
-    source: '/admin',
-    permission: 'admin.users.manage',
-    entitlement: null,
-  },
-  {
-    id: 'A157',
-    group: 'Tenant Settings',
-    label: 'Modules',
-    href: '/admin/settings/modules',
-    source: '/admin/settings',
-    permission: 'admin.settings.manage',
-    entitlement: null,
-  },
-  {
-    id: 'A158',
-    group: 'Tenant Settings',
-    label: 'Notifications',
-    href: '/admin/notifications',
-    source: '/admin/settings',
-    permission: 'admin.settings.manage',
-    entitlement: null,
-  },
-  {
-    id: 'A159',
-    group: 'Tenant Settings',
-    label: 'Integrations',
-    href: '/admin/integrations',
-    source: '/admin',
-    permission: 'admin.integrations.manage',
-    entitlement: null,
-  },
-  {
-    id: 'A160',
-    group: 'Tenant Settings',
-    label: 'Import / Export',
-    href: '/admin/settings/import-export',
-    source: '/admin/settings',
-    permission: 'admin.settings.manage',
-    entitlement: null,
-  },
-  {
-    id: 'A161',
-    group: 'Tenant Settings',
-    label: 'Tenant Branding',
-    href: '/admin/settings/branding',
-    source: '/admin/settings',
-    permission: 'admin.settings.manage',
-    entitlement: null,
-  },
-  {
-    id: 'A162',
-    group: 'Tenant Settings',
-    label: 'Data Management',
-    href: '/admin/export',
-    source: '/admin',
-    permission: 'admin.data.export',
-    entitlement: null,
-  },
-  {
-    id: 'A163',
-    group: 'Tenant Settings',
-    label: 'Templates',
-    href: '/apps',
-    source: '/apps',
-    permission: 'forms.template.read',
-    entitlement: null,
-  },
-  {
-    id: 'A164',
-    group: 'Tenant Settings',
-    label: 'Audit Log',
-    href: '/admin/audit',
-    source: '/admin',
-    permission: 'admin.audit.read',
-    entitlement: null,
-  },
-  {
-    id: 'A165',
-    group: 'Tenant Settings',
-    label: 'Advanced',
-    href: '/admin/settings/advanced',
-    source: '/admin/settings',
-    permission: 'admin.settings.manage',
-    entitlement: null,
-  },
 ]
 
 const PRESENTATION: Record<string, { iconKey: string; colour: SidebarNavItem['colour'] }> = {
@@ -762,10 +644,6 @@ const PRESENTATION: Record<string, { iconKey: string; colour: SidebarNavItem['co
     iconKey: 'check',
     colour: 'rose',
   },
-  'Tenant Settings': {
-    iconKey: 'settings',
-    colour: 'blue',
-  },
 }
 
 /** Ownership of already-authorized destinations which predate the approved hierarchy.
@@ -776,14 +654,13 @@ function destinationParent(item: SidebarNavItem): (typeof APPROVED_APPLICATION_G
   if (item.approvedParent) return item.approvedParent
   const path = item.href.split(/[?#]/, 1)[0]!
   const owners: readonly [string, (typeof APPROVED_APPLICATION_GROUPS)[number]][] = [
-    ['/hospitality/properties', 'Tenant Settings'],
+    ['/hospitality/properties', 'Diary & Tasks'],
     ['/hospitality/maintenance', 'Maintenance'],
     ['/hospitality/risk', 'Risk'],
     ['/hospitality/handover', 'Handover'],
     ['/hospitality/metering', 'Metering'],
     ['/apps/templates', 'Diary & Tasks'],
-    ['/apps', 'Tenant Settings'],
-    ['/admin', 'Tenant Settings'],
+    ['/apps', 'Diary & Tasks'],
     ['/my', 'Diary & Tasks'],
     ['/journals', 'Diary & Tasks'],
     ['/inspections', 'Inspections'],
@@ -818,6 +695,10 @@ export function approvedNavigation(
       path === '/my/hazard-assessments' ||
       path.startsWith('/my/hazard-assessments/')
     )
+  }
+  const isRetiredTenantAdministrationHref = (href: string) => {
+    const path = href.split(/[?#]/, 1)[0]!
+    return path === '/admin' || path.startsWith('/admin/')
   }
   const visible = new Map(groups.flatMap((group) => group.items).map((item) => [item.href, item]))
   const childrenByGroup = new Map<string, SidebarNavItem[]>()
@@ -864,7 +745,7 @@ export function approvedNavigation(
     childrenByGroup.set(group, children)
   }
   // Normalize the *same filtered input* into one tree. Never append the old
-  // category groups: that produced a second navigation below Tenant Settings.
+  // category groups: that produced a second legacy navigation tree.
   // Keep existing hubs, saved custom links and authorized pinned forms without
   // manufacturing routes or re-running a less restrictive permission fallback.
   const represented = new Set(
@@ -873,7 +754,7 @@ export function approvedNavigation(
   for (const item of visible.values()) {
     // Old saved tenant links are retired with the module; do not surface them
     // as custom links after the built-in registry entry has been removed.
-    if (isRetiredHazidHref(item.href)) continue
+    if (isRetiredHazidHref(item.href) || isRetiredTenantAdministrationHref(item.href)) continue
     if (represented.has(item.href)) continue
     childrenByGroup.get(destinationParent(item))!.push({ ...item })
     represented.add(item.href)

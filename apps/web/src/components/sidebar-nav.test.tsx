@@ -58,18 +58,12 @@ describe('expandable sidebar', () => {
     expect(host.querySelectorAll('h2')).toHaveLength(0)
     expect(
       [...host.querySelectorAll('button[aria-expanded]')].map((button) => button.textContent),
-    ).toEqual(['Dashboard', 'Diary & Tasks', 'Tenant Settings'])
+    ).toEqual(['Dashboard', 'Diary & Tasks'])
     const feed = host.querySelector('a[href="/feed"]')!
     const diary = host.querySelector('a[href="/journals"]')!
     expect(feed.closest('.uvanoo-nav-children')).not.toBeNull()
     expect(diary.closest('.uvanoo-nav-children')).not.toBeNull()
-    const settings = [...host.querySelectorAll<HTMLButtonElement>('button[aria-expanded]')].find(
-      (button) => button.textContent === 'Tenant Settings',
-    )!
-    const panel = document.getElementById(settings.getAttribute('aria-controls')!)!
-    await act(() => settings.click())
-    expect(panel.hidden).toBe(false)
-    expect(panel.querySelector('a[href="/admin/settings"]')).not.toBeNull()
+    expect(host.querySelector('a[href="/admin/settings"]')).toBeNull()
     expect(host.textContent).not.toMatch(/Frontline|Administration|Knowledge|Assurance/)
   })
   it('exposes a real accessible disclosure without removing the parent destination', async () => {

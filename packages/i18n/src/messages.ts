@@ -15,6 +15,7 @@ const platformActivityMessages = {
   [systemMessageKey('Platform administration')]: 'Platform administration',
   [systemMessageKey('Platform activity')]: 'Platform activity',
   [systemMessageKey('Platform Activity')]: 'Platform Activity',
+  [systemMessageKey('Platform Activity & Errors')]: 'Platform Activity & Errors',
   [systemMessageKey('Recent platform administration actions. Visible only to super admins.')]:
     'Recent platform administration actions. Visible only to super admins.',
   [systemMessageKey('Platform errors')]: 'Platform errors',

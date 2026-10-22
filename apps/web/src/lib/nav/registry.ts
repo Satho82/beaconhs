@@ -267,10 +267,27 @@ export const NAV_MODULES: NavModule[] = [
   },
 
   // Administration
-  // Tenant administration is deliberately not a workspace menu module. Platform
-  // administration, including master branding, lives under /platform and is
-  // protected by the super-admin gate. Existing tenant routes retain their
-  // own authorization for bookmarked operational links.
+  // Tenant administration is the workspace control centre. It is shown only
+  // when the active membership carries at least one administration permission;
+  // platform administration remains separately protected under /platform.
+  {
+    key: 'admin',
+    href: '/admin',
+    label: 'Tenant Settings',
+    iconKey: 'settings',
+    requiredAnyPermission: [
+      'admin.users.manage',
+      'admin.roles.manage',
+      'admin.org.manage',
+      'admin.api-keys.manage',
+      'admin.settings.manage',
+      'admin.audit.read',
+      'admin.nav.manage',
+      'admin.integrations.manage',
+      'admin.data.export',
+    ],
+    group: 'Administration',
+  },
   // Forms = the template library + designer; a build/admin task, so it lives in
   // Administration. Crews don't need the library — they fill forms via
   // assignments, the module pages (inspections/JSHA/…), and pinned forms.

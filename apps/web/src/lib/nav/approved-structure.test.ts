@@ -9,11 +9,12 @@ const source = (href: string): SidebarNavGroup[] => [{ label: 'Existing', items:
 const flatten = (groups: SidebarNavGroup[]) =>
   groups.flatMap((g) => g.items.flatMap((i) => [i, ...(i.children ?? [])]))
 describe('approved navigation boundaries', () => {
-  it('retains the documented workspace groups without tenant administration', () => {
-    expect(APPROVED_APPLICATION_GROUPS).toHaveLength(17)
+  it('retains the documented workspace groups including tenant administration', () => {
+    expect(APPROVED_APPLICATION_GROUPS).toHaveLength(18)
     expect(APPROVED_APPLICATION_GROUPS).toContain('Approvals')
     expect(APPROVED_APPLICATION_GROUPS).toContain('Reporting')
     expect(APPROVED_APPLICATION_GROUPS).toContain('Reports')
+    expect(APPROVED_APPLICATION_GROUPS).toContain('Tenant Settings')
   })
   it('never restores a hidden module or creates unimplemented groups', () => {
     const result = flatten(approvedNavigation([], () => true, new Set()))

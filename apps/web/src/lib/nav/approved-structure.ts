@@ -19,6 +19,7 @@ export const APPROVED_APPLICATION_GROUPS = [
   'Metering',
   'Reporting',
   'Reports',
+  'Tenant Settings',
   'Approvals',
 ] as const
 
@@ -573,6 +574,26 @@ const APPROVED_DESTINATIONS: readonly ApprovedDestination[] = [
     permission: 'reports.schedule',
     entitlement: null,
   },
+  {
+    id: 'A145',
+    group: 'Tenant Settings',
+    label: 'Tenant Settings',
+    href: '/admin',
+    source: '/admin',
+    permission: null,
+    anyPermissions: [
+      'admin.users.manage',
+      'admin.roles.manage',
+      'admin.org.manage',
+      'admin.api-keys.manage',
+      'admin.settings.manage',
+      'admin.audit.read',
+      'admin.nav.manage',
+      'admin.integrations.manage',
+      'admin.data.export',
+    ],
+    entitlement: null,
+  },
 ]
 
 const PRESENTATION: Record<string, { iconKey: string; colour: SidebarNavItem['colour'] }> = {
@@ -640,6 +661,10 @@ const PRESENTATION: Record<string, { iconKey: string; colour: SidebarNavItem['co
     iconKey: 'file',
     colour: 'blue',
   },
+  'Tenant Settings': {
+    iconKey: 'settings',
+    colour: 'blue',
+  },
   Approvals: {
     iconKey: 'check',
     colour: 'rose',
@@ -674,6 +699,7 @@ function destinationParent(item: SidebarNavItem): (typeof APPROVED_APPLICATION_G
     ['/compliance', 'Compliance'],
     ['/reports', 'Reports'],
     ['/insights', 'Reports'],
+    ['/admin', 'Tenant Settings'],
   ]
   return owners.find(([root]) => path === root || path.startsWith(`${root}/`))?.[1] ?? 'Dashboard'
 }
@@ -698,7 +724,7 @@ export function approvedNavigation(
   }
   const isRetiredTenantAdministrationHref = (href: string) => {
     const path = href.split(/[?#]/, 1)[0]!
-    return path === '/admin' || path.startsWith('/admin/')
+    return path === '/admin/settings' || path.startsWith('/admin/settings/')
   }
   const visible = new Map(groups.flatMap((group) => group.items).map((item) => [item.href, item]))
   const childrenByGroup = new Map<string, SidebarNavItem[]>()

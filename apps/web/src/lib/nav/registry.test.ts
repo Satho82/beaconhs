@@ -20,8 +20,14 @@ describe('withMissingModules', () => {
     expect(moduleKeysOf(withMissingModules(config))).not.toContain('hazid')
   })
 
-  it('keeps tenant administration out of the workspace module registry', () => {
-    expect(NAV_MODULES.map((module) => module.key)).not.toContain('admin')
+  it('includes the tenant administration control centre with an explicit RBAC gate', () => {
+    const admin = NAV_MODULES.find((module) => module.key === 'admin')
+    expect(admin).toMatchObject({
+      href: '/admin',
+      label: 'Tenant Settings',
+      group: 'Administration',
+    })
+    expect(admin?.requiredAnyPermission).toContain('admin.roles.manage')
     expect(NAV_MODULES.map((module) => module.key)).not.toContain('tenant-settings')
   })
 

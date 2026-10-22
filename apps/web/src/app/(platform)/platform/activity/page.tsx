@@ -4,11 +4,13 @@ import { platformAuditLog, platformErrorLog, users } from '@beaconhs/db/schema'
 import { requirePlatformOperator } from '@/lib/auth'
 import { PageContainer } from '@/components/page-layout'
 import { DetailHeader, EmptyState } from '@beaconhs/ui'
+import { getGeneratedValueTranslations } from '@/i18n/generated.server'
 
 export const dynamic = 'force-dynamic'
 
 /** Super-admin-only operational audit trail. Technical exception ingestion is separate. */
 export default async function PlatformActivityPage() {
+  const t = await getGeneratedValueTranslations()
   await requirePlatformOperator()
   const [events, errors] = await Promise.all([
     withSuperAdmin(db, (tx) =>
@@ -34,12 +36,12 @@ export default async function PlatformActivityPage() {
     <PageContainer>
       <div className="space-y-5">
         <DetailHeader
-          back={{ href: '/platform', label: 'Platform administration' }}
-          title="Platform activity"
-          subtitle="Recent platform administration actions. Visible only to super admins."
+          back={{ href: '/platform', label: t('Platform administration') }}
+          title={t('Platform activity')}
+          subtitle={t('Recent platform administration actions. Visible only to super admins.')}
         />
         <section className="rounded-xl border border-red-200 bg-red-50 p-5 dark:bg-red-950/20">
-          <h2 className="font-semibold">Platform errors</h2>
+          <h2 className="font-semibold">{t('Platform errors')}</h2>
           {errors.length ? (
             <ul className="mt-3 space-y-3 text-sm">
               {errors.map((error) => (
@@ -52,7 +54,7 @@ export default async function PlatformActivityPage() {
               ))}
             </ul>
           ) : (
-            <p className="mt-2 text-sm text-slate-600">No captured server errors.</p>
+            <p className="mt-2 text-sm text-slate-600">{t('No captured server errors.')}</p>
           )}
         </section>
         {events.length ? (
@@ -60,9 +62,9 @@ export default async function PlatformActivityPage() {
             <ul className="divide-y">
               {events.map((event) => (
                 <li key={event.id} className="px-5 py-4">
-                  <p className="font-medium">{event.summary || event.action}</p>
+                  <p className="font-medium">{t(event.summary || event.action)}</p>
                   <p className="mt-1 text-sm text-slate-500">
-                    {event.actor || 'System'} · {event.occurredAt.toLocaleString()}
+                    {event.actor || t('System')} · {event.occurredAt.toLocaleString()}
                   </p>
                 </li>
               ))}
@@ -70,8 +72,8 @@ export default async function PlatformActivityPage() {
           </div>
         ) : (
           <EmptyState
-            title="No platform activity yet"
-            description="Actions will appear here as they are recorded."
+            title={t('No platform activity yet')}
+            description={t('Actions will appear here as they are recorded.')}
           />
         )}
       </div>

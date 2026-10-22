@@ -106,7 +106,8 @@ export const PLATFORM_NAV_GROUPS: SidebarNavGroup[] = [
       },
       {
         href: '/platform/activity',
-        label: 'Platform Activity',
+        label: '',
+        labelKey: 'Generated.m_18a5d61da2434e',
         iconKey: 'activity',
         exact: true,
       },

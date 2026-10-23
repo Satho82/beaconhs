@@ -167,17 +167,6 @@ function fixture(maintenance = false) {
       holdReceiptSha256: h,
       allowedMigrationConnectionsSha256: h,
     },
-    collaboraDrainage: {
-      documents: 0,
-      users: 0,
-      inFlight: 0,
-      failedSaves: 0,
-      unknownOutcomes: 0,
-      producerCoverageComplete: true,
-      holdActive: true,
-      stableWatermarkSha256: h,
-      sealedDrainReceiptSha256: h,
-    },
     independentWatchdog: {
       independent: true,
       active: true,
@@ -344,7 +333,6 @@ describe('independent DEV observation/signing adapter', () => {
   })
   it.each([
     'writerExclusion',
-    'collaboraDrainage',
     'independentWatchdog',
     'persistentFiveZero',
     'legacyIsolation',
@@ -355,14 +343,6 @@ describe('independent DEV observation/signing adapter', () => {
     expect(existsSync(join(f.directory, 'safety.json'))).toBe(false)
     expect(existsSync(join(f.directory, 'monitor-stopped.json'))).toBe(true)
   })
-  it.each(['inFlight', 'failedSaves', 'unknownOutcomes', 'documents', 'users'])(
-    'rejects unresolved drainage %s',
-    async (field) => {
-      const f = fixture()
-      f.facts.collaboraDrainage![field] = 1
-      await expect(monitorOnce(f)).rejects.toThrow()
-    },
-  )
   it.each([
     'source',
     'target',

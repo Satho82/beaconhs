@@ -6,9 +6,8 @@ import { fileURLToPath } from 'node:url'
 
 const composeId = 'wYb0LxLQrvj2FPI21i-Oj'
 const stack = 'uvanoo-v1-4-dev-gniriv'
-// Include every writer: storage bootstrap mutates policies and Collabora can
-// finish WOPI saves. Keep all five services present even when fenced (--prune).
-export const writers = ['web', 'worker', 'scheduler', 'storage-init', 'collabora']
+// Every mutable DEV service is fenced before candidate admission.
+export const writers = ['web', 'worker', 'scheduler', 'storage-init']
 export const controls = Object.fromEntries(
   writers.map((role) => [role, `${role.replace('-', '_').toUpperCase()}_REPLICAS`]),
 )
@@ -99,7 +98,6 @@ export function runtimeReady(
     const spec = service.Spec.TaskTemplate.ContainerSpec
     if (
       image &&
-      role !== 'collabora' &&
       (spec.Image !== image ||
         (role !== 'storage-init' && !spec.Env?.includes(`APP_VERSION=${sha}`)))
     )
@@ -135,10 +133,10 @@ export function runtimeReady(
     return (
       active.length === 1 &&
       active[0].Status.State === 'running' &&
-      (role === 'collabora' || active[0].health === 'healthy') &&
+      active[0].health === 'healthy' &&
       active[0].DesiredState === 'running' &&
       active[0].Spec?.ContainerSpec?.Image === spec.Image &&
-      (role === 'collabora' || active[0].Spec.ContainerSpec.Env?.includes(`APP_VERSION=${sha}`))
+      active[0].Spec.ContainerSpec.Env?.includes(`APP_VERSION=${sha}`)
     )
   })
 }
@@ -214,7 +212,7 @@ export async function runFence(mode, io, config) {
     await io.validateCompose(state)
     await wait(state, zero, false)
   } else if (
-    ['restore-web', 'restore-worker', 'restore-scheduler', 'restore-collabora'].includes(mode)
+    ['restore-web', 'restore-worker', 'restore-scheduler'].includes(mode)
   ) {
     check(config.authorization === mode, 'SERVICE_OWNER_AUTHORIZATION_REQUIRED')
     const state = await read()
@@ -348,7 +346,7 @@ export function liveIO() {
           const config = JSON.parse(result)
           check(
             JSON.stringify(Object.keys(config.services ?? {}).sort()) ===
-              JSON.stringify(['collabora', 'scheduler', 'storage-init', 'web', 'worker']),
+              JSON.stringify(['scheduler', 'storage-init', 'web', 'worker']),
             'COMPOSE_SERVICE_SET_AMBIGUOUS',
           )
           for (const role of writers) {
@@ -360,7 +358,7 @@ export function liveIO() {
               /@sha256:[0-9a-f]{64}$/.test(config.services[role].image ?? ''),
               'UNPINNED_SERVICE_IMAGE',
             )
-            if (expectedImage && role !== 'collabora') {
+            if (expectedImage) {
               check(
                 config.services[role].image === expectedImage &&
                   (role === 'storage-init' ||

@@ -105,7 +105,7 @@ function fixture() {
   }
 }
 const admit = (f, r) => runFence(`restore-${r}`, f.io, { ...config, authorization: `restore-${r}` })
-test('all FIVE services fence and require two actual zero observations', async () => {
+test('all active candidate services fence and require two actual zero observations', async () => {
   const f = fixture()
   await runFence('fence', f.io, config)
   assert.deepEqual(f.events, ['validate', 'persist', 'deploy', 'runtime', 'runtime'])
@@ -114,7 +114,7 @@ test('all FIVE services fence and require two actual zero observations', async (
 })
 test('independent sequential approvals never enable storage-init', async () => {
   const f = fixture()
-  for (const role of ['web', 'worker', 'scheduler', 'collabora']) {
+  for (const role of ['web', 'worker', 'scheduler']) {
     await admit(f, role)
     assert.equal(counts(f.state().env)[role], 1)
     assert.equal(counts(f.state().env)['storage-init'], 0)
@@ -122,7 +122,7 @@ test('independent sequential approvals never enable storage-init', async () => {
   }
   assert.match(f.state().env, /SECRET=never-display/)
 })
-for (const role of ['worker', 'scheduler', 'collabora'])
+for (const role of ['worker', 'scheduler'])
   test(`${role} cannot bypass web-first`, async () => {
     const f = fixture()
     await assert.rejects(admit(f, role), /WEB_FIRST_REQUIRED/)

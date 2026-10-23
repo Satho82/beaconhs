@@ -124,7 +124,6 @@ permissions:
 
 env:
   IMAGE_NAME: ghcr.io/satho82/beaconhs
-  COLLABORA_IMAGE: collabora/code:26.04.2.1.1@sha256:df33af88c59e26b7335ea98d91e65f1edf13f33369ce6115941b8d59d3409cb5
   # The migration runtime is pinned separately from the application image so
   # it can be verified before the forward-only migration command is reached.
   MIGRATION_NODE_IMAGE: node:24-bookworm@sha256:64af3819f9275802414d7cdc38c27e9d82bd564dec4d4da87d008255d36c63b4
@@ -485,8 +484,6 @@ jobs:
           echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
           docker pull "$IMAGE"
           docker image inspect "$IMAGE" --format 'pulled {{.Id}}'
-          docker pull "$COLLABORA_IMAGE"
-          docker image inspect "$COLLABORA_IMAGE" --format 'pulled Collabora {{.Id}}'
           docker pull "$MIGRATION_NODE_IMAGE"
           docker image inspect "$MIGRATION_NODE_IMAGE" --format 'pulled migration runtime {{.Id}}'
           docker pull "$DEPLOY_UTILITY_IMAGE"
@@ -944,30 +941,6 @@ jobs:
             "$MIGRATION_NODE_IMAGE" \
             pnpm --filter @beaconhs/db exec tsx "$migration_entrypoint"
 
-      # coolwsd caches browser assets at startup, so a changed branding file
-      # needs a Collabora restart; an unchanged file needs nothing.
-      - name: Install Collabora branding on the swarm manager
-        if: ${{ !inputs.feature_candidate_verified }}
-        run: |
-          set -euo pipefail
-          before="$(docker run --rm --pull=never -v /etc/dokploy/beaconhs:/target "$DEPLOY_UTILITY_IMAGE" \
-            sh -c 'sha256sum /target/collabora-branding.js 2>/dev/null | cut -d" " -f1' || true)"
-          docker run --rm --pull=never -i -v /etc/dokploy/beaconhs:/target "$DEPLOY_UTILITY_IMAGE" \
-            sh -c 'cat > /target/collabora-branding.js && chmod 0644 /target/collabora-branding.js' \
-            < deploy/collabora-branding.js
-          after="$(sha256sum deploy/collabora-branding.js | cut -d' ' -f1)"
-          echo "branding installed ($(wc -c < deploy/collabora-branding.js) bytes)"
-          if [ "$before" != "$after" ]; then
-            service="${DOKPLOY_TARGET_STACK}_collabora"
-            if docker service inspect "$service" >/dev/null 2>&1; then
-              echo "branding changed — restarting the current Collabora service"
-              docker service update --force "$service" >/dev/null
-            else
-              echo "No existing Collabora service found; the new deployment will load the branding"
-            fi
-          else
-            echo "branding unchanged — no restart needed"
-          fi
 
       - name: Update the Dokploy compose environment
         if: env.DOKPLOY_DEPLOY_MODE == 'api'
@@ -1003,24 +976,16 @@ jobs:
           if [ "$FEATURE_CANDIDATE_VERIFIED" = true ]; then
             COMPOSE_FILE="$(cat .deployment-governance/deploy/dokploy-uvanoo-foundation.compose.yaml)"
           fi
-          # Collabora is served same-origin on the app domain (Traefik path
-          # routes), so both editor and WOPI-callback bases are APP_URL; the
-          # server_name is the bare host for Collabora's generated URLs.
-          APP_HOST="$(printf '%s' "$APP_URL" | sed -E 's~^https?://~~; s~/+$~~' | tr '[:upper:]' '[:lower:]')"
           {
             printf 'IMAGE=%s\n' "$IMAGE"
             printf 'APP_VERSION=%s\n' "$DEPLOY_SOURCE_SHA"
             # Install candidate service specs while the persisted fence remains
             # closed. Only the verified restore step may start new writers.
             if [ "$FEATURE_CANDIDATE_VERIFIED" = true ]; then
-              printf 'WEB_REPLICAS=0\nWORKER_REPLICAS=0\nSCHEDULER_REPLICAS=0\nSTORAGE_INIT_REPLICAS=0\nCOLLABORA_REPLICAS=0\n'
+              printf 'WEB_REPLICAS=0\nWORKER_REPLICAS=0\nSCHEDULER_REPLICAS=0\nSTORAGE_INIT_REPLICAS=0\n'
             else
               printf 'WRITER_REPLICAS=1\n'
             fi
-            printf 'COLLABORA_IMAGE=%s\n' "$COLLABORA_IMAGE"
-            printf 'COLLABORA_URL=%s\n' "$APP_URL"
-            printf 'COLLABORA_WOPI_URL=%s\n' "$APP_URL"
-            printf 'COLLABORA_SERVER_NAME=%s\n' "$APP_HOST"
             printf 'DATABASE_URL=%s\n' "$DATABASE_URL"
             printf 'SUPERADMIN_DATABASE_URL=%s\n' "$SUPERADMIN_DATABASE_URL"
             printf 'REDIS_URL=%s\n' "$REDIS_URL"

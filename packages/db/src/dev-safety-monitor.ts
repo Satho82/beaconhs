@@ -97,17 +97,6 @@ const contracts: Record<string, Record<string, 'zero' | 'true' | 'false' | 'hash
     holdReceiptSha256: 'hash',
     allowedMigrationConnectionsSha256: 'hash',
   },
-  collaboraDrainage: {
-    documents: 'zero',
-    users: 'zero',
-    inFlight: 'zero',
-    failedSaves: 'zero',
-    unknownOutcomes: 'zero',
-    producerCoverageComplete: 'true',
-    holdActive: 'true',
-    stableWatermarkSha256: 'hash',
-    sealedDrainReceiptSha256: 'hash',
-  },
   independentWatchdog: {
     independent: 'true',
     active: 'true',

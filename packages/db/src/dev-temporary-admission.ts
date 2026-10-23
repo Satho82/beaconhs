@@ -97,7 +97,6 @@ export type PrivateRestoreReceipt = {
 }
 const MIGRATION_CHECKS = [
   'writerExclusion',
-  'collaboraDrainage',
   'independentWatchdog',
   'persistentFiveZero',
   'legacyIsolation',

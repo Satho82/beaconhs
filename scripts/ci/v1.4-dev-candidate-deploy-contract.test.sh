@@ -606,7 +606,8 @@ steps[positions[2]..positions[5]].each do |step|
 end
 update = steps[positions[4]]
 abort 'Candidate rollout must keep writers at zero' unless update['run'].include?(%q{if [ "$FEATURE_CANDIDATE_VERIFIED" = true ]; then}) &&
-  update['run'].include?(%q{printf 'WEB_REPLICAS=0\nWORKER_REPLICAS=0\nSCHEDULER_REPLICAS=0\nSTORAGE_INIT_REPLICAS=0\nCOLLABORA_REPLICAS=0\n'})
+  update['run'].include?(%q{printf 'WEB_REPLICAS=0\nWORKER_REPLICAS=0\nSCHEDULER_REPLICAS=0\nSTORAGE_INIT_REPLICAS=0\n'}) &&
+  !update['run'].include?('COLLABORA_REPLICAS=')
 report = steps.find { |s| s['name'] == 'Report DEV writer recovery state' }
 abort 'Failure reporting must not restore or deploy anything' unless report && report['if'].include?('failure() || cancelled()') &&
   !report['run'].match?(/compose\.deploy|compose\.update|docker service|dev-writer-fence\.mjs restore/)

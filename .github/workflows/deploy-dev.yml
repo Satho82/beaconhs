@@ -124,6 +124,8 @@ permissions:
 
 env:
   IMAGE_NAME: ghcr.io/satho82/beaconhs
+  # Used only by ordinary releases; governed DEV candidates omit Collabora.
+  COLLABORA_IMAGE: collabora/code:26.04.2.1.1@sha256:df33af88c59e26b7335ea98d91e65f1edf13f33369ce6115941b8d59d3409cb5
   # The migration runtime is pinned separately from the application image so
   # it can be verified before the forward-only migration command is reached.
   MIGRATION_NODE_IMAGE: node:24-bookworm@sha256:64af3819f9275802414d7cdc38c27e9d82bd564dec4d4da87d008255d36c63b4
@@ -470,6 +472,7 @@ jobs:
         env:
           GHCR_USER: ${{ github.actor }}
           GHCR_TOKEN: ${{ github.token }}
+          FEATURE_CANDIDATE_VERIFIED: ${{ inputs.feature_candidate_verified }}
         run: |
           set -euo pipefail
           if ! command -v docker >/dev/null 2>&1; then
@@ -484,6 +487,10 @@ jobs:
           echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
           docker pull "$IMAGE"
           docker image inspect "$IMAGE" --format 'pulled {{.Id}}'
+          if [ "$FEATURE_CANDIDATE_VERIFIED" != true ]; then
+            docker pull "$COLLABORA_IMAGE"
+            docker image inspect "$COLLABORA_IMAGE" --format 'pulled Collabora {{.Id}}'
+          fi
           docker pull "$MIGRATION_NODE_IMAGE"
           docker image inspect "$MIGRATION_NODE_IMAGE" --format 'pulled migration runtime {{.Id}}'
           docker pull "$DEPLOY_UTILITY_IMAGE"
@@ -942,6 +949,25 @@ jobs:
             pnpm --filter @beaconhs/db exec tsx "$migration_entrypoint"
 
 
+      # Ordinary releases retain Collabora branding. Governed DEV candidates do not
+      # run the service and must not install or restart it.
+      - name: Install Collabora branding on the swarm manager
+        if: ${{ !inputs.feature_candidate_verified }}
+        run: |
+          set -euo pipefail
+          before="$(docker run --rm --pull=never -v /etc/dokploy/beaconhs:/target "$DEPLOY_UTILITY_IMAGE" \
+            sh -c 'sha256sum /target/collabora-branding.js 2>/dev/null | cut -d" " -f1' || true)"
+          docker run --rm --pull=never -i -v /etc/dokploy/beaconhs:/target "$DEPLOY_UTILITY_IMAGE" \
+            sh -c 'cat > /target/collabora-branding.js && chmod 0644 /target/collabora-branding.js' \
+            < deploy/collabora-branding.js
+          after="$(sha256sum deploy/collabora-branding.js | cut -d' ' -f1)"
+          if [ "$before" != "$after" ]; then
+            service="${DOKPLOY_TARGET_STACK}_collabora"
+            if docker service inspect "$service" >/dev/null 2>&1; then
+              docker service update --force "$service" >/dev/null
+            fi
+          fi
+
       - name: Update the Dokploy compose environment
         if: env.DOKPLOY_DEPLOY_MODE == 'api'
         env:
@@ -975,6 +1001,8 @@ jobs:
           COMPOSE_FILE="$(cat .deployment-governance/deploy/dokploy-dev.compose.yaml)"
           if [ "$FEATURE_CANDIDATE_VERIFIED" = true ]; then
             COMPOSE_FILE="$(cat .deployment-governance/deploy/dokploy-uvanoo-foundation.compose.yaml)"
+          else
+            APP_HOST="$(printf '%s' "$APP_URL" | sed -E 's~^https?://~~; s~/+$~~' | tr '[:upper:]' '[:lower:]')"
           fi
           {
             printf 'IMAGE=%s\n' "$IMAGE"
@@ -985,6 +1013,10 @@ jobs:
               printf 'WEB_REPLICAS=0\nWORKER_REPLICAS=0\nSCHEDULER_REPLICAS=0\nSTORAGE_INIT_REPLICAS=0\n'
             else
               printf 'WRITER_REPLICAS=1\n'
+              printf 'COLLABORA_IMAGE=%s\n' "$COLLABORA_IMAGE"
+              printf 'COLLABORA_URL=%s\n' "$APP_URL"
+              printf 'COLLABORA_WOPI_URL=%s\n' "$APP_URL"
+              printf 'COLLABORA_SERVER_NAME=%s\n' "$APP_HOST"
             fi
             printf 'DATABASE_URL=%s\n' "$DATABASE_URL"
             printf 'SUPERADMIN_DATABASE_URL=%s\n' "$SUPERADMIN_DATABASE_URL"

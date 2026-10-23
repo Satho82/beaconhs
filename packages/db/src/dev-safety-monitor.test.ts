@@ -334,12 +334,13 @@ describe('independent DEV observation/signing adapter', () => {
   it.each(['writerExclusion', 'independentWatchdog', 'persistentFiveZero', 'legacyIsolation'])(
     'fails closed on missing %s',
     async (check) => {
-    const f = fixture()
-    delete f.policy.probes[check]
-    await expect(monitorOnce(f)).rejects.toThrow('DEV_MONITOR_STOPPED')
-    expect(existsSync(join(f.directory, 'safety.json'))).toBe(false)
-    expect(existsSync(join(f.directory, 'monitor-stopped.json'))).toBe(true)
-  })
+      const f = fixture()
+      delete f.policy.probes[check]
+      await expect(monitorOnce(f)).rejects.toThrow('DEV_MONITOR_STOPPED')
+      expect(existsSync(join(f.directory, 'safety.json'))).toBe(false)
+      expect(existsSync(join(f.directory, 'monitor-stopped.json'))).toBe(true)
+    },
+  )
   it.each([
     'source',
     'target',

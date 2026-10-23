@@ -331,12 +331,9 @@ describe('independent DEV observation/signing adapter', () => {
       ).toBe(check.evidenceSha256)
     expect(JSON.parse(readFileSync(join(f.directory, 'safety.json'), 'utf8'))).toEqual(envelope)
   })
-  it.each([
-    'writerExclusion',
-    'independentWatchdog',
-    'persistentFiveZero',
-    'legacyIsolation',
-  ])('fails closed on missing %s', async (check) => {
+  it.each(['writerExclusion', 'independentWatchdog', 'persistentFiveZero', 'legacyIsolation'])(
+    'fails closed on missing %s',
+    async (check) => {
     const f = fixture()
     delete f.policy.probes[check]
     await expect(monitorOnce(f)).rejects.toThrow('DEV_MONITOR_STOPPED')

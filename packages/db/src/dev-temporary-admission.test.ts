@@ -45,7 +45,7 @@ function fixture(phase: AdmissionPhase = 'migration', maintenance = false) {
     sourceSha: 'b'.repeat(40),
     sourceTree: 'c'.repeat(40),
     imageDigest: 'sha256:' + hash,
-    database: 'beaconhs',
+    database: 'uvanoo_dev',
     databaseOid: 123,
     postgresVersion: '160015',
     migrations: files,
@@ -307,13 +307,13 @@ describe('exact DEV temporary admission', () => {
     },
   )
   it('binds the actual connection rather than trusting environment target labels', () => {
-    const url = 'postgresql://beaconhs_backup:synthetic@uvanoo-dev-postgres:5432/beaconhs'
+    const url = 'postgresql://beaconhs_backup:synthetic@uvanoo-dev-postgres:5432/uvanoo_dev'
     expect(() => requireTemporaryDatabaseTarget(url, 'beaconhs_backup')).not.toThrow()
     for (const bad of [
       url.replace('uvanoo-dev-postgres', 'beaconhs-postgres'),
       url.replace('5432', '5433'),
       url + '?hostaddr=127.0.0.1',
-      url.replace('/beaconhs', '/other'),
+      url.replace('/uvanoo_dev', '/other'),
       url + '#fragment',
     ])
       expect(() => requireTemporaryDatabaseTarget(bad, 'beaconhs_backup')).toThrow(

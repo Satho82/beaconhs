@@ -38,7 +38,7 @@ function correctConnection(name, value) {
       ['postgres:', 'postgresql:'].includes(u.protocol) &&
         u.hostname === 'uvanoo-dev-postgres' &&
         (u.port || '5432') === '5432' &&
-        u.pathname === '/beaconhs',
+        u.pathname === '/uvanoo_dev',
       'POSTGRES_TARGET_MISMATCH',
     )
     check(

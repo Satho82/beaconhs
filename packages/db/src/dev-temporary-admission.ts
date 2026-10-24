@@ -98,7 +98,7 @@ export type PrivateRestoreReceipt = {
 const MIGRATION_CHECKS = [
   'writerExclusion',
   'independentWatchdog',
-  'persistentFiveZero',
+  'persistentFourZero',
   'legacyIsolation',
 ] as const
 export const WEB_CHECKS = [

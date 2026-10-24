@@ -1,0 +1,62 @@
+name: Fence DEV writers for governed maintenance
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_sha:
+        description: Exact current feature candidate SHA
+        required: true
+        type: string
+      image_digest:
+        description: Exact immutable candidate image digest
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v1.4-dev-maintenance-hold
+  cancel-in-progress: false
+
+jobs:
+  fence:
+    name: Persist and verify DEV writer fence
+    runs-on: [self-hosted, dokploy]
+    timeout-minutes: 15
+    env:
+      DOKPLOY_COMPOSE_ID: wYb0LxLQrvj2FPI21i-Oj
+      EXPECTED_DOKPLOY_STACK: uvanoo-v1-4-dev-gniriv
+      EXPECTED_APP_HOST: dev.uvanoo.com
+      DEPLOY_SOURCE_SHA: ${{ inputs.source_sha }}
+      IMAGE_DIGEST: ${{ inputs.image_digest }}
+      FEATURE_CANDIDATE_VERIFIED: 'true'
+      DOKPLOY_DEPLOY_MODE: api
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          ref: feature/uvanoo-v1.4
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Verify exact feature candidate
+        run: |
+          set -euo pipefail
+          test "${GITHUB_REF}" = "refs/heads/main"
+          test "${DEPLOY_SOURCE_SHA}" = "$(git rev-parse HEAD)"
+          [[ "${IMAGE_DIGEST}" =~ ^sha256:[0-9a-f]{64}$ ]]
+      - name: Configure TLS-preserving Dokploy resolution
+        env:
+          DOKPLOY_URL: ${{ secrets.DOKPLOY_URL }}
+          DOKPLOY_RESOLVE_IP: ${{ secrets.DOKPLOY_RESOLVE_IP }}
+        run: |
+          set -euo pipefail
+          host="${DOKPLOY_URL#https://}"
+          test "${host}" != "${DOKPLOY_URL}"
+          [[ "${host}" =~ ^([A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?\.)+[A-Za-z]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?$ ]]
+          [[ "${DOKPLOY_RESOLVE_IP}" =~ ^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.) ]]
+          printf 'DOKPLOY_CURL_RESOLVE=%s\n' "${host}:443:${DOKPLOY_RESOLVE_IP}" >> "$GITHUB_ENV"
+      - name: Persist, apply, and verify DEV writer fence
+        env:
+          DOKPLOY_URL: ${{ secrets.DOKPLOY_URL }}
+          DOKPLOY_TOKEN: ${{ secrets.DOKPLOY_TOKEN }}
+        run: node scripts/cluster/dev-writer-fence.mjs fence

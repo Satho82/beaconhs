@@ -1,0 +1,215 @@
+{
+  "version": 1,
+  "status": "LOCAL_STAGING_PREPARED; STOPPED_BEFORE_SERVICE_CHANGES_ON_FENCE_RESTORATION_BOUNDARY",
+  "scope": "DEV Risk Assessments, People and Approvals only",
+  "recordedAt": "2026-10-13T10:50:46.976Z",
+  "product": {
+    "sha": "563fb0e9b79a838a5f394abaffb2f7dc743fc571",
+    "tree": "324c50a60e2cb0639ba920488a150c6531968374",
+    "validationRun": "https://github.com/Satho82/beaconhs/actions/runs/38313918871",
+    "validation": "Reverified successful jobs and immutable checkout/source/tree assertions in control workflow; control run head differs intentionally from product source."
+  },
+  "backupImplementation": {
+    "sha": "e1c6a7e87e115bad10276b93b2eec6304a7d8506",
+    "tree": "2cac5d7bfec02879b03961da5adb3ea640549ab2",
+    "runtimeValidation": "https://github.com/Satho82/beaconhs/actions/runs/38380746756",
+    "result": "PASS synthetic PostgreSQL16.15 capture/restore,24 contracts,19 schema/security sections; not actual DEV restore."
+  },
+  "integration": {
+    "governedHead": "d18f635a41f092e9e86aa6f53518f9c28992b0d2",
+    "pr9": {
+      "url": "https://github.com/Satho82/beaconhs/pull/9",
+      "head": "563fb0e9b79a838a5f394abaffb2f7dc743fc571",
+      "state": "OPEN_DRAFT_CLEAN_MERGEABLE"
+    },
+    "pr10": {
+      "url": "https://github.com/Satho82/beaconhs/pull/10",
+      "head": "b11778aee65e3a6818fed58d4927070165746e1b",
+      "tree": "eca775c1c6cd162b659e15eee4c3ef52d4a0e978",
+      "target": "integration/uvanoo-v1.4-approvals-dev-gate-20261012",
+      "state": "OPEN_DRAFT_CLEAN_MERGEABLE",
+      "validation": "https://github.com/Satho82/beaconhs/actions/runs/38373723297",
+      "changedFiles": [
+        ".github/workflows/deploy-dev.yml",
+        ".github/workflows/dev-release-safety-validation.yml",
+        "scripts/ci/dev-release-safety-contract.rb",
+        "scripts/cluster/dev-readiness.mjs",
+        "scripts/cluster/dev-readiness.test.mjs"
+      ]
+    },
+    "runningActions": 0,
+    "queuedActions": 0,
+    "externalWorkerInventory": "NOT VERIFIED",
+    "mergePerformed": false
+  },
+  "liveReadOnly": {
+    "vps": "ONLINE",
+    "postgres": "healthy",
+    "redis": "healthy",
+    "databaseInspectionRepeated": false,
+    "previousDatabaseEvidence": {
+      "migrations": 58,
+      "properties": 5,
+      "lifecycleEvents": 968,
+      "attachments": 2,
+      "securityComparison": "58/58 ledger,18/19 schema sections; two public default ACL records remain different"
+    },
+    "writers": {
+      "web": "0/1",
+      "worker": "0/1",
+      "scheduler": "0/1",
+      "storageInit": "0/1",
+      "collabora": "1/1",
+      "conclusion": "Desired replicas remain1. Unhealthy/stopped tasks are not a persistent writer fence."
+    },
+    "backupProcesses": {
+      "pg_dump": 0,
+      "pg_restore": 0,
+      "age": 0,
+      "rclone": 0,
+      "restic": 0
+    },
+    "availableBytes": 29178507264,
+    "ageIdentity": {
+      "exists": true,
+      "mode": "0600",
+      "publicRecipientSha256": "138aa3b6a8f40c219b5d69a30357cf5ac9971c9523c87c04e42fc43c5434727f",
+      "independentOwnerRecovery": "OWNER CONFIRMED: secure SCP transfer to independent Mac;0600;184bytes;age-keygen validation PASS; no private disclosure",
+      "privateKeyRead": false,
+      "publicRecipientCrossCheck": "PASS: owner independently derived public-recipient SHA256; exact match to approved 138aa3b6a8f40c219b5d69a30357cf5ac9971c9523c87c04e42fc43c5434727f"
+    },
+    "localRecoveryRootExists": false,
+    "defaultUbuntuAwsConfigExists": false,
+    "defaultUbuntuAwsCredentialsExists": false,
+    "note": "Absence of default AWS files is not proof that no bucket or alternative credential configuration exists.",
+    "freshCheck": {
+      "remoteExecution": "PASS",
+      "postgres": "healthy",
+      "redis": "healthy",
+      "freeBytes": 29178507264,
+      "hostMemoryBytes": 8122273792,
+      "hostCpuCount": 4,
+      "pinnedPostgres1615ImageCached": true,
+      "recoveryProcessCounts": {
+        "pg_dump": 0,
+        "pg_restore": 0,
+        "age": 0,
+        "rclone": 0,
+        "restic": 0
+      },
+      "databaseInspectionRepeated": false,
+      "keyChecksRepeated": false
+    },
+    "previousObservationOnly": false,
+    "freeBytes": 29168275456,
+    "latestTaskEvidence": {
+      "web": {
+        "desired": 1,
+        "starting": 1,
+        "failed": 4
+      },
+      "worker": {
+        "desired": 1,
+        "starting": 1,
+        "complete": 4
+      },
+      "scheduler": {
+        "desired": 1,
+        "complete": 1
+      },
+      "storageInit": {
+        "desired": 1,
+        "complete": 5
+      },
+      "collabora": {
+        "desired": 1,
+        "running": 1
+      },
+      "interpretation": "Web/worker actively restart. Completed scheduler/storage-init tasks must not be assumed equivalent to stopped persistent services. Scaling0 then1 can create fresh job executions; safe restore cannot be inferred from saving replica counts."
+    }
+  },
+  "backup": {
+    "archive": null,
+    "checksum": null,
+    "actualRestore": "NOT EXECUTED",
+    "providerChoice": "Owner superseded OVH storage requirement: temporary encrypted VPS staging and owner Mac independent encrypted-copy custody.",
+    "bucketAccess": "NOT REQUIRED FOR THIS AUTHORISED MINIMAL RECOVERY",
+    "privateDestination": {
+      "path": "/opt/uvanoo-dev/backups/recovery",
+      "mode": "0700",
+      "uid": 1000,
+      "verified": true,
+      "createdThisTurn": true
+    },
+    "restoreDestination": {
+      "path": "/opt/uvanoo-dev/backups/recovery/restore-isolated",
+      "mode": "0700",
+      "uid": 1000,
+      "directoryPrepared": true,
+      "containerCreated": false,
+      "isolation": "Pending verified execution of existing restore helper: fresh PostgreSQL16.15, network none, no published ports, separate new data directory, resource limits. Directory alone is not isolation proof."
+    },
+    "fencingAndSafeRestoration": "NOT VERIFIED; explicit owner instruction to stop before service changes followed",
+    "fenceReview": {
+      "sourceSha": "563fb0e9b79a838a5f394abaffb2f7dc743fc571",
+      "path": "scripts/cluster/dev-writer-fence.mjs",
+      "writerRoles": [
+        "web",
+        "worker",
+        "scheduler"
+      ],
+      "fenceAction": "Changes saved WRITER_REPLICAS and invokes compose.deploy",
+      "restoreAction": "Requires candidate immutable image/source, deploys saved stack and checks candidate runtime convergence",
+      "unresolved": [
+        "storage-init, Collabora-related edits and external/direct writer admission not fenced by this helper",
+        "No backup-scoped unchanged-state restoration contract",
+        "Capture guard/continuous supervision not provided by existing helper",
+        "Current desired replicas1 despite actual0/1; not fenced"
+      ],
+      "executed": false
+    },
+    "offVpsArchiveCustody": "PENDING: no archive exists yet. Owner-held key verified; that is distinct from independent backup-copy custody."
+  },
+  "rehearsal": {
+    "actualDev58To63": "NOT EXECUTED",
+    "isolatedAclProposalSha256": "7262d5c6a52d5c57f1888837eabb44e3b29fa43f253ccc1086f888d46fbe9d54",
+    "independentCanonical58": "730d95c22ad6914d68bcdbea46283741f24ebd21a5f609c7951a4e5f72392a7c",
+    "existingObserved58": "0529262d8f4b1a323994e1dbeae85e70b3506cd0746c2faf3d0b4e014ccb0074",
+    "previousSyntheticCorrectionEvidence": "https://github.com/Satho82/beaconhs/actions/runs/38372116422",
+    "riskPeopleApprovalsRealDataVerification": "PENDING protected restore",
+    "attachments": "Two references previously observed; retained MinIO object correspondence not verified",
+    "redis": "Prior permanent Redis keyspace empty; clean155 queue disposition unresolved; no replay/deletion",
+    "clean155": "Original recovery volumes preserved; no deletion or copy undertaken"
+  },
+  "image": {
+    "configuredDev": "ghcr.io/satho82/uvanoo-staging-private@sha256:a043f96d8c6b453d9df3e4b38b402963e6e3c0705c4ffb1aed19d6566cdfbec3",
+    "candidateDigest": null,
+    "status": "Configured old image is not validated product. Final governed source/tree and immutable image must be bound after approved integration and authoritative build."
+  },
+  "blockers": [
+    "Backup-only fencing/restoration remains unverified: web/worker restart, completed scheduler/storage-init may rerun on replica restoration, Collabora and direct/external writers require complete admission/control assessment. Existing deployment helper must not be invoked.",
+    "No encrypted recovery set or independent custody exists yet; capture cannot start before fence/restoration verification.",
+    "No actual private restore or real-data58-to63 rehearsal; attachment/Redis/clean155 contents must be reconciled without deletion."
+  ],
+  "preparedSequence": [
+    "Use verified public age recipient; protected local staging is prepared. Verify backup-only writer fence and safe end-state before any service change. No compose.deploy.",
+    "Preserve exact service specifications/task state privately and establish target-only control against concurrent deployments/direct writers. Do not scale completed jobs0-to1 blindly.",
+    "Using existing approved backup tooling, capture one protected encrypted database plus required storage/Redis recovery evidence; independently verify encrypted archive checksums and restore.",
+    "Once an encrypted recovery set exists, transfer only ciphertext and non-sensitive checksum/manifest to owner-controlled private Mac folder using SCP. Owner verifies SHA256 against published manifest and confirms off-VPS archive custody before risky changes. Do not copy raw dump, metadata or private key into public evidence.",
+    "On restored real data only, verify58 ledger/security/data identities, apply tested narrow default-ACL correction, match canonical58, rehearse0059-0063 and verify data/security/locking/rollback/retry.",
+    "Resolve readiness-before-writer-activation, then seek approval of exact final integration heads/tree. PR10 targets PR9's source; integrate reviewed safety changes there before governed PR9. Recheck heads, tree, triggers and mergeability; no force push.",
+    "After separate governed-merge approval, validate/build exact final governed SHA through authoritative publication-only workflow; verify OCI revision/source labels and immutable digest.",
+    "After separate live correction approval, apply only reviewed SQL under lock with before/after fingerprint; keep pre-correction recovery archive and obtain fresh post-correction backup/independent restore for unchanged gate equality and one-hour freshness.",
+    "Seek separate manifest-bound deployment approval for DEV migration, endpoint/storage recovery, immutable image, DEV-only Basic Auth router removal, native login/security smoke and controlled writer release/refencing. Keep staging/production unchanged.",
+    "Only after actual authorised rollout, record63 ledger, source/tree/image, preserved five properties/history/attachments and authenticated desktop/mobile Risk/People/Approvals acceptance."
+  ],
+  "approvals": {
+    "backupAndIsolatedRehearsal": "Already authorised; prerequisites remain unverified. No repeat blanket approval requested.",
+    "nextOwnerAction": "No OVH bucket or additional key check needed. Existing authorisation covers backup/rehearsal. Next engineering gate is a reviewed backup-only writer pause/resume procedure preserving completed one-shot tasks and controlling external redeployment/writers; stop before service changes until proven. If original unhealthy state cannot safely be resumed, explicitly settle a fenced end-state before capture rather than inventing successful restoration.",
+    "persistentSql": "Separate exact two-statement approval after real-data rehearsal evidence",
+    "governedMerge": "Separate exact PR heads/resulting tree approval",
+    "deployment": "Separate final SHA/tree/image/ReleaseEvidence and precise DEV operations approval"
+  },
+  "changesThisTurn": "Read-only DEV service/task inspection; created exactly two private staging directories0700 under existing backup parent. No private key checks, original data changes, service scaling, compose.deploy, capture, restore, SQL, migrations, merge, deployment or Traefik changes. No passing tests repeated.",
+  "supersedes": "1720fa7c8cb3c4bdfff78289e8e81cf5663559df"
+}

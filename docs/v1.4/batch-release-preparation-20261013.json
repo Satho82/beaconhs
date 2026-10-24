@@ -1,0 +1,50 @@
+{
+  "status": "BLOCKED_AT_PERSISTENT_OPERATION_APPROVAL",
+  "productSha": "563fb0e9b79a838a5f394abaffb2f7dc743fc571",
+  "productTree": "324c50a60e2cb0639ba920488a150c6531968374",
+  "governedSha": "d18f635a41f092e9e86aa6f53518f9c28992b0d2",
+  "databaseCheckpoint": "de8eb36d0031663a617ebd0ad941229077fc16a5",
+  "databaseRun": 38372116422,
+  "proposedProfileFingerprint": "730d95c22ad6914d68bcdbea46283741f24ebd21a5f609c7951a4e5f72392a7c",
+  "liveComparison": "58/58 ledger;18/19 sections against proposed profile; default ACL correction NOT APPLIED",
+  "safetyProposal": {
+    "pr": 10,
+    "sha": "b11778aee65e3a6818fed58d4927070165746e1b",
+    "tree": "eca775c1c6cd162b659e15eee4c3ef52d4a0e978",
+    "run": 38373723297,
+    "focusedTests": 59,
+    "releaseReady": false
+  },
+  "preservedValidationRun": 38313918871,
+  "preservedBrowserRuns": [
+    38318803277,
+    38320812403
+  ],
+  "governedPR": {
+    "number": 9,
+    "merged": false,
+    "head": "563fb0e9b79a838a5f394abaffb2f7dc743fc571",
+    "mergeable": true
+  },
+  "newReleaseImageDigest": null,
+  "currentOldImageDigest": "sha256:a043f96d8c6b453d9df3e4b38b402963e6e3c0705c4ffb1aed19d6566cdfbec3",
+  "currentOldImageRevision": "6976a851c18e879df1813bb7c18729d6da5ab846",
+  "liveCounts": {
+    "properties": 5,
+    "lifecycleEvents": 968,
+    "tenants": 2,
+    "attachments": 2,
+    "permanentRedisKeys": 0
+  },
+  "backupCreated": false,
+  "restorePerformed": false,
+  "realDataRehearsal": false,
+  "basicAuthRemoved": false,
+  "liveBrowserAcceptance": false,
+  "goldenBaseline": false,
+  "remainingEngineering": "Controlled external readiness before writer release; PR10 is containment only. Final exact-source full release/security validation required.",
+  "approvalBoundary": "Persistent writer-fenced encrypted backup and private restore/rehearsal; no SQL correction, merge or deployment in that initial approval",
+  "lastActionsInProgress": 0,
+  "externalWorkers": "NOT VERIFIED",
+  "rawMetadataPublished": false
+}

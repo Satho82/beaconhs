@@ -1,0 +1,68 @@
+{
+  "recordedAt": "2026-10-13T11:11:29.003Z",
+  "previousCheckpoint": "aca0bfe78b9f13d4193ec954b19db53c0d0f4190",
+  "status": "OWNER_INVENTORY_ACCEPTED; PROTECTED_RECOVERY_CAPTURE_ACCESS_BLOCKED",
+  "source": "Owner-supplied VPS evidence; no repeat collection",
+  "ownerEvidence": {
+    "volumeSizesReported": {
+      "Decision149": "47 MB",
+      "Decision154": "83 MB",
+      "Decision155": "231 MB",
+      "DEVPostgreSQL": "113 MB",
+      "clean155Redis": "43 MB",
+      "DEVMinIO": "580 KB"
+    },
+    "rootCrontab": "No entries returned",
+    "filteredSystemTimers": "No Uvanoo-specific timer found",
+    "filteredRootProcesses": "No Uvanoo writer found",
+    "inspectionContainer": "Stopped cleanly exit0",
+    "permanentPostgreSQLRedis": "Healthy at last inspection",
+    "devWebWorker": "Desired1 each, restarting",
+    "schedulerStorageInit": "Desired1 each, no running tasks",
+    "separateBeaconHS": "Distinct database/Redis endpoints"
+  },
+  "cleared": [
+    "Recovery volume-size inventory",
+    "Requested root-job/process evidence supplied by owner",
+    "Decision155 inspection writer stopped",
+    "Independent age key custody and recipient fingerprint previously PASS"
+  ],
+  "remainingAccessBlocker": {
+    "paths": [
+      "/var/lib/docker/volumes/uvanoo-decision149-restore-data/_data",
+      "/var/lib/docker/volumes/uvanoo-decision154-clean-data/_data",
+      "/var/lib/docker/volumes/uvanoo-decision155-clean-data/_data",
+      "/var/lib/docker/volumes/uvanoo-clean155-redis-data/_data",
+      "/var/lib/docker/volumes/uvanoo-dev-minio-data/_data"
+    ],
+    "observed": "Current account lacked read/traverse access; privileged read-only command rejected by Remote Desktop Commander with Command not allowed.",
+    "meaning": "Owner evidence supplies metadata, not a usable authorised execution path to archive required recovery contents.",
+    "request": "Approved privileged backup execution path or administrator-executed reviewed capture. No repeat inventory/key confirmation or blanket backup authorisation requested.",
+    "circumventionAttempted": false
+  },
+  "writerAssessment": {
+    "additionalWriterIdentifiedBySuppliedChecks": false,
+    "externalControlsToVerifyAtCapture": [
+      "No concurrent DEV deployment/operator changes during capture",
+      "Direct database/Redis client observations and service-task convergence after approved pause"
+    ],
+    "proposedPause": "Directly pause only verified repeating DEV writer services, preserve saved specs and counts, leave completed scheduler/storage-init untouched. Resolve any remaining callbacks before declaring fence.",
+    "applied": false,
+    "verifiedComplete": false,
+    "reasonForNoMutation": "Cannot complete required protected recovery capture through current execution access; avoid leaving services unnecessarily paused."
+  },
+  "backup": {
+    "captured": false,
+    "checksum": null,
+    "scpCommand": null,
+    "ownerArchiveCustody": "Pending actual ciphertext creation and verified transfer; key custody already PASS"
+  },
+  "restore": {
+    "executed": false
+  },
+  "rehearsal": {
+    "executed": false
+  },
+  "releaseReady": false,
+  "restrictions": "No service changes, compose.deploy, one-shot restart, live SQL/migrations, merge, deployment, Traefik changes, original data deletion or repeated tests."
+}

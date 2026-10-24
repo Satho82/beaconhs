@@ -1,0 +1,160 @@
+{
+  "version": 1,
+  "status": "CORE_IMPLEMENTED_AND_DISPOSABLE_VALIDATED; LIVE_ACTIVATION_BLOCKED",
+  "repository": "Satho82/beaconhs",
+  "branch": "feat/uvanoo-v1.4-secure-dev-backup-20261013",
+  "implementationSha": "5cbfc5b8be9d24ea5e634c2d4218a810506caf26",
+  "implementationTree": "b52396e65983cd12e28d8135e03646e31c13c50a",
+  "parentRecoveryCheckpoint": "23210119d7a0d2f33f78fd86e4107e2df8b0620d",
+  "productCandidate": "563fb0e9b79a838a5f394abaffb2f7dc743fc571",
+  "governedHeadVerified": "d18f635a41f092e9e86aa6f53518f9c28992b0d2",
+  "files": [
+    {
+      "path": ".github/workflows/dev-recovery-docs.yml",
+      "gitBlob": "e6045392bfb9e7dbda704ea0d112b0e824710281",
+      "status": "added"
+    },
+    {
+      "path": ".github/workflows/dev-recovery-validation.yml",
+      "gitBlob": "976736acd2df044cb0b2ba630fbb94d460ab8ab4",
+      "status": "added"
+    },
+    {
+      "path": "scripts/cluster/dev-recovery/README.md",
+      "gitBlob": "f93d3fb6f36eb4f862f94c6791056dc758b837c3",
+      "status": "added"
+    },
+    {
+      "path": "scripts/cluster/dev-recovery/bootstrap-restore.sql",
+      "gitBlob": "3109a34ad2fca90a403c056e942b4a03d668d983",
+      "status": "added"
+    },
+    {
+      "path": "scripts/cluster/dev-recovery/dev_recovery.py",
+      "gitBlob": "b850f2336c87c00033c969b43581216e933c3146",
+      "status": "added"
+    },
+    {
+      "path": "scripts/cluster/dev-recovery/disposable_validation.py",
+      "gitBlob": "4fad0c039c35faed376ea3f6901b774ee1237602",
+      "status": "added"
+    },
+    {
+      "path": "scripts/cluster/dev-recovery/restore_disposable.py",
+      "gitBlob": "b433623c28aaac92d1503fa89dc9323f63fb7c34",
+      "status": "added"
+    },
+    {
+      "path": "scripts/cluster/dev-recovery/test_dev_recovery.py",
+      "gitBlob": "f2c79ffb04c04856dd2ff266a7d6ce9b00d51595",
+      "status": "added"
+    }
+  ],
+  "validation": {
+    "runtimeSha": "8e8a01dd85bb27e0754691427fcfd80605c4435c",
+    "runtimeRun": "https://github.com/Satho82/beaconhs/actions/runs/38380746756",
+    "unitContracts": 24,
+    "postgresImage": "postgres@sha256:ca0bd484cb98bf4b24eb1010e73fb3fcbd6714d240fbc1a10eea5b7dbecb641d",
+    "postgresVersion": "16.15",
+    "syntheticOnly": true,
+    "encryptedDatabaseCaptureRestore": "PASS",
+    "metadataDocuments": 21,
+    "schemaSecuritySectionsMatched": 19,
+    "syntheticLedgerEntries": 1,
+    "ledgerEquality": "PASS",
+    "dataSequenceEquality": "PASS",
+    "tenantIsolation": "PASS",
+    "appendOnlyTrigger": "PASS",
+    "encryptedStorageRedisRecoveryFixtureRoundTrips": "PASS",
+    "live58To63Rehearsal": false,
+    "releaseGateEvidenceProduced": false,
+    "formatRun": "https://github.com/Satho82/beaconhs/actions/runs/38381159543",
+    "format": "PASS",
+    "runtimeFilesUnchangedAfterSuccessfulRuntimeRun": true,
+    "failedRunsPreserved": [
+      38379662369,
+      38379976829,
+      38380164231,
+      38380482538,
+      38381006786
+    ],
+    "correctedIssues": [
+      "PostgreSQL OID JSON needed explicit integer conversion",
+      "Collector JSON documents can span physical lines; complete ordered parsing required",
+      "Public SCHEMA TOC entry does not imply CREATE SCHEMA; retain initdb public for owner-bearing PG16.15 dump",
+      "Formatter CommonJS API import corrected"
+    ],
+    "fullApplicationCiRepeated": false,
+    "fullReleaseValidationOfFutureIntegratedSource": "REQUIRED before release acceptance",
+    "secretsProtection": "No live secrets/data available to synthetic Actions; no upload-artifact; private materials not tracked",
+    "securityGateChanged": false
+  },
+  "keyCustody": {
+    "identityPath": "/home/ubuntu/uvanoo-preflight/backup-key-custody/uvanoo-dev-20261013.agekey",
+    "recipientPath": "/home/ubuntu/uvanoo-preflight/backup-key-custody/uvanoo-dev-20261013.recipient",
+    "publicRecipientSha256": "138aa3b6a8f40c219b5d69a30357cf5ac9971c9523c87c04e42fc43c5434727f",
+    "identityMode": "0600",
+    "directoryMode": "0700",
+    "privateKeyPrintedOrPublished": false,
+    "localNonSensitiveRoundTrip": "PASS",
+    "independentKeyRecovery": "NOT VERIFIED",
+    "status": "PREPARED_ONLY"
+  },
+  "architecture": {
+    "components": [
+      "PostgreSQL custom dump retaining owners/ACLs",
+      "Encrypted unchanged 21-document metadata export",
+      "MinIO objects/config/attachment mapping",
+      "Redis persistence/queue provenance",
+      "Separate clean155/Decision recovery preservation"
+    ],
+    "localStagingProposal": "/opt/uvanoo-dev/backups/recovery (0700; per-capture directories0700, files0600)",
+    "localBackupRootInstalled": false,
+    "offHostDestination": "NOT SELECTED",
+    "privateRestoreExecutor": "NOT SELECTED",
+    "protectedReceipts": "Content-addressed manifest; external approved digest required; no local WORM/signing claim",
+    "retentionProposal": {
+      "daily": 14,
+      "weekly": 8,
+      "monthly": 12,
+      "preReleaseHold": true
+    },
+    "scheduleProposal": "02:00 UTC nightly and before migrations; not activated",
+    "deletionEnabled": false,
+    "alertsEnabled": false,
+    "sourceBinding": "SHA/tree/image/database OID/version, ledger/schema/data hashes, recipient and reviewed custody/off-host/guard/collector receipt hashes",
+    "freshness": "Capture start time retained; gate fragment rejects age over1hour and mismatched independent restore receipt",
+    "gateIntegration": "Adapter emits existing ReleaseEvidence.backup shape only; existing gate remains unchanged and authoritative"
+  },
+  "fencing": {
+    "liveMutations": false,
+    "liveSupervisorImplemented": false,
+    "status": "BLOCKED",
+    "reason": "Current candidate helper requires deployment/candidate health; unchanged-state backup fencing and restoration are not established.",
+    "required": [
+      "Exact saved control-plane and service-spec snapshot",
+      "Exclusive recovery/deployment lock",
+      "Complete external/database/queue/storage writer inventory",
+      "Continuous zero-writer/fence monitoring",
+      "Independent failure watchdog and re-fencing",
+      "Controlled readiness before writer restoration"
+    ],
+    "guardContract": "Hash-bound private executable required before and after capture/encryption; no always-successful live default. Receipt hashes/zero exit alone are not independent custody or continuous fencing proof."
+  },
+  "limitations": [
+    "Off-host uploader/download verifier integration, retention enforcement, scheduling and alerts cannot be configured until storage/account/custody choices are provided.",
+    "Physical MinIO/Redis/clean155 snapshot adapters and actual attachment/queue reconciliation remain unverified; encrypted byte fixtures are not those live restores.",
+    "Actual DEV data and all58 identities were not copied or rehearsed in this task.",
+    "Live database last verified at58 entries,5properties,968lifecycle events,2attachments; no new collection or persistent SQL changes.",
+    "Private restore helper retains operation records and failed isolated copies; it does not certify full restore by pg_restore exit alone.",
+    "No implementation files were deployed to VPS. Only the explicitly authorised prepared key and public-recipient files were created there.",
+    "No governed merge, live migrations, service changes, Traefik changes, staging/production changes, raw metadata upload or volume deletion."
+  ],
+  "ownerDecisions": [
+    "Accept prepared public recipient fingerprint and name the independent secret vault/escrow, custodian and secure cloud retrieval path.",
+    "Select private off-host backup account/bucket, immutable-retention policy and separate delete authority.",
+    "Select isolated private restore runner/control repository and secure credentials/receipt channel.",
+    "Ratify retention, RPO/RTO and failure-alert recipient."
+  ],
+  "nextAuthorization": "Authorise custody/storage provisioning against the selected exact resources, including independent key-recovery and encrypted transfer/decrypt verification. Existing DEV backup/rehearsal authorisation remains valid but capture stays blocked until custody, storage and continuous fencing pass. This does not authorise live SQL correction, migration, governed merge, deployment or Traefik changes."
+}

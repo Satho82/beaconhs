@@ -1,0 +1,20 @@
+# REVIEW TEMPLATE ONLY: do not install/start during isolated engineering.
+# Replace @APPROVED_TOOL_DIRECTORY@ and approve an exact source digest first.
+[Unit]
+Description=Uvanoo DEV recovery all-zero admission watchdog
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=simple
+User=root
+UMask=0077
+EnvironmentFile=/etc/uvanoo-dev/recovery-window.env
+ExecStart=/usr/bin/python3 @APPROVED_TOOL_DIRECTORY@/scripts/cluster/dev-recovery/recovery_admission.py ${UVANOO_RECOVERY_WORK}
+Restart=no
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ReadWritePaths=/opt/uvanoo-dev/backups/recovery
+# No automatic restart clears invalidation; no stop action resumes services.
+# Operator must keep deployment/write admission closed after monitor failure.

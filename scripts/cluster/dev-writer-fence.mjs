@@ -95,7 +95,8 @@ export function target(state, allowLegacy = false) {
       state.domains[0].path === '/',
     'DEV_TARGET_MISMATCH',
   )
-  if (allowLegacy) legacyCounts(state.env)\n  else counts(state.env)
+  if (allowLegacy) legacyCounts(state.env)
+  else counts(state.env)
 }
 
 export function runtimeReady(

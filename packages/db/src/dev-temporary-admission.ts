@@ -302,7 +302,7 @@ export function validateTemporaryAdmission(
   requireValue(
     Number.isSafeInteger(e.databaseOid) &&
       e.databaseOid > 0 &&
-      e.database === 'beaconhs' &&
+      e.database === DEV_TARGET.database &&
       e.postgresVersion === '160015' &&
       approval.backupSha256 === e.backup.sha256 &&
       receipt.backupSha256 === e.backup.sha256 &&

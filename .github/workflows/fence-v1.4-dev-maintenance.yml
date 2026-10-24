@@ -41,7 +41,8 @@ jobs:
       - name: Verify DEV-only maintenance inputs
         run: |
           set -euo pipefail
-          test "${GITHUB_SHA}" = "$(git rev-parse origin/feature/uvanoo-v1.4)"
+          test "${GITHUB_REF}" = "refs/heads/feature/uvanoo-v1.4"
+          test "${GITHUB_SHA}" = "$(git rev-parse HEAD)"
           test "${DEPLOY_SOURCE_SHA}" = "${GITHUB_SHA}"
           [[ "${IMAGE_DIGEST}" =~ ^sha256:[0-9a-f]{64}$ ]]
       - name: Configure TLS-preserving Dokploy resolution

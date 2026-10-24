@@ -93,6 +93,7 @@ RUN chmod +x /entrypoint.sh
 # Candidate image publication is deliberately digest-bound; only the governed
 # workflow may promote this immutable build to the isolated DEV target.
 # A DEV maintenance hold may fence writers, but cannot replace promotion checks.
+# The hold workflow validates the checked-out branch head before it can act.
 ENV APP_ROLE=web
 ENV HOME=/home/node
 EXPOSE 3000

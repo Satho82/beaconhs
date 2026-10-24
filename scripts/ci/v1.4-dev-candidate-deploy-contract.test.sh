@@ -298,7 +298,7 @@ abort 'Selected Redis credential validation must precede migrations' unless redi
 unless core_deploy.dig('env', 'EXPECTED_MIGRATION_HOST') == "${{ inputs.feature_candidate_verified && 'uvanoo-dev-postgres' || 'beaconhs-postgres' }}"
   abort 'Reusable deployment must select the matching candidate or normal-main migration host from the verification flag'
 end
-unless core_deploy.dig('env', 'EXPECTED_DATABASE_NAME') == "${{ inputs.feature_candidate_verified && 'beaconhs' || 'beaconhs' }}"
+unless core_deploy.dig('env', 'EXPECTED_DATABASE_NAME') == "${{ inputs.feature_candidate_verified && 'uvanoo_dev' || 'beaconhs' }}"
   abort 'Database identity must remain exact for candidate and main'
 end
 url_step = core_deploy.fetch('steps').find { |step| step['name'] == 'Validate migration database URLs' }

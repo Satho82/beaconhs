@@ -39,7 +39,7 @@ function fixture(maintenance = false) {
     sourceSha: 'b'.repeat(40),
     sourceTree: 'c'.repeat(40),
     imageDigest: 'sha256:' + h,
-    database: 'beaconhs',
+    database: 'uvanoo_dev',
     databaseOid: 123,
     postgresVersion: '160015',
     migrations: [],

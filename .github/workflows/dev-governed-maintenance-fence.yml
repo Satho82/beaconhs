@@ -60,4 +60,5 @@ jobs:
         env:
           DOKPLOY_URL: ${{ secrets.DOKPLOY_URL }}
           DOKPLOY_TOKEN: ${{ secrets.DOKPLOY_TOKEN }}
-        run: node scripts/cluster/dev-writer-fence.mjs fence
+          DEV_SERVICE_AUTHORIZATION: bootstrap-fence
+        run: node scripts/cluster/dev-writer-fence.mjs bootstrap-fence

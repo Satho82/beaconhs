@@ -39,6 +39,26 @@ export function counts(env) {
   )
 }
 
+export function legacyCounts(env) {
+  check(typeof env === 'string', 'ENV_MISSING')
+  const lines = env.split('\n')
+  const legacy = lines.filter((line) => /^\s*(?:export\s+)?WRITER_REPLICAS\s*=/.test(line))
+  check(
+    legacy.length === 1 && /^\s*(?:export\s+)?WRITER_REPLICAS=1\r?$/.test(legacy[0]) &&
+      !writers.some((role) => new RegExp(`^\\s*(?:export\\s+)?${controls[role]}\\s*=`).test(env)),
+    'LEGACY_FENCE_REQUIRES_APPROVED_BOOTSTRAP',
+  )
+}
+
+export function bootstrapZero(env) {
+  legacyCounts(env)
+  return env
+    .split('\n')
+    .filter((line) => !/^\s*(?:export\s+)?WRITER_REPLICAS\s*=/.test(line))
+    .concat(writers.map((role) => `${controls[role]}=0`))
+    .join('\n')
+}
+
 export function replicas(env, value) {
   counts(env)
   check(
@@ -56,7 +76,7 @@ export function replicas(env, value) {
     .join('\n')
 }
 
-export function target(state) {
+export function target(state, allowLegacy = false) {
   check(
     state.composeId === composeId &&
       state.appName === stack &&
@@ -75,7 +95,7 @@ export function target(state) {
       state.domains[0].path === '/',
     'DEV_TARGET_MISMATCH',
   )
-  counts(state.env)
+  if (allowLegacy) legacyCounts(state.env)\n  else counts(state.env)
 }
 
 export function runtimeReady(
@@ -204,6 +224,17 @@ export async function runFence(mode, io, config) {
     // Do not replace its networks, images, storage settings or other services.
     await io.validateCompose(before)
     const fenced = await persist(before, zero)
+    await io.deploy()
+    await wait(fenced, zero, false)
+  } else if (mode === 'bootstrap-fence') {
+    check(config.authorization === 'bootstrap-fence', 'SERVICE_OWNER_AUTHORIZATION_REQUIRED')
+    const before = await io.get()
+    target(before, true)
+    const env = bootstrapZero(before.env)
+    await io.update({ composeId, env })
+    const fenced = await read()
+    check(fenced.env === env && fenced.composeFile === before.composeFile, 'FENCE_PERSIST_POSTCONDITION')
+    await io.validateCompose(fenced)
     await io.deploy()
     await wait(fenced, zero, false)
   } else if (mode === 'verify-zero') {

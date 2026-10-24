@@ -73,14 +73,6 @@ export function GuestReportForm({ token, submissionId }: { token: string; submis
           {translateValue('Add one photo to help the hotel team. Maximum 10 MB.')}
         </span>
       </Label>
-      <Label>
-        {translateValue('Urgency')}
-        <Select name="priority" defaultValue="medium">
-          <option value="low">{translateValue('Low — can wait')}</option>
-          <option value="medium">{translateValue('Normal')}</option>
-          <option value="high">{translateValue('Urgent — affecting the stay')}</option>
-        </Select>
-      </Label>
       <div className="grid gap-4 sm:grid-cols-2">
         <Label>
           {translateValue('Name (optional)')}

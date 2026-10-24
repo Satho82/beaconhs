@@ -16,7 +16,6 @@ on:
       - .github/workflows/deploy-v1.4-dev-candidate.yml
       - .github/workflows/deploy-dev.yml
       - scripts/ci/v1.4-dev-candidate-deploy-contract.test.sh
-      - scripts/cluster/dev-writer-fence.mjs
       - apps/**
       - packages/**
       - package.json

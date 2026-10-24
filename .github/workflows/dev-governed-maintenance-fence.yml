@@ -26,6 +26,7 @@ jobs:
     timeout-minutes: 15
     env:
       DOKPLOY_COMPOSE_ID: wYb0LxLQrvj2FPI21i-Oj
+      DOKPLOY_TARGET_STACK: uvanoo-v1-4-dev-gniriv
       EXPECTED_DOKPLOY_STACK: uvanoo-v1-4-dev-gniriv
       EXPECTED_APP_HOST: dev.uvanoo.com
       DEPLOY_SOURCE_SHA: ${{ inputs.source_sha }}

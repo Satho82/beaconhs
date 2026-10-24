@@ -44,6 +44,17 @@ jobs:
           test "${GITHUB_SHA}" = "$(git rev-parse origin/feature/uvanoo-v1.4)"
           test "${DEPLOY_SOURCE_SHA}" = "${GITHUB_SHA}"
           [[ "${IMAGE_DIGEST}" =~ ^sha256:[0-9a-f]{64}$ ]]
+      - name: Configure TLS-preserving Dokploy resolution
+        env:
+          DOKPLOY_URL: ${{ secrets.DOKPLOY_URL }}
+          DOKPLOY_RESOLVE_IP: ${{ secrets.DOKPLOY_RESOLVE_IP }}
+        run: |
+          set -euo pipefail
+          host="${DOKPLOY_URL#https://}"
+          test "${host}" != "${DOKPLOY_URL}"
+          [[ "${host}" =~ ^([A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?\.)+[A-Za-z]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?$ ]]
+          [[ "${DOKPLOY_RESOLVE_IP}" =~ ^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.) ]]
+          printf 'DOKPLOY_CURL_RESOLVE=%s\n' "${host}:443:${DOKPLOY_RESOLVE_IP}" >> "${GITHUB_ENV}"
       - name: Persist apply and verify DEV writer fence
         env:
           DOKPLOY_URL: ${{ secrets.DOKPLOY_URL }}

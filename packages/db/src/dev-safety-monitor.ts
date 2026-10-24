@@ -105,8 +105,8 @@ const contracts: Record<string, Record<string, 'zero' | 'true' | 'false' | 'hash
     failureRehearsalSha256: 'hash',
     heartbeatSha256: 'hash',
   },
-  persistentFiveZero: {
-    exactFiveServiceIdentities: 'true',
+  persistentFourZero: {
+    exactFourServiceIdentities: 'true',
     desiredReplicas: 'zero',
     activeTasks: 'zero',
     approvedServiceIdsSha256: 'hash',

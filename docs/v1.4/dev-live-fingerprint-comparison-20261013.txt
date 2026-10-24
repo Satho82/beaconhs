@@ -1,0 +1,141 @@
+UVANOO V1.4 — actual DEV saved-export comparison — 2026-10-13
+STATUS: LEDGER PASS; STRICT SCHEMA COMPARISON FAIL; RELEASE NOT READY
+
+Executed through ONLINE Remote Desktop Commander device vps-c54e0b88
+(cbab0184-0ddc-483a-87ac-1ba36ecbdab0). Node v24.20.0.
+No PostgreSQL connection or repeated metadata export. This validates the saved
+snapshot, not a newly observed live database state.
+
+Verified inputs:
+DEV file /home/ubuntu/uvanoo-preflight/dev-metadata.jsonl
+SHA256 51959099c665622286fc2a13bb771f64574b518f81dfcee67ea7524ed68f933d
+Checksum rechecked unchanged after analysis.
+Canonical corrected artifact recovered from run 38367875871:
+reference-public.json SHA256
+08616cba75b6dc87c79891d54e2ea896eb9f89117c7b835fd7d08a9851e99461
+Approved comparison utility at 5b427356d5230f6db72397b8a4b6c519652f0c31:
+downloaded Git blob 9657d059304db12b4e5186cae1048c025c5f503d matches repository.
+Product candidate 563fb0e9b79a838a5f394abaffb2f7dc743fc571.
+
+RESULT
+All 58 ledger hashes, timestamps and increasing ID order match.
+Canonical fingerprint:
+adce2e70b4447ac5787ade49040f1a8f101c3e3b0dd067069f029bbd13c0493e
+Actual saved DEV fingerprint:
+0529262d8f4b1a323994e1dbeae85e70b3506cd0746c2faf3d0b4e014ccb0074
+Utility exit 2 (schema mismatch). Wrapper exit 0 only means diagnostic reporting
+completed; it is NOT a comparison pass.
+13 of 19 sections match exactly.
+
+MATCHED SECTIONS (zero-based gate section indices)
+0 database owner/ACL/properties
+2 relations, ownership, ACLs and RLS/FORCE flags
+3 columns/defaults/column ACLs
+4 constraints
+5 indexes
+6 non-internal trigger definitions and states
+8 policies including roles/predicates/checks
+9 views
+12 beaconhs role memberships
+14 event triggers
+15 rewrite rules
+16 domain constraints
+18 sequence metadata
+All 8 canonical function records are also present unchanged, although section 7
+has additional extension functions. Existing matched objects do not establish
+complete security equivalence when defaults/extensions/role settings differ.
+
+EXACT DIFFERENCES
+Section 1 schemas: reference 3, DEV 4.
+Additional etl owned by beaconhs_owner. ACL grants owner USAGE/CREATE,
+beaconhs_super USAGE/CREATE, beaconhs_backup USAGE; no app/PUBLIC grant.
+
+Section 7 functions: reference 8, DEV 75.
+67 additional functions: 36 definitions reference $libdir/pgcrypto and 31
+reference $libdir/pg_trgm; none outside those two libraries in the extra set.
+This establishes library references from saved definitions, not independently
+verified extension membership/dependency provenance.
+
+Section 10 types/enums: reference 1108 rows, DEV 1110.
+Additional public.gtrgm and public._gtrgm.
+
+Section 11 roles: 5 rows in both; four differ only in rolconfig.
+beaconhs_app, beaconhs_super, beaconhs_migrator and beaconhs_backup each have
+idle_in_transaction_session_timeout=5min,
+tcp_keepalives_idle=60, tcp_keepalives_interval=10, tcp_keepalives_count=6.
+All four tuning settings were checked and match scripts/cluster/provision.sql.
+Backup still has default_transaction_read_only=on. Other role attributes match.
+beaconhs_owner row matches completely.
+
+Section 13 default ACLs: reference 2, DEV 8.
+The two drizzle backup-read defaults match.
+Six additional records:
+- etl tables created by beaconhs_owner: ALL table privileges for beaconhs_super,
+  SELECT for beaconhs_backup.
+- etl sequences created by beaconhs_owner: USAGE/SELECT/UPDATE for beaconhs_super,
+  SELECT for beaconhs_backup.
+- etl tables created by beaconhs_super: same table privilege pattern.
+- etl sequences created by beaconhs_super: same sequence privilege pattern.
+- public tables created by beaconhs_owner: SELECT/INSERT/UPDATE/DELETE for app
+  and super; SELECT for backup.
+- public sequences created by beaconhs_owner: USAGE/SELECT/UPDATE for app
+  and super; SELECT for backup.
+No grant-option markers in these exported entries.
+These are creation-time defaults, distinct from existing-object ACLs which match.
+
+Section 17 extensions: reference 1, DEV 3.
+DEV: plpgsql 1.0, pgcrypto 1.3, pg_trgm 1.6, all owned by uvanoo_dev.
+Reference plpgsql row differs only in owner. Additional pgcrypto/pg_trgm absent
+from minimal reference. Extension owner-role attributes/dependencies outside the
+exported beaconhs role scope remain unverified.
+
+INTERPRETATION / REFERENCE LIMITATION
+scripts/cluster/provision.sql is byte-identical at historical base
+d18f635a41f092e9e86aa6f53518f9c28992b0d2 and product candidate.
+It explicitly installs pgcrypto/pg_trgm (lines 91–92), creates/limits etl
+(103–107), establishes the extra default privileges (132–155) and role tuning
+(158–174).
+Therefore these differences are largely provision-contract differences, not
+evidence of random DEV corruption or missing tenant security.
+The published adce... reference is a trusted migration-fixture reference with
+minimal CI role provisioning; it is NOT yet a complete provisioned-VPS baseline.
+This qualifies the earlier "canonical reference complete" statement.
+The public defaults also differ from the candidate migration privilege
+preparation contract, which revokes broad creation-time defaults. Installer
+order/provenance must be resolved; do not assume the runner can repair them,
+because the gate validates current state first.
+The strict gate correctly rejects 0529... against adce.... No exception or
+replacement expected hash was applied.
+
+NEXT SAFE ACTION
+Prepare an independently reconstructed reference incorporating the reviewed
+full provisioning contract, approved bootstrap/extension ownership and correct
+historical installer order. Review each resulting difference before any release
+evidence approval. Do not copy observed DEV ACLs/settings into a trusted baseline.
+Do not drop etl/extensions, remove protective timeouts, broadly regrant
+privileges, or substitute the observed fingerprint to obtain a pass.
+
+READINESS / BACKUP
+58-entry ledger compatibility confirmed. Persistent 58→63 execution remains
+NO-GO until the provisioned baseline/security differences are reconciled.
+Then require authorised encrypted backup, complete backup-role coverage,
+independent restore and real-data 58→63 rehearsal with property/lifecycle data,
+Risk/People/Approvals and attachments verified. Reconcile clean155 data and
+Redis jobs; plan writer fencing/re-fencing and coordinated rollback.
+Matching metadata alone would not prove data backfill compatibility.
+No backup, restore or migration executed.
+
+PRIVATE EVIDENCE
+Comparison directory:
+/home/ubuntu/uvanoo-preflight/live-compare58.3HeBjkGV
+result.json SHA256:
+d1cd37218fccd21f06e6fca52bb0dc553ebe6cbb464d72662160ad7207eb8ab5
+Raw DEV metadata and full local results were not uploaded to GitHub.
+Only this non-sensitive summary is published.
+
+BOUNDARIES
+No database writes/queries, migrations, Docker/service/network changes, volume
+changes, deployment, governed merge or CI run.
+Only protected comparison files were created on the VPS.
+DEV-only Basic Auth removal remains documented for the next separately
+authorised release; Traefik/native authentication unchanged.

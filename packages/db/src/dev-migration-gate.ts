@@ -333,7 +333,7 @@ export async function loadDevMigrationGate(folder: string, phase: AdmissionPhase
     if (evidence.version === 2) checkTemporaryFiles(evidence, directory, phase)
   }
   admit()
-  if (evidence.database !== 'beaconhs') throw new Error('DEV persistent database must be beaconhs')
+  if (evidence.database !== 'uvanoo_dev') throw new Error('DEV persistent database must be uvanoo_dev')
   const archive =
     evidence.version === 2
       ? privateEvidenceFile(directory, evidence.backup.file)

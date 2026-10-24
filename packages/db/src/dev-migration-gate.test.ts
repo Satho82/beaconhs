@@ -171,3 +171,5 @@ describe('strict DEV release migration gate', () => {
     )
   })
 })
+
+[executed on device: vps-c54e0b88 (fc795f58-05bc-455e-8758-99b3f4cc0544)]

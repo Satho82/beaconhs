@@ -175,8 +175,8 @@ function fixture(maintenance = false) {
       failureRehearsalSha256: h,
       heartbeatSha256: h,
     },
-    persistentFiveZero: {
-      exactFiveServiceIdentities: true,
+    persistentFourZero: {
+      exactFourServiceIdentities: true,
       desiredReplicas: 0,
       activeTasks: 0,
       approvedServiceIdsSha256: h,
@@ -331,7 +331,7 @@ describe('independent DEV observation/signing adapter', () => {
       ).toBe(check.evidenceSha256)
     expect(JSON.parse(readFileSync(join(f.directory, 'safety.json'), 'utf8'))).toEqual(envelope)
   })
-  it.each(['writerExclusion', 'independentWatchdog', 'persistentFiveZero', 'legacyIsolation'])(
+  it.each(['writerExclusion', 'independentWatchdog', 'persistentFourZero', 'legacyIsolation'])(
     'fails closed on missing %s',
     async (check) => {
       const f = fixture()

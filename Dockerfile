@@ -57,7 +57,7 @@ RUN test "$TARGETARCH" = amd64 || { echo "BeaconHS runtime requires linux/amd64"
 ENV NODE_ENV=production
 
 # Headless-browser shared libs for PDF rendering (worker), plus LibreOffice
-# (Impress for the slides import, Writer for document version renders) +
+# (Impress for the slides import, Writer for document version renders) + 
 # poppler (pdftoppm page images, pdfunite book concatenation).
 RUN apt-get update && apt-get install -y --no-install-recommends \
     fonts-liberation libpcre2-8-0 libnss3 libatk-bridge2.0-0 libcups2 \
@@ -90,6 +90,8 @@ COPY --chown=node:node --from=builder /prod/worker ./apps/worker
 COPY --chown=node:node docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
+# Candidate image publication is deliberately digest-bound; only the governed
+# workflow may promote this immutable build to the isolated DEV target.
 ENV APP_ROLE=web
 ENV HOME=/home/node
 EXPOSE 3000

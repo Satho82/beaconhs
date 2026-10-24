@@ -219,7 +219,7 @@ jobs:
       SUPERADMIN_DATABASE_URL: ${{ inputs.feature_candidate_verified && secrets.DEV_SUPERADMIN_DATABASE_URL || secrets.MAIN_SUPERADMIN_DATABASE_URL }}
       REDIS_URL: ${{ inputs.feature_candidate_verified && secrets.DEV_REDIS_URL || secrets.MAIN_REDIS_URL }}
       EXPECTED_MIGRATION_HOST: ${{ inputs.feature_candidate_verified && 'uvanoo-dev-postgres' || 'beaconhs-postgres' }}
-      EXPECTED_DATABASE_NAME: ${{ inputs.feature_candidate_verified && 'uvanoo_dev' || 'beaconhs' }}
+      EXPECTED_DATABASE_NAME: ${{ inputs.feature_candidate_verified && 'beaconhs' || 'beaconhs' }}
       DEV_RELEASE_ENVIRONMENT: ${{ inputs.feature_candidate_verified && 'dev' || 'production' }}
       DEV_TEMPORARY_APPROVAL_SHA256: ${{ inputs.temporary_dev_approval_sha256 }}
       DEV_RELEASE_EVIDENCE_SHA256: ${{ inputs.release_evidence_sha256 }}

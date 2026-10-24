@@ -11,8 +11,8 @@ import { controls, liveIO, writers, zero } from './dev-writer-fence.mjs'
 
 // Synthetic credentials only. No daemon, network, repository secrets or live files.
 const permanent = {
-  DATABASE_URL: 'postgres://beaconhs_app:synthetic@uvanoo-dev-postgres:5432/uvanoo_dev',
-  SUPERADMIN_DATABASE_URL: 'postgres://beaconhs_super:synthetic@uvanoo-dev-postgres:5432/uvanoo_dev',
+  DATABASE_URL: 'postgres://beaconhs_app:synthetic@uvanoo-dev-postgres:5432/beaconhs',
+  SUPERADMIN_DATABASE_URL: 'postgres://beaconhs_super:synthetic@uvanoo-dev-postgres:5432/beaconhs',
   REDIS_URL: 'redis://:synthetic@uvanoo-dev-redis:6379/0',
   R2_ENDPOINT: 'http://uvanoo-dev-minio:9000',
   R2_BUCKET: 'synthetic-dev-bucket',
@@ -131,8 +131,8 @@ for (const [name, mutate] of [
     'wrong database',
     (c) => {
       c.services.worker.environment.DATABASE_URL = permanent.DATABASE_URL.replace(
-        '/uvanoo_dev',
-        '/uvanoo_dev',
+        '/beaconhs',
+        '/beaconhs',
       )
     },
   ],

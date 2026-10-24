@@ -32,7 +32,7 @@ function evidence(): ReleaseEvidence {
   return {
     version: 1,
     ...identity,
-    database: 'uvanoo_dev',
+    database: 'beaconhs',
     databaseOid: 123,
     postgresVersion: '160015',
     migrations: files,
@@ -86,14 +86,14 @@ describe('strict DEV release migration gate', () => {
     }
     expect(() =>
       validateBackupTarget(
-        'postgresql://beaconhs_backup:fixture@host:5432/uvanoo_dev',
-        'postgresql://beaconhs_migrator:fixture@host:5432/uvanoo_dev',
+        'postgresql://beaconhs_backup:fixture@host:5432/beaconhs',
+        'postgresql://beaconhs_migrator:fixture@host:5432/beaconhs',
       ),
     ).not.toThrow()
     expect(() =>
       validateBackupTarget(
-        'postgresql://beaconhs_backup:fixture@other:5432/uvanoo_dev',
-        'postgresql://beaconhs_migrator:fixture@host:5432/uvanoo_dev',
+        'postgresql://beaconhs_backup:fixture@other:5432/beaconhs',
+        'postgresql://beaconhs_migrator:fixture@host:5432/beaconhs',
       ),
     ).toThrow()
   })

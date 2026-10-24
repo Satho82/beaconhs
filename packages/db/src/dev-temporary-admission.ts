@@ -10,7 +10,7 @@ export const DEV_TARGET = Object.freeze({
   composeId: 'wYb0LxLQrvj2FPI21i-Oj',
   stack: 'uvanoo-v1-4-dev-gniriv',
   host: 'dev.uvanoo.com',
-  database: 'uvanoo_dev',
+  database: 'beaconhs',
   databaseHost: 'uvanoo-dev-postgres',
   network: 'uvanoo-dev-private',
 })
@@ -204,7 +204,7 @@ export function requireTemporaryDatabaseTarget(
       u.protocol === 'postgresql:' &&
         u.hostname === DEV_TARGET.databaseHost &&
         (u.port || '5432') === '5432' &&
-        u.pathname === '/uvanoo_dev' &&
+        u.pathname === '/beaconhs' &&
         decodeURIComponent(u.username) === role &&
         Boolean(u.password) &&
         !u.hash,

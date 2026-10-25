@@ -388,18 +388,25 @@ export function liveIO() {
         const configs = vectors.map((count) => {
           writeFileSync(envFile, replicas(state.env, count), { mode: 0o600 })
           const cleanEnv = { PATH: process.env.PATH, HOME: process.env.HOME }
-          const result = execFileSync(
-            'docker',
-            ['compose', '--env-file', envFile, '-f', file, 'config', '--format', 'json'],
-            {
-              env: cleanEnv,
-              encoding: 'utf8',
-              timeout: 30000,
-              maxBuffer: 16 * 1024 * 1024,
-              stdio: ['pipe', 'pipe', 'pipe'],
-            },
-          )
-          const config = JSON.parse(result)
+          let config
+          try {
+            const result = execFileSync(
+              'docker',
+              ['compose', '--env-file', envFile, '-f', file, 'config', '--format', 'json'],
+              {
+                env: cleanEnv,
+                encoding: 'utf8',
+                timeout: 30000,
+                maxBuffer: 16 * 1024 * 1024,
+                stdio: ['pipe', 'pipe', 'pipe'],
+              },
+            )
+            config = JSON.parse(result)
+          } catch {
+            // Docker Compose can include saved environment values in its error
+            // output. Keep the release log redacted and classify only the stage.
+            throw new Error('COMPOSE_CONFIG_VALIDATION_FAILED')
+          }
           check(
             JSON.stringify(Object.keys(config.services ?? {}).sort()) ===
               JSON.stringify(['scheduler', 'storage-init', 'web', 'worker']),

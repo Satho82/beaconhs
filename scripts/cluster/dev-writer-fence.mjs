@@ -230,14 +230,28 @@ export async function runFence(mode, io, config) {
   } else if (mode === 'bootstrap-fence') {
     check(config.authorization === 'bootstrap-fence', 'SERVICE_OWNER_AUTHORIZATION_REQUIRED')
     const before = await io.get()
-    target(before, true)
-    const env = bootstrapZero(before.env)
-    await io.update({ composeId, env })
-    const fenced = await read()
-    check(fenced.env === env && fenced.composeFile === before.composeFile, 'FENCE_PERSIST_POSTCONDITION')
-    await io.validateCompose(fenced)
-    await io.deploy()
-    await wait(fenced, zero, false)
+    // DEV may still have the approved single legacy control, or may already
+    // have the four independent controls. In both cases validate the complete
+    // current state before writing anything; never silently accept a hybrid.
+    if (/^\s*(?:export\s+)?WRITER_REPLICAS\s*=/m.test(before.env)) {
+      target(before, true)
+      const env = bootstrapZero(before.env)
+      await io.update({ composeId, env })
+      const fenced = await read()
+      check(
+        fenced.env === env && fenced.composeFile === before.composeFile,
+        'FENCE_PERSIST_POSTCONDITION',
+      )
+      await io.validateCompose(fenced)
+      await io.deploy()
+      await wait(fenced, zero, false)
+    } else {
+      target(before)
+      await io.validateCompose(before)
+      const fenced = await persist(before, zero)
+      await io.deploy()
+      await wait(fenced, zero, false)
+    }
   } else if (mode === 'verify-zero') {
     const state = await read()
     check(state.env === replicas(state.env, zero), 'FENCE_NOT_PERSISTED')

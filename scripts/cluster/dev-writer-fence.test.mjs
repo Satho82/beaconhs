@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import {
+  bootstrapComposeControls,
   counts,
   controls,
   replicas,
@@ -246,6 +247,26 @@ test('ambiguous controls and invalid target counts rejected; unrelated bytes pre
     assert.throws(() => counts(bad), /FENCE_ENV_AMBIGUOUS/)
   assert.throws(() => replicas(good, { ...zero, worker: 2 }), /FENCE_VALUE_INVALID/)
   assert.equal(replicas(good, zero), good)
+})
+
+test('bootstrap preserves an exact existing independent-control compose file', () => {
+  const independent = [
+    '',
+    '  web:',
+    '    deploy:',
+    '      replicas: ' + String.fromCharCode(36) + '{WEB_REPLICAS}',
+    '  worker:',
+    '    deploy:',
+    '      replicas: ' + String.fromCharCode(36) + '{WORKER_REPLICAS}',
+    '  scheduler:',
+    '    deploy:',
+    '      replicas: ' + String.fromCharCode(36) + '{SCHEDULER_REPLICAS}',
+    '  storage-init:',
+    '    deploy:',
+    '      replicas: ' + String.fromCharCode(36) + '{STORAGE_INIT_REPLICAS}',
+    '',
+  ].join('\n')
+  assert.equal(bootstrapComposeControls(independent), independent)
 })
 
 test('failed activation compensates with a persisted, verified full fence', async () => {

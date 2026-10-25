@@ -10,3 +10,4 @@ It contains no VPS, SSH, Dokploy, staging, production, or deployment steps. Runt
 - The approved writer-fence bootstrap validates either the legacy single writer control or an already-established independent control set; mixed or malformed layouts remain rejected.
 - Docker Compose validation failures in the writer fence are reported as a symbolic stage code; Compose output is not written to release logs.
 - The bootstrap may migrate only the exact legacy writer replica placeholders into the four approved independent placeholders before applying the all-zero fence; all other saved compose content is preserved and re-read before deployment.
+- The bounded compose-control migration uses literal control names constructed without interpolation, preserving the candidate contract parser and secret-free validation output.

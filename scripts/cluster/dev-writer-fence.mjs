@@ -76,6 +76,16 @@ export function bootstrapComposeControls(compose) {
     const next = source.slice(start + 1).search(/\n  [A-Za-z][A-Za-z0-9-]*:\n/)
     return [start, next < 0 ? source.length : start + 1 + next]
   }
+  const alreadyIndependent = writers.every((role) => {
+    const [start, end] = serviceBlock(compose, role)
+    const block = compose.slice(start, end)
+    const expected = 'replicas: ' + replacement[role]
+    return block.split(expected).length === 2
+  })
+  if (alreadyIndependent) {
+    check(!compose.includes('replicas: ' + legacy), 'COMPOSE_LEGACY_CONTROL_AMBIGUOUS')
+    return compose
+  }
   let next = compose
   for (const role of ['web', 'worker', 'scheduler']) {
     const [start, end] = serviceBlock(next, role)

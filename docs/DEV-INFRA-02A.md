@@ -7,3 +7,4 @@ The `Uvanoo V1.4 cloud validation and DEV image` workflow accepts an explicit im
 It contains no VPS, SSH, Dokploy, staging, production, or deployment steps. Runtime credentials remain external to the image. A governed DEV writer-fence bootstrap is validated as part of the candidate contract; it is only used later by the separate DEV-only maintenance workflow and never by this build workflow. To recover, dispatch the workflow from `feature/uvanoo-v1.4` and provide the exact SHA; use the resulting digest for a later explicitly authorized DEV runtime stage.
 
 - Governed writer-fence failures emit only a symbolic stage code; control-plane response bodies and credentials are never written to release logs.
+- The approved writer-fence bootstrap validates either the legacy single writer control or an already-established independent control set; mixed or malformed layouts remain rejected.

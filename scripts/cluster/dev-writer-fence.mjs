@@ -897,27 +897,25 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
 } + '{' + controls[role] + '}']),
   )
   const serviceBlock = (source, role) => {
-    const start = source.indexOf(`\n  ${role}:\n`)
+    const marker = '\n  ' + role + ':\n'
+    const start = source.indexOf(marker)
     check(start >= 0, 'COMPOSE_SERVICE_MISSING')
     const next = source.slice(start + 1).search(/\n  [A-Za-z][A-Za-z0-9-]*:\n/)
-    return [
-      start,
-      next < 0 ? source.length : start + 1 + next,
-    ]
+    return [start, next < 0 ? source.length : start + 1 + next]
   }
   let next = compose
   for (const role of ['web', 'worker', 'scheduler']) {
     const [start, end] = serviceBlock(next, role)
     const block = next.slice(start, end)
-    const expected = `replicas: ${legacy}`
+    const expected = 'replicas: ' + legacy
     check(block.split(expected).length === 2, 'COMPOSE_LEGACY_CONTROL_AMBIGUOUS')
-    next = next.slice(0, start) + block.replace(expected, `replicas: ${replacement[role]}`) + next.slice(end)
+    next = next.slice(0, start) + block.replace(expected, 'replicas: ' + replacement[role]) + next.slice(end)
   }
   const [start, end] = serviceBlock(next, 'storage-init')
   const block = next.slice(start, end)
   check(block.split('replicas: 1').length === 2, 'COMPOSE_LEGACY_CONTROL_AMBIGUOUS')
-  next = next.slice(0, start) + block.replace('replicas: 1', `replicas: ${replacement['storage-init']}`) + next.slice(end)
-  check(!next.includes(`replicas: ${legacy}`), 'COMPOSE_LEGACY_CONTROL_AMBIGUOUS')
+  next = next.slice(0, start) + block.replace('replicas: 1', 'replicas: ' + replacement['storage-init']) + next.slice(end)
+  check(!next.includes('replicas: ' + legacy), 'COMPOSE_LEGACY_CONTROL_AMBIGUOUS')
   return next
 }
 

@@ -18,3 +18,5 @@ The DEV writer-maintenance fence now explicitly preserves the existing disabled
 `collabora` sidecar while validating and controlling only the four writer
 services. This correction followed a safe pre-mutation fence refusal; it does
 not admit, start, or modify Collabora.
+
+The bootstrap now recognizes that exact already-migrated four-control form as idempotent; it still rejects any mixed legacy and independent control layout before mutation.

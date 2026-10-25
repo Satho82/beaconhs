@@ -310,12 +310,22 @@ export function liveIO() {
     ]
     if (payload) args.push('-X', 'POST', '-H', 'content-type: application/json', '--data', '@-')
     else args.push('-G', '--data-urlencode', `composeId=${composeId}`)
-    const result = exec(
-      'bash',
-      [helper, ...args, `${origin}/api/${endpoint}`],
-      payload && JSON.stringify(payload),
-    )
-    return endpoint === 'compose.one' ? JSON.parse(result) : undefined
+    let result
+    try {
+      result = exec(
+        'bash',
+        [helper, ...args, `${origin}/api/${endpoint}`],
+        payload && JSON.stringify(payload),
+      )
+    } catch {
+      throw new Error(`CONTROL_PLANE_${endpoint.replace('.', '_').toUpperCase()}_FAILED`)
+    }
+    if (endpoint !== 'compose.one') return undefined
+    try {
+      return JSON.parse(result)
+    } catch {
+      throw new Error('CONTROL_PLANE_RESPONSE_INVALID')
+    }
   }
   return {
     get: () => api('compose.one'),

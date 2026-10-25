@@ -8,6 +8,9 @@ const composeId = 'wYb0LxLQrvj2FPI21i-Oj'
 const stack = 'uvanoo-v1-4-dev-gniriv'
 // Every mutable DEV service is fenced before candidate admission.
 export const writers = ['web', 'worker', 'scheduler', 'storage-init']
+// Collabora remains an explicitly disabled, non-writer DEV sidecar. It is not
+// admitted, restarted, or otherwise changed by the writer-maintenance fence.
+export const preservedSidecars = ['collabora']
 export const controls = Object.fromEntries(
   writers.map((role) => [role, `${role.replace('-', '_').toUpperCase()}_REPLICAS`]),
 )
@@ -452,7 +455,7 @@ export function liveIO() {
           }
           check(
             JSON.stringify(Object.keys(config.services ?? {}).sort()) ===
-              JSON.stringify(['scheduler', 'storage-init', 'web', 'worker']),
+              JSON.stringify([...writers, ...preservedSidecars].sort()),
             'COMPOSE_SERVICE_SET_AMBIGUOUS',
           )
           for (const role of writers) {

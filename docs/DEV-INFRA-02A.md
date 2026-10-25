@@ -12,7 +12,6 @@ It contains no VPS, SSH, Dokploy, staging, production, or deployment steps. Runt
 - The bootstrap may migrate only the exact legacy writer replica placeholders into the four approved independent placeholders before applying the all-zero fence; all other saved compose content is preserved and re-read before deployment.
 - The bounded compose-control migration uses literal control names constructed without interpolation, preserving the candidate contract parser and secret-free validation output.
 
-
 ### 2026-10-25 governed writer-fence correction
 
 The DEV writer-maintenance fence now explicitly preserves the existing disabled

@@ -15,4 +15,7 @@ It contains no VPS, SSH, Dokploy, staging, production, or deployment steps. Runt
 
 ### 2026-10-25 governed writer-fence correction
 
-The DEV writer-maintenance fence now explicitly preserves the existing disabled `collabora` sidecar while validating and controlling only the four writer services. This correction followed a safe pre-mutation fence refusal; it does not admit, start, or modify Collabora.
+The DEV writer-maintenance fence now explicitly preserves the existing disabled
+`collabora` sidecar while validating and controlling only the four writer
+services. This correction followed a safe pre-mutation fence refusal; it does
+not admit, start, or modify Collabora.

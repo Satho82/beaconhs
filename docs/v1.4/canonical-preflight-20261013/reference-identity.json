@@ -1,0 +1,360 @@
+{
+  "candidate": "563fb0e9b79a838a5f394abaffb2f7dc743fc571",
+  "candidateTree": "324c50a60e2cb0639ba920488a150c6531968374",
+  "historicalInstaller": "d18f635a41f092e9e86aa6f53518f9c28992b0d2",
+  "historicalTree": "cac8f1184b7852629aab49e77f49a693abd0e350",
+  "prefix": 58,
+  "postgresRequired": "16.15",
+  "fingerprint": null,
+  "status": "NOT GENERATED",
+  "migrations": [
+    {
+      "idx": 0,
+      "tag": "0000_init",
+      "when": 1782427425950,
+      "blob": "2744db90b5b4a465f22da65096cd7956f2e21c61"
+    },
+    {
+      "idx": 1,
+      "tag": "0001_migration_cutover",
+      "when": 1783884000000,
+      "blob": "3ee36eab15e3cb84ed293800c5435a83ba22bbde"
+    },
+    {
+      "idx": 2,
+      "tag": "0002_drop_retired_plugin_tables",
+      "when": 1783884001000,
+      "blob": "159297688f9ef8aa9e33564a3d5b07176ca749a6"
+    },
+    {
+      "idx": 3,
+      "tag": "0003_converge_dev_schema",
+      "when": 1783885836249,
+      "blob": "8a20fa6919430c01c1668e7da9c7780851784373"
+    },
+    {
+      "idx": 4,
+      "tag": "0004_flawless_boomer",
+      "when": 1783897386441,
+      "blob": "f1f68aa0eef257e4035e5a29a11cb027ca5d9072"
+    },
+    {
+      "idx": 5,
+      "tag": "0005_production_cutover",
+      "when": 1783956236047,
+      "blob": "bf71f2dd16e6d291e2cdcf49fea5358f9bdd9f27"
+    },
+    {
+      "idx": 6,
+      "tag": "0006_tenant_language_policy",
+      "when": 1784091600000,
+      "blob": "c0af25f855bd14c3ece6863d19f3f539bbd08cac"
+    },
+    {
+      "idx": 7,
+      "tag": "0007_compliance_scan_toggle",
+      "when": 1784206236857,
+      "blob": "ad4c5bfb503c96bc758eda859a7c8bf8b4720f29"
+    },
+    {
+      "idx": 8,
+      "tag": "0008_hazid_review_conditions_signatures",
+      "when": 1784221200000,
+      "blob": "fbe00131c5d4b6a65a1c0fca4196cd98730889cc"
+    },
+    {
+      "idx": 9,
+      "tag": "0009_early_longshot",
+      "when": 1784232101074,
+      "blob": "81c3b7143ad306f4aea65f583c1f79de26b0d353"
+    },
+    {
+      "idx": 10,
+      "tag": "0010_lush_sue_storm",
+      "when": 1784232727486,
+      "blob": "83798275868ef527afdaf5e960bf0ceab5c2c4a5"
+    },
+    {
+      "idx": 11,
+      "tag": "0011_calm_talkback",
+      "when": 1784240387164,
+      "blob": "7efa145ffe47821ab504526a0fb49daf6be30a30"
+    },
+    {
+      "idx": 12,
+      "tag": "0012_orange_violations",
+      "when": 1784240420220,
+      "blob": "c8936cf6cf30ee331c7e1d5c9ec20e4bd59ff42d"
+    },
+    {
+      "idx": 13,
+      "tag": "0013_remarkable_mimic",
+      "when": 1784241846171,
+      "blob": "4269daac5692580a1b949d8a8e33559b4fbb4343"
+    },
+    {
+      "idx": 14,
+      "tag": "0014_military_major_mapleleaf",
+      "when": 1784242858332,
+      "blob": "48fcbac0e5f3a6b7d892a542d7d6897f879a6eec"
+    },
+    {
+      "idx": 15,
+      "tag": "0015_deep_scalphunter",
+      "when": 1784244464695,
+      "blob": "46bc6300bcbec9563977cd9067c5c4223fb5ca36"
+    },
+    {
+      "idx": 16,
+      "tag": "0016_smiling_thunderbolts",
+      "when": 1784732220958,
+      "blob": "dcca4b172cb6a9e653b90f703e9b78ad90bb9181"
+    },
+    {
+      "idx": 17,
+      "tag": "0017_wakeful_jackal",
+      "when": 1784734189756,
+      "blob": "8e58c1a003e690732f0fbbcd0b265a645a14554a"
+    },
+    {
+      "idx": 18,
+      "tag": "0018_training_report_parity",
+      "when": 1784736000000,
+      "blob": "364091c241791806a7d0d8bd2d6a0927a5a3f231"
+    },
+    {
+      "idx": 19,
+      "tag": "0019_report_parity_cutover",
+      "when": 1784739600000,
+      "blob": "12c48d8eb1a503fb683a69bdc1980c4d802b9dfc"
+    },
+    {
+      "idx": 20,
+      "tag": "0020_inspection_location_storage",
+      "when": 1784814783386,
+      "blob": "be8f3bf9ec7289fdee02fed8f18f318796ff9d06"
+    },
+    {
+      "idx": 21,
+      "tag": "0021_training_assessment_history",
+      "when": 1784824177552,
+      "blob": "076f9b6e98daaafae48615c2a722719e4eb3584b"
+    },
+    {
+      "idx": 22,
+      "tag": "0022_hazid_submit_trigger_cutover",
+      "when": 1784827071367,
+      "blob": "1b716c4a0eb650a0a188f45a57c8b9bacb6a7cfc"
+    },
+    {
+      "idx": 23,
+      "tag": "0023_gorgeous_sheva_callister",
+      "when": 1784829151470,
+      "blob": "c2378d05b2920447a91fedd7cb44ca992ff26c4d"
+    },
+    {
+      "idx": 24,
+      "tag": "0024_flawless_la_nuit",
+      "when": 1784829998995,
+      "blob": "f8da4dd4bc6f14412f02fe88923576989fef1ec6"
+    },
+    {
+      "idx": 25,
+      "tag": "0025_unify_builder_photo_fields",
+      "when": 1784831400000,
+      "blob": "24384319d93ee96cbc6427cd05e5e022b2c98f21"
+    },
+    {
+      "idx": 26,
+      "tag": "0026_order_frontline_photos",
+      "when": 1784835600000,
+      "blob": "4bbe0b1c6b06f6dfef359e8bdc8cb7af56a84fa3"
+    },
+    {
+      "idx": 27,
+      "tag": "0027_report_portrait_cutover",
+      "when": 1784894400000,
+      "blob": "b665ae5c51b29f2346459418f194175f9e843ed9"
+    },
+    {
+      "idx": 28,
+      "tag": "0028_generalize_monitored_sessions",
+      "when": 1784916000000,
+      "blob": "cd96d1fe66e6b912b0b13eb0cd79a6ec28141381"
+    },
+    {
+      "idx": 29,
+      "tag": "0029_faulty_thunderball",
+      "when": 1785940083986,
+      "blob": "012a7918dcc49430205ac6c9c49a6abe3d1fd3e8"
+    },
+    {
+      "idx": 30,
+      "tag": "0030_unify_hazid_app_locations",
+      "when": 1785954317000,
+      "blob": "8771bc2597726f1f37b656afedc8773cef4820a0"
+    },
+    {
+      "idx": 31,
+      "tag": "0031_hazid_optional_risk_ratings",
+      "when": 1785954317001,
+      "blob": "a61093d5f352197df0e0d9bf80d28bcd3864aba4"
+    },
+    {
+      "idx": 32,
+      "tag": "0032_ppe_status_lifecycle",
+      "when": 1785954317002,
+      "blob": "750a85ec42b6a41b7495ef8709cf5842c52bb2b6"
+    },
+    {
+      "idx": 33,
+      "tag": "0034_compliance_group_audience_ppe_report",
+      "when": 1787331600000,
+      "blob": "b5a8f28bbb40b58f09d1990de2be406c5d8d0cde"
+    },
+    {
+      "idx": 34,
+      "tag": "0035_journal_analysis_runs",
+      "when": 1787926800000,
+      "blob": "b1f6933b52080d32c80efe25a6f9306b9e7ef09d"
+    },
+    {
+      "idx": 35,
+      "tag": "0036_training_report_wallet_cutover",
+      "when": 1788220800000,
+      "blob": "df64bb42efb814dfa5078553ecee115f547a952c"
+    },
+    {
+      "idx": 36,
+      "tag": "0037_platform_branding",
+      "when": 1789045551344,
+      "blob": "1aba5ae5086b6e1c23390d55cb33ba5e94e8fbb0"
+    },
+    {
+      "idx": 37,
+      "tag": "0038_uvanoo_hospitality_foundation",
+      "when": 1789070400000,
+      "blob": "6680b9f7c3bf52d72225c8d9a82c495bf1769902"
+    },
+    {
+      "idx": 38,
+      "tag": "0039_uvanoo_maintenance_issue_lifecycle",
+      "when": 1789156800000,
+      "blob": "59671c1b1e3e6cd0894ea56ea0031e09c45fea63"
+    },
+    {
+      "idx": 39,
+      "tag": "0040_uvanoo_operational_diary_completion",
+      "when": 1789243200000,
+      "blob": "1ef31aa355a77f52b079d95befc22b1b1b5be5ed"
+    },
+    {
+      "idx": 40,
+      "tag": "0041_uvanoo_operational_task_lifecycle",
+      "when": 1789329600000,
+      "blob": "43715a198b43dfd8bc28de3621aa75f6ea2833dc"
+    },
+    {
+      "idx": 41,
+      "tag": "0042_uvanoo_guest_room_reporting",
+      "when": 1789416000000,
+      "blob": "b5a2c0d143f0388281164e4d95205898262ee79d"
+    },
+    {
+      "idx": 42,
+      "tag": "0043_hospitality_issue_sources",
+      "when": 1789502400000,
+      "blob": "5bfeae9037440af14a14d514e16970f45ce565c4"
+    },
+    {
+      "idx": 43,
+      "tag": "0044_risk_assessment_foundation",
+      "when": 1790071200000,
+      "blob": "44bae5455f3cdfc2b7544344ff5236af6f54fdff"
+    },
+    {
+      "idx": 44,
+      "tag": "0045_risk_review_lifecycle",
+      "when": 1790157600000,
+      "blob": "5d312aad6a7836b1578adb9d4939bdf42d824ae2"
+    },
+    {
+      "idx": 45,
+      "tag": "0046_risk_signoff_snapshot",
+      "when": 1790244000000,
+      "blob": "c83bcace76633f0a4cc0d304b28289dbefbf9f41"
+    },
+    {
+      "idx": 46,
+      "tag": "0047_hospitality_handover",
+      "when": 1790330400000,
+      "blob": "ef8e8e47d1838071a97c3192910e3e9fb068c89c"
+    },
+    {
+      "idx": 47,
+      "tag": "0048_hospitality_metering",
+      "when": 1790416800000,
+      "blob": "815e3111ec9f584840ed23411dae8cf4cdee42ad"
+    },
+    {
+      "idx": 48,
+      "tag": "0049_maintenance_issue_evidence",
+      "when": 1790503200000,
+      "blob": "af4787d0e06b3c0c13894185eeecc630fe00eb4f"
+    },
+    {
+      "idx": 49,
+      "tag": "0050_report_property_context",
+      "when": 1790589600000,
+      "blob": "ec69299f34a21ed10ba500f69659bc89bc77ef62"
+    },
+    {
+      "idx": 50,
+      "tag": "0051_platform_audit",
+      "when": 1790676000000,
+      "blob": "bc454319c0524694e8a598189bd08f3bb4642118"
+    },
+    {
+      "idx": 51,
+      "tag": "0052_user_identity_lifecycle",
+      "when": 1790762400000,
+      "blob": "5b41b0e8afe3e5d7d96a57fccd8dbf47256022d8"
+    },
+    {
+      "idx": 52,
+      "tag": "0053_property_scope_repair",
+      "when": 1790848800000,
+      "blob": "e6be1c906a0625fdbcb138ded6e619433601bbad"
+    },
+    {
+      "idx": 53,
+      "tag": "0054_v14_configuration_tenant_defaults",
+      "when": 1790935200000,
+      "blob": "40037e49b2e86a0b0cbab13cb40cc14838e9a561"
+    },
+    {
+      "idx": 54,
+      "tag": "0055_v14_configuration_governance_lifecycle",
+      "when": 1791021600000,
+      "blob": "8756e4bb71c981707c486c0a95e4524e4851f1f7"
+    },
+    {
+      "idx": 55,
+      "tag": "0056_v14_governed_bulk_imports",
+      "when": 1791108000000,
+      "blob": "04b6af48d83607ac466ed26fd9c8b9e64a403693"
+    },
+    {
+      "idx": 56,
+      "tag": "0057_people_property_provenance",
+      "when": 1791542400000,
+      "blob": "7d76b61dc6447bbb76f4d72ca1317d6972669492"
+    },
+    {
+      "idx": 57,
+      "tag": "0058_platform_regional_defaults",
+      "when": 1791542400001,
+      "blob": "0d69608905d83238c55d5006f236edf9cf7d7578"
+    }
+  ]
+}

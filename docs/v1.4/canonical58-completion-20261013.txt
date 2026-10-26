@@ -1,0 +1,95 @@
+UVANOO canonical 58 reference COMPLETED — 2026-10-13
+
+Product SHA: 563fb0e9b79a838a5f394abaffb2f7dc743fc571
+Product tree: 324c50a60e2cb0639ba920488a150c6531968374
+Historical migrate.ts and rls.ts: d18f635a41f092e9e86aa6f53518f9c28992b0d2
+Validation harness SHA: 5b427356d5230f6db72397b8a4b6c519652f0c31
+Reference fingerprint (existing DEV gate):
+adce2e70b4447ac5787ade49040f1a8f101c3e3b0dd067069f029bbd13c0493e
+
+PostgreSQL server_version_num: 160015 (asserted at startup and reference collection)
+Immutable image:
+postgres@sha256:ca0bd484cb98bf4b24eb1010e73fb3fcbd6714d240fbc1a10eea5b7dbecb641d
+Initial tag resolution was recorded by run 38367286000; successful run pins this digest directly.
+
+VERIFIED
+Run 38367554588 completed/success:
+https://github.com/Satho82/beaconhs/actions/runs/38367554588
+Exactly 58 journal entries with matching ordered SQL SHA256s and timestamps.
+This is the original journal prefix (including 0000 and its historical numbering gap), not a renumbered 0001–0058 sequence.
+No 0059–0063 applied. No actual DEV metadata used to construct this reference.
+Historical runner/RLS reconstruction follows the already validated candidate integration fixture, with candidate helper dependencies and canonical isolated five-role provisioning.
+227 public tables; 218 RLS enabled; 219 FORCE; 226 policies; 16 non-internal triggers; zero disabled.
+Nine global RLS exceptions asserted by exact name.
+Collector bytes match the approved prior checkpoint collector.
+Offline fingerprint equals candidate schemaFingerprint() against the database.
+Focused regressions: schema ownership mutation, altered ledger hash, truncated metadata rejected.
+No full application/release CI repeated.
+
+HARNESS CORRECTIONS
+First focused run 38367286000 failed the offline/gate equality check. Fixed offline handling of PostgreSQL int8 sequence fields: lossless JSON source parsing plus postgres.js string type representation. Gate and historical SQL unchanged.
+The successful run's top-level policy COUNT summary initially referenced trigger section 6 (16) instead of policy section 8 (226). Raw metadata, all 19 section hashes and overall fingerprint were correct.
+Report run 38367875871 verified the immutable original artifact checksum and corrected only this summary field, without another database build or validation run:
+https://github.com/Satho82/beaconhs/actions/runs/38367875871
+For reproduction, the reference builder at the validation SHA must be followed by the report correction; do not cite its uncorrected policy summary. This known reporting-only defect does not affect fingerprints or comparison.
+
+ARTIFACTS
+Corrected public evidence artifact: 11797632216, canonical58-public-corrected
+ZIP SHA256: 533e897e554a5b02c99de393933b0094cdd21c5479401f10820529fc7d62723d
+reference-public.json SHA256:
+08616cba75b6dc87c79891d54e2ea896eb9f89117c7b835fd7d08a9851e99461
+Contains only source/image identities, SQL hashes/timestamps, counts, object identities and field/row hashes; no raw function/policy/ACL definitions.
+https://github.com/Satho82/beaconhs/actions/runs/38367875871/artifacts/11797632216
+
+Private canonical metadata encrypted with age to supported SSH public keys registered on Satho82's GitHub profile:
+artifact 11796564610, canonical58-encrypted
+ZIP SHA256: 06e742ddc717be93f0ec898425fbf90a754fb05f5f5c2973caccfcbe20f133bd
+https://github.com/Satho82/beaconhs/actions/runs/38367554588/artifacts/11796564610
+Contains encrypted metadata plus recipient key fingerprints. No private key or plaintext was uploaded.
+Plaintext checksum: 6fdc9288a642964955247c57daa870ed40ea61387d211156566143e6e496ff26
+Owner decryption possession/rehearsal has not been independently verified. Retention is 30 days; retain encrypted evidence in owner-controlled storage before artifact expiry.
+
+DEV COMPARISON
+NOT RUN: connector remains offline, and protected VPS file was not read or uploaded.
+Owner supplied file:
+  /home/ubuntu/uvanoo-preflight/dev-metadata.jsonl
+  SHA256 51959099c665622286fc2a13bb771f64574b518f81dfcee67ea7524ed68f933d
+Owner supplied counts agree with canonical counts. This is NOT a full schema/security match.
+Genuine schema/ACL/role/function/trigger drift remains UNKNOWN until offline comparison completes.
+No repeated DEV collection.
+
+OFFLINE COMPARISON
+Run the following in Bash on the VPS, using existing Node.js 24 and an authenticated GitHub CLI (gh). If these tools are absent, stop and arrange approved tool access; do not modify running application services.
+Downloads only public reference data and pinned utility into a new private directory. Does not connect to PostgreSQL or Docker.
+Utility verifies the actual file SHA256 before parsing; enforces 21 complete documents, 19 sections, PostgreSQL 16.15, beaconhs and exactly 58 ledger rows; validates canonical ledger hashes/timestamps/order; compares every schema section.
+Output contains object identities, hashes and changed field names only, never raw values/definitions.
+Exit 0 = exact schema fingerprint and ledger match.
+Exit 2 = ledger valid but schema/security differences; do not proceed.
+Exit 1 = invalid input/checksum/runtime/reference/ledger; do not proceed.
+Keep the comparison output private initially. Share only its non-sensitive findings.
+
+set -euo pipefail
+umask 077
+test "$(node -p 'process.versions.node.split(".")[0]')" = 24
+comparison_dir=$(mktemp -d /home/ubuntu/uvanoo-preflight/compare58.XXXXXXXX)
+gh run download 38367875871 --repo Satho82/beaconhs --name canonical58-public-corrected --dir "$comparison_dir"
+printf '%s  %s\n' '08616cba75b6dc87c79891d54e2ea896eb9f89117c7b835fd7d08a9851e99461' "$comparison_dir/reference-public.json" | sha256sum -c -
+curl --fail --silent --show-error --proto '=https' \
+  https://raw.githubusercontent.com/Satho82/beaconhs/5b427356d5230f6db72397b8a4b6c519652f0c31/docs/v1.4/canonical58-validation/compare.mjs \
+  -o "$comparison_dir/compare.mjs"
+node "$comparison_dir/compare.mjs" \
+  "$comparison_dir/reference-public.json" \
+  /home/ubuntu/uvanoo-preflight/dev-metadata.jsonl \
+  51959099c665622286fc2a13bb771f64574b518f81dfcee67ea7524ed68f933d
+
+A successful comparison is necessary but does not approve migration or establish data/backfill compatibility, backup/restore readiness or queue/storage reconciliation. These metadata sections do not cover every environment attribute or all non-beaconhs role configuration.
+
+NEXT RECOVERY ACTION
+Execute the offline comparison above and review differences without changing DEV. No re-collection required.
+Then, under separate approval: encrypted DEV backup and independent restore rehearsal; real-data 58→63 migration rehearsal; clean155 data and Redis queue disposition; writer fencing/re-fencing; source/tree/image binding and safe service endpoint corrections.
+No persistent migration, deployment or governed merge is authorised by this checkpoint.
+The documented DEV-only removal of Traefik Basic Auth at the next authorised release remains required; native authentication, RBAC/RLS and protected infrastructure remain mandatory.
+
+CHANGES
+Isolated validation workflow/harness, offline comparison utility and evidence documentation only.
+No product runtime, Risk/People, historical SQL, VPS/service/network, staging or production changes.

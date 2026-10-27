@@ -474,6 +474,15 @@ const APPROVED_DESTINATIONS: readonly ApprovedDestination[] = [
     entitlement: null,
   },
   {
+    id: 'A103',
+    group: 'Handover',
+    label: 'Handover History',
+    href: '/hospitality/handover?view=history',
+    source: '/hospitality/handover',
+    permission: 'hospitality.read',
+    entitlement: null,
+  },
+  {
     id: 'A110',
     group: 'Assets & Reminders',
     label: 'Asset Register',

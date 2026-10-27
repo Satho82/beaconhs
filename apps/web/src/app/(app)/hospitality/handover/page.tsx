@@ -152,6 +152,7 @@ export default async function HandoverPage({
   const ctx = await requireRequestContext()
   const propertyContext = await resolveHospitalityPropertyContext(ctx)
   const search = await searchParams
+  const isHistory = search.view === 'history'
   const params = parseListParams(search, {
     sort: 'occurred',
     dir: 'desc',
@@ -192,114 +193,119 @@ export default async function HandoverPage({
   return (
     <PageContainer>
       <PageHeader
-        title={t('Hotel Handover')}
+        title={t(isHistory ? 'Handover History' : 'Current Handover')}
         description={t(
-          'A chronological shift record across the properties you are authorised to access.',
+          isHistory
+            ? 'Review past handovers for the properties you are authorised to access.'
+            : 'Submit a handover for your current shift.',
         )}
       />
 
-      <section className="mt-5 rounded-2xl border border-teal-100 bg-gradient-to-br from-teal-50 via-white to-white p-5">
-        <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
-          <div>
-            <p className="text-xs font-semibold tracking-[0.16em] text-teal-700 uppercase">
-              {t('Hotel operations')} · {t('Shift control')}
-            </p>
-            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-slate-950">
-              {t('Handover overview')}
-            </h2>
-            <p className="mt-1 max-w-2xl text-sm text-slate-600">
-              {t(
-                'Track operational notes, outstanding follow-ups and linked maintenance in one accountable shift record.',
-              )}
-            </p>
+      {isHistory ? (
+        <section className="mt-5 rounded-2xl border border-teal-100 bg-gradient-to-br from-teal-50 via-white to-white p-5">
+          <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
+            <div>
+              <p className="text-xs font-semibold tracking-[0.16em] text-teal-700 uppercase">
+                {t('Hotel operations')} · {t('Shift control')}
+              </p>
+              <h2 className="mt-1 text-2xl font-semibold tracking-tight text-slate-950">
+                {t('Handover overview')}
+              </h2>
+              <p className="mt-1 max-w-2xl text-sm text-slate-600">
+                {t(
+                  'Track operational notes, outstanding follow-ups and linked maintenance in one accountable shift record.',
+                )}
+              </p>
+            </div>
+            <div className="rounded-xl border border-teal-100 bg-white px-4 py-3 text-sm shadow-sm">
+              <p className="text-xs font-medium tracking-wide text-slate-500 uppercase">
+                {t('Latest shift')}
+              </p>
+              <p className="mt-1 font-semibold text-slate-900">
+                {latestShift
+                  ? `${latestShift.shift === 'custom' ? latestShift.customShift : latestShift.shift.toUpperCase()} · ${latestShift.occurredAt.toLocaleString('en-GB')}`
+                  : t('No handover recorded')}
+              </p>
+            </div>
           </div>
-          <div className="rounded-xl border border-teal-100 bg-white px-4 py-3 text-sm shadow-sm">
-            <p className="text-xs font-medium tracking-wide text-slate-500 uppercase">
-              {t('Latest shift')}
-            </p>
-            <p className="mt-1 font-semibold text-slate-900">
-              {latestShift
-                ? `${latestShift.shift === 'custom' ? latestShift.customShift : latestShift.shift.toUpperCase()} · ${latestShift.occurredAt.toLocaleString('en-GB')}`
-                : t('No handover recorded')}
-            </p>
-          </div>
-        </div>
 
-        <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <div className="rounded-xl border border-white bg-white p-4 shadow-sm">
-            <p className="text-sm font-medium text-slate-600">{t('Occupancy')}</p>
-            <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
-              {latestShift?.occupancyPercent === null || latestShift?.occupancyPercent === undefined
-                ? '—'
-                : `${latestShift.occupancyPercent}%`}
-            </p>
-            <p className="mt-1 text-xs text-teal-700">{t('Latest recorded shift')}</p>
+          <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="rounded-xl border border-white bg-white p-4 shadow-sm">
+              <p className="text-sm font-medium text-slate-600">{t('Occupancy')}</p>
+              <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
+                {latestShift?.occupancyPercent === null ||
+                latestShift?.occupancyPercent === undefined
+                  ? '—'
+                  : `${latestShift.occupancyPercent}%`}
+              </p>
+              <p className="mt-1 text-xs text-teal-700">{t('Latest recorded shift')}</p>
+            </div>
+            <div className="rounded-xl border border-white bg-white p-4 shadow-sm">
+              <p className="text-sm font-medium text-slate-600">{t('ADR')}</p>
+              <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
+                {latestShift?.adr === null || latestShift?.adr === undefined
+                  ? '—'
+                  : `£${latestShift.adr.toFixed(2)}`}
+              </p>
+              <p className="mt-1 text-xs text-teal-700">{t('Latest recorded shift')}</p>
+            </div>
+            <div className="rounded-xl border border-white bg-white p-4 shadow-sm">
+              <p className="text-sm font-medium text-slate-600">{t('VIP / PEEP')}</p>
+              <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
+                {metricValue(latestShift?.vipGuestCount ?? null)} /{' '}
+                {metricValue(latestShift?.peepGuestCount ?? null)}
+              </p>
+              <p className="mt-1 text-xs text-teal-700">
+                {t('Count only — controlled guest records remain separate')}
+              </p>
+            </div>
+            <div className="rounded-xl border border-white bg-white p-4 shadow-sm">
+              <p className="text-sm font-medium text-slate-600">{t('Arrivals / departures')}</p>
+              <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
+                {metricValue(latestShift?.arrivalsCount ?? null)} /{' '}
+                {metricValue(latestShift?.departuresCount ?? null)}
+              </p>
+              <p className="mt-1 text-xs text-teal-700">{t('Latest recorded shift')}</p>
+            </div>
           </div>
-          <div className="rounded-xl border border-white bg-white p-4 shadow-sm">
-            <p className="text-sm font-medium text-slate-600">{t('ADR')}</p>
-            <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
-              {latestShift?.adr === null || latestShift?.adr === undefined
-                ? '—'
-                : `£${latestShift.adr.toFixed(2)}`}
-            </p>
-            <p className="mt-1 text-xs text-teal-700">{t('Latest recorded shift')}</p>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="rounded-xl border border-white bg-white p-4 shadow-sm">
+              <p className="text-sm font-medium text-slate-600">{t('Handover entries')}</p>
+              <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
+                {data.total}
+              </p>
+              <p className="mt-1 text-xs text-teal-700">
+                {t('Within the current property and search scope')}
+              </p>
+            </div>
+            <div className="rounded-xl border border-white bg-white p-4 shadow-sm">
+              <p className="text-sm font-medium text-slate-600">{t('Open follow-ups')}</p>
+              <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
+                {openFollowUps.length}
+              </p>
+              <p className="text-coral-700 mt-1 text-xs">{t('Require owner attention')}</p>
+            </div>
+            <div className="rounded-xl border border-white bg-white p-4 shadow-sm">
+              <p className="text-sm font-medium text-slate-600">{t('Urgent notes')}</p>
+              <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
+                {urgentEntries.length}
+              </p>
+              <p className="text-coral-700 mt-1 text-xs">{t('Shown in this handover view')}</p>
+            </div>
+            <div className="rounded-xl border border-white bg-white p-4 shadow-sm">
+              <p className="text-sm font-medium text-slate-600">{t('Maintenance linked')}</p>
+              <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
+                {linkedMaintenance.length}
+              </p>
+              <p className="mt-1 text-xs text-teal-700">
+                {t('Defects retained with their source handover')}
+              </p>
+            </div>
           </div>
-          <div className="rounded-xl border border-white bg-white p-4 shadow-sm">
-            <p className="text-sm font-medium text-slate-600">{t('VIP / PEEP')}</p>
-            <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
-              {metricValue(latestShift?.vipGuestCount ?? null)} /{' '}
-              {metricValue(latestShift?.peepGuestCount ?? null)}
-            </p>
-            <p className="mt-1 text-xs text-teal-700">
-              {t('Count only — controlled guest records remain separate')}
-            </p>
-          </div>
-          <div className="rounded-xl border border-white bg-white p-4 shadow-sm">
-            <p className="text-sm font-medium text-slate-600">{t('Arrivals / departures')}</p>
-            <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
-              {metricValue(latestShift?.arrivalsCount ?? null)} /{' '}
-              {metricValue(latestShift?.departuresCount ?? null)}
-            </p>
-            <p className="mt-1 text-xs text-teal-700">{t('Latest recorded shift')}</p>
-          </div>
-        </div>
-        <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <div className="rounded-xl border border-white bg-white p-4 shadow-sm">
-            <p className="text-sm font-medium text-slate-600">{t('Handover entries')}</p>
-            <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
-              {data.total}
-            </p>
-            <p className="mt-1 text-xs text-teal-700">
-              {t('Within the current property and search scope')}
-            </p>
-          </div>
-          <div className="rounded-xl border border-white bg-white p-4 shadow-sm">
-            <p className="text-sm font-medium text-slate-600">{t('Open follow-ups')}</p>
-            <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
-              {openFollowUps.length}
-            </p>
-            <p className="text-coral-700 mt-1 text-xs">{t('Require owner attention')}</p>
-          </div>
-          <div className="rounded-xl border border-white bg-white p-4 shadow-sm">
-            <p className="text-sm font-medium text-slate-600">{t('Urgent notes')}</p>
-            <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
-              {urgentEntries.length}
-            </p>
-            <p className="text-coral-700 mt-1 text-xs">{t('Shown in this handover view')}</p>
-          </div>
-          <div className="rounded-xl border border-white bg-white p-4 shadow-sm">
-            <p className="text-sm font-medium text-slate-600">{t('Maintenance linked')}</p>
-            <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
-              {linkedMaintenance.length}
-            </p>
-            <p className="mt-1 text-xs text-teal-700">
-              {t('Defects retained with their source handover')}
-            </p>
-          </div>
-        </div>
-      </section>
+        </section>
+      ) : null}
 
-      {mayManage ? (
+      {!isHistory && mayManage ? (
         <Card className="mt-5">
           <CardContent className="pt-6">
             <form action={createEntry} className="grid gap-4 md:grid-cols-2">
@@ -458,130 +464,138 @@ export default async function HandoverPage({
         </Card>
       ) : null}
 
-      <TableToolbar className="mt-5">
-        <SearchInput placeholder={t('Search handover notes, department, location or property…')} />
-      </TableToolbar>
+      {isHistory ? (
+        <>
+          <TableToolbar className="mt-5">
+            <SearchInput
+              placeholder={t('Search handover notes, department, location or property…')}
+            />
+          </TableToolbar>
 
-      {data.rows.length === 0 ? (
-        <EmptyState title={t('No handover entries found')} />
-      ) : (
-        <div className="mt-4 space-y-4">
-          {data.rows.map(
-            ({ handover, propertyName, roomCode, authorName, comments, acknowledgements }) => (
-              <Card key={handover.id}>
-                <CardContent className="space-y-3 pt-5">
-                  <div className="flex flex-wrap items-start justify-between gap-2">
-                    <div>
-                      <div className="font-semibold">{handover.department}</div>
-                      <div className="text-muted-foreground text-sm">
-                        {propertyName} ·{' '}
-                        {handover.shift === 'custom'
-                          ? handover.customShift
-                          : handover.shift.toUpperCase()}{' '}
-                        · {handover.occurredAt.toLocaleString('en-GB')} · {authorName}
+          {data.rows.length === 0 ? (
+            <EmptyState title={t('No handover entries found')} />
+          ) : (
+            <div className="mt-4 space-y-4">
+              {data.rows.map(
+                ({ handover, propertyName, roomCode, authorName, comments, acknowledgements }) => (
+                  <Card key={handover.id}>
+                    <CardContent className="space-y-3 pt-5">
+                      <div className="flex flex-wrap items-start justify-between gap-2">
+                        <div>
+                          <div className="font-semibold">{handover.department}</div>
+                          <div className="text-muted-foreground text-sm">
+                            {propertyName} ·{' '}
+                            {handover.shift === 'custom'
+                              ? handover.customShift
+                              : handover.shift.toUpperCase()}{' '}
+                            · {handover.occurredAt.toLocaleString('en-GB')} · {authorName}
+                          </div>
+                        </div>
+                        <span className="rounded-full border px-2 py-1 text-xs font-medium">
+                          {handover.priority}
+                        </span>
                       </div>
-                    </div>
-                    <span className="rounded-full border px-2 py-1 text-xs font-medium">
-                      {handover.priority}
-                    </span>
-                  </div>
-                  <p className="text-sm whitespace-pre-wrap">{handover.note}</p>
-                  {roomCode || handover.location ? (
-                    <div className="text-muted-foreground text-sm">
-                      {[roomCode ? `Room ${roomCode}` : null, handover.location]
-                        .filter(Boolean)
-                        .join(' · ')}
-                    </div>
-                  ) : null}
-                  <div className="flex flex-wrap gap-2 text-xs">
-                    <span>
-                      {acknowledgements} {t('acknowledgement(s)')}
-                    </span>
-                    <span>
-                      {comments} {t('update(s)')}
-                    </span>
-                    {handover.followUpRequired ? (
-                      <span>
-                        {t('Follow-up:')} {handover.followUpStatus.replaceAll('_', ' ')}
-                      </span>
-                    ) : null}
-                    {handover.maintenanceIssueId ? (
-                      <Link
-                        className="underline"
-                        href={`/hospitality/maintenance/${handover.maintenanceIssueId}`}
-                      >
-                        {t('Maintenance issue')}
-                      </Link>
-                    ) : null}
-                    {handover.correctiveActionId ? (
-                      <Link
-                        className="underline"
-                        href={`/corrective-actions/${handover.correctiveActionId}`}
-                      >
-                        {t('Corrective Action')}
-                      </Link>
-                    ) : null}
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    <form action={acknowledge.bind(null, handover.id)}>
-                      <Button type="submit" variant="outline" size="sm">
-                        {t('Acknowledge')}
-                      </Button>
-                    </form>
-                    {mayManage && handover.followUpRequired ? (
-                      <form action={setFollowUp.bind(null, handover.id)} className="flex gap-2">
-                        <Select
-                          name="status"
-                          defaultValue={
-                            handover.followUpStatus === 'not_required'
-                              ? 'open'
-                              : handover.followUpStatus
-                          }
-                        >
-                          <option value="open">{t('Open')}</option>
-                          <option value="in_progress">{t('In progress')}</option>
-                          <option value="completed">{t('Completed')}</option>
-                        </Select>
-                        <Button type="submit" variant="outline" size="sm">
-                          {t('Update follow-up')}
-                        </Button>
-                      </form>
-                    ) : null}
-                    {mayManage &&
-                    handover.priority !== 'routine' &&
-                    handover.followUpRequired &&
-                    handover.followUpStatus !== 'completed' ? (
-                      <form action={carryForward.bind(null, handover.id)}>
-                        <Button type="submit" variant="outline" size="sm">
-                          {t('Carry forward')}
-                        </Button>
-                      </form>
-                    ) : null}
-                  </div>
-                  {mayManage ? (
-                    <>
-                      <form action={addComment.bind(null, handover.id)} className="flex gap-2">
-                        <Input name="body" required placeholder={t('Add an update…')} />
-                        <Button type="submit" variant="outline">
-                          {t('Add update')}
-                        </Button>
-                      </form>
-                      <PhotoUploaderSection attachAction={attachPhotos.bind(null, handover.id)} />
-                    </>
-                  ) : null}
-                </CardContent>
-              </Card>
-            ),
+                      <p className="text-sm whitespace-pre-wrap">{handover.note}</p>
+                      {roomCode || handover.location ? (
+                        <div className="text-muted-foreground text-sm">
+                          {[roomCode ? `Room ${roomCode}` : null, handover.location]
+                            .filter(Boolean)
+                            .join(' · ')}
+                        </div>
+                      ) : null}
+                      <div className="flex flex-wrap gap-2 text-xs">
+                        <span>
+                          {acknowledgements} {t('acknowledgement(s)')}
+                        </span>
+                        <span>
+                          {comments} {t('update(s)')}
+                        </span>
+                        {handover.followUpRequired ? (
+                          <span>
+                            {t('Follow-up:')} {handover.followUpStatus.replaceAll('_', ' ')}
+                          </span>
+                        ) : null}
+                        {handover.maintenanceIssueId ? (
+                          <Link
+                            className="underline"
+                            href={`/hospitality/maintenance/${handover.maintenanceIssueId}`}
+                          >
+                            {t('Maintenance issue')}
+                          </Link>
+                        ) : null}
+                        {handover.correctiveActionId ? (
+                          <Link
+                            className="underline"
+                            href={`/corrective-actions/${handover.correctiveActionId}`}
+                          >
+                            {t('Corrective Action')}
+                          </Link>
+                        ) : null}
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        <form action={acknowledge.bind(null, handover.id)}>
+                          <Button type="submit" variant="outline" size="sm">
+                            {t('Acknowledge')}
+                          </Button>
+                        </form>
+                        {mayManage && handover.followUpRequired ? (
+                          <form action={setFollowUp.bind(null, handover.id)} className="flex gap-2">
+                            <Select
+                              name="status"
+                              defaultValue={
+                                handover.followUpStatus === 'not_required'
+                                  ? 'open'
+                                  : handover.followUpStatus
+                              }
+                            >
+                              <option value="open">{t('Open')}</option>
+                              <option value="in_progress">{t('In progress')}</option>
+                              <option value="completed">{t('Completed')}</option>
+                            </Select>
+                            <Button type="submit" variant="outline" size="sm">
+                              {t('Update follow-up')}
+                            </Button>
+                          </form>
+                        ) : null}
+                        {mayManage &&
+                        handover.priority !== 'routine' &&
+                        handover.followUpRequired &&
+                        handover.followUpStatus !== 'completed' ? (
+                          <form action={carryForward.bind(null, handover.id)}>
+                            <Button type="submit" variant="outline" size="sm">
+                              {t('Carry forward')}
+                            </Button>
+                          </form>
+                        ) : null}
+                      </div>
+                      {mayManage ? (
+                        <>
+                          <form action={addComment.bind(null, handover.id)} className="flex gap-2">
+                            <Input name="body" required placeholder={t('Add an update…')} />
+                            <Button type="submit" variant="outline">
+                              {t('Add update')}
+                            </Button>
+                          </form>
+                          <PhotoUploaderSection
+                            attachAction={attachPhotos.bind(null, handover.id)}
+                          />
+                        </>
+                      ) : null}
+                    </CardContent>
+                  </Card>
+                ),
+              )}
+            </div>
           )}
-        </div>
-      )}
-      <Pagination
-        basePath={BASE}
-        currentParams={search}
-        total={data.total}
-        page={params.page}
-        perPage={params.perPage}
-      />
+          <Pagination
+            basePath={BASE}
+            currentParams={search}
+            total={data.total}
+            page={params.page}
+            perPage={params.perPage}
+          />
+        </>
+      ) : null}
     </PageContainer>
   )
 }

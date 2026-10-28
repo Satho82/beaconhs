@@ -56,6 +56,7 @@ export function SettingsNavigation({
   canManageIntegrations?: boolean
 }) {
   const t = useTranslations('TenantSettings')
+  const tGeneratedValue = useGeneratedValueTranslations()
 
   return (
     <nav
@@ -81,7 +82,7 @@ export function SettingsNavigation({
             )}
           >
             <Icon size={22} />
-            {entry.id === 'branding' ? t('Tenant Branding') : t(entry.label)}
+            {entry.id === 'branding' ? tGeneratedValue('Tenant Branding') : t(entry.label)}
           </a>
         )
       })}

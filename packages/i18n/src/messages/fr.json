@@ -326,6 +326,10 @@
     "unlock": "Déverrouiller la borne"
   },
   "Generated": {
+    "m_0b77f0e2261765": "Historique des transmissions",
+    "m_017ad73c30f04b": "Identité visuelle du locataire",
+    "m_1110666f76d095": "Consultez les transmissions précédentes des établissements auxquels vous avez accès.",
+    "m_1a30a6ea055dba": "Soumettez une transmission pour votre service actuel.",
     "m_19d72b5569e724": "Operational journals, recurring tasks, reminders, and handover notes.",
     "m_08ba93a5f9d7ba": "Risk assessments, registers, and mitigation controls.",
     "m_0aca4382b0f73a": "Inspection types, records, schedules, and evidence.",

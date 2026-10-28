@@ -81,7 +81,7 @@ export function SettingsNavigation({
             )}
           >
             <Icon size={22} />
-            {entry.id === 'branding' ? 'Tenant Branding' : t(entry.label)}
+            {entry.id === 'branding' ? t('Tenant Branding') : t(entry.label)}
           </a>
         )
       })}

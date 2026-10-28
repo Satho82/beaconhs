@@ -193,7 +193,8 @@ export async function schemaFingerprint(
       userSchema,
     'SELECT n.nspname,t.typname,t.typtype,pg_get_userbyid(t.typowner) owner,t.typacl::text acl,e.enumlabel,e.enumsortorder FROM pg_type t JOIN pg_namespace n ON n.oid=t.typnamespace LEFT JOIN pg_enum e ON e.enumtypid=t.oid WHERE ' +
       userSchema +
-      " AND NOT EXISTS (SELECT 1 FROM pg_depend d WHERE d.classid='pg_type'::regclass AND d.objid=t.oid AND d.deptype='e')",
+      " AND NOT EXISTS (SELECT 1 FROM pg_depend d WHERE d.classid='pg_type'::regclass AND d.objid=t.oid AND d.deptype='e')" +
+      " AND NOT EXISTS (SELECT 1 FROM pg_type e JOIN pg_depend d ON d.classid='pg_type'::regclass AND d.objid=e.oid AND d.deptype='e' WHERE t.typelem=e.oid)",
     "SELECT rolname,rolsuper,rolinherit,rolcreaterole,rolcreatedb,rolcanlogin,rolreplication,rolbypassrls,rolconfig FROM pg_roles WHERE rolname LIKE 'beaconhs_%'",
     "SELECT p.rolname parent,m.rolname member,a.admin_option,a.inherit_option,a.set_option FROM pg_auth_members a JOIN pg_roles p ON p.oid=a.roleid JOIN pg_roles m ON m.oid=a.member WHERE p.rolname LIKE 'beaconhs_%' OR m.rolname LIKE 'beaconhs_%'",
     "SELECT pg_get_userbyid(d.defaclrole) owner,coalesce(n.nspname,'') schema,d.defaclobjtype,d.defaclacl::text acl FROM pg_default_acl d LEFT JOIN pg_namespace n ON n.oid=d.defaclnamespace WHERE pg_get_userbyid(d.defaclrole) LIKE 'beaconhs_%'",

@@ -27,6 +27,8 @@ import {
   maintenanceHoldExpiry,
   usesDocumentedOperationalEvidence,
   validateTemporaryAdmission,
+  validateHistoricalSaveUncertainty,
+  type HistoricalSaveUncertainty,
   type AdmissionPhase,
   type PrivateRestoreReceipt,
   type SafetyReceipt,
@@ -119,6 +121,24 @@ const contracts: Record<string, Record<string, 'zero' | 'true' | 'false' | 'hash
     saveCoverageComplete: 'true',
     drainageEvidenceSha256: 'hash',
   },
+  collaboraObservedInterval: {
+    desiredReplicas: 'zero',
+    activeTasks: 'zero',
+    activeSessions: 'zero',
+    pendingSaves: 'zero',
+    failedSaves: 'zero',
+    unknownOutcomes: 'zero',
+    newActivityCoverageComplete: 'true',
+    editingBlocked: 'true',
+    historicalSaveStateUnknown: 'true',
+    knownUnsavedDocumentsPreserved: 'true',
+    intervalEvidenceSha256: 'hash',
+    taskCoverageSha256: 'hash',
+    completionWatermark: 'hash',
+    bootstrapReceiptSha256: 'hash',
+    approvalReceiptSha256: 'hash',
+    epoch: 'hash',
+  },
   persistentFourZero: {
     exactFourServiceIdentities: 'true',
     desiredReplicas: 'zero',
@@ -160,6 +180,7 @@ export function validateObservation(
   started: number,
   now: number,
   exception?: HistoricalException,
+  saveUncertainty?: HistoricalSaveUncertainty,
 ) {
   keys(value, ['version', 'target', 'sourceSha', 'phase', 'check', 'observedAt', 'facts'])
   requireValue(
@@ -191,6 +212,11 @@ export function validateObservation(
             ? v === false
             : digest(v),
     )
+  }
+  if (check === 'collaboraObservedInterval') {
+    requireValue(saveUncertainty !== undefined)
+    for (const k of ['approvalReceiptSha256', 'bootstrapReceiptSha256', 'epoch'] as const)
+      requireValue(value.facts[k] === saveUncertainty![k])
   }
   if (check === 'legacyIsolation')
     requireValue(value.facts.baselineSha256 === value.facts.observedSha256)
@@ -344,6 +370,7 @@ export async function monitorOnce(options: {
         policy.monitorId === approval.monitorId &&
         (policy.phase === 'migration' || policy.phase === 'web'),
     )
+    validateHistoricalSaveUncertainty(approval, started)
     const holdExpires = maintenanceHoldExpiry(approval, started)
     const checks = admissionChecks(policy.phase, approval)
     keys(policy.probes, [...checks])
@@ -366,6 +393,7 @@ export async function monitorOnce(options: {
           started,
           now(),
           approval.historicalMissingObjectsException,
+          approval.historicalSaveUncertainty,
         )
         if (check === 'ownerMaintenanceHold')
           requireValue(value.facts.holdReceiptSha256 === approval.maintenanceHold?.receiptSha256)
@@ -397,6 +425,9 @@ export async function monitorOnce(options: {
                 approval.historicalMissingObjectsException.recoveryEvidenceSha256,
             },
           }
+        : {}),
+      ...(approval.historicalSaveUncertainty
+        ? { historicalSaveUncertainty: approval.historicalSaveUncertainty }
         : {}),
       checks: Object.fromEntries(
         observations.map((v) => [v.check, { passed: true, evidenceSha256: hash(v.bytes) }]),

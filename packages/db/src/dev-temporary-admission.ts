@@ -30,6 +30,16 @@ export type TemporaryAdmission = {
   restoreReceiptFile: 'private-restore.json'
   restoreReceiptSha256: string
 }
+export type HistoricalSaveUncertainty = {
+  exceptionId: 'DEV_PRE_TELEMETRY_SAVE_UNKNOWN_20261029'
+  historicalSaveState: 'UNKNOWN'
+  possibleUnsavedChangesAccepted: true
+  preserveKnownUnsavedDocuments: true
+  approvalReceiptSha256: string
+  bootstrapReceiptSha256: string
+  epoch: string
+  observationStartsAt: string
+}
 export type TemporaryApproval = {
   version: 1
   class: typeof TEMPORARY_CLASS
@@ -69,6 +79,7 @@ export type TemporaryApproval = {
   // monitor signature. It is valid only together with maintenanceHold and is
   // still pinned by the existing private owner-approval bytes.
   historicalMissingObjectsException?: HistoricalException
+  historicalSaveUncertainty?: HistoricalSaveUncertainty
   // The same-host path is DEV-only and requires an independently isolated
   // PostgreSQL container and volume. It is deliberately not host-level DR.
   operationalEvidence?: {
@@ -135,6 +146,7 @@ export type SafetyReceipt = {
   observedAt: string
   expiresAt: string
   checks: Record<string, { passed: true; evidenceSha256: string }>
+  historicalSaveUncertainty?: HistoricalSaveUncertainty
   historicalException?: {
     exceptionId: string
     missingObjects: number
@@ -169,12 +181,49 @@ export function usesDocumentedOperationalEvidence(approval: TemporaryApproval) {
   )
   return true
 }
-export function admissionChecks(phase: AdmissionPhase, approval: TemporaryApproval): string[] {
-  return (phase === 'web' ? WEB_CHECKS : MIGRATION_CHECKS).map((check) =>
-    check === 'writerExclusion' && approval.maintenanceHold !== undefined
-      ? 'ownerMaintenanceHold'
-      : check,
+export function validateHistoricalSaveUncertainty(approval: TemporaryApproval, now: number) {
+  const x = approval.historicalSaveUncertainty
+  if (x === undefined) return
+  exactTarget(approval.target)
+  requireValue(approval.maintenanceHold !== undefined)
+  requireValue(
+    canonical(Object.keys(x).sort()) ===
+      canonical(
+        [
+          'exceptionId',
+          'historicalSaveState',
+          'possibleUnsavedChangesAccepted',
+          'preserveKnownUnsavedDocuments',
+          'approvalReceiptSha256',
+          'bootstrapReceiptSha256',
+          'epoch',
+          'observationStartsAt',
+        ].sort(),
+      ) &&
+      x.exceptionId === 'DEV_PRE_TELEMETRY_SAVE_UNKNOWN_20261029' &&
+      x.historicalSaveState === 'UNKNOWN' &&
+      x.possibleUnsavedChangesAccepted === true &&
+      x.preserveKnownUnsavedDocuments === true &&
+      hash(x.approvalReceiptSha256) &&
+      hash(x.bootstrapReceiptSha256) &&
+      hash(x.epoch),
   )
+  const starts = Date.parse(x.observationStartsAt)
+  requireValue(
+    Number.isFinite(starts) &&
+      starts <= now &&
+      starts >= Date.parse(approval.maintenanceHold!.startsAt) &&
+      starts < Date.parse(approval.maintenanceHold!.expiresAt),
+  )
+}
+export function admissionChecks(phase: AdmissionPhase, approval: TemporaryApproval): string[] {
+  return (phase === 'web' ? WEB_CHECKS : MIGRATION_CHECKS).map((check) => {
+    if (check === 'writerExclusion' && approval.maintenanceHold !== undefined)
+      return 'ownerMaintenanceHold'
+    if (check === 'collaboraDrainage' && approval.historicalSaveUncertainty !== undefined)
+      return 'collaboraObservedInterval'
+    return check
+  })
 }
 /** Reuse the existing pinned owner/audit decision; no roster or additional signing system. */
 export function maintenanceHoldExpiry(approval: TemporaryApproval, now: number): number {
@@ -293,6 +342,12 @@ export function validateTemporaryAdmission(
   exactTarget(safety.payload.target)
   if (approval.historicalMissingObjectsException !== undefined)
     validateHistoricalException(approval.target, approval.historicalMissingObjectsException)
+  validateHistoricalSaveUncertainty(approval, now)
+  if (approval.historicalSaveUncertainty)
+    requireValue(
+      Date.parse(approval.historicalSaveUncertainty.observationStartsAt) <=
+        Date.parse(e.backup.createdAt),
+    )
   const holdExpires = maintenanceHoldExpiry(approval, now)
   const documentedOperational = usesDocumentedOperationalEvidence(approval)
   if (approval.maintenanceHold !== undefined)
@@ -382,6 +437,10 @@ export function validateTemporaryAdmission(
       validUntil - observed <= 10_000 &&
       validUntil <= expires &&
       validUntil <= holdExpires,
+  )
+  requireValue(
+    canonical(p.historicalSaveUncertainty ?? null) ===
+      canonical(approval.historicalSaveUncertainty ?? null),
   )
   const exception = approval.historicalMissingObjectsException
   if (phase === 'web' && exception) {

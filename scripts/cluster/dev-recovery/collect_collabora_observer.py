@@ -3,6 +3,7 @@
 import base64
 import datetime as dt
 import json
+import hashlib
 import os
 from pathlib import Path
 import re
@@ -126,6 +127,9 @@ def collect(config, discover=tasks, fetch=request):
     require(time.time() - started <= 5)
     return {"version": 1, "status": "OBSERVED", "target": config["target"],
         "observedAt": dt.datetime.now(dt.timezone.utc).isoformat(),
+        "sourceSha": config["wopi"]["sourceSha"], "epoch": config["wopi"]["epoch"],
+        "taskCoverageSha256": hashlib.sha256(json.dumps(
+            [cpids, wpids, sorted(v["producer"] for v in saves)], separators=(",", ":")).encode()).hexdigest(),
         "activeSessions": sum(v["activeSessions"] for v in counts),
         "activeDocuments": sum(v["activeDocuments"] for v in counts),
         **{k: saves[0][k] for k in keys},

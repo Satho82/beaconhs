@@ -749,5 +749,6 @@ RUBY
 
 ruby scripts/ci/dev-temporary-admission-contract.rb
 ruby scripts/ci/dev-monitor-publication-contract.rb
-python3 -B -m unittest discover -s scripts/cluster/dev-recovery -p test_collabora_observer.py
+python3 -B -m unittest discover -s scripts/cluster/dev-recovery -p 'test_collabora*.py'
+python3 -B scripts/cluster/test_dev_dokploy_token.py
 echo 'PASS V1.4 candidate deployment is manual, DEV-only, digest-bound and writer-fenced'

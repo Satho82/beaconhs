@@ -120,9 +120,9 @@ The deployment contract runs the Python observer suite in CI.
 - [26.04 aggregate metrics](https://github.com/CollaboraOnline/online.mirror/blob/distro/collabora/co-26.04/wsd/metrics.txt)
 - [26.04 supported configuration tool](https://github.com/CollaboraOnline/online.mirror/blob/distro/collabora/co-26.04/tools/Config.cpp)
 
-## Current external prerequisite
+## Current follow-up
 
-Dokploy is reachable on its published API port, but the approved private token
-returns HTTP 401. A valid authorized replacement is required before persisting
-the observer settings or continuing the governed rollout. No credential recovery
-from unrelated environments or authentication bypass is permitted.
+Dokploy authentication has been restored and the exact DEV observer settings are
+persisted. The owner authorised the historical-uncertainty amendment and constrained
+bootstrap described in [DEV telemetry bootstrap](dev-telemetry-bootstrap-20261029.md).
+This authorisation does not constitute final release approval or live verification.

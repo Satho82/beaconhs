@@ -154,3 +154,32 @@ if [ "$newline_status" -eq 0 ]; then
   exit 1
 fi
 echo 'PASS line-break token fails closed'
+
+cat > "${mock_bin}/sudo" <<'MOCK'
+#!/usr/bin/env bash
+set -euo pipefail
+[ "$1" = -n ] && [ "$2" = python3 ] && [[ "$3" == */read_dev_dokploy_token.py ]]
+if [ "${DOKPLOY_LOCAL_READ_FAIL:-false}" = true ]; then exit 1; fi
+printf '%s' 'host-private-synthetic-token'
+MOCK
+chmod 0700 "${mock_bin}/sudo"
+local_state="${test_root}/local-state"
+local_output="$(PATH="${mock_bin}:$PATH" RUNNER_TEMP="$test_root" \
+  FEATURE_CANDIDATE_VERIFIED=true DOKPLOY_COMPOSE_ID=wYb0LxLQrvj2FPI21i-Oj \
+  EXPECTED_DOKPLOY_STACK=uvanoo-v1-4-dev-gniriv EXPECTED_APP_HOST=dev.uvanoo.com \
+  DOKPLOY_TOKEN=must-not-use-shared-token DOKPLOY_CURL_EXPECTED_TOKEN=host-private-synthetic-token \
+  DOKPLOY_CURL_TEST_STATE="$local_state" "$subject" https://dokploy.example.test/api/test </dev/null)"
+[ "$local_output" = mock-response ] && [ ! -e "$(cat "$local_state")" ]
+for defect in read scope; do
+  status=0
+  host=dev.uvanoo.com
+  fail=false
+  if [ "$defect" = scope ]; then host=production.invalid; else fail=true; fi
+  PATH="${mock_bin}:$PATH" RUNNER_TEMP="$test_root" \
+    FEATURE_CANDIDATE_VERIFIED=true DOKPLOY_COMPOSE_ID=wYb0LxLQrvj2FPI21i-Oj \
+    EXPECTED_DOKPLOY_STACK=uvanoo-v1-4-dev-gniriv EXPECTED_APP_HOST="$host" \
+    DOKPLOY_LOCAL_READ_FAIL="$fail" DOKPLOY_TOKEN=must-not-fall-back \
+    "$subject" https://dokploy.example.test/api/test >/dev/null 2>&1 || status=$?
+  [ "$status" -ne 0 ]
+done
+echo 'PASS DEV uses host-private pipe, rejects wrong scope, and never falls back to shared token'

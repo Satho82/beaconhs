@@ -568,3 +568,74 @@ describe('Collabora drainage safety facts', () => {
     },
   )
 })
+
+describe('new interval observation remains fail closed', () => {
+  const uncertainty = {
+    exceptionId: 'DEV_PRE_TELEMETRY_SAVE_UNKNOWN_20261029' as const,
+    historicalSaveState: 'UNKNOWN' as const,
+    possibleUnsavedChangesAccepted: true as const,
+    preserveKnownUnsavedDocuments: true as const,
+    approvalReceiptSha256: h,
+    bootstrapReceiptSha256: h,
+    epoch: h,
+    observationStartsAt: new Date(now - 60_000).toISOString(),
+  }
+  function observation() {
+    return {
+      version: 1 as const,
+      target: DEV_TARGET,
+      sourceSha: 'b'.repeat(40),
+      phase: 'migration' as const,
+      check: 'collaboraObservedInterval',
+      observedAt: new Date(now).toISOString(),
+      facts: {
+        desiredReplicas: 0,
+        activeTasks: 0,
+        activeSessions: 0,
+        pendingSaves: 0,
+        failedSaves: 0,
+        unknownOutcomes: 0,
+        newActivityCoverageComplete: true,
+        editingBlocked: true,
+        historicalSaveStateUnknown: true,
+        knownUnsavedDocumentsPreserved: true,
+        intervalEvidenceSha256: h,
+        taskCoverageSha256: h,
+        completionWatermark: h,
+        bootstrapReceiptSha256: h,
+        approvalReceiptSha256: h,
+        epoch: h,
+      },
+    }
+  }
+  it('requires explicit approval binding for observed-interval protocol', () => {
+    const f = fixture(true),
+      v = observation()
+    expect(() =>
+      validateObservation(v, v.check, f.policy, now, now, undefined, uncertainty),
+    ).not.toThrow()
+    expect(() => validateObservation(v, v.check, f.policy, now, now)).toThrow()
+  })
+  it.each(['pendingSaves', 'failedSaves', 'unknownOutcomes', 'activeSessions', 'activeTasks'])(
+    'rejects nonzero %s',
+    (field) => {
+      const f = fixture(true),
+        v = observation()
+      Object.assign(v.facts, { [field]: 1 })
+      expect(() =>
+        validateObservation(v, v.check, f.policy, now, now, undefined, uncertainty),
+      ).toThrow()
+    },
+  )
+  it.each(['epoch', 'bootstrapReceiptSha256', 'approvalReceiptSha256'])(
+    'rejects changed %s binding',
+    (field) => {
+      const f = fixture(true),
+        v = observation()
+      Object.assign(v.facts, { [field]: '0'.repeat(64) })
+      expect(() =>
+        validateObservation(v, v.check, f.policy, now, now, undefined, uncertainty),
+      ).toThrow()
+    },
+  )
+})

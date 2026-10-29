@@ -11,6 +11,7 @@ import {
   admissionChecks,
   checkTemporaryFiles,
   validateTemporaryAdmission,
+  validateHistoricalSaveUncertainty,
   requireTemporaryDatabaseTarget,
   type TemporaryApproval,
   type PrivateRestoreReceipt,
@@ -499,4 +500,84 @@ describe('exact DEV temporary admission', () => {
       rmSync(directory, { recursive: true, force: true })
     }
   })
+})
+
+describe('owner-pinned historical save uncertainty', () => {
+  function accepted() {
+    const f = fixture('migration', true)
+    f.a.historicalSaveUncertainty = {
+      exceptionId: 'DEV_PRE_TELEMETRY_SAVE_UNKNOWN_20261029',
+      historicalSaveState: 'UNKNOWN',
+      possibleUnsavedChangesAccepted: true,
+      preserveKnownUnsavedDocuments: true,
+      approvalReceiptSha256: hash,
+      bootstrapReceiptSha256: '9'.repeat(64),
+      epoch: '8'.repeat(64),
+      observationStartsAt: f.e.backup.createdAt,
+    }
+    f.pin = digest(JSON.stringify(f.a))
+    f.e.admission!.approvalSha256 = f.pin
+    f.safety.payload.approvalSha256 = f.pin
+    f.safety.payload.historicalSaveUncertainty = structuredClone(f.a.historicalSaveUncertainty)
+    delete f.safety.payload.checks.collaboraDrainage
+    f.safety.payload.checks.collaboraObservedInterval = { passed: true, evidenceSha256: hash }
+    f.safety.signature = sign(
+      null,
+      Buffer.from(canonical(f.safety.payload)),
+      f.keys.privateKey,
+    ).toString('base64')
+    return f
+  }
+  it('admits only the separately named observed-interval check and retains UNKNOWN in the signed receipt', () => {
+    const f = accepted()
+    expect(() =>
+      validateTemporaryAdmission(f.e, f.a, f.r, f.safety, f.pin, 'migration', env, now),
+    ).not.toThrow()
+    expect(admissionChecks('web', f.a)).toContain('objectReferences')
+    expect(admissionChecks('web', f.a)).toContain('crossStoreConsistency')
+    expect(admissionChecks('web', f.a)).not.toContain('collaboraDrainage')
+  })
+  it.each(['target', 'hold', 'future', 'before-hold', 'hash', 'claim', 'discard', 'extra'])(
+    'rejects %s exception defects',
+    (kind) => {
+      const f = accepted()
+      const x = f.a.historicalSaveUncertainty!
+      if (kind === 'target')
+        f.a.target = { ...DEV_TARGET, host: 'production.invalid' } as unknown as typeof DEV_TARGET
+      if (kind === 'hold') delete f.a.maintenanceHold
+      if (kind === 'future') x.observationStartsAt = new Date(now + 1).toISOString()
+      if (kind === 'before-hold') x.observationStartsAt = '2020-01-01T00:00:00Z'
+      if (kind === 'hash') x.bootstrapReceiptSha256 = ''
+      if (kind === 'claim') Object.assign(x, { historicalSaveState: 'VERIFIED' })
+      if (kind === 'discard') Object.assign(x, { preserveKnownUnsavedDocuments: false })
+      if (kind === 'extra') Object.assign(x, { waiveBackup: true })
+      expect(() => validateHistoricalSaveUncertainty(f.a, now)).toThrow()
+    },
+  )
+  it.each(['missing-disclosure', 'changed-epoch', 'old-check', 'stale-backup', 'unsigned'])(
+    'rejects %s even with accepted historical risk',
+    (kind) => {
+      const f = accepted()
+      if (kind === 'missing-disclosure') delete f.safety.payload.historicalSaveUncertainty
+      if (kind === 'changed-epoch')
+        f.safety.payload.historicalSaveUncertainty!.epoch = '0'.repeat(64)
+      if (kind === 'old-check') {
+        delete f.safety.payload.checks.collaboraObservedInterval
+        f.safety.payload.checks.collaboraDrainage = { passed: true, evidenceSha256: hash }
+      }
+      if (kind === 'unsigned') f.safety.signature = ''
+      expect(() =>
+        validateTemporaryAdmission(
+          f.e,
+          f.a,
+          f.r,
+          f.safety,
+          f.pin,
+          'migration',
+          env,
+          kind === 'stale-backup' ? now + 3600_001 : now,
+        ),
+      ).toThrow()
+    },
+  )
 })

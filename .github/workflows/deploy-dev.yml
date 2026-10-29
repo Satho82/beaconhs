@@ -201,6 +201,7 @@ jobs:
     runs-on: [self-hosted, dokploy]
     timeout-minutes: 45
     env:
+      FEATURE_CANDIDATE_VERIFIED: ${{ inputs.feature_candidate_verified }}
       IMAGE_DIGEST: ${{ inputs.image_digest || needs.build.outputs.image_digest }}
       DEPLOY_SOURCE_SHA: ${{ inputs.source_sha || github.sha }}
       DEPLOY_IMAGE_NAME: ${{ inputs.source_sha != '' && 'ghcr.io/satho82/uvanoo-staging-private' || 'ghcr.io/satho82/beaconhs' }}
@@ -359,7 +360,7 @@ jobs:
       - name: Resolve the dev deployment target
         env:
           DOKPLOY_URL: ${{ secrets.DOKPLOY_URL }}
-          DOKPLOY_TOKEN: ${{ secrets.DOKPLOY_TOKEN }}
+          DOKPLOY_TOKEN: ${{ !inputs.feature_candidate_verified && secrets.DOKPLOY_TOKEN || '' }}
           COMPOSE_ID: ${{ env.DOKPLOY_COMPOSE_ID }}
           EXPECTED_STACK: ${{ env.EXPECTED_DOKPLOY_STACK }}
           EXPECTED_APP_HOST: ${{ env.EXPECTED_APP_HOST }}
@@ -700,7 +701,7 @@ jobs:
         env:
           FEATURE_CANDIDATE_VERIFIED: ${{ inputs.feature_candidate_verified }}
           DOKPLOY_URL: ${{ secrets.DOKPLOY_URL }}
-          DOKPLOY_TOKEN: ${{ secrets.DOKPLOY_TOKEN }}
+          DOKPLOY_TOKEN: ${{ !inputs.feature_candidate_verified && secrets.DOKPLOY_TOKEN || '' }}
         run: node .deployment-governance/scripts/cluster/dev-writer-fence.mjs fence
 
       - name: Preflight all migration database roles
@@ -903,7 +904,7 @@ jobs:
         env:
           FEATURE_CANDIDATE_VERIFIED: ${{ inputs.feature_candidate_verified }}
           DOKPLOY_URL: ${{ secrets.DOKPLOY_URL }}
-          DOKPLOY_TOKEN: ${{ secrets.DOKPLOY_TOKEN }}
+          DOKPLOY_TOKEN: ${{ !inputs.feature_candidate_verified && secrets.DOKPLOY_TOKEN || '' }}
           NODE_ENV: production
           MIGRATION_DATABASE_URL: ${{ env.MIGRATION_DATABASE_URL }}
           DATABASE_URL: ${{ env.DATABASE_URL }}
@@ -972,7 +973,7 @@ jobs:
         env:
           FEATURE_CANDIDATE_VERIFIED: ${{ inputs.feature_candidate_verified }}
           DOKPLOY_URL: ${{ secrets.DOKPLOY_URL }}
-          DOKPLOY_TOKEN: ${{ secrets.DOKPLOY_TOKEN }}
+          DOKPLOY_TOKEN: ${{ !inputs.feature_candidate_verified && secrets.DOKPLOY_TOKEN || '' }}
           COMPOSE_ID: ${{ env.DOKPLOY_COMPOSE_ID }}
           DATABASE_URL: ${{ env.DATABASE_URL }}
           SUPERADMIN_DATABASE_URL: ${{ env.SUPERADMIN_DATABASE_URL }}
@@ -1084,7 +1085,7 @@ jobs:
         if: env.DOKPLOY_DEPLOY_MODE == 'api'
         env:
           DOKPLOY_URL: ${{ secrets.DOKPLOY_URL }}
-          DOKPLOY_TOKEN: ${{ secrets.DOKPLOY_TOKEN }}
+          DOKPLOY_TOKEN: ${{ !inputs.feature_candidate_verified && secrets.DOKPLOY_TOKEN || '' }}
           COMPOSE_ID: ${{ env.DOKPLOY_COMPOSE_ID }}
         run: |
           set -euo pipefail
@@ -1102,7 +1103,7 @@ jobs:
         env:
           FEATURE_CANDIDATE_VERIFIED: ${{ inputs.feature_candidate_verified }}
           DOKPLOY_URL: ${{ secrets.DOKPLOY_URL }}
-          DOKPLOY_TOKEN: ${{ secrets.DOKPLOY_TOKEN }}
+          DOKPLOY_TOKEN: ${{ !inputs.feature_candidate_verified && secrets.DOKPLOY_TOKEN || '' }}
           DEV_SERVICE_AUTHORIZATION: restore-web
           DEV_BACKUP_DATABASE_URL: ${{ secrets.DEV_BACKUP_DATABASE_URL }}
         run: |
@@ -1163,7 +1164,7 @@ jobs:
         env:
           FEATURE_CANDIDATE_VERIFIED: ${{ inputs.feature_candidate_verified }}
           DOKPLOY_URL: ${{ secrets.DOKPLOY_URL }}
-          DOKPLOY_TOKEN: ${{ secrets.DOKPLOY_TOKEN }}
+          DOKPLOY_TOKEN: ${{ !inputs.feature_candidate_verified && secrets.DOKPLOY_TOKEN || '' }}
         run: node .deployment-governance/scripts/cluster/dev-writer-fence.mjs fence
 
       - name: Report DEV writer recovery state

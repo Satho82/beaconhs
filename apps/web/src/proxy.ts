@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { bootstrapRequestAllowed } from '@/lib/dev-telemetry-bootstrap'
 import { contentSecurityPolicy } from '@/lib/security-headers'
 
 export function proxy(request: NextRequest) {
+  if (!bootstrapRequestAllowed(request.method, request.nextUrl.pathname))
+    return new NextResponse('DEV maintenance', {
+      status: 503,
+      headers: { 'Cache-Control': 'no-store' },
+    })
   const nonce = crypto.randomUUID().replaceAll('-', '')
   const policy = contentSecurityPolicy({
     nonce,
@@ -19,14 +25,4 @@ export function proxy(request: NextRequest) {
   return response
 }
 
-export const config = {
-  matcher: [
-    {
-      source: '/((?!_next/static|_next/image|favicon.ico).*)',
-      missing: [
-        { type: 'header', key: 'next-router-prefetch' },
-        { type: 'header', key: 'purpose', value: 'prefetch' },
-      ],
-    },
-  ],
-}
+export const config = { matcher: '/:path*' }

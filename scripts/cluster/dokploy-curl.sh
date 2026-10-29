@@ -2,6 +2,14 @@
 
 set -euo pipefail
 
+if [ "${FEATURE_CANDIDATE_VERIFIED:-false}" = true ]; then
+  [ "${DOKPLOY_COMPOSE_ID:-}" = wYb0LxLQrvj2FPI21i-Oj ] &&
+    [ "${EXPECTED_DOKPLOY_STACK:-}" = uvanoo-v1-4-dev-gniriv ] &&
+    [ "${EXPECTED_APP_HOST:-}" = dev.uvanoo.com ] || { echo 'Invalid DEV credential scope' >&2; exit 1; }
+  script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+  # Capture only within this host process; never export to GitHub secrets/outputs.
+  DOKPLOY_TOKEN="$(sudo -n python3 "$script_dir/read_dev_dokploy_token.py")"
+fi
 : "${DOKPLOY_TOKEN:?DOKPLOY_TOKEN is required}"
 
 if ! command -v curl >/dev/null 2>&1; then

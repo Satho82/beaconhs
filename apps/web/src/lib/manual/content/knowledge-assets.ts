@@ -334,6 +334,8 @@ Open **Training** in the left menu, then **Courses**. Open a course, add or open
 
 If the page says PowerPoint editing or playback is unavailable, ask your administrator to restore the Collabora server. There is no image or PDF playback fallback.
 
+During DEV maintenance, the page may show **DEV maintenance** and editing is temporarily unavailable. Wait for the administrator to confirm that editing has reopened. Keep any known unsaved work until its save is confirmed.
+
 If the page says the workspace is unavailable, a platform administrator must restore the workspace before the editor can open or save the file.
 
 The editor is also blocked while an administrator is using **View as user**. Exit that session and open the deck as yourself.

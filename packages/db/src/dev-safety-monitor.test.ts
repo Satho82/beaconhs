@@ -85,6 +85,8 @@ function fixture(maintenance = false) {
     catalogSections: 19,
     postgresVersion: '160015',
     pristineRetained: true,
+    isolatedContainer: true,
+    isolatedVolume: true,
   }
   const approval: TemporaryApproval = {
     version: 1,
@@ -224,7 +226,11 @@ describe('independent DEV observation/signing adapter', () => {
     f.approval.operationalEvidence = {
       mode: 'documented-operational',
       independentAttestation: false,
+      sameHostRestore: true,
+      hostDisasterRecoveryVerified: false,
     }
+    f.approval.restoreHostSha256 = f.approval.sourceHostSha256
+    f.restore.restoreHostSha256 = f.restore.sourceHostSha256
     const approvalSha = sha(canonical(f.approval))
     f.evidence.admission!.approvalSha256 = approvalSha
     f.policy.approvalSha256 = approvalSha

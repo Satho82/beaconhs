@@ -69,9 +69,13 @@ export type TemporaryApproval = {
   // monitor signature. It is valid only together with maintenanceHold and is
   // still pinned by the existing private owner-approval bytes.
   historicalMissingObjectsException?: HistoricalException
+  // The same-host path is DEV-only and requires an independently isolated
+  // PostgreSQL container and volume. It is deliberately not host-level DR.
   operationalEvidence?: {
     mode: 'documented-operational'
     independentAttestation: false
+    sameHostRestore: true
+    hostDisasterRecoveryVerified: false
   }
 }
 export type PrivateRestoreReceipt = {
@@ -100,6 +104,8 @@ export type PrivateRestoreReceipt = {
   catalogSections: 19
   postgresVersion: '160015'
   pristineRetained: true
+  isolatedContainer: true
+  isolatedVolume: true
 }
 const MIGRATION_CHECKS = [
   'writerExclusion',
@@ -149,9 +155,17 @@ export function usesDocumentedOperationalEvidence(approval: TemporaryApproval) {
   requireValue(
     approval.maintenanceHold !== undefined &&
       approval.safetyPublicKeyDer === undefined &&
-      canonical(Object.keys(evidence).sort()) === canonical(['independentAttestation', 'mode']) &&
+      canonical(Object.keys(evidence).sort()) ===
+        canonical([
+          'hostDisasterRecoveryVerified',
+          'independentAttestation',
+          'mode',
+          'sameHostRestore',
+        ]) &&
       evidence.mode === 'documented-operational' &&
-      evidence.independentAttestation === false,
+      evidence.independentAttestation === false &&
+      evidence.sameHostRestore === true &&
+      evidence.hostDisasterRecoveryVerified === false,
   )
   return true
 }
@@ -325,7 +339,9 @@ export function validateTemporaryAdmission(
   for (const key of ['sourceHostSha256', 'restoreHostSha256', 'recipientSha256'] as const)
     requireValue(hash(approval[key]) && receipt[key] === approval[key])
   requireValue(
-    approval.sourceHostSha256 !== approval.restoreHostSha256 &&
+    (documentedOperational
+      ? approval.sourceHostSha256 === approval.restoreHostSha256
+      : approval.sourceHostSha256 !== approval.restoreHostSha256) &&
       receipt.version === 1 &&
       /^[a-zA-Z0-9_-]{8,100}$/.test(receipt.runId) &&
       e.backup.restoreRun === 'private:' + receipt.runId &&
@@ -335,6 +351,8 @@ export function validateTemporaryAdmission(
       receipt.catalogSections === 19 &&
       receipt.postgresVersion === '160015' &&
       receipt.pristineRetained === true &&
+      receipt.isolatedContainer === true &&
+      receipt.isolatedVolume === true &&
       hash(receipt.sourceRawCatalogSha256) &&
       hash(receipt.restoredRawCatalogSha256),
   )
@@ -387,9 +405,10 @@ export function validateTemporaryAdmission(
     checks.every((k) => p.checks[k]?.passed === true && hash(p.checks[k]?.evidenceSha256)),
   )
   if (documentedOperational) {
-    // This is intentionally not described as independent: a privileged DEV
-    // operator can alter operational evidence. The exact target, short hold,
-    // owner pin and every live data/safety check remain mandatory.
+    // Same-host restore is intentionally not described as independent or as
+    // host-level DR: a privileged DEV operator can alter its evidence. The exact
+    // target, short hold, owner pin, isolated container/volume and every live
+    // data/safety check remain mandatory.
     requireValue(safety.signature === '')
   } else {
     requireValue(typeof approval.safetyPublicKeyDer === 'string')

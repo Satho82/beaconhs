@@ -91,6 +91,8 @@ function fixture(phase: AdmissionPhase = 'migration', maintenance = false) {
     catalogSections: 19,
     postgresVersion: '160015',
     pristineRetained: true,
+    isolatedContainer: true,
+    isolatedVolume: true,
   }
   const a: TemporaryApproval = {
     version: 1,
@@ -161,13 +163,17 @@ function fixture(phase: AdmissionPhase = 'migration', maintenance = false) {
   return { e, a, r, safety, pin, check, keys }
 }
 describe('exact DEV temporary admission', () => {
-  it('accepts documented operational evidence only for the exact DEV maintenance hold', () => {
+  it('accepts documented same-host operational evidence only for the exact DEV maintenance hold', () => {
     const f = fixture('migration', true)
     delete f.a.safetyPublicKeyDer
     f.a.operationalEvidence = {
       mode: 'documented-operational',
       independentAttestation: false,
+      sameHostRestore: true,
+      hostDisasterRecoveryVerified: false,
     }
+    f.a.restoreHostSha256 = f.a.sourceHostSha256
+    f.r.restoreHostSha256 = f.r.sourceHostSha256
     f.pin = digest(JSON.stringify(f.a))
     f.e.admission!.approvalSha256 = f.pin
     f.safety.payload.approvalSha256 = f.pin
@@ -177,7 +183,7 @@ describe('exact DEV temporary admission', () => {
       validateTemporaryAdmission(f.e, f.a, f.r, f.safety, f.pin, 'migration', env, now),
     ).not.toThrow()
   })
-  it.each(['signature', 'target', 'production', 'hold', 'claim'])(
+  it.each(['signature', 'target', 'production', 'hold', 'claim', 'same-host-claim'])(
     'rejects documented operational evidence with %s safety defect',
     (kind) => {
       const f = fixture('migration', true)
@@ -185,6 +191,8 @@ describe('exact DEV temporary admission', () => {
       f.a.operationalEvidence = {
         mode: 'documented-operational',
         independentAttestation: false,
+        sameHostRestore: true,
+        hostDisasterRecoveryVerified: false,
       }
       f.pin = digest(JSON.stringify(f.a))
       f.e.admission!.approvalSha256 = f.pin
@@ -199,6 +207,8 @@ describe('exact DEV temporary admission', () => {
         } as unknown as typeof DEV_TARGET
       if (kind === 'hold') delete f.a.maintenanceHold
       if (kind === 'claim') f.a.operationalEvidence.independentAttestation = true as false
+      if (kind === 'same-host-claim')
+        f.a.operationalEvidence.hostDisasterRecoveryVerified = true as false
       expect(() =>
         validateTemporaryAdmission(
           f.e,
@@ -213,13 +223,41 @@ describe('exact DEV temporary admission', () => {
       ).toThrow()
     },
   )
-  it('does not waive a web safety check for documented operational evidence', () => {
+  it('requires same-host identity and isolated restore resources for documented operational evidence', () => {
+    const f = fixture('migration', true)
+    delete f.a.safetyPublicKeyDer
+    f.a.operationalEvidence = {
+      mode: 'documented-operational',
+      independentAttestation: false,
+      sameHostRestore: true,
+      hostDisasterRecoveryVerified: false,
+    }
+    f.a.restoreHostSha256 = f.a.sourceHostSha256
+    f.r.restoreHostSha256 = f.r.sourceHostSha256
+    f.pin = digest(JSON.stringify(f.a))
+    f.e.admission!.approvalSha256 = f.pin
+    f.safety.payload.approvalSha256 = f.pin
+    f.safety.payload.attestation = 'documented-operational'
+    f.safety.signature = ''
+    expect(() =>
+      validateTemporaryAdmission(f.e, f.a, f.r, f.safety, f.pin, 'migration', env, now),
+    ).not.toThrow()
+    f.r.isolatedVolume = false as true
+    expect(() =>
+      validateTemporaryAdmission(f.e, f.a, f.r, f.safety, f.pin, 'migration', env, now),
+    ).toThrow()
+  })
+  it('does not waive a web safety check for documented same-host operational evidence', () => {
     const f = fixture('web', true)
     delete f.a.safetyPublicKeyDer
     f.a.operationalEvidence = {
       mode: 'documented-operational',
       independentAttestation: false,
+      sameHostRestore: true,
+      hostDisasterRecoveryVerified: false,
     }
+    f.a.restoreHostSha256 = f.a.sourceHostSha256
+    f.r.restoreHostSha256 = f.r.sourceHostSha256
     f.pin = digest(JSON.stringify(f.a))
     f.e.admission!.approvalSha256 = f.pin
     f.safety.payload.approvalSha256 = f.pin

@@ -5,6 +5,11 @@ on:
     paths:
       - .github/workflows/deploy-dev.yml
       - .github/workflows/dev-release-safety-validation.yml
+      - packages/db/src/dev-temporary-admission.ts
+      - packages/db/src/dev-temporary-admission.test.ts
+      - packages/db/src/dev-safety-monitor.ts
+      - packages/db/src/dev-safety-monitor.test.ts
+      - docs/v1.4/dev-documented-operational-admission-20261014.md
       - scripts/cluster/dev-readiness*
       - scripts/ci/dev-release-safety-contract.rb
 permissions:
@@ -27,11 +32,12 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Focused formatting and syntax
         run: |
-          pnpm exec prettier --check .github/workflows/deploy-dev.yml .github/workflows/dev-release-safety-validation.yml scripts/cluster/dev-readiness.mjs scripts/cluster/dev-readiness.test.mjs
+          pnpm exec prettier --check .github/workflows/deploy-dev.yml .github/workflows/dev-release-safety-validation.yml packages/db/src/dev-temporary-admission.ts packages/db/src/dev-temporary-admission.test.ts packages/db/src/dev-safety-monitor.ts packages/db/src/dev-safety-monitor.test.ts docs/v1.4/dev-documented-operational-admission-20261014.md scripts/cluster/dev-readiness.mjs scripts/cluster/dev-readiness.test.mjs
           node --check scripts/cluster/dev-readiness.mjs
           ruby -c scripts/ci/dev-release-safety-contract.rb
-      - name: Native login security, writer fence and deployment contracts
+      - name: DEV admission, writer fence and deployment contracts
         run: |
+          pnpm --filter @beaconhs/db test -- dev-temporary-admission.test.ts dev-safety-monitor.test.ts
           node --test scripts/cluster/dev-readiness.test.mjs scripts/cluster/dev-writer-fence.test.mjs
           bash scripts/ci/v1.4-dev-candidate-deploy-contract.test.sh
           ruby scripts/ci/dev-release-safety-contract.rb

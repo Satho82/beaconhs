@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { bootstrapRequestAllowed } from './dev-telemetry-bootstrap'
 const now = Date.parse('2026-10-29T16:00:00Z')
@@ -15,13 +16,16 @@ describe('DEV telemetry bootstrap request fence', () => {
   it('does not change deployments without the explicit bootstrap switch', () => {
     expect(bootstrapRequestAllowed('POST', '/anything', {}, now)).toBe(true)
   })
-  it.each(['/api/health', '/api/internal/recovery/wopi'])('permits GET %s only', (path) => {
+  it.each(['/api/health/ready', '/api/internal/recovery/wopi'])('permits GET %s only', (path) => {
+    expect(existsSync(new URL('../app' + path + '/route.ts', import.meta.url))).toBe(true)
     expect(bootstrapRequestAllowed('GET', path, env, now)).toBe(true)
     expect(bootstrapRequestAllowed('POST', path, env, now)).toBe(false)
   })
   it.each([
     '/',
     '/login',
+    '/api/health',
+    '/api/health/ready/extra',
     '/api/auth/sign-in/email',
     '/api/trpc/handover.create',
     '/browser/editor',
@@ -46,6 +50,8 @@ describe('DEV telemetry bootstrap request fence', () => {
     { UVANOO_DEV_TELEMETRY_BOOTSTRAP_EXPIRES_AT: new Date(now).toISOString() },
     { UVANOO_DEV_TELEMETRY_BOOTSTRAP_EXPIRES_AT: new Date(now + 7200_001).toISOString() },
   ])('fails closed for invalid or expired bootstrap configuration %j', (change) => {
-    expect(bootstrapRequestAllowed('GET', '/api/health', { ...env, ...change }, now)).toBe(false)
+    expect(bootstrapRequestAllowed('GET', '/api/health/ready', { ...env, ...change }, now)).toBe(
+      false,
+    )
   })
 })

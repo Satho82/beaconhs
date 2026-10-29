@@ -43,7 +43,7 @@ compose/environment and recovery evidence before changes.
    `UVANOO_DEV_TELEMETRY_BOOTSTRAP=true` and an explicit expiry at most two hours
    ahead. Bind APP_VERSION/source, exact DEV compose, epoch and observer digest.
    Keep worker/scheduler/storage-init stopped. Keep AutoDeploy off.
-   The application gate allows GET health and authenticated telemetry, plus the
+   The application gate allows GET /api/health/ready and authenticated telemetry, plus the
    existing capability-authenticated POST /wopi/files/UUID/contents callback.
    All other requests, including prefetched requests, receive maintenance 503.
    Invalid/expired binding fails closed. The entrypoint runs no migrations.
@@ -96,3 +96,5 @@ The failure rehearsal covers a running task whose desired state is shutdown,
 missing tasks/services, unknown states, live Collabora, unhealthy infrastructure
 and observer failures. These tests are engineering evidence, not independent
 human approval or release admission.
+
+The bootstrap uses the existing readiness route, including database, Redis and auth checks. A route-existence regression check prevents a permissive allowlist from naming a nonexistent health endpoint. The earlier /api/health target failed readiness and was not accepted as a live release.

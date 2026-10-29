@@ -22,7 +22,7 @@ export function bootstrapRequestAllowed(
   )
     return false
   return (
-    (method === 'GET' && ['/api/health', '/api/internal/recovery/wopi'].includes(pathname)) ||
+    (method === 'GET' && ['/api/health/ready', '/api/internal/recovery/wopi'].includes(pathname)) ||
     // Existing authenticated save callbacks retain their normal capability/RLS checks.
     (method === 'POST' && /^\/wopi\/files\/[a-f0-9-]{36}\/contents$/.test(pathname))
   )

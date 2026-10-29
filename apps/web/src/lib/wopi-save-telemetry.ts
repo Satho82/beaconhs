@@ -59,7 +59,7 @@ export async function settleSave(attempt: SaveAttempt | null) {
   if (attempt) await withTenant(db, attempt.tenantId, (tx) => event(tx, attempt, 'settled'))
 }
 
-/** Called only after explicit DEV + privileged non-impersonated reader checks. */
+/** Called only after exact DEV binding and dedicated aggregate-observer authentication. */
 export async function saveStatus() {
   const config = recoveryConfig()
   if (!config) throw new Error('WOPI_RECOVERY_DISABLED')

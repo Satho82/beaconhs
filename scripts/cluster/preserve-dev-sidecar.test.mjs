@@ -107,3 +107,38 @@ test('rejects active Collabora sidecar', () => {
     })),
   )
 })
+
+test('preserves dedicated DEV observer hash and binds the new source SHA', () => {
+  const observerEnv =
+    'UVANOO_WOPI_OBSERVER_SHA256=' +
+    'a'.repeat(64) +
+    '\nUVANOO_WOPI_OBSERVER_EXPIRES_AT=2099-01-01T00:00:00Z' +
+    '\nUVANOO_WOPI_RECOVERY_EPOCH=' +
+    'b'.repeat(64) +
+    '\nUVANOO_RECOVERY_COMPOSE_ID=wYb0LxLQrvj2FPI21i-Oj\n'
+  const scoped = {
+    ...saved,
+    env: saved.env.replaceAll('dev.example', 'dev.uvanoo.com') + observerEnv,
+  }
+  const newEnv = 'APP_URL=https://dev.uvanoo.com\nAPP_VERSION=' + 'c'.repeat(40) + '\n'
+  const result = preserveSidecar(scoped, template, newEnv, render)
+  assert.ok(result.env.includes(observerEnv))
+  assert.ok(result.env.includes('UVANOO_RECOVERY_SOURCE_SHA=' + 'c'.repeat(40)))
+  assert.throws(() =>
+    preserveSidecar(
+      { ...scoped, env: scoped.env.replace('2099-01-01', '2000-01-01') },
+      template,
+      newEnv,
+      render,
+    ),
+  )
+  assert.throws(() =>
+    preserveSidecar(
+      { ...scoped, env: scoped.env.replace('wYb0LxLQrvj2FPI21i-Oj', 'other') },
+      template,
+      newEnv,
+      render,
+    ),
+  )
+  assert.throws(() => preserveSidecar(scoped, template, newEnv + observerEnv, render))
+})

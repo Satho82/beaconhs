@@ -60,6 +60,38 @@ export function preserveSidecar(saved, template, newEnv, render) {
       env += (env.endsWith('\n') ? '' : '\n') + key + '=' + old + '\n'
     }
   }
+  // Dedicated telemetry settings are hashes/bindings, never an interactive session.
+  const observerKeys = [
+    'UVANOO_WOPI_OBSERVER_SHA256',
+    'UVANOO_WOPI_OBSERVER_EXPIRES_AT',
+    'UVANOO_WOPI_RECOVERY_EPOCH',
+    'UVANOO_RECOVERY_COMPOSE_ID',
+  ]
+  if (
+    observerKeys.some((key) => saved.env.split('\n').some((line) => line.startsWith(key + '=')))
+  ) {
+    const values = Object.fromEntries(observerKeys.map((key) => [key, getValue(saved.env, key)]))
+    assert(
+      /^[a-f0-9]{64}$/.test(values.UVANOO_WOPI_OBSERVER_SHA256) &&
+        /^[a-f0-9]{64}$/.test(values.UVANOO_WOPI_RECOVERY_EPOCH) &&
+        values.UVANOO_RECOVERY_COMPOSE_ID === 'wYb0LxLQrvj2FPI21i-Oj' &&
+        Number.isFinite(Date.parse(values.UVANOO_WOPI_OBSERVER_EXPIRES_AT)) &&
+        Date.parse(values.UVANOO_WOPI_OBSERVER_EXPIRES_AT) > Date.now() &&
+        getValue(env, 'APP_URL') === 'https://dev.uvanoo.com' &&
+        /^[a-f0-9]{40}$/.test(getValue(env, 'APP_VERSION')),
+      'OBSERVER_BINDING_INVALID',
+    )
+    for (const key of [...observerKeys, 'UVANOO_RECOVERY_SOURCE_SHA']) {
+      assert(!env.split('\n').some((line) => line.startsWith(key + '=')), 'OBSERVER_ENV_DUPLICATE')
+    }
+    env +=
+      (env.endsWith('\n') ? '' : '\n') +
+      observerKeys.map((key) => key + '=' + values[key]).join('\n') +
+      '\n' +
+      'UVANOO_RECOVERY_SOURCE_SHA=' +
+      getValue(env, 'APP_VERSION') +
+      '\n'
+  }
   const compose = template.replace(/^networks:\s*$/m, block + '\nnetworks:')
   const oldSidecar = render(saved.composeFile, saved.env).services?.collabora
   const newSidecar = render(compose, env).services?.collabora

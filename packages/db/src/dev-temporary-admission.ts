@@ -2,6 +2,10 @@ import { createHash, createPublicKey, verify } from 'node:crypto'
 import { existsSync, lstatSync, readFileSync, realpathSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { canonical, LOGICAL_SCHEMA_PROFILE } from './dev-logical-catalog'
+import {
+  validateHistoricalException,
+  type HistoricalException,
+} from './dev-historical-object-exception'
 import type { ReleaseEvidence } from './dev-migration-gate'
 
 export const DEV_TARGET = Object.freeze({
@@ -63,6 +67,7 @@ export type TemporaryApproval = {
   // An explicit, deliberately weaker DEV-only alternative to the independent
   // monitor signature. It is valid only together with maintenanceHold and is
   // still pinned by the existing private owner-approval bytes.
+  historicalMissingObjectsException?: HistoricalException
   operationalEvidence?: {
     mode: 'documented-operational'
     independentAttestation: false
@@ -98,6 +103,7 @@ export type PrivateRestoreReceipt = {
 const MIGRATION_CHECKS = [
   'writerExclusion',
   'independentWatchdog',
+  'collaboraDrainage',
   'persistentFourZero',
   'legacyIsolation',
 ] as const
@@ -122,6 +128,11 @@ export type SafetyReceipt = {
   observedAt: string
   expiresAt: string
   checks: Record<string, { passed: true; evidenceSha256: string }>
+  historicalException?: {
+    exceptionId: string
+    missingObjects: number
+    recoveryEvidenceSha256: string
+  }
 }
 const hash = (v: unknown): v is string => typeof v === 'string' && /^[a-f0-9]{64}$/.test(v)
 const sha = (b: Buffer) => createHash('sha256').update(b).digest('hex')
@@ -265,6 +276,8 @@ export function validateTemporaryAdmission(
   exactTarget(approval.target)
   exactTarget(receipt.target)
   exactTarget(safety.payload.target)
+  if (approval.historicalMissingObjectsException !== undefined)
+    validateHistoricalException(approval.target, approval.historicalMissingObjectsException)
   const holdExpires = maintenanceHoldExpiry(approval, now)
   const documentedOperational = usesDocumentedOperationalEvidence(approval)
   if (approval.maintenanceHold !== undefined)
@@ -351,6 +364,22 @@ export function validateTemporaryAdmission(
       validUntil <= expires &&
       validUntil <= holdExpires,
   )
+  const exception = approval.historicalMissingObjectsException
+  if (phase === 'web' && exception) {
+    requireValue(p.historicalException !== undefined)
+    const x = p.historicalException!
+    requireValue(
+      canonical(Object.keys(x).sort()) ===
+        canonical(['exceptionId', 'missingObjects', 'recoveryEvidenceSha256'].sort()),
+    )
+    requireValue(
+      x.exceptionId === exception.exceptionId &&
+        x.recoveryEvidenceSha256 === exception.recoveryEvidenceSha256 &&
+        Number.isInteger(x.missingObjects) &&
+        x.missingObjects >= 0 &&
+        x.missingObjects <= 6,
+    )
+  } else requireValue(p.historicalException === undefined)
   const checks = admissionChecks(phase, approval)
   requireValue(canonical(Object.keys(p.checks).sort()) === canonical([...checks].sort()))
   requireValue(

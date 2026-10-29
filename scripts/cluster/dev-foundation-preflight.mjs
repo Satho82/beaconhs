@@ -5,7 +5,7 @@ import { readFileSync } from 'node:fs'
 import { isDeepStrictEqual } from 'node:util'
 import { fileURLToPath } from 'node:url'
 import { posix } from 'node:path'
-import { writers, zero } from './dev-writer-fence.mjs'
+import { writers, zero, preservedSidecars } from './dev-writer-fence.mjs'
 
 const check = (ok, code) => {
   if (!ok) throw new Error(code)
@@ -68,7 +68,10 @@ export function configurationComparison(before, after, permanent) {
     report = []
   for (const config of [baseline, proposed])
     check(
-      isDeepStrictEqual(Object.keys(config.services ?? {}).sort(), [...writers].sort()),
+      isDeepStrictEqual(
+        Object.keys(config.services ?? {}).sort(),
+        [...writers, ...preservedSidecars].sort(),
+      ),
       'FIVE_SERVICES_REQUIRED',
     )
   for (const role of writers) {
@@ -152,7 +155,10 @@ export function runtimeComparison(rendered, services) {
     'RUNTIME_SERVICE_SET_INVALID',
   )
   check(
-    isDeepStrictEqual(Object.keys(rendered?.services ?? {}).sort(), [...writers].sort()),
+    isDeepStrictEqual(
+      Object.keys(rendered?.services ?? {}).sort(),
+      [...writers, ...preservedSidecars].sort(),
+    ),
     'FIVE_SERVICES_REQUIRED',
   )
   for (const role of writers) {
@@ -175,7 +181,10 @@ export function runtimeComparison(rendered, services) {
       const at = entry.indexOf('='),
         name = entry.slice(0, at)
       check(!Object.hasOwn(actualEnv, name), 'RUNTIME_ENV_AMBIGUOUS')
-      Object.defineProperty(actualEnv, name, { value: entry.slice(at + 1), enumerable: true })
+      Object.defineProperty(actualEnv, name, {
+        value: entry.slice(at + 1),
+        enumerable: true,
+      })
     }
     check(isDeepStrictEqual(actualEnv, expected.environment), 'RUNTIME_ENV_DRIFT')
   }
@@ -183,6 +192,7 @@ export function runtimeComparison(rendered, services) {
     status: 'PASS',
     imageReplicaEnvironmentParity: true,
     mountNetworkLabelParity: 'SEPARATE_SPEC_PROOF_REQUIRED',
+    sidecarRuntimeParity: 'SEPARATE_SPEC_PROOF_REQUIRED',
   }
 }
 

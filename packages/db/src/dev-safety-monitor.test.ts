@@ -175,6 +175,16 @@ function fixture(maintenance = false) {
       failureRehearsalSha256: h,
       heartbeatSha256: h,
     },
+    collaboraDrainage: {
+      desiredReplicas: 0,
+      activeTasks: 0,
+      adminSessionCoverageComplete: true,
+      activeSessions: 0,
+      pendingSaves: 0,
+      failedSaves: 0,
+      saveCoverageComplete: true,
+      drainageEvidenceSha256: h,
+    },
     persistentFourZero: {
       exactFourServiceIdentities: true,
       desiredReplicas: 0,
@@ -331,16 +341,19 @@ describe('independent DEV observation/signing adapter', () => {
       ).toBe(check.evidenceSha256)
     expect(JSON.parse(readFileSync(join(f.directory, 'safety.json'), 'utf8'))).toEqual(envelope)
   })
-  it.each(['writerExclusion', 'independentWatchdog', 'persistentFourZero', 'legacyIsolation'])(
-    'fails closed on missing %s',
-    async (check) => {
-      const f = fixture()
-      delete f.policy.probes[check]
-      await expect(monitorOnce(f)).rejects.toThrow('DEV_MONITOR_STOPPED')
-      expect(existsSync(join(f.directory, 'safety.json'))).toBe(false)
-      expect(existsSync(join(f.directory, 'monitor-stopped.json'))).toBe(true)
-    },
-  )
+  it.each([
+    'writerExclusion',
+    'independentWatchdog',
+    'collaboraDrainage',
+    'persistentFourZero',
+    'legacyIsolation',
+  ])('fails closed on missing %s', async (check) => {
+    const f = fixture()
+    delete f.policy.probes[check]
+    await expect(monitorOnce(f)).rejects.toThrow('DEV_MONITOR_STOPPED')
+    expect(existsSync(join(f.directory, 'safety.json'))).toBe(false)
+    expect(existsSync(join(f.directory, 'monitor-stopped.json'))).toBe(true)
+  })
   it.each([
     'source',
     'target',
@@ -459,4 +472,93 @@ describe('independent DEV observation/signing adapter', () => {
       ).rejects.toThrow()
     }
   }, 20_000)
+})
+
+describe('DEV historical object exception integration', () => {
+  it('records the exception in signed admission and rejects a new missing identity', async () => {
+    const { HISTORICAL_ALLOWLIST_SHA256, HISTORICAL_EXCEPTION_ID } =
+      await import('./dev-historical-object-exception')
+    const { HISTORICAL_DEV_MISSING_IDENTITIES, HISTORICAL_RECOVERY_EVIDENCE_SHA256 } =
+      await import('./dev-historical-objects-allowlist')
+    const f = fixture()
+    f.approval.historicalMissingObjectsException = {
+      exceptionId: HISTORICAL_EXCEPTION_ID,
+      allowlistSha256: HISTORICAL_ALLOWLIST_SHA256,
+      lossAcknowledged: true,
+      recoveryRequired: true,
+      recoveryEvidenceSha256: HISTORICAL_RECOVERY_EVIDENCE_SHA256,
+    }
+    const approvalSha = sha(canonical(f.approval))
+    f.evidence.admission!.approvalSha256 = approvalSha
+    f.policy.approvalSha256 = approvalSha
+    f.policy.phase = 'web'
+    f.policy.probes = Object.fromEntries(
+      admissionChecks('web', f.approval).map((c) => [
+        c,
+        { executable: c, args: [], dependencies: {}, sha256: h },
+      ]),
+    )
+    f.facts.minioContents = {
+      complete: true,
+      retainedVolumeIdentityVerified: true,
+      inventorySha256: h,
+    }
+    f.facts.minioCredentials = {
+      adminIdentityVerified: true,
+      appIdentityVerified: true,
+      receiptSha256: h,
+    }
+    f.facts.objectReferences = {
+      missingObjects: 6,
+      mismatchedObjects: 0,
+      allReferencesCovered: false,
+      receiptSha256: h,
+      missingIdentitySha256: [...HISTORICAL_DEV_MISSING_IDENTITIES],
+      exceptionId: HISTORICAL_EXCEPTION_ID,
+      recoveryEvidenceSha256: HISTORICAL_RECOVERY_EVIDENCE_SHA256,
+    }
+    f.facts.crossStoreConsistency = {
+      consistent: true,
+      noWriterIntervalVerified: true,
+      receiptSha256: h,
+    }
+    f.facts.queueSafety = { outboundExcluded: true, inventoryVerified: true, receiptSha256: h }
+    const probe = async (spec: { executable: string }) => ({
+      ...f.observation(spec.executable),
+      phase: 'web' as const,
+    })
+    const result = await monitorOnce({ ...f, probe })
+    expect(result.payload.historicalException).toEqual({
+      exceptionId: HISTORICAL_EXCEPTION_ID,
+      missingObjects: 6,
+      recoveryEvidenceSha256: HISTORICAL_RECOVERY_EVIDENCE_SHA256,
+    })
+    ;(f.facts.objectReferences!.missingIdentitySha256 as string[])[0] = 'f'.repeat(64)
+    await expect(monitorOnce({ ...f, probe })).rejects.toThrow()
+  })
+})
+
+describe('Collabora drainage safety facts', () => {
+  it.each(['desiredReplicas', 'activeTasks', 'activeSessions', 'pendingSaves', 'failedSaves'])(
+    'rejects nonzero %s',
+    (field) => {
+      const f = fixture()
+      const observation = f.observation('collaboraDrainage')
+      observation.facts[field] = 1
+      expect(() =>
+        validateObservation(observation, 'collaboraDrainage', f.policy, now, now),
+      ).toThrow()
+    },
+  )
+  it.each(['adminSessionCoverageComplete', 'saveCoverageComplete'])(
+    'rejects missing coverage %s',
+    (field) => {
+      const f = fixture()
+      const observation = f.observation('collaboraDrainage')
+      observation.facts[field] = false
+      expect(() =>
+        validateObservation(observation, 'collaboraDrainage', f.policy, now, now),
+      ).toThrow()
+    },
+  )
 })

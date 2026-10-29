@@ -948,7 +948,6 @@ jobs:
             "$MIGRATION_NODE_IMAGE" \
             pnpm --filter @beaconhs/db exec tsx "$migration_entrypoint"
 
-
       # Ordinary releases retain Collabora branding. Governed DEV candidates do not
       # run the service and must not install or restart it.
       - name: Install Collabora branding on the swarm manager
@@ -996,7 +995,9 @@ jobs:
           update_response="$(mktemp)"
           compose_state="$(mktemp)"
           env_block_file="$(mktemp)"
-          trap 'rm -f "$update_response" "$compose_state" "$env_block_file"' EXIT
+          sidecar_template="$(mktemp)"
+          sidecar_result="$(mktemp)"
+          trap 'rm -f "$update_response" "$compose_state" "$env_block_file" "$sidecar_template" "$sidecar_result"' EXIT
           IMAGE="${DEPLOY_IMAGE_NAME}@${IMAGE_DIGEST}"
           COMPOSE_FILE="$(cat .deployment-governance/deploy/dokploy-dev.compose.yaml)"
           if [ "$FEATURE_CANDIDATE_VERIFIED" = true ]; then
@@ -1035,6 +1036,19 @@ jobs:
             printf 'VAPID_SUBJECT=%s\n' "$VAPID_SUBJECT"
             printf 'SENTRY_DSN=%s\n' "$SENTRY_DSN"
           } > "$env_block_file"
+          if [ "$FEATURE_CANDIDATE_VERIFIED" = true ]; then
+            # Read the actual saved DEV sidecar immediately before the update.
+            # The preservation helper rejects unknown variables and compares
+            # Docker Compose's fully rendered sidecar, including mounts and env.
+            scripts/cluster/dokploy-curl.sh -sS --fail --connect-timeout 5 --max-time 20 \
+              --noproxy "${DOKPLOY_CURL_RESOLVE%%:*}" --resolve "$DOKPLOY_CURL_RESOLVE" \
+              -G -o "$compose_state" "${DOKPLOY_URL%/}/api/compose.one" \
+              --data-urlencode "composeId=$COMPOSE_ID"
+            printf '%s\n' "$COMPOSE_FILE" > "$sidecar_template"
+            node .deployment-governance/scripts/cluster/preserve-dev-sidecar.mjs \
+              "$compose_state" "$sidecar_template" "$env_block_file" "$sidecar_result"
+            COMPOSE_FILE="$(cat "$sidecar_result")"
+          fi
           jq -n --arg id "$COMPOSE_ID" --arg cf "$COMPOSE_FILE" \
             --argjson registry "$DOKPLOY_EXISTING_REGISTRY_ID_JSON" \
             --rawfile env "$env_block_file" \

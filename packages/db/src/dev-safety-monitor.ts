@@ -16,6 +16,10 @@ import {
 import { dirname, isAbsolute, join, resolve } from 'node:path'
 import { promisify } from 'node:util'
 import { canonical } from './dev-logical-catalog'
+import {
+  validateHistoricalMissingObservation,
+  type HistoricalException,
+} from './dev-historical-object-exception'
 import type { ReleaseEvidence } from './dev-migration-gate'
 import {
   DEV_TARGET,
@@ -105,6 +109,16 @@ const contracts: Record<string, Record<string, 'zero' | 'true' | 'false' | 'hash
     failureRehearsalSha256: 'hash',
     heartbeatSha256: 'hash',
   },
+  collaboraDrainage: {
+    desiredReplicas: 'zero',
+    activeTasks: 'zero',
+    adminSessionCoverageComplete: 'true',
+    activeSessions: 'zero',
+    pendingSaves: 'zero',
+    failedSaves: 'zero',
+    saveCoverageComplete: 'true',
+    drainageEvidenceSha256: 'hash',
+  },
   persistentFourZero: {
     exactFourServiceIdentities: 'true',
     desiredReplicas: 'zero',
@@ -145,6 +159,7 @@ export function validateObservation(
   policy: MonitorPolicy,
   started: number,
   now: number,
+  exception?: HistoricalException,
 ) {
   keys(value, ['version', 'target', 'sourceSha', 'phase', 'check', 'observedAt', 'facts'])
   requireValue(
@@ -158,6 +173,10 @@ export function validateObservation(
   requireValue(
     Number.isFinite(observed) && observed >= started && observed <= now && now - observed <= 5000,
   )
+  if (check === 'objectReferences' && exception) {
+    validateHistoricalMissingObservation(value.target, exception, value.facts)
+    return observed
+  }
   const contract = contracts[check]
   requireValue(contract)
   keys(value.facts, Object.keys(contract))
@@ -340,10 +359,17 @@ export async function monitorOnce(options: {
     const observations = await Promise.all(
       checks.map(async (check) => {
         const value = await (options.probe ?? runProbe)(policy.probes[check]!)
-        const stamp = validateObservation(value, check, policy, started, now())
+        const stamp = validateObservation(
+          value,
+          check,
+          policy,
+          started,
+          now(),
+          approval.historicalMissingObjectsException,
+        )
         if (check === 'ownerMaintenanceHold')
           requireValue(value.facts.holdReceiptSha256 === approval.maintenanceHold?.receiptSha256)
-        return { check, stamp, bytes: canonical(value) }
+        return { check, stamp, bytes: canonical(value), facts: value.facts }
       }),
     )
     const finished = now()
@@ -361,6 +387,17 @@ export async function monitorOnce(options: {
       phase: policy.phase,
       observedAt: new Date(observed).toISOString(),
       expiresAt: new Date(Math.min(observed + 10_000, holdExpires)).toISOString(),
+      ...(policy.phase === 'web' && approval.historicalMissingObjectsException
+        ? {
+            historicalException: {
+              exceptionId: approval.historicalMissingObjectsException.exceptionId,
+              missingObjects: observations.find((v) => v.check === 'objectReferences')!.facts
+                .missingObjects as number,
+              recoveryEvidenceSha256:
+                approval.historicalMissingObjectsException.recoveryEvidenceSha256,
+            },
+          }
+        : {}),
       checks: Object.fromEntries(
         observations.map((v) => [v.check, { passed: true, evidenceSha256: hash(v.bytes) }]),
       ),

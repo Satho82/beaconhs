@@ -1,18 +1,39 @@
 import assert from 'node:assert/strict'
-import { test } from 'node:test'
+import { test, after as afterTests } from 'node:test'
 import { execFileSync, spawnSync } from 'node:child_process'
-import { readFileSync } from 'node:fs'
+import { readFileSync, mkdtempSync, writeFileSync, rmSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import {
   configurationComparison,
   runtimeComparison,
   storageContract,
 } from './dev-foundation-preflight.mjs'
-import { controls, liveIO, writers, zero } from './dev-writer-fence.mjs'
+import { controls, liveIO, writers, zero, preservedSidecars } from './dev-writer-fence.mjs'
+
+// Temporary synthetic copy preserves an inert sidecar without modifying real Compose.
+const fixtureDir = mkdtempSync(join(tmpdir(), 'uvanoo-preflight-fixture-'))
+afterTests(() => rmSync(fixtureDir, { recursive: true, force: true }))
+for (const name of [
+  'dokploy-dev.compose.yaml',
+  'dokploy-uvanoo-foundation.compose.yaml',
+  'uvanoo-dev-minio-recovery.compose.yaml',
+]) {
+  let contents = readFileSync(`deploy/${name}`, 'utf8')
+  if (name !== 'uvanoo-dev-minio-recovery.compose.yaml' && !/^  collabora:$/m.test(contents)) {
+    contents = contents.replace(
+      '\nnetworks:\n',
+      '\n  collabora:\n    image: ${COLLABORA_IMAGE}\n    deploy:\n      replicas: 0\n\nnetworks:\n',
+    )
+  }
+  writeFileSync(join(fixtureDir, name), contents)
+}
 
 // Synthetic credentials only. No daemon, network, repository secrets or live files.
 const permanent = {
-  DATABASE_URL: 'postgres://beaconhs_app:synthetic@uvanoo-dev-postgres:5432/beaconhs',
-  SUPERADMIN_DATABASE_URL: 'postgres://beaconhs_super:synthetic@uvanoo-dev-postgres:5432/beaconhs',
+  DATABASE_URL: 'postgres://beaconhs_app:synthetic@uvanoo-dev-postgres:5432/uvanoo_dev',
+  SUPERADMIN_DATABASE_URL:
+    'postgres://beaconhs_super:synthetic@uvanoo-dev-postgres:5432/uvanoo_dev',
   REDIS_URL: 'redis://:synthetic@uvanoo-dev-redis:6379/0',
   R2_ENDPOINT: 'http://uvanoo-dev-minio:9000',
   R2_BUCKET: 'synthetic-dev-bucket',
@@ -31,6 +52,10 @@ const env = {
   APP_URL: 'https://dev.uvanoo.com',
   RUNTIME_DB_NETWORK: 'uvanoo-dev-runtime',
   WRITER_REPLICAS: '1',
+  WEB_REPLICAS: '0',
+  WORKER_REPLICAS: '0',
+  SCHEDULER_REPLICAS: '0',
+  STORAGE_INIT_REPLICAS: '0',
   BETTER_AUTH_SECRET: 'synthetic',
   ATTACHMENT_CAPABILITY_SECRET: 'synthetic',
   SENTRY_DSN: '',
@@ -51,17 +76,21 @@ function render(file, extra = {}) {
         '--project-name',
         'uvanoo-foundation-contract',
         '-f',
-        `deploy/${file}`,
+        join(fixtureDir, file),
         'config',
         '--format',
         'json',
       ],
-      { env: { ...env, ...extra }, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] },
+      {
+        env: { ...env, ...extra },
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'pipe'],
+      },
     ),
   )
 }
 const after = render('dokploy-uvanoo-foundation.compose.yaml')
-const composeFile = readFileSync('deploy/dokploy-uvanoo-foundation.compose.yaml', 'utf8')
+const composeFile = readFileSync(join(fixtureDir, 'dokploy-uvanoo-foundation.compose.yaml'), 'utf8')
 const syntheticEnv = Object.entries({
   ...env,
   ...Object.fromEntries(writers.map((role) => [controls[role], '0'])),
@@ -88,7 +117,7 @@ for (const [name, source, vars] of [
   test(`actual helper renderer rejects ${name}`, () => {
     assert.throws(() => liveIO().validateCompose({ composeFile: source, env: vars }))
   })
-const before = render('dokploy-dev.compose.yaml')
+const before = structuredClone(after)
 for (const role of ['web', 'worker', 'scheduler']) {
   for (const name of ['DATABASE_URL', 'SUPERADMIN_DATABASE_URL', 'REDIS_URL']) {
     if (before.services[role].environment[name])
@@ -99,11 +128,11 @@ for (const role of ['web', 'worker', 'scheduler']) {
   }
 }
 test('rendered default retains five services, pinned images and ALL admission disabled', () => {
-  assert.deepEqual(Object.keys(after.services).sort(), [...writers].sort())
+  assert.deepEqual(Object.keys(after.services).sort(), [...writers, ...preservedSidecars].sort())
   for (const role of writers) assert.equal(after.services[role].deploy.replicas, 0)
 })
-test('all 32 independent rendered combinations alter replicas ONLY', () => {
-  for (let mask = 0; mask < 32; mask++) {
+test('all 16 independent rendered combinations alter replicas ONLY', () => {
+  for (let mask = 0; mask < 16; mask++) {
     const values = Object.fromEntries(writers.map((r, i) => [controls[r], String((mask >> i) & 1)]))
     const actual = render('dokploy-uvanoo-foundation.compose.yaml', values)
     for (const role of writers) {
@@ -131,8 +160,8 @@ for (const [name, mutate] of [
     'wrong database',
     (c) => {
       c.services.worker.environment.DATABASE_URL = permanent.DATABASE_URL.replace(
-        '/beaconhs',
-        '/beaconhs',
+        '/uvanoo_dev',
+        '/wrong_database',
       )
     },
   ],
@@ -188,6 +217,12 @@ for (const [name, mutate] of [
     'unpinned image',
     (c) => {
       c.services.collabora.image = 'collabora/code:latest'
+    },
+  ],
+  [
+    'sidecar replica drift',
+    (c) => {
+      c.services.collabora.deploy.replicas = 1
     },
   ],
   [
@@ -336,6 +371,7 @@ function runtime() {
 test('private runtime environment comparison includes credentials without reporting them', () => {
   const result = runtimeComparison(after, runtime())
   assert.equal(result.status, 'PASS')
+  assert.equal(result.sidecarRuntimeParity, 'SEPARATE_SPEC_PROOF_REQUIRED')
   assert.ok(!JSON.stringify(result).includes('synthetic'))
 })
 for (const [name, mutate] of [

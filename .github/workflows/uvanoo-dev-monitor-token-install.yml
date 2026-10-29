@@ -1,0 +1,50 @@
+name: DEV monitor credential private install
+on:
+  push:
+    branches: [probe/uvanoo-dev-monitor-token-install-20261029]
+    paths:
+      - .github/workflows/uvanoo-dev-monitor-token-install.yml
+      - scripts/cluster/dev-monitor-token-install.py
+permissions:
+  contents: read
+jobs:
+  install:
+    runs-on: [self-hosted, dokploy]
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+      - name: Verify isolated installer identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = Satho82/beaconhs
+          test "$GITHUB_REF" = refs/heads/probe/uvanoo-dev-monitor-token-install-20261029
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$(git rev-parse HEAD^)" = f5354c6554607694575e959d183e0e7732782b3f
+          expected=$'.github/workflows/uvanoo-dev-monitor-token-install.yml\nscripts/cluster/dev-monitor-token-install.py'
+          test "$(git diff-tree --no-commit-id --name-only -r HEAD | sort)" = "$expected"
+      - name: Privately install and verify DEV monitor credential
+        shell: bash
+        env:
+          DOKPLOY_URL: ${{ secrets.DOKPLOY_URL }}
+          DOKPLOY_RESOLVE_IP: ${{ secrets.DOKPLOY_RESOLVE_IP }}
+          DOKPLOY_TOKEN: ${{ secrets.DOKPLOY_TOKEN }}
+        run: |
+          set -euo pipefail
+          set +x
+          test "$DOKPLOY_URL" = https://dokploy.uvanoo.com
+          test -n "$DOKPLOY_TOKEN"
+          sudo -n true
+          root_temp="$(sudo -n mktemp -d /run/uvanoo-dev-monitor-install.XXXXXXXX)"
+          [[ "$root_temp" == /run/uvanoo-dev-monitor-install.* ]]
+          cleanup() {
+            sudo -n rm -f -- "$root_temp/install.py"
+            sudo -n rmdir -- "$root_temp"
+          }
+          trap cleanup EXIT
+          sudo -n install -o root -g root -m 0500 scripts/cluster/dev-monitor-token-install.py "$root_temp/install.py"
+          test "$(sudo -n sha256sum "$root_temp/install.py" | cut -d ' ' -f1)" = 0585aa138fd0c6ed27fb18e8cd74a1fef8f2ff82d2790b1cf7f6de1864d66835
+          printf '%s\n%s\n' "$DOKPLOY_RESOLVE_IP" "$DOKPLOY_TOKEN" | sudo -n /usr/bin/python3 "$root_temp/install.py"

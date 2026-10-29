@@ -509,7 +509,7 @@ describe('DEV historical object exception integration', () => {
       receiptSha256: h,
     }
     f.facts.objectReferences = {
-      missingObjects: 6,
+      missingObjects: 9,
       mismatchedObjects: 0,
       allReferencesCovered: false,
       receiptSha256: h,
@@ -530,7 +530,7 @@ describe('DEV historical object exception integration', () => {
     const result = await monitorOnce({ ...f, probe })
     expect(result.payload.historicalException).toEqual({
       exceptionId: HISTORICAL_EXCEPTION_ID,
-      missingObjects: 6,
+      missingObjects: 9,
       recoveryEvidenceSha256: HISTORICAL_RECOVERY_EVIDENCE_SHA256,
     })
     ;(f.facts.objectReferences!.missingIdentitySha256 as string[])[0] = 'f'.repeat(64)

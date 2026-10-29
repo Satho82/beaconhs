@@ -5,8 +5,8 @@ import {
   HISTORICAL_RECOVERY_EVIDENCE_SHA256,
 } from './dev-historical-objects-allowlist'
 
-// Commitments bind tenant, attachment, key, creation time, size and media type.
-export const HISTORICAL_EXCEPTION_ID = 'owner-approved-dev-six-20261029'
+// Commitments bind exact attachment or branding reference identities.
+export const HISTORICAL_EXCEPTION_ID = 'owner-approved-dev-nine-20261029'
 export const HISTORICAL_ALLOWLIST_SHA256 = createHash('sha256')
   .update(canonical([...HISTORICAL_DEV_MISSING_IDENTITIES].sort()))
   .digest('hex')
@@ -85,7 +85,9 @@ export function validateHistoricalMissingObservation(
       ),
   )
   const ids = facts.missingIdentitySha256
-  insist(Array.isArray(ids) && ids.length <= 6 && ids.every(hash))
+  insist(
+    Array.isArray(ids) && ids.length <= HISTORICAL_DEV_MISSING_IDENTITIES.length && ids.every(hash),
+  )
   insist(
     new Set(ids).size === ids.length &&
       ids.every((id) => HISTORICAL_DEV_MISSING_IDENTITIES.includes(id)),
@@ -96,12 +98,4 @@ export function validateHistoricalMissingObservation(
     facts.exceptionId === exception.exceptionId &&
       facts.recoveryEvidenceSha256 === exception.recoveryEvidenceSha256,
   )
-}
-
-/** Hash only privately observed exact record values; do not print the input. */
-export function historicalObjectIdentity(
-  fields: [string, string, string, string, string, string],
-): string {
-  insist(fields.length === 6 && fields.every((v) => typeof v === 'string' && v.length > 0))
-  return createHash('sha256').update(JSON.stringify(fields)).digest('hex')
 }

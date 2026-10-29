@@ -544,6 +544,7 @@ forbid 'runs-on: \[self-hosted, dokploy\]' "$cloud"
 # Shell-invoked Node tests must remain visible to the dead-code gate.
 require 'scripts/cluster/dev-writer-fence\.test\.mjs' knip.ts
 node --test scripts/cluster/dev-writer-fence.test.mjs
+node --test scripts/cluster/preserve-dev-sidecar.test.mjs
 node --test scripts/cluster/dev-readiness.test.mjs
 
 ruby <<'RUBY'

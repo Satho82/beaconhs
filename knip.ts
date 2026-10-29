@@ -11,6 +11,7 @@ const config: KnipConfig = {
         // Executed by the shell deployment-contract suite in both CI lanes.
         'scripts/cluster/dev-writer-fence.test.mjs',
         'scripts/cluster/dev-foundation-preflight.test.mjs',
+        'scripts/cluster/preserve-dev-sidecar.test.mjs',
         // Host-only executable, checksum-bound by the DEV safety monitor policy.
         'scripts/cluster/dev-release-safety-probe.mjs',
       ],

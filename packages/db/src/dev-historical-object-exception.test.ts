@@ -28,7 +28,7 @@ const approval: HistoricalException = {
   recoveryEvidenceSha256: HISTORICAL_RECOVERY_EVIDENCE_SHA256,
 }
 const facts = () => ({
-  missingObjects: 6,
+  missingObjects: 9,
   mismatchedObjects: 0,
   allReferencesCovered: false,
   receiptSha256: 'b'.repeat(64),
@@ -37,17 +37,23 @@ const facts = () => ({
   recoveryEvidenceSha256: HISTORICAL_RECOVERY_EVIDENCE_SHA256,
 })
 describe('exact DEV historical-object exception', () => {
-  it('accepts the six approved records', () =>
+  it('accepts the nine approved records', () =>
     expect(() => validateHistoricalMissingObservation(target, approval, facts())).not.toThrow())
   it('accepts a subset when originals are recovered', () => {
     const x = facts()
     x.missingIdentitySha256.pop()
-    x.missingObjects = 5
+    x.missingObjects = 8
     expect(() => validateHistoricalMissingObservation(target, approval, x)).not.toThrow()
   })
   it('rejects any new missing object', () => {
     const x = facts()
     x.missingIdentitySha256[0] = 'c'.repeat(64)
+    expect(() => validateHistoricalMissingObservation(target, approval, x)).toThrow()
+  })
+  it('rejects a tenth missing record', () => {
+    const x = facts()
+    x.missingIdentitySha256.push('d'.repeat(64))
+    x.missingObjects = 10
     expect(() => validateHistoricalMissingObservation(target, approval, x)).toThrow()
   })
   it('rejects duplicate identities', () => {
@@ -57,9 +63,9 @@ describe('exact DEV historical-object exception', () => {
   })
   it('rejects count mismatch and altered object', () => {
     const x = facts()
-    x.missingObjects = 5
+    x.missingObjects = 8
     expect(() => validateHistoricalMissingObservation(target, approval, x)).toThrow()
-    x.missingObjects = 6
+    x.missingObjects = 9
     x.mismatchedObjects = 1
     expect(() => validateHistoricalMissingObservation(target, approval, x)).toThrow()
   })

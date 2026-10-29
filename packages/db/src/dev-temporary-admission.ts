@@ -6,6 +6,7 @@ import {
   validateHistoricalException,
   type HistoricalException,
 } from './dev-historical-object-exception'
+import { HISTORICAL_DEV_MISSING_IDENTITIES } from './dev-historical-objects-allowlist'
 import type { ReleaseEvidence } from './dev-migration-gate'
 
 export const DEV_TARGET = Object.freeze({
@@ -377,7 +378,7 @@ export function validateTemporaryAdmission(
         x.recoveryEvidenceSha256 === exception.recoveryEvidenceSha256 &&
         Number.isInteger(x.missingObjects) &&
         x.missingObjects >= 0 &&
-        x.missingObjects <= 6,
+        x.missingObjects <= HISTORICAL_DEV_MISSING_IDENTITIES.length,
     )
   } else requireValue(p.historicalException === undefined)
   const checks = admissionChecks(phase, approval)

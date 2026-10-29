@@ -1,0 +1,59 @@
+name: DEV Dokploy read-only credential probe
+on:
+  push:
+    branches: [probe/uvanoo-dev-dokploy-readonly-20261029]
+    paths: [.github/workflows/uvanoo-dev-dokploy-readonly-probe.yml]
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: [self-hosted, dokploy]
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+      - name: Verify isolated probe identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = Satho82/beaconhs
+          test "$GITHUB_REF" = refs/heads/probe/uvanoo-dev-dokploy-readonly-20261029
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$(git rev-parse HEAD^)" = f5354c6554607694575e959d183e0e7732782b3f
+          test "$(git diff-tree --no-commit-id --name-only -r HEAD)" = .github/workflows/uvanoo-dev-dokploy-readonly-probe.yml
+      - name: Check DEV compose read access
+        shell: bash
+        env:
+          DOKPLOY_URL: ${{ secrets.DOKPLOY_URL }}
+          DOKPLOY_RESOLVE_IP: ${{ secrets.DOKPLOY_RESOLVE_IP }}
+          DOKPLOY_TOKEN: ${{ secrets.DOKPLOY_TOKEN }}
+        run: |
+          set -euo pipefail
+          umask 077
+          test "$DOKPLOY_URL" = https://dokploy.uvanoo.com
+          [[ "$DOKPLOY_RESOLVE_IP" =~ ^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[01])\.) ]]
+          test -n "$DOKPLOY_TOKEN"
+          temp_dir="$(mktemp -d)"
+          trap 'rm -rf -- "$temp_dir"' EXIT
+          if status="$(bash scripts/cluster/dokploy-curl.sh -sS --connect-timeout 5 --max-time 15 --noproxy dokploy.uvanoo.com --resolve "dokploy.uvanoo.com:443:$DOKPLOY_RESOLVE_IP" -o "$temp_dir/response" -w '%{http_code}' -G --data-urlencode 'composeId=wYb0LxLQrvj2FPI21i-Oj' "$DOKPLOY_URL/api/compose.one" 2>/dev/null)"; then
+            :
+          else
+            echo DOKPLOY_READ_PROBE_TRANSPORT_FAILED
+            exit 1
+          fi
+          if [ "$status" != 200 ]; then
+            echo DOKPLOY_READ_PROBE_HTTP_$status
+            exit 1
+          fi
+          python3 - "$temp_dir/response" <<'PY'
+          import json,sys
+          try:
+              d=json.load(open(sys.argv[1]))
+              valid=(d.get('composeId')=='wYb0LxLQrvj2FPI21i-Oj' and d.get('appName')=='uvanoo-v1-4-dev-gniriv' and d.get('environmentId')=='qT391QtcIqahNap5wPjif')
+          except Exception:
+              valid=False
+          print('DOKPLOY_DEV_READ_PROBE_PASS' if valid else 'DOKPLOY_DEV_TARGET_MISMATCH')
+          sys.exit(0 if valid else 1)
+          PY

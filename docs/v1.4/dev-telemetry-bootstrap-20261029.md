@@ -80,3 +80,19 @@ same-host helper. No token is uploaded to GitHub secrets or written to workflow
 outputs. Ordinary releases retain their existing credential path. A failed local
 read has no fallback to the shared credential. The candidate helper requires the
 exact DEV compose, stack and host before reading the fixed private token path.
+
+## Maintenance watchdog correction
+
+The previous host-only checker filtered tasks by desired state, which could miss
+a task still running after shutdown was requested. The governed
+\`check_recovery_watchdog.py\` inspects every task's actual state for all four
+application services and Collabora. Missing observations, unknown task states,
+nonzero replicas or unhealthy DEV PostgreSQL/MinIO/Redis fail closed. It does not
+change services or clear a stop latch. Re-arming still requires review of the
+preserved latch and an explicit maintenance lifecycle transition; the checker
+must not be used as a normal-operation health check after editing is restored.
+
+The failure rehearsal covers a running task whose desired state is shutdown,
+missing tasks/services, unknown states, live Collabora, unhealthy infrastructure
+and observer failures. These tests are engineering evidence, not independent
+human approval or release admission.

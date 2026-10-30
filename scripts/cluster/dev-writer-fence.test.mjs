@@ -17,6 +17,7 @@ const sha = 'a'.repeat(40),
 const image = `ghcr.io/satho82/uvanoo-staging-private@${digest}`
 const config = {
   verified: 'true',
+  activationConsumedAt: new Date().toISOString(),
   mode: 'api',
   stack,
   composeId: 'wYb0LxLQrvj2FPI21i-Oj',
@@ -298,4 +299,34 @@ test('saved candidate validation fails before any activation write', async () =>
   }
   await assert.rejects(admit(f, 'web'), /SAVED_CANDIDATE_IDENTITY_MISMATCH/)
   assert.ok(!f.events.includes('persist'))
+})
+
+test('expired web admission cannot change persisted replicas', async () => {
+  const f = fixture()
+  await assert.rejects(
+    runFence('restore-web', f.io, {
+      ...config,
+      authorization: 'restore-web',
+      activationConsumedAt: new Date(Date.now() - 10001).toISOString(),
+    }),
+    /WEB_ADMISSION_HANDOFF_EXPIRED/,
+  )
+  assert.equal(f.events.includes('persist'), false)
+  assert.equal(f.events.includes('deploy'), false)
+})
+
+test('expiry after persistence compensates before candidate deployment', async () => {
+  const f = fixture()
+  const admitted = {
+    ...config,
+    authorization: 'restore-web',
+    activationConsumedAt: new Date().toISOString(),
+  }
+  const update = f.io.update
+  f.io.update = async (value) => {
+    await update(value)
+    admitted.activationConsumedAt = new Date(Date.now() - 10001).toISOString()
+  }
+  await assert.rejects(runFence('restore-web', f.io, admitted), /ADMISSION_FAILED_REFENCED/)
+  assert.deepEqual(counts(f.state().env), zero)
 })

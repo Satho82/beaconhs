@@ -488,6 +488,7 @@ export function checkTemporaryFiles(
   phase: AdmissionPhase,
   env = process.env,
   now = Date.now(),
+  onConsumedSafety?: (safety: Buffer, consumedAt: number) => void,
 ) {
   try {
     requireValue(!existsSync(resolve(directory, 'monitor-stopped.json')))
@@ -500,16 +501,18 @@ export function checkTemporaryFiles(
     const approval = privateEvidenceFile(directory, a.approvalFile),
       receipt = privateEvidenceFile(directory, a.restoreReceiptFile)
     requireValue(sha(approval) === a.approvalSha256 && sha(receipt) === a.restoreReceiptSha256)
+    const safety = privateEvidenceFile(directory, 'safety.json')
     validateTemporaryAdmission(
       e,
       JSON.parse(approval.toString()),
       JSON.parse(receipt.toString()),
-      JSON.parse(privateEvidenceFile(directory, 'safety.json').toString()),
+      JSON.parse(safety.toString()),
       env.DEV_TEMPORARY_APPROVAL_SHA256 ?? '',
       phase,
       env,
       now,
     )
+    onConsumedSafety?.(safety, now)
     return a.approvalSha256
   } catch {
     throw new Error('DEV temporary admission rejected')

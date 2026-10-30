@@ -1,0 +1,60 @@
+UVANOO DEV release observation adapters — 30 October 2026
+
+Scope: only Satho82/beaconhs, uvanoo-v1-4-dev-gniriv, dev.uvanoo.com and canonical uvanoo_dev.
+No production or legacy mutation is permitted.
+
+The collector emits the existing ten web-admission observations. It never admits
+migration writers. For this consolidation release the exact 67-entry source
+migration ledger must already match the canonical database; any migration delta
+requires the existing separate migration admission procedure.
+
+Private configuration and all credentials remain outside Git, owned by the
+monitoring account with mode0600. The monitor policy must pin the collector,
+sample_release_interval.py, release_object_inventory.py,
+observe_collabora_interval.py, private configuration and all static dependency
+receipts. Mutable streams use canonical private paths and contain source, epoch,
+configuration, collector and sampler identities. Changed or missing observations
+fail closed. Historical save uncertainty remains UNKNOWN under the owner's
+separate DEV bootstrap authorization.
+
+Prepare current service/spec/task, infrastructure/volume, database counter/reset,
+object/version/queue, full-reference-scan and control-plane baselines under the
+approved hold. Never rebaseline a difference automatically. The full table scan
+and storage classification must bind the exact canonical database and source.
+The nine-object exception remains an identity allowlist; fewer currently missing
+objects do not require inventing missing objects.
+
+Start sample_release_interval.py CONFIG SOURCE_SHA before the release backup.
+The bounded stream must cover a fresh >=60 second interval and continue across
+the actual backup and isolated restore. releaseCapture is appended only after
+real capture/restore evidence exists and must match the manifest's archive and
+restore-receipt hashes. All other observer configuration stays immutable.
+
+Read-only verification connections are narrow exceptions: exact observer SQL,
+the exact pinned PostgreSQL pg_dump process with source-specific application
+name, or source-pinned verification SQL hashes. The web admission container
+must have the exact source, immutable runtime, command, entrypoint, read-only
+mounts, DEV network/IP, capability restrictions and manifest/approval/image
+identities. No generic administrator, migration or backup-role client exemption
+is permitted.
+
+MinIO image sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e
+uses RELEASE.2025-09-07T16-13-09Z. Its cmd/metrics-v3-types.go MetricValues.Set
+emits only positive metrics; cmd/metrics-v3-api.go loads current and waiting
+request counters. Omitted zero series is accepted only for that pinned runtime
+and a successful complete authenticated response. Cumulative non-read API
+counts, complete inventories and retained-volume consumers are checked too.
+Primary source: https://github.com/minio/minio/blob/RELEASE.2025-09-07T16-13-09Z/cmd/metrics-v3-types.go
+
+activate_admitted_web.py consumes final web admission while both maintenance
+monitors are active. It preserves the exact consumed safety bytes and timestamp,
+then stops the zero-writer watchdog and release monitor, verifies safety
+revocation plus retained stop latch/lock, and invokes restore-web. The ten-second
+consumption budget is checked again before replica persistence and deployment.
+Failures compensate with the existing full writer fence. No latch is cleared
+automatically. Public editing fences remain until live acceptance is separately
+verified. Background retry/notification work is not replayed by this helper.
+
+A successful preflight is not owner release approval. Final owner-pinned
+approval, immutable-source validation, actual encrypted backup/isolated restore,
+tenant isolation and rollback readiness remain mandatory.

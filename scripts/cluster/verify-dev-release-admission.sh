@@ -14,7 +14,11 @@ case "${1:-}" in migration|web) export DEV_ADMISSION_PHASE="$1" ;; *) exit 1 ;; 
 evidence_dir="/opt/uvanoo-dev/release-evidence/$DEPLOY_SOURCE_SHA"
 test -d "$evidence_dir" && test ! -L "$evidence_dir"
 test "$(realpath "$evidence_dir")" = "$evidence_dir"
-docker run --rm --pull=never --read-only --tmpfs /tmp:rw,nosuid,nodev,size=64m \
+docker run --rm --pull=never --name "uvanoo-dev-admission-${DEPLOY_SOURCE_SHA:0:12}-$DEV_ADMISSION_PHASE" \
+  --label "uvanoo.dev.admission.source=$DEPLOY_SOURCE_SHA" \
+  --label "uvanoo.dev.admission.phase=$DEV_ADMISSION_PHASE" \
+  --label "uvanoo.dev.admission.evidence=$DEV_RELEASE_EVIDENCE_SHA256" \
+  --read-only --tmpfs /tmp:rw,nosuid,nodev,size=64m \
   --memory 512m --cpus 1 --pids-limit 128 --cap-drop ALL --security-opt no-new-privileges \
   --network "$MIGRATION_DOCKER_NETWORK" \
   -v "$GITHUB_WORKSPACE:/workspace:ro" \

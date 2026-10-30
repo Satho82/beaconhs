@@ -331,13 +331,26 @@ export async function loadDevMigrationGate(folder: string, phase: AdmissionPhase
   const sourceSha = git('HEAD')
   const sourceTree = git('HEAD^{tree}')
   if (sourceSha !== process.env.DEPLOY_SOURCE_SHA) throw new Error('DEV checkout source mismatch')
+  let consumedSafety: Buffer | undefined
+  let consumedAt: string | undefined
   const admit = () => {
     validateEvidence(evidence, files, {
       sourceSha,
       sourceTree,
       imageDigest: process.env.IMAGE_DIGEST ?? '',
     })
-    if (evidence.version === 2) checkTemporaryFiles(evidence, directory, phase)
+    if (evidence.version === 2)
+      checkTemporaryFiles(
+        evidence,
+        directory,
+        phase,
+        process.env,
+        Date.now(),
+        (safety, observedAt) => {
+          consumedSafety = safety
+          consumedAt = new Date(observedAt).toISOString()
+        },
+      )
   }
   admit()
   if (evidence.database !== 'uvanoo_dev')
@@ -359,6 +372,8 @@ export async function loadDevMigrationGate(folder: string, phase: AdmissionPhase
     requireTemporaryDatabaseTarget(process.env.MIGRATION_DATABASE_URL ?? '', 'beaconhs_migrator')
   }
   return {
+    consumedSafety: () => consumedSafety,
+    consumedAt: () => consumedAt,
     guard: (db: MigrationDatabase) =>
       evidence.version === 2 ? admissionConnection(db, admit) : db,
     verifyWeb: async () => {
@@ -367,6 +382,7 @@ export async function loadDevMigrationGate(folder: string, phase: AdmissionPhase
         max: 1,
         prepare: false,
         onnotice: () => undefined,
+        connection: { application_name: 'uvanoo-admission:' + sourceSha },
       })
       try {
         await client.begin('isolation level repeatable read read only', async (tx) => {

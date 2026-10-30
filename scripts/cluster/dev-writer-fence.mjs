@@ -47,7 +47,8 @@ export function legacyCounts(env) {
   const lines = env.split('\n')
   const legacy = lines.filter((line) => /^\s*(?:export\s+)?WRITER_REPLICAS\s*=/.test(line))
   check(
-    legacy.length === 1 && /^\s*(?:export\s+)?WRITER_REPLICAS=1\r?$/.test(legacy[0]) &&
+    legacy.length === 1 &&
+      /^\s*(?:export\s+)?WRITER_REPLICAS=1\r?$/.test(legacy[0]) &&
       !writers.some((role) => new RegExp(`^\\s*(?:export\\s+)?${controls[role]}\\s*=`).test(env)),
     'LEGACY_FENCE_REQUIRES_APPROVED_BOOTSTRAP',
   )
@@ -92,12 +93,18 @@ export function bootstrapComposeControls(compose) {
     const block = next.slice(start, end)
     const expected = 'replicas: ' + legacy
     check(block.split(expected).length === 2, 'COMPOSE_LEGACY_CONTROL_AMBIGUOUS')
-    next = next.slice(0, start) + block.replace(expected, 'replicas: ' + replacement[role]) + next.slice(end)
+    next =
+      next.slice(0, start) +
+      block.replace(expected, 'replicas: ' + replacement[role]) +
+      next.slice(end)
   }
   const [start, end] = serviceBlock(next, 'storage-init')
   const block = next.slice(start, end)
   check(block.split('replicas: 1').length === 2, 'COMPOSE_LEGACY_CONTROL_AMBIGUOUS')
-  next = next.slice(0, start) + block.replace('replicas: 1', 'replicas: ' + replacement['storage-init']) + next.slice(end)
+  next =
+    next.slice(0, start) +
+    block.replace('replicas: 1', 'replicas: ' + replacement['storage-init']) +
+    next.slice(end)
   check(!next.includes('replicas: ' + legacy), 'COMPOSE_LEGACY_CONTROL_AMBIGUOUS')
   return next
 }
@@ -282,27 +289,25 @@ export async function runFence(mode, io, config) {
       const composeFile = bootstrapComposeControls(before.composeFile)
       await io.update({ composeId, env, composeFile })
       const fenced = await read()
-      check(
-        fenced.env === env && fenced.composeFile === composeFile,
-        'FENCE_PERSIST_POSTCONDITION',
-      )
+      check(fenced.env === env && fenced.composeFile === composeFile, 'FENCE_PERSIST_POSTCONDITION')
       await io.validateCompose(fenced)
       await io.deploy()
       await wait(fenced, zero, false)
     } else {
       target(before)
       const composeFile = bootstrapComposeControls(before.composeFile)
-      const migrated = composeFile === before.composeFile
-        ? before
-        : await (async () => {
-            await io.update({ composeId, composeFile })
-            const after = await read()
-            check(
-              after.env === before.env && after.composeFile === composeFile,
-              'FENCE_PERSIST_POSTCONDITION',
-            )
-            return after
-          })()
+      const migrated =
+        composeFile === before.composeFile
+          ? before
+          : await (async () => {
+              await io.update({ composeId, composeFile })
+              const after = await read()
+              check(
+                after.env === before.env && after.composeFile === composeFile,
+                'FENCE_PERSIST_POSTCONDITION',
+              )
+              return after
+            })()
       await io.validateCompose(migrated)
       const fenced = await persist(migrated, zero)
       await io.deploy()
@@ -313,10 +318,17 @@ export async function runFence(mode, io, config) {
     check(state.env === replicas(state.env, zero), 'FENCE_NOT_PERSISTED')
     await io.validateCompose(state)
     await wait(state, zero, false)
-  } else if (
-    ['restore-web', 'restore-worker', 'restore-scheduler'].includes(mode)
-  ) {
+  } else if (['restore-web', 'restore-worker', 'restore-scheduler'].includes(mode)) {
     check(config.authorization === mode, 'SERVICE_OWNER_AUTHORIZATION_REQUIRED')
+    const assertActivationDeadline = () => {
+      if (mode !== 'restore-web') return
+      const consumed = Date.parse(config.activationConsumedAt ?? '')
+      check(
+        Number.isFinite(consumed) && Date.now() >= consumed && Date.now() - consumed <= 10000,
+        'WEB_ADMISSION_HANDOFF_EXPIRED',
+      )
+    }
+    assertActivationDeadline()
     const state = await read()
     const current = counts(state.env)
     const role = mode.slice('restore-'.length)
@@ -333,7 +345,9 @@ export async function runFence(mode, io, config) {
     const oldTasks = new Set((await io.runtime()).tasks.map((task) => task.ID))
     const next = { ...current, [role]: 1 }
     try {
+      assertActivationDeadline()
       const restored = await persist(state, next)
+      assertActivationDeadline()
       await io.deploy()
       // Only a newly admitted scheduler needs a NEW successful task. Other
       // independent transitions must not restart an already completed scheduler.
@@ -511,6 +525,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     sha: process.env.DEPLOY_SOURCE_SHA,
     digest: process.env.IMAGE_DIGEST,
     authorization: process.env.DEV_SERVICE_AUTHORIZATION,
+    activationConsumedAt: process.env.DEV_ADMISSION_CONSUMED_AT,
   })
     .then(() => console.log(`DEV writer ${process.argv[2]} verified`))
     .catch((error) => {

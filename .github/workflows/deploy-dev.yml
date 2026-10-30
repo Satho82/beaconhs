@@ -1108,8 +1108,7 @@ jobs:
           DEV_BACKUP_DATABASE_URL: ${{ secrets.DEV_BACKUP_DATABASE_URL }}
         run: |
           set -euo pipefail
-          bash scripts/cluster/verify-dev-release-admission.sh web
-          node .deployment-governance/scripts/cluster/dev-writer-fence.mjs restore-web
+          python3 -B scripts/cluster/dev-recovery/activate_admitted_web.py
 
       - name: Roll the immutable image directly on Swarm
         if: env.DOKPLOY_DEPLOY_MODE == 'direct'

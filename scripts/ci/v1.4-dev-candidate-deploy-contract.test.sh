@@ -546,6 +546,8 @@ require 'scripts/cluster/dev-writer-fence\.test\.mjs' knip.ts
 node --test scripts/cluster/dev-writer-fence.test.mjs
 node --test scripts/cluster/preserve-dev-sidecar.test.mjs
 node --test scripts/cluster/dev-readiness.test.mjs
+python3 -B scripts/cluster/dev-recovery/test_collect_release_observations.py
+python3 -B scripts/cluster/dev-recovery/test_activate_admitted_web.py
 
 ruby <<'RUBY'
 require 'yaml'
@@ -594,10 +596,18 @@ restore = steps[positions[6]]
     step['if'] == 'inputs.feature_candidate_verified' &&
     !step.key?('continue-on-error') &&
     (step == fence ? step['run'] == 'node .deployment-governance/scripts/cluster/dev-writer-fence.mjs fence' :
-      step['run'].lines.map(&:strip) == ['set -euo pipefail', 'bash scripts/cluster/verify-dev-release-admission.sh web', 'node .deployment-governance/scripts/cluster/dev-writer-fence.mjs restore-web'])
+      step['run'].lines.map(&:strip) == ['set -euo pipefail', 'python3 -B scripts/cluster/dev-recovery/activate_admitted_web.py'])
 end
 abort 'Fence must perform persist, rollout and runtime proof' unless fence['run'].end_with?(' fence')
-abort 'Restore must validate candidate before raising ONLY web replicas' unless restore['run'].rstrip.end_with?(' restore-web')
+abort 'Restore must use the admission-consuming monitored handoff' unless
+  restore['run'].rstrip.end_with?('scripts/cluster/dev-recovery/activate_admitted_web.py')
+handoff = File.read('scripts/cluster/dev-recovery/activate_admitted_web.py')
+abort 'Handoff must retain exact admission, bounded activation and refencing' unless
+  handoff.include?('verify-dev-release-admission.sh') &&
+  handoff.include?('consumedSafetySha256') &&
+  handoff.include?('DEV_ADMISSION_CONSUMED_AT') &&
+  handoff.include?('monitor-stopped.json') &&
+  handoff.include?('dev-writer-fence.mjs')
 migration = steps[positions[3]]
 abort 'Migration must recheck zero writers before docker run' unless
   migration['run'].index('dev-writer-fence.mjs verify-zero') < migration['run'].index('docker run') &&

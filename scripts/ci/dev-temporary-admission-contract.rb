@@ -16,7 +16,7 @@ abort 'Early gate must be DEV-only and before fence' unless early['if'] == 'inpu
 abort 'Read-only evidence missing from actual migration container' unless migration['run'].include?('"${evidence_mount[@]}"') && migration['run'].include?('/release-evidence:ro')
 abort 'Evidence mounted into unrelated preflight' if preflight['run'].include?('release-evidence')
 abort 'Main path must not mount DEV evidence' unless migration['run'].match?(/evidence_mount=\(\).*if \[ "\$FEATURE_CANDIDATE_VERIFIED" = true \]; then.*evidence_mount=\(-v .*\/release-evidence:ro"\).*fi.*docker run/m)
-abort 'Web admission must precede scaling, with shell fail-fast' unless restore['if'] == 'inputs.feature_candidate_verified' && restore['run'].lines.map(&:strip) == ['set -euo pipefail','bash scripts/cluster/verify-dev-release-admission.sh web','node .deployment-governance/scripts/cluster/dev-writer-fence.mjs restore-web']
+abort 'Web admission must precede scaling, with shell fail-fast' unless restore['if'] == 'inputs.feature_candidate_verified' && restore['run'].lines.map(&:strip) == ['set -euo pipefail','python3 -B scripts/cluster/dev-recovery/activate_admitted_web.py']
 %w[DEV_TEMPORARY_APPROVAL_SHA256 DEV_RELEASE_ENVIRONMENT GITHUB_REPOSITORY DOKPLOY_COMPOSE_ID EXPECTED_DOKPLOY_STACK EXPECTED_APP_HOST EXPECTED_MIGRATION_HOST MIGRATION_DOCKER_NETWORK].each do |key|
   abort "Missing migration context #{key}" unless migration['run'].include?("-e #{key}")
 end

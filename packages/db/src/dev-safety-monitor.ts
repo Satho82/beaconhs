@@ -42,6 +42,17 @@ const digest = (v: unknown) => typeof v === 'string' && /^[a-f0-9]{64}$/.test(v)
 function requireValue(value: unknown): asserts value {
   if (!value) throw new Error('DEV_MONITOR_REJECTED')
 }
+export function requireMonitorKeyArgument(
+  directory: string,
+  keyPath: string,
+  documentedOperational: boolean,
+) {
+  requireValue(
+    documentedOperational
+      ? keyPath === DOCUMENTED_OPERATIONAL_KEY_ARGUMENT
+      : isAbsolute(keyPath) && !resolve(keyPath).startsWith(resolve(directory) + '/'),
+  )
+}
 export function requireMonitorService(hostIdentity: string, cgroup: string, approvedHost: string) {
   requireValue(
     hash(hostIdentity.trim()) === approvedHost &&
@@ -479,7 +490,6 @@ export async function runMonitor(
   keyPath: string,
 ) {
   privateDirectory(directory)
-  requireValue(isAbsolute(keyPath) && !resolve(keyPath).startsWith(directory + '/'))
   const policyBytes = privateBytes(policyPath)
   requireValue(digest(policySha) && hash(policyBytes) === policySha)
   const policy = JSON.parse(policyBytes.toString()) as MonitorPolicy
@@ -494,11 +504,7 @@ export async function runMonitor(
   const evidence = JSON.parse(manifest.toString()) as ReleaseEvidence
   const approval = JSON.parse(approvalBytes.toString()) as TemporaryApproval
   const documentedOperational = usesDocumentedOperationalEvidence(approval)
-  requireValue(
-    documentedOperational
-      ? keyPath === DOCUMENTED_OPERATIONAL_KEY_ARGUMENT
-      : keyPath !== DOCUMENTED_OPERATIONAL_KEY_ARGUMENT,
-  )
+  requireMonitorKeyArgument(directory, keyPath, documentedOperational)
   requireValue(process.platform === 'linux')
   requireMonitorService(
     readFileSync('/etc/machine-id', 'utf8'),

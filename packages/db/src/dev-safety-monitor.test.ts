@@ -17,6 +17,7 @@ import {
   monitorOnce,
   prepareMonitorDirectory,
   requireMonitorService,
+  requireMonitorKeyArgument,
   runProbe,
   validateObservation,
   type MonitorPolicy,
@@ -219,6 +220,30 @@ function fixture(maintenance = false) {
     observation,
   }
 }
+describe('monitor startup key argument', () => {
+  const directory = '/private/release-evidence/source'
+  it('accepts the documented operational flag without treating it as a key path', () => {
+    expect(() =>
+      requireMonitorKeyArgument(directory, '--documented-operational', true),
+    ).not.toThrow()
+  })
+  it.each(['relative.key', '/private/observer.key', '--unknown'])(
+    'rejects a key argument inconsistent with documented mode: %s',
+    (value) => {
+      expect(() => requireMonitorKeyArgument(directory, value, true)).toThrow()
+    },
+  )
+  it.each(['--documented-operational', 'relative.key', directory + '/key.pem'])(
+    'rejects unsafe signing-key custody: %s',
+    (value) => {
+      expect(() => requireMonitorKeyArgument(directory, value, false)).toThrow()
+    },
+  )
+  it('keeps signing-key custody outside the release evidence directory', () => {
+    expect(() => requireMonitorKeyArgument(directory, '/private/observer.key', false)).not.toThrow()
+  })
+})
+
 describe('independent DEV observation/signing adapter', () => {
   it('marks the approved documented DEV path as non-independent and never signs it', async () => {
     const f = fixture(true)

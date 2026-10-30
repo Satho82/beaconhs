@@ -17,6 +17,18 @@ HEADER="# HELP minio_api_requests_total Total requests\n# TYPE minio_api_request
 READ='minio_api_requests_total{name="HeadObject",type="s3"} 12\n'
 
 class Observations(unittest.TestCase):
+    def setUp(self):
+        directory=tempfile.TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        real_open=m.os.open
+        def isolated_open(path,flags,mode=0o777,**kwargs):
+            if path=="/opt/uvanoo-dev/monitor-private/release-postgres-observation.lock":
+                path=str(Path(directory.name)/"postgres-observation.lock")
+            return real_open(path,flags,mode,**kwargs)
+        opened=patch.object(m.os,"open",side_effect=isolated_open)
+        opened.start()
+        self.addCleanup(opened.stop)
+
     def rejected(self,call):
         with self.assertRaises((ValueError,KeyError,TypeError)):call()
 

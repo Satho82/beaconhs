@@ -60,6 +60,10 @@ class Observations(unittest.TestCase):
         value={"oid":1,"clients":[{"user":"uvanoo_dev","address":None,"state":"active","query":"BEGIN READ ONLY; SET LOCAL statement_timeout=1500; SELECT count(*) FROM audit_log WHERE entity_type='wopi_save_dev_v1'; ROLLBACK;"}],"stats":[],"wopiEvents":0}
         with patch.object(m,"execute",return_value=json.dumps(value).encode()):
             self.assertEqual(m.pg_observation()["clients"],0)
+    def test_individual_readonly_statement_is_recognized(self):
+        value={"oid":1,"clients":[{"user":"uvanoo_dev","address":None,"state":"idle in transaction","query":"SELECT count(*) FROM audit_log WHERE entity_type='wopi_save_dev_v1';"}],"stats":[],"wopiEvents":0}
+        with patch.object(m,"execute",return_value=json.dumps(value).encode()):
+            self.assertEqual(m.pg_observation()["clients"],0)
     def test_sql_prefix_not_trusted(self):
         value={"oid":1,"clients":[{"user":"uvanoo_dev","address":None,"state":"active","query":"BEGIN READ ONLY; SET LOCAL statement_timeout=1500; SELECT count(*) FROM audit_log WHERE entity_type='wopi_save_dev_v1'; ROLLBACK; DELETE FROM tenants;"}],"stats":[],"wopiEvents":0}
         with patch.object(m,"execute",return_value=json.dumps(value).encode()):

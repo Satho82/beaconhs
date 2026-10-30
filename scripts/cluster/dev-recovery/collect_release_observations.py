@@ -293,6 +293,12 @@ def pg_observation(config=None):
     result=json.loads(execute(["docker","exec","-i","uvanoo-dev-postgres","psql","-X","-qAt",
         "-U","uvanoo_dev","-d","uvanoo_dev","-v","ON_ERROR_STOP=1"],sql.encode()))
     sampler="BEGIN READ ONLY; SET LOCAL statement_timeout=1500; SELECT count(*) FROM audit_log WHERE entity_type='wopi_save_dev_v1'; ROLLBACK;"
+    observer_queries={sql.strip(),sampler.strip()}
+    for statement in [sql,sampler]:
+        for part in statement.split(";"):
+            if part.strip():
+                observer_queries.add(part.strip()+";")
+                observer_queries.add(part.strip())
     for client in result["clients"]:
         if config is not None and client["user"]=="uvanoo_dev" and client["address"] is None and client["application"]=="uvanoo-backup:"+config["sourceSha"]:
             container=docker_get("/containers/uvanoo-dev-postgres/json")
@@ -308,8 +314,8 @@ def pg_observation(config=None):
         if client["user"]=="beaconhs_backup" and config is not None:
             verify_admission_client(client,config)
             continue
-        require(client["user"]=="uvanoo_dev" and client["address"] is None and client["state"]=="active")
-        require(client["query"] in [sql,sampler])
+        require(client["user"]=="uvanoo_dev" and client["address"] is None and client["state"] in ["active","idle in transaction"])
+        require(client["query"].strip() in observer_queries)
     result["clients"]=0
     return result
 

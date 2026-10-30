@@ -63,3 +63,11 @@ The installed operational unit retains NoNewPrivileges and RestrictSUIDSGID.
 Its GitHub GET checks use the existing authorized /home/ubuntu/.config/gh
 configuration through GH_CONFIG_DIR, with ProtectHome=read-only. Credentials
 are not copied into source, environment variables or monitor output.
+
+PostgreSQL observer concurrency: the collector holds a private, owner-only
+release-postgres-observation.lock through connection startup and psql exit.
+Acquisition times out after 1.5 seconds and remains fail closed. Independent
+operational samplers must use this same lock; no idle or empty-query client
+exception is permitted. The hardened monitor must allow writing this lock
+alongside the existing Redis observation lock. Sustained overload can reject
+observations and must not be represented as a successful coverage interval.

@@ -20,6 +20,29 @@ class Observations(unittest.TestCase):
     def rejected(self,call):
         with self.assertRaises((ValueError,KeyError,TypeError)):call()
 
+    def test_postgres_connections_serialized_through_client_exit(self):
+        from concurrent.futures import ThreadPoolExecutor
+        import threading
+        active=0
+        maximum=0
+        guard=threading.Lock()
+        real_open=m.os.open
+        def query(*args):
+            nonlocal active,maximum
+            with guard:
+                active+=1
+                maximum=max(maximum,active)
+            time.sleep(0.02)
+            with guard:active-=1
+            return b'{"clients":[]}'
+        with tempfile.TemporaryDirectory() as directory:
+            path=str(Path(directory)/"observer.lock")
+            with patch.object(m.os,"open",side_effect=lambda name,flags,mode:real_open(path,flags,mode)), patch.object(m,"execute",side_effect=query):
+                with ThreadPoolExecutor(max_workers=5) as pool:
+                    results=list(pool.map(lambda _:m.pg_observation(),range(15)))
+        self.assertEqual(maximum,1)
+        self.assertEqual(results,[{"clients":0}]*15)
+
     def test_pinned_metrics_omitted_zero(self):
         self.assertEqual(m.parse_storage_metrics(HEADER+READ),{})
     def test_write_counter_preserved(self):

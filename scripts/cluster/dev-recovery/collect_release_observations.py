@@ -339,8 +339,11 @@ def pg_observation(config=None):
         AND backend_type='client backend' AND datname IN ('beaconhs','uvanoo_dev','uvanoo_dev_preconsolidation_20261030')),
       'stats',(SELECT json_agg(json_build_array(datid,datname,stats_reset,tup_inserted,tup_updated,tup_deleted) ORDER BY datname) FROM pg_stat_database WHERE datname IN ('beaconhs','uvanoo_dev','uvanoo_dev_preconsolidation_20261030')),
       'wopiEvents',(SELECT count(*) FROM audit_log WHERE entity_type='wopi_save_dev_v1')); ROLLBACK;"""
-    result=json.loads(execute(["docker","exec","-i","uvanoo-dev-postgres","psql","-X","-qAt",
-        "-U","uvanoo_dev","-d","uvanoo_dev","-v","ON_ERROR_STOP=1"],sql.encode()))
+    # Serialize collector connections, including their empty-query startup phase.
+    # Other clients still require the same strict identity and query checks below.
+    with postgres_observation_lock():
+        result=json.loads(execute(["docker","exec","-i","uvanoo-dev-postgres","psql","-X","-qAt",
+            "-U","uvanoo_dev","-d","uvanoo_dev","-v","ON_ERROR_STOP=1"],sql.encode()))
     sampler="BEGIN READ ONLY; SET LOCAL statement_timeout=1500; SELECT count(*) FROM audit_log WHERE entity_type='wopi_save_dev_v1'; ROLLBACK;"
     observer_queries={sql.strip(),sampler.strip()}
     for statement in [sql,sampler]:
@@ -363,6 +366,26 @@ def pg_observation(config=None):
         require(client["query"].strip() in observer_queries)
     result["clients"]=0
     return result
+
+@contextmanager
+def postgres_observation_lock():
+    # Serialize our short-lived read-only PostgreSQL clients; never exempt other clients.
+    path="/opt/uvanoo-dev/monitor-private/release-postgres-observation.lock"
+    fd=os.open(path,os.O_CREAT|os.O_RDWR|os.O_NOFOLLOW,0o600)
+    try:
+        st=os.fstat(fd)
+        require(st.st_uid == os.getuid() and st.st_mode & 0o077 == 0)
+        deadline=time.monotonic()+1.5
+        while True:
+            try:
+                fcntl.flock(fd,fcntl.LOCK_EX|fcntl.LOCK_NB)
+                break
+            except BlockingIOError:
+                require(time.monotonic()<deadline)
+                time.sleep(0.01)
+        yield
+    finally:
+        os.close(fd)
 
 @contextmanager
 def redis_observation_lock():

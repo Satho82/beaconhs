@@ -414,7 +414,7 @@ def dokploy_observation(config):
 
 def github_observation():
     def fetch(path):
-        return json.loads(execute(["sudo","-H","-u","ubuntu","gh","api",path]))
+        return json.loads(execute(["env","GH_CONFIG_DIR=/home/ubuntu/.config/gh","gh","api",path]))
     with ThreadPoolExecutor(max_workers=3) as pool:
         state=pool.submit(fetch,"repos/Satho82/beaconhs/actions/workflows/373396385")
         queued=pool.submit(fetch,"repos/Satho82/beaconhs/actions/workflows/373396385/runs?status=queued&per_page=1")

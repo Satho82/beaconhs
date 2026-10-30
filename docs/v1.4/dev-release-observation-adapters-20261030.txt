@@ -58,3 +58,8 @@ verified. Background retry/notification work is not replayed by this helper.
 A successful preflight is not owner release approval. Final owner-pinned
 approval, immutable-source validation, actual encrypted backup/isolated restore,
 tenant isolation and rollback readiness remain mandatory.
+
+The installed operational unit retains NoNewPrivileges and RestrictSUIDSGID.
+Its GitHub GET checks use the existing authorized /home/ubuntu/.config/gh
+configuration through GH_CONFIG_DIR, with ProtectHome=read-only. Credentials
+are not copied into source, environment variables or monitor output.

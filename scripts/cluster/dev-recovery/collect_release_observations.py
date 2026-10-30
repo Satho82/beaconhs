@@ -283,10 +283,59 @@ def verify_admission_client(client,config):
     require(env["DEV_TEMPORARY_APPROVAL_SHA256"]==digest(approval_bytes)==manifest["admission"]["approvalSha256"])
     require(env["IMAGE_DIGEST"]==manifest["imageDigest"])
 
+def process_identity(pid):
+    value=Path("/proc/"+str(pid)+"/stat").read_text()
+    return (value.split(") ",1)[1].split()[19],os.readlink("/proc/"+str(pid)+"/ns/pid"))
+
+def backup_socket_peer(text, client_pid, backend_pid, namespace):
+    import re
+    rows=[]
+    for line in text.splitlines():
+        fields=line.split()
+        if len(fields)<9 or fields[:2]!=["u_str","ESTAB"]:continue
+        match=re.fullmatch(r'users:\(\("([^"]+)",pid=(\d+),fd=(\d+)\)\)',"".join(fields[8:]))
+        if match:
+            rows.append((fields[5],fields[7],match.group(1),int(match.group(2)),fields[4]))
+    outgoing=[row for row in rows if row[2]=="pg_dump" and row[3]==client_pid]
+    require(len(outgoing)==1)
+    local,peer,_,_,_=outgoing[0]
+    incoming=[row for row in rows if row[0]==peer and row[1]==local and row[2]=="postgres"]
+    require(len(incoming)==1 and incoming[0][4]=="/var/run/postgresql/.s.PGSQL.5432")
+    server_pid=incoming[0][3]
+    before={pid:process_identity(pid) for pid in [client_pid,server_pid]}
+    for pid in [client_pid,server_pid]:
+        require(os.readlink("/proc/"+str(pid)+"/ns/pid")==namespace)
+    status=Path("/proc/"+str(server_pid)+"/status").read_text()
+    nspid=[line.split()[1:] for line in status.splitlines() if line.startswith("NSpid:")]
+    require(len(nspid)==1 and nspid[0] and int(nspid[0][-1])==backend_pid)
+    require(before=={pid:process_identity(pid) for pid in [client_pid,server_pid]})
+
+def verify_backup_client(client, clients, config):
+    tagged=[x for x in clients if x["application"]=="uvanoo-backup:"+config["sourceSha"]]
+    require(len(tagged)==1 and client["user"]=="uvanoo_dev" and client["address"] is None)
+    require(client["state"] in ["active","idle in transaction"] and type(client["pid"]) is int)
+    container=docker_get("/containers/uvanoo-dev-postgres/json")
+    require(container["State"]["Running"] is True)
+    require(container["Config"]["Image"]=="postgres@sha256:f1c3376c26f2609ab9f29f71f824103fe2fcd8ee0346485cb6122a4f93df6f94")
+    processes=docker_get("/containers/uvanoo-dev-postgres/top?ps_args=-eo%20pid,args")
+    require(processes["Titles"]==["PID","COMMAND"])
+    matches=[row for row in processes["Processes"] if row[1]=="/usr/lib/postgresql/16/bin/pg_dump -U uvanoo_dev -d uvanoo_dev -Fc"]
+    require(len(matches)==1)
+    init_pid=container["State"]["Pid"]
+    namespace=os.readlink("/proc/"+str(init_pid)+"/ns/pid")
+    client_pid=int(matches[0][0])
+    process_before=process_identity(client_pid)
+    sockets=execute(["nsenter","-t",str(init_pid),"-n","ss","-xnpH"]).decode()
+    backup_socket_peer(sockets,client_pid,client["pid"],namespace)
+    require(process_identity(client_pid)==process_before)
+    after=docker_get("/containers/uvanoo-dev-postgres/json")
+    require(after["Id"]==container["Id"] and after["State"]["Running"] is True)
+    require(after["State"]["Pid"]==init_pid and after["State"]["StartedAt"]==container["State"]["StartedAt"])
+
 def pg_observation(config=None):
     sql = """BEGIN READ ONLY; SET LOCAL statement_timeout=1000;
     SELECT json_build_object('oid',(SELECT oid::int FROM pg_database WHERE datname=current_database()),
-      'clients',(SELECT coalesce(json_agg(json_build_object('query',query,'user',usename,'address',client_addr,'state',state,'application',application_name)),'[]'::json) FROM pg_stat_activity WHERE pid<>pg_backend_pid()
+      'clients',(SELECT coalesce(json_agg(json_build_object('pid',pid,'query',query,'user',usename,'address',client_addr,'state',state,'application',application_name)),'[]'::json) FROM pg_stat_activity WHERE pid<>pg_backend_pid()
         AND backend_type='client backend' AND datname IN ('beaconhs','uvanoo_dev','uvanoo_dev_preconsolidation_20261030')),
       'stats',(SELECT json_agg(json_build_array(datid,datname,stats_reset,tup_inserted,tup_updated,tup_deleted) ORDER BY datname) FROM pg_stat_database WHERE datname IN ('beaconhs','uvanoo_dev','uvanoo_dev_preconsolidation_20261030')),
       'wopiEvents',(SELECT count(*) FROM audit_log WHERE entity_type='wopi_save_dev_v1')); ROLLBACK;"""
@@ -301,11 +350,7 @@ def pg_observation(config=None):
                 observer_queries.add(part.strip())
     for client in result["clients"]:
         if config is not None and client["user"]=="uvanoo_dev" and client["address"] is None and client["application"]=="uvanoo-backup:"+config["sourceSha"]:
-            container=docker_get("/containers/uvanoo-dev-postgres/json")
-            require(container["Config"]["Image"]=="postgres@sha256:f1c3376c26f2609ab9f29f71f824103fe2fcd8ee0346485cb6122a4f93df6f94")
-            processes=docker_get("/containers/uvanoo-dev-postgres/top?ps_args=-eo%20pid,args")
-            require(processes["Titles"]==["PID","COMMAND"])
-            require(sum(row[1]=="pg_dump -U uvanoo_dev -d uvanoo_dev -Fc" for row in processes["Processes"])==1)
+            verify_backup_client(client,result["clients"],config)
             continue
         if config is not None and client["user"]=="uvanoo_dev" and client["address"] is None and client["application"]=="uvanoo-verify:"+config["sourceSha"]:
             require(client["state"] in ["active","idle in transaction"])

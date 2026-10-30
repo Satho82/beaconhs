@@ -167,4 +167,28 @@ class Boundaries(unittest.TestCase):
         boundary,events,bootstrap=self.stop_fixture();events.append({"Action":"oom","Actor":{"ID":"container"}})
         with self.assertRaises(ValueError):m.validate_stop_event(boundary,b"\n".join(json.dumps(x).encode() for x in events),bootstrap)
 
+class BackupPeers(unittest.TestCase):
+    sockets='u_str ESTAB 0 0 /var/run/postgresql/.s.PGSQL.5432 200 * 100 users:(("postgres",pid=222,fd=10))\n'+'u_str ESTAB 0 0 * 100 * 200 users:(("pg_dump",pid=111,fd=3))\n'
+    def verify(self,text=None,pid=17,namespace="pid:[5]"):
+        with patch.object(m,"process_identity",return_value=("10","pid:[5]")),patch.object(m.os,"readlink",return_value="pid:[5]"),patch.object(m.Path,"read_text",return_value="NSpid:\t222\t17\n"):
+            m.backup_socket_peer(self.sockets if text is None else text,111,pid,namespace)
+    def test_exact_backend_peer(self):self.verify()
+    def test_other_backend(self):
+        with self.assertRaises(ValueError):self.verify(pid=18)
+    def test_other_namespace(self):
+        with self.assertRaises(ValueError):self.verify(namespace="pid:[6]")
+    def test_wrong_peer(self):
+        with self.assertRaises(ValueError):self.verify(text=self.sockets.replace("* 200","* 201"))
+    def test_missing_server(self):
+        with self.assertRaises(ValueError):self.verify(text=self.sockets.splitlines()[1])
+    def test_duplicate_client_socket(self):
+        with self.assertRaises(ValueError):self.verify(text=self.sockets+self.sockets.splitlines()[1])
+    def test_wrong_postgres_socket(self):
+        with self.assertRaises(ValueError):self.verify(text=self.sockets.replace(".s.PGSQL.5432",".s.PGSQL.5433"))
+    def test_wrong_client_process(self):
+        with self.assertRaises(ValueError):self.verify(text=self.sockets.replace('"pg_dump"','"psql"'))
+    def test_duplicate_tagged_session(self):
+        c={"application":"uvanoo-backup:"+"a"*40,"user":"uvanoo_dev","address":None,"state":"active","pid":17}
+        with self.assertRaises(ValueError):m.verify_backup_client(c,[c,c],{"sourceSha":"a"*40})
+
 if __name__=="__main__":unittest.main()

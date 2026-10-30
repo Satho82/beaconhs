@@ -32,7 +32,7 @@ restore-receipt hashes. All other observer configuration stays immutable.
 
 Read-only verification connections are narrow exceptions: exact observer SQL,
 the exact pinned PostgreSQL pg_dump process with source-specific application
-name, or source-pinned verification SQL hashes. The web admission container
+name, one backend and reciprocal local socket/DEV PID-namespace correlation, or source-pinned verification SQL hashes. The web admission container
 must have the exact source, immutable runtime, command, entrypoint, read-only
 mounts, DEV network/IP, capability restrictions and manifest/approval/image
 identities. No generic administrator, migration or backup-role client exemption

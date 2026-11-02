@@ -1,5 +1,6 @@
+import { createHash } from 'node:crypto'
 import { execFileSync } from 'node:child_process'
-import { readFileSync, appendFileSync, mkdirSync } from 'node:fs'
+import { readFileSync, appendFileSync, mkdirSync, openSync, fstatSync, constants } from 'node:fs'
 import { resolve } from 'node:path'
 import { TARGET, patchEnv, release, requireValue as check } from './release.mjs'
 import { verifyReadiness, liveIO } from '../dev-readiness.mjs'
@@ -76,9 +77,10 @@ const compose = async () => {
 }
 const service = () => inspect('service', 'inspect', `${TARGET.stack}_web`)
 const journal = resolve(process.env.DEV_V2_JOURNAL ?? '/tmp/uvanoo-dev-v2-release.jsonl')
+let journalFd
 const record = async (event, facts) =>
   appendFileSync(
-    journal,
+    journalFd,
     JSON.stringify({ at: new Date().toISOString(), event, ...facts }) + '\n',
     { mode: 0o600 },
   )
@@ -159,6 +161,31 @@ const io = {
     }
   },
   async preflight(before) {
+    const journal = JSON.parse(git('show', `${before.sha}:packages/db/drizzle/meta/_journal.json`))
+    const expected = journal.entries.map((entry) => ({
+      hash: createHash('sha256')
+        .update(command('git', ['show', `${before.sha}:packages/db/drizzle/${entry.tag}.sql`]))
+        .digest('hex'),
+      created_at: String(entry.when),
+    }))
+    const ledger = JSON.parse(
+      docker(
+        'exec',
+        'uvanoo-dev-postgres',
+        'psql',
+        '-X',
+        '-qAt',
+        '-v',
+        'ON_ERROR_STOP=1',
+        '-U',
+        'uvanoo_dev',
+        '-d',
+        'uvanoo_dev',
+        '-c',
+        "BEGIN READ ONLY; SELECT coalesce(json_agg(x ORDER BY created_at), '[]'::json) FROM (SELECT hash, created_at::text FROM drizzle.__drizzle_migrations) x; ROLLBACK;",
+      ),
+    )
+    check(JSON.stringify(ledger) === JSON.stringify(expected), 'LIVE_MIGRATION_LEDGER_DRIFT')
     await io.checkPaused()
     for (const name of ['uvanoo-dev-postgres', 'uvanoo-dev-redis', 'uvanoo-dev-minio']) {
       const d = inspect('inspect', name)
@@ -232,6 +259,19 @@ const io = {
 }
 try {
   mkdirSync(resolve(journal, '..'), { recursive: true, mode: 0o700 })
+  const candidateJournalFd = openSync(
+    journal,
+    constants.O_WRONLY | constants.O_APPEND | constants.O_CREAT | constants.O_NOFOLLOW,
+    0o600,
+  )
+  const journalStat = fstatSync(candidateJournalFd)
+  check(
+    journalStat.isFile() &&
+      journalStat.uid === process.getuid() &&
+      (journalStat.mode & 0o077) === 0,
+    'JOURNAL_PERMISSIONS_INVALID',
+  )
+  journalFd = candidateJournalFd
   const result = await release(io, {
     repository: process.env.GITHUB_REPOSITORY ?? TARGET.repository,
     sha: process.env.DEV_SOURCE_SHA,
@@ -245,7 +285,7 @@ try {
 } catch (error) {
   // Never emit child-process stderr, API responses, service specs or credentials.
   const code = /^[A-Z_]+$/.test(error.message) ? error.message : 'DEV_V2_OPERATION_FAILED'
-  await record('failed', { code })
+  if (journalFd !== undefined) await record('failed', { code })
   console.error(code)
   process.exitCode = 1
 }

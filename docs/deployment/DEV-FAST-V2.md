@@ -24,7 +24,7 @@ watchdog remain unchanged. This document applies only to `dev.uvanoo.com` and
 2. Owner dispatches **Uvanoo DEV deploy V2**, mode `fast`, exact SHA and digest,
    `execute=true`, and confirms backward-compatible application writes.
 3. The runner checks actual live source, immutable image labels, successful authoritative
-   CI jobs, target identities, infrastructure health, background-job pause and configuration drift.
+   CI jobs, target identities, the small migration ledger against deployed source, infrastructure health, background-job pause and configuration drift.
 4. A normal, dedicated tenant test account checks Current Handover, History and property
    scope. The rollout changes only web image and version, then repeats readiness and
    creates one clearly labelled Handover smoke record, verifying it in History.
@@ -100,3 +100,18 @@ labelled; no operational follow-ups, notifications or deletions are requested.
 - Existing readiness and legacy candidate contracts still pass.
 - Original deployment/production workflows and watchdog unchanged from live baseline.
 - Full cloud validation and immutable publication for this branch; no DEV deployment.
+
+## Recorded implementation validation
+
+The non-deploying VPS run against live `a8009246` passed exact image/source/CI,
+canonical database identity, all 67 migration ledger hashes/timestamps, infrastructure
+health, paused background services and public editor/readiness checks. No live service
+or database configuration was modified. The initial health probe incorrectly rejected
+Next.js streaming login redirects; the V2 adapter now recognizes only the exact
+same-origin login markers, with negative regression tests. Original readiness code
+and the old deployment paths remain intact.
+
+The replacement has not been activated against live DEV. Browser smoke credentials
+and the approved runner/browser setup must be provisioned before enablement; missing
+fixtures fail before any rollout. Simulated rollback coverage is not a claim that a
+live rollback rehearsal occurred.

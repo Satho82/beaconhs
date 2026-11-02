@@ -61,7 +61,12 @@ export async function release(io, request) {
   await io.verifyCI(request.sha)
   await io.verifyImage(request.sha, request.digest)
   await io.preflight(before)
-  await io.record('plan', { ...impact, digest: request.digest, dryRun: !request.execute })
+  await io.record('plan', {
+    ...impact,
+    digest: request.digest,
+    previousDigest: before.digest,
+    dryRun: !request.execute,
+  })
   if (!request.execute) return { status: 'DRY_RUN', ...impact }
   requireValue(
     request.enabled && request.authorized && request.compatible,

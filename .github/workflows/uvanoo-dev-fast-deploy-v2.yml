@@ -120,9 +120,25 @@ jobs:
     permissions:
       actions: write
       contents: read
+      packages: read
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
         with: { persist-credentials: false }
+      - name: Bind controlled request to the published immutable candidate
+        env:
+          SOURCE: ${{ inputs.source_sha }}
+          DIGEST: ${{ inputs.image_digest }}
+          REGISTRY_USER: ${{ github.actor }}
+          REGISTRY_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          export DOCKER_CONFIG="$(mktemp -d)"
+          chmod 700 "$DOCKER_CONFIG"
+          trap 'rm -rf "$DOCKER_CONFIG"' EXIT
+          printf '%s' "$REGISTRY_TOKEN" | docker login ghcr.io -u "$REGISTRY_USER" --password-stdin >/dev/null
+          inspected="$(docker buildx imagetools inspect "ghcr.io/satho82/uvanoo-staging-private:v1.4-dev-$SOURCE")"
+          published="$(awk '$1 == "Digest:" { print $2; exit }' <<< "$inspected")"
+          test "$published" = "$DIGEST"
       - name: Retain proven controlled admission during V2 transition
         env:
           GH_TOKEN: ${{ github.token }}

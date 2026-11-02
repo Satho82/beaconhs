@@ -688,27 +688,61 @@ describe('bounded monitor probe scheduling', () => {
     expect(peak).toBe(3)
   })
 
-  it('stops queued work and settles active probes before latching on failure', async () => {
+  it('revokes prior readiness immediately and settles active probes before returning', async () => {
     const f = fixture()
+    await monitorOnce(f)
+    expect(existsSync(join(f.directory, 'safety.json'))).toBe(true)
     let calls = 0
     let active = 0
+    let releaseSiblings!: () => void
+    let failFirst!: () => void
+    const siblings = new Promise<void>((done) => {
+      releaseSiblings = done
+    })
+    const first = new Promise<void>((done) => {
+      failFirst = done
+    })
     const probe = async (spec: { executable: string }) => {
       const call = calls++
       active++
       try {
-        await new Promise((done) => setTimeout(done, call === 0 ? 1 : 15))
-        if (call === 0) throw new Error('probe failed')
-        expect(existsSync(join(f.directory, 'monitor-stopped.json'))).toBe(false)
+        if (call === 0) {
+          await first
+          throw new Error('probe failed')
+        }
+        await siblings
         return f.observation(spec.executable)
       } finally {
         active--
       }
     }
-    await expect(monitorOnce({ ...f, probe })).rejects.toThrow('DEV_MONITOR_STOPPED')
+    let settled = false
+    const result = monitorOnce({ ...f, probe }).then(
+      () => {
+        settled = true
+        return 'unexpected success'
+      },
+      (error: Error) => {
+        settled = true
+        return error.message
+      },
+    )
+    expect(calls).toBe(3)
+    failFirst()
+    await new Promise((done) => setImmediate(done))
+    expect(existsSync(join(f.directory, 'safety.json'))).toBe(false)
+    expect(existsSync(join(f.directory, 'monitor-stopped.json'))).toBe(true)
+    expect(active).toBe(2)
+    expect(settled).toBe(false)
+    releaseSiblings()
+    expect(await result).toBe('DEV_MONITOR_STOPPED')
     expect(calls).toBe(3)
     expect(active).toBe(0)
     expect(existsSync(join(f.directory, 'safety.json'))).toBe(false)
-    expect(existsSync(join(f.directory, 'monitor-stopped.json'))).toBe(true)
+    expect(JSON.parse(readFileSync(join(f.directory, 'monitor-stopped.json'), 'utf8'))).toEqual({
+      version: 1,
+      status: 'STOPPED',
+    })
   })
 
   it('includes queue delay in the original whole-round deadline', async () => {

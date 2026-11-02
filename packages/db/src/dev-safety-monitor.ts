@@ -410,7 +410,7 @@ export async function monitorOnce(options: {
       return { check, stamp, bytes: canonical(value), facts: value.facts }
     }
     // Bound concurrent clients without extending the whole-round or probe deadlines.
-    // Settle in-flight probes on failure before latching; never overlap another round.
+    // Revoke readiness immediately on failure, then settle in-flight probes before returning.
     const observations: Awaited<ReturnType<typeof observe>>[] = []
     let next = 0
     let failed = false
@@ -423,7 +423,9 @@ export async function monitorOnce(options: {
             observations[index] = await observe(checks[index]!)
           }
         } catch (error) {
+          const firstFailure = !failed
           failed = true
+          if (firstFailure) latchMonitor(directory)
           throw error
         }
       }),

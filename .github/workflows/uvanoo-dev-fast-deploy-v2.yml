@@ -1,0 +1,133 @@
+name: Uvanoo DEV deploy V2 (approval required for enablement)
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        type: choice
+        options: [fast, controlled]
+        default: fast
+        required: true
+      source_sha:
+        description: Full validated feature candidate SHA
+        type: string
+        required: true
+      image_digest:
+        description: Immutable sha256 image digest
+        type: string
+        required: true
+      execute:
+        description: Activate (false is non-deploying verification)
+        type: boolean
+        default: false
+      backward_compatible:
+        description: FAST only - app writes remain compatible with previous image
+        type: boolean
+        default: false
+      release_evidence_sha256:
+        description: CONTROLLED only - approved existing admission evidence
+        type: string
+        default: ''
+      temporary_dev_approval_sha256:
+        description: CONTROLLED only - approved existing policy pin when required
+        type: string
+        default: ''
+permissions:
+  contents: read
+concurrency:
+  group: uvanoo-dev-v2-dispatch
+  cancel-in-progress: false
+jobs:
+  guard:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Require owner dispatch and approved workflow before activation
+        env:
+          ACTOR: ${{ github.actor }}
+          EXECUTE: ${{ inputs.execute }}
+          ENABLED: ${{ vars.DEV_FAST_V2_ENABLED }}
+          SOURCE: ${{ inputs.source_sha }}
+          DIGEST: ${{ inputs.image_digest }}
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = Satho82/beaconhs
+          test "$ACTOR" = Satho82
+          [[ "$SOURCE" =~ ^[a-f0-9]{40}$ ]]
+          [[ "$DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]
+          if [ "$EXECUTE" = true ]; then
+            test "$ENABLED" = true
+            test "$GITHUB_REF" = refs/heads/feature/uvanoo-v1.4
+          fi
+  fast:
+    needs: guard
+    if: inputs.mode == 'fast'
+    runs-on: [self-hosted, dokploy]
+    timeout-minutes: 20
+    concurrency:
+      group: deploy-dev
+      cancel-in-progress: false
+    permissions:
+      actions: read
+      contents: read
+      packages: read
+    env:
+      DEV_SOURCE_SHA: ${{ inputs.source_sha }}
+      DEV_IMAGE_DIGEST: ${{ inputs.image_digest }}
+      DEV_FAST_V2_ENABLED: ${{ vars.DEV_FAST_V2_ENABLED }}
+      DEV_OWNER_AUTHORIZED: 'true'
+      DEV_BACKWARD_COMPATIBLE: ${{ inputs.backward_compatible }}
+      DEV_SMOKE_EMAIL: ${{ secrets.DEV_SMOKE_EMAIL }}
+      DEV_SMOKE_PASSWORD: ${{ secrets.DEV_SMOKE_PASSWORD }}
+      DEV_SMOKE_PROPERTY_ID: ${{ vars.DEV_SMOKE_PROPERTY_ID }}
+      DEV_SMOKE_FORBIDDEN_PROPERTY_ID: ${{ vars.DEV_SMOKE_FORBIDDEN_PROPERTY_ID }}
+      DEV_SMOKE_BROWSER: ${{ vars.DEV_SMOKE_BROWSER }}
+      DEV_V2_JOURNAL: ${{ runner.temp }}/dev-v2-${{ github.run_id }}-${{ github.run_attempt }}.jsonl
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with: { fetch-depth: 0, persist-credentials: false }
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with: { node-version-file: .nvmrc }
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Pull only the requested immutable image with temporary credentials
+        env: { REGISTRY_USER: '${{ github.actor }}', REGISTRY_TOKEN: '${{ github.token }}' }
+        run: |
+          set -euo pipefail
+          export DOCKER_CONFIG="$(mktemp -d)"
+          chmod 700 "$DOCKER_CONFIG"
+          trap 'rm -rf "$DOCKER_CONFIG"' EXIT
+          printf '%s' "$REGISTRY_TOKEN" | docker login ghcr.io -u "$REGISTRY_USER" --password-stdin >/dev/null
+          docker pull "ghcr.io/satho82/uvanoo-staging-private@$DEV_IMAGE_DIGEST" >/dev/null
+      - name: Verify or activate under the shared DEV deployment lock
+        env: { EXECUTE: '${{ inputs.execute }}' }
+        run: |
+          set -euo pipefail
+          args=()
+          if [ "$EXECUTE" = true ]; then args+=(--execute); fi
+          flock -n /opt/uvanoo-dev/dev-v2-deploy.lock node scripts/cluster/fast-dev-v2/run.mjs "${args[@]}"
+      - name: Preserve redacted release journal
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: dev-v2-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.DEV_V2_JOURNAL }}
+          retention-days: 90
+  controlled:
+    needs: guard
+    if: inputs.mode == 'controlled'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    permissions:
+      actions: write
+      contents: read
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with: { persist-credentials: false }
+      - name: Retain proven controlled admission during V2 transition
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXECUTE: ${{ inputs.execute }}
+          SOURCE: ${{ inputs.source_sha }}
+          EVIDENCE: ${{ inputs.release_evidence_sha256 }}
+          APPROVAL: ${{ inputs.temporary_dev_approval_sha256 }}
+        run: node scripts/cluster/fast-dev-v2/controlled.mjs

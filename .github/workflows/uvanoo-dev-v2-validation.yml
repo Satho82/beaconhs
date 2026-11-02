@@ -1,0 +1,32 @@
+name: Uvanoo DEV V2 non-deploying validation
+on:
+  push:
+    branches: [feature/uvanoo-dev-fast-deploy-v2]
+  workflow_dispatch:
+permissions:
+  contents: read
+  packages: write
+jobs:
+  regressions:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with: { fetch-depth: 0, persist-credentials: false }
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with: { node-version-file: .nvmrc }
+      - name: Regression and failure simulations (no deployment credentials)
+        run: |
+          node --test scripts/cluster/fast-dev-v2/release.test.mjs scripts/cluster/dev-readiness.test.mjs
+          node --check scripts/cluster/fast-dev-v2/run.mjs
+          node --check scripts/cluster/fast-dev-v2/smoke.mjs
+          node --check scripts/cluster/fast-dev-v2/controlled.mjs
+          bash scripts/ci/v1.4-dev-candidate-deploy-contract.test.sh
+          git diff --exit-code a8009246e841c03f2ab28ac294b127477d72d3c2 -- .github/workflows/deploy-dev.yml .github/workflows/ci.yml .github/workflows/deploy-v1.4-dev-candidate.yml scripts/cluster/dev-recovery packages/db/src/dev-safety-monitor.ts
+      - name: Non-deploying CONTROLLED plan
+        env: { SOURCE: '${{ github.sha }}', EXECUTE: 'false' }
+        run: node scripts/cluster/fast-dev-v2/controlled.mjs
+  full-validation:
+    uses: ./.github/workflows/uvanoo-v1.4-cloud-build.yml
+    with: { source_sha: '${{ github.sha }}' }
+    secrets: inherit

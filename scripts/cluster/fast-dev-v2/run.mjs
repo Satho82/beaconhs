@@ -3,6 +3,7 @@ import { readFileSync, appendFileSync, mkdirSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { TARGET, patchEnv, release, requireValue as check } from './release.mjs'
 import { verifyReadiness, liveIO } from '../dev-readiness.mjs'
+import { readinessFetch } from './streaming-redirect.mjs'
 
 const command = (exe, args) =>
   execFileSync(exe, args, {
@@ -198,7 +199,7 @@ const io = {
   async ready(to) {
     for (let attempt = 0; attempt < 36; attempt++) {
       try {
-        await verifyReadiness(liveIO(), {
+        await verifyReadiness(liveIO(undefined, readinessFetch), {
           verified: 'true',
           stack: TARGET.stack,
           host: 'dev.uvanoo.com',

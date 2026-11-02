@@ -125,3 +125,16 @@ test('wrong repository rejected', async () => {
     /WRONG_REPOSITORY/,
   )
 })
+
+test('streaming auth redirect requires both exact Next markers', async () => {
+  const { isStreamingLoginRedirect } = await import('./streaming-redirect.mjs')
+  const meta = '<meta id="__next-page-redirect" http-equiv="refresh" content="1;url=/login"/>'
+  const digest = 'NEXT_REDIRECT;replace;/login;307;'
+  assert(isStreamingLoginRedirect(meta + digest))
+  assert(!isStreamingLoginRedirect(meta))
+  assert(!isStreamingLoginRedirect(digest))
+  assert(
+    !isStreamingLoginRedirect((meta + digest).replaceAll('/login', 'https://evil.invalid/login')),
+  )
+  assert(!isStreamingLoginRedirect('<h1>Private records</h1>'))
+})

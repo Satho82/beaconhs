@@ -82,13 +82,50 @@ def retain(source, digest, evidence):
     try: os.fsync(dfd)
     finally: os.close(dfd)
 
+REDIS_VOLUME = "uvanoo-dev-redis-data"
+REDIS_LOCK = Path("/opt/uvanoo-dev/monitor-private/release-redis-observation.lock")
+REDIS_LOCK_TARGET = "/run/uvanoo-redis-observation.lock"
+REDIS_HEALTHCHECK = ["CMD-SHELL", "flock -w 1 /run/uvanoo-redis-observation.lock sh -c 'export REDISCLI_AUTH=\"$DEV_REDIS_PASSWORD\"; exec redis-cli --no-auth-warning ping' | grep -q PONG"]
+
+def private_lock_stat(value):
+    if not stat.S_ISREG(value.st_mode) or stat.S_IMODE(value.st_mode)!=0o600 or value.st_uid!=0: fail()
+    return value.st_dev,value.st_ino
+
+def redis_mounts(item):
+    # Only the reviewed DEV persistence volume and the shared observer lock.
+    mounts=item.get('Mounts',[])
+    if len(mounts)!=2: fail()
+    by_dest={mount.get('Destination'):mount for mount in mounts}
+    if set(by_dest)!={'/data',REDIS_LOCK_TARGET}: fail()
+    data,lock=by_dest['/data'],by_dest[REDIS_LOCK_TARGET]
+    if data.get('Type')!='volume' or data.get('Name')!=REDIS_VOLUME or data.get('RW') is not True or data.get('SubPath',''): fail()
+    volumes=json.loads(run(['docker','volume','inspect',REDIS_VOLUME]))
+    if len(volumes)!=1: fail()
+    volume=volumes[0]
+    if volume.get('Name')!=REDIS_VOLUME or volume.get('Driver')!='local' or volume.get('Scope')!='local' or volume.get('Options') not in [None,{}]: fail()
+    source=volume.get('Mountpoint')
+    if not isinstance(source,str) or not source.startswith('/') or str(Path(source).resolve(strict=True))!=source or not Path(source).is_dir() or data.get('Source')!=source: fail()
+    if lock.get('Type')!='bind' or lock.get('Source')!=str(REDIS_LOCK) or lock.get('RW') is not True: fail()
+    if item.get('Config',{}).get('Healthcheck',{}).get('Test')!=REDIS_HEALTHCHECK: fail()
+    if REDIS_LOCK.resolve(strict=True)!=REDIS_LOCK: fail()
+    fd=os.open(REDIS_LOCK,os.O_RDONLY|os.O_NOFOLLOW)
+    try:
+        identity=private_lock_stat(os.fstat(fd))
+        if private_lock_stat(REDIS_LOCK.lstat())!=identity: fail()
+        # Docker's source path alone cannot prove that a bound inode wasn't replaced.
+        mounted=run(['docker','exec','uvanoo-dev-redis','stat','-Lc','%d:%i',REDIS_LOCK_TARGET]).decode().strip()
+        if mounted!=str(identity[0])+':'+str(identity[1]): fail()
+        if private_lock_stat(os.fstat(fd))!=identity or private_lock_stat(REDIS_LOCK.lstat())!=identity: fail()
+    finally:
+        os.close(fd)
+
 def containers():
     items=json.loads(run(['docker','inspect','uvanoo-dev-minio','uvanoo-dev-postgres','uvanoo-dev-redis']))
     found={item.get('Name','').lstrip('/'):item for item in items}
     expected={
         'uvanoo-dev-minio':('minio/minio@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e','uvanoo-dev-minio-data','/data'),
         'uvanoo-dev-postgres':('postgres@sha256:f1c3376c26f2609ab9f29f71f824103fe2fcd8ee0346485cb6122a4f93df6f94','uvanoo-dev-postgres-data','/var/lib/postgresql/data'),
-        'uvanoo-dev-redis':('redis@sha256:71da9275c5f3fcb97d0fa0c8c5b36cc995327265420f17a04bfd544f458059f7',None,None),
+        'uvanoo-dev-redis':('redis@sha256:71da9275c5f3fcb97d0fa0c8c5b36cc995327265420f17a04bfd544f458059f7',REDIS_VOLUME,'/data'),
     }
     if set(found)!=set(expected): fail()
     result=[]
@@ -97,8 +134,8 @@ def containers():
         if item.get('Config',{}).get('Image')!=image or item.get('State',{}).get('Health',{}).get('Status')!='healthy': fail()
         if set(item.get('NetworkSettings',{}).get('Networks',{}))!={'uvanoo-dev-private','uvanoo-dev-runtime'}: fail()
         mounts=item.get('Mounts',[])
-        if volume is None:
-            if mounts: fail()
+        if name=='uvanoo-dev-redis':
+            redis_mounts(item)
         elif len(mounts)!=1 or mounts[0].get('Type')!='volume' or mounts[0].get('Name')!=volume or mounts[0].get('Destination')!=dest or mounts[0].get('RW') is not True: fail()
         result.append({'name':name,'id':item['Id'],'startedAt':item['State']['StartedAt'],'image':image,'volume':volume})
     return sorted(result,key=lambda x:x['name'])

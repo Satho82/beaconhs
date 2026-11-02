@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import {
@@ -23,6 +23,10 @@ const csvRoute = readFileSync(
 )
 
 describe('Risk reporting foundation', () => {
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
   it('escapes report-authored text before rendering HTML', () => {
     expect(escapeRiskReport('<script>"x"&</script>')).toBe(
       '&lt;script&gt;&quot;x&quot;&amp;&lt;/script&gt;',
@@ -48,6 +52,8 @@ describe('Risk reporting foundation', () => {
   })
 
   it('formats real register rows with headers, UTF-8 BOM, escaping and canonical ratings', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-10-15T12:00:00Z'))
     const csv = formatRiskRegisterCsv([
       {
         assessment: {

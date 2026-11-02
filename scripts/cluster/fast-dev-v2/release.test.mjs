@@ -43,6 +43,10 @@ function fixture(failures = {}) {
   return { io, calls }
 }
 for (const path of [
+  'apps/web/package.json',
+  'apps/web/next.config.ts',
+  'apps/web/.env',
+  'packages/ui/package.json',
   'packages/db/src/schema/a.ts',
   'packages/tenant/src/index.ts',
   '.github/workflows/deploy-dev.yml',

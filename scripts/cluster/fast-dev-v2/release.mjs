@@ -20,8 +20,15 @@ export function plan(base, sha, changes, ancestor) {
       p,
     ),
   )
+  const applicationPathsOnly = paths.every(
+    (p) =>
+      /^(?:apps\/web\/(?:src|public)\/|packages\/ui\/src\/|docs\/(?:screenshots|user-guide)\/)/.test(
+        p,
+      ) || p === 'README.md',
+  )
   const routine =
     ancestor &&
+    applicationPathsOnly &&
     !sensitive &&
     categories.every((c) => ['WEB LOGIC', 'UI PRESENTATION', 'SHARED UI', 'DOCS ONLY'].includes(c))
   return {

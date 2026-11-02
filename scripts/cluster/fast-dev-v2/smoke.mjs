@@ -1,6 +1,7 @@
 import { createRequire } from 'node:module'
 import { resolve } from 'node:path'
 import { TARGET, requireValue as check } from './release.mjs'
+import { submitHandover } from './submit.mjs'
 
 // Reuse the workspace's pinned browser client. No saved interactive admin session.
 const require = createRequire(resolve('packages/forms-pdf/package.json'))
@@ -70,10 +71,7 @@ try {
     await page.select('select[name="propertyId"]', property)
     await page.type('input[name="department"]', 'Release acceptance')
     await page.type('textarea[name="note"]', marker)
-    await Promise.all([
-      page.waitForNavigation({ waitUntil: 'networkidle2' }),
-      page.$eval('textarea[name="note"]', (field) => field.form.requestSubmit()),
-    ])
+    await submitHandover(page)
   }
   await page.goto(
     TARGET.origin +

@@ -142,3 +142,40 @@ test('streaming auth redirect requires both exact Next markers', async () => {
   )
   assert(!isStreamingLoginRedirect('<h1>Private records</h1>'))
 })
+
+test('Handover save completes without a navigation event', async () => {
+  const { submitHandover } = await import('./submit.mjs')
+  let submitted = false,
+    completed = false
+  const response = {
+    url: () => TARGET.origin + '/hospitality/handover',
+    request: () => ({ method: () => 'POST' }),
+    ok: () => true,
+    buffer: async () => {
+      completed = true
+    },
+  }
+  await submitHandover({
+    waitForResponse: async (matches) => {
+      assert(matches(response))
+      assert(!matches({ ...response, url: () => 'https://example.com/hospitality/handover' }))
+      assert(!matches({ ...response, request: () => ({ method: () => 'GET' }) }))
+      return response
+    },
+    $eval: async () => {
+      submitted = true
+    },
+  })
+  assert(submitted && completed)
+})
+
+test('failed Handover POST cannot pass the smoke test', async () => {
+  const { submitHandover } = await import('./submit.mjs')
+  await assert.rejects(
+    submitHandover({
+      waitForResponse: async () => ({ ok: () => false }),
+      $eval: async () => {},
+    }),
+    /HANDOVER_SUBMISSION_FAILED/,
+  )
+})

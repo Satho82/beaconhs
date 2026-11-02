@@ -14,9 +14,13 @@ const config: KnipConfig = {
         'scripts/cluster/preserve-dev-sidecar.test.mjs',
         // Host-only executable, checksum-bound by the DEV safety monitor policy.
         'scripts/cluster/dev-release-safety-probe.mjs',
+        // Invoked through flock and a child process, not static module imports.
+        'scripts/cluster/fast-dev-v2/run.mjs',
+        'scripts/cluster/fast-dev-v2/smoke.mjs',
       ],
-      // The sanitizer audit resolves these through apps/web's createRequire.
-      ignoreDependencies: ['next', 'jsdom'],
+      // The sanitizer audit resolves through apps/web's createRequire; the DEV
+      // smoke runner resolves the pinned browser client through packages/forms-pdf.
+      ignoreDependencies: ['next', 'jsdom', 'puppeteer-core'],
     },
     'apps/web': {
       // Next externalizes the shared sanitizer through this runtime dependency.

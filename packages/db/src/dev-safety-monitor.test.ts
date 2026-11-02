@@ -664,3 +664,67 @@ describe('new interval observation remains fail closed', () => {
     },
   )
 })
+
+describe('bounded monitor probe scheduling', () => {
+  it('runs every required check once with at most three active probes across rounds', async () => {
+    const f = fixture()
+    let active = 0
+    let peak = 0
+    const seen: string[] = []
+    const probe = async (spec: { executable: string }) => {
+      active++
+      peak = Math.max(peak, active)
+      seen.push(spec.executable)
+      await new Promise((done) => setTimeout(done, 5))
+      active--
+      return f.observation(spec.executable)
+    }
+    for (let round = 0; round < 2; round++) {
+      seen.length = 0
+      await monitorOnce({ ...f, probe })
+      expect(active).toBe(0)
+      expect(seen.sort()).toEqual(Object.keys(f.policy.probes).sort())
+    }
+    expect(peak).toBe(3)
+  })
+
+  it('stops queued work and settles active probes before latching on failure', async () => {
+    const f = fixture()
+    let calls = 0
+    let active = 0
+    const probe = async (spec: { executable: string }) => {
+      const call = calls++
+      active++
+      try {
+        await new Promise((done) => setTimeout(done, call === 0 ? 1 : 15))
+        if (call === 0) throw new Error('probe failed')
+        expect(existsSync(join(f.directory, 'monitor-stopped.json'))).toBe(false)
+        return f.observation(spec.executable)
+      } finally {
+        active--
+      }
+    }
+    await expect(monitorOnce({ ...f, probe })).rejects.toThrow('DEV_MONITOR_STOPPED')
+    expect(calls).toBe(3)
+    expect(active).toBe(0)
+    expect(existsSync(join(f.directory, 'safety.json'))).toBe(false)
+    expect(existsSync(join(f.directory, 'monitor-stopped.json'))).toBe(true)
+  })
+
+  it('includes queue delay in the original whole-round deadline', async () => {
+    const f = fixture()
+    let clock = now
+    let calls = 0
+    const probe = async (spec: { executable: string }) => {
+      calls++
+      await new Promise((done) => setTimeout(done, 1))
+      clock = now + 5001
+      return { ...f.observation(spec.executable), observedAt: new Date(clock).toISOString() }
+    }
+    await expect(monitorOnce({ ...f, now: () => clock, probe })).rejects.toThrow(
+      'DEV_MONITOR_STOPPED',
+    )
+    expect(calls).toBe(3)
+    expect(existsSync(join(f.directory, 'safety.json'))).toBe(false)
+  })
+})

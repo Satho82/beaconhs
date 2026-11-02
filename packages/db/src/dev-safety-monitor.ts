@@ -394,22 +394,43 @@ export async function monitorOnce(options: {
           createPublicKey(key).export({ format: 'der', type: 'spki' }).toString('base64') ===
             approval.safetyPublicKeyDer,
       )
-    const observations = await Promise.all(
-      checks.map(async (check) => {
-        const value = await (options.probe ?? runProbe)(policy.probes[check]!)
-        const stamp = validateObservation(
-          value,
-          check,
-          policy,
-          started,
-          now(),
-          approval.historicalMissingObjectsException,
-          approval.historicalSaveUncertainty,
-        )
-        if (check === 'ownerMaintenanceHold')
-          requireValue(value.facts.holdReceiptSha256 === approval.maintenanceHold?.receiptSha256)
-        return { check, stamp, bytes: canonical(value), facts: value.facts }
+    const observe = async (check: (typeof checks)[number]) => {
+      const value = await (options.probe ?? runProbe)(policy.probes[check]!)
+      const stamp = validateObservation(
+        value,
+        check,
+        policy,
+        started,
+        now(),
+        approval.historicalMissingObjectsException,
+        approval.historicalSaveUncertainty,
+      )
+      if (check === 'ownerMaintenanceHold')
+        requireValue(value.facts.holdReceiptSha256 === approval.maintenanceHold?.receiptSha256)
+      return { check, stamp, bytes: canonical(value), facts: value.facts }
+    }
+    // Bound concurrent clients without extending the whole-round or probe deadlines.
+    // Settle in-flight probes on failure before latching; never overlap another round.
+    const observations: Awaited<ReturnType<typeof observe>>[] = []
+    let next = 0
+    let failed = false
+    const workers = await Promise.allSettled(
+      Array.from({ length: Math.min(3, checks.length) }, async () => {
+        try {
+          while (!failed && next < checks.length) {
+            requireValue(now() >= started && now() - started < 5000)
+            const index = next++
+            observations[index] = await observe(checks[index]!)
+          }
+        } catch (error) {
+          failed = true
+          throw error
+        }
       }),
+    )
+    requireValue(
+      workers.every((worker) => worker.status === 'fulfilled') &&
+        observations.length === checks.length,
     )
     const finished = now()
     requireValue(finished >= started && finished - started <= 5000)

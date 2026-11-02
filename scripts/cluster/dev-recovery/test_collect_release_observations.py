@@ -162,6 +162,37 @@ class Intervals(unittest.TestCase):
     def test_changed_sampler_code(self):self.samples[8]["samplerSha256"]="e"*64;self.reject()
     def test_missing_observation(self):del self.samples[8]["storageWriters"];self.reject()
 
+class VolumeSnapshot(unittest.TestCase):
+    def item(self,name="/unrelated",mounts=None):
+        return {"Id":"a"*64,"Names":[name],"Mounts":mounts or []}
+    def test_disappearing_unrelated_container_needs_no_inspection(self):
+        with patch.object(m,"docker_get",return_value=[self.item()]) as get,patch.object(m,"docker",side_effect=AssertionError("must not inspect container")):
+            self.assertEqual(m.volume_consumer_snapshot(),[{"Name":"/unrelated","Mounts":[]}])
+            get.assert_called_once_with("/containers/json?all=1")
+    def test_missing_volume_source_resolved_by_exact_identity(self):
+        item=self.item(mounts=[{"Type":"volume","Name":"anonymous","Source":""}])
+        with patch.object(m,"docker_get",return_value=[item]),patch.object(m,"docker",return_value=[{"Name":"anonymous","Mountpoint":"/private/volume"}]) as inspect:
+            self.assertEqual(m.volume_consumer_snapshot()[0]["Mounts"][0]["Source"],"/private/volume")
+            inspect.assert_called_once_with(["volume","inspect","anonymous"])
+    def test_unresolved_volume_fails_closed(self):
+        item=self.item(mounts=[{"Type":"volume","Name":"anonymous","Source":""}])
+        with patch.object(m,"docker_get",return_value=[item]),patch.object(m,"docker",side_effect=ValueError("404")):
+            with self.assertRaises(ValueError):m.volume_consumer_snapshot()
+    def test_wrong_volume_identity_rejected(self):
+        item=self.item(mounts=[{"Type":"volume","Name":"anonymous","Source":""}])
+        with patch.object(m,"docker_get",return_value=[item]),patch.object(m,"docker",return_value=[{"Name":"other","Mountpoint":"/private/volume"}]):
+            with self.assertRaises(ValueError):m.volume_consumer_snapshot()
+    def test_malformed_snapshot_rejected(self):
+        for snapshot in [[],{},[self.item(),self.item()], [{"Id":"bad","Names":["/x"],"Mounts":[]}], [{"Id":"a"*64,"Names":["/x","/alias"],"Mounts":[]}], [{"Id":"a"*64,"Names":["/x"],"Mounts":None}]]:
+            with self.subTest(snapshot=snapshot),patch.object(m,"docker_get",return_value=snapshot):
+                with self.assertRaises(ValueError):m.volume_consumer_snapshot()
+    def test_anonymous_volume_overlap_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            expected=self.item("/uvanoo-dev-minio",[{"Type":"volume","Name":"uvanoo-dev-minio-data","Source":directory}])
+            other=self.item(mounts=[{"Type":"volume","Name":"anonymous","Source":""}]);other["Id"]="b"*64
+            with patch.object(m,"docker_get",return_value=[expected,other]),patch.object(m,"docker",return_value=[{"Name":"anonymous","Mountpoint":directory}]):
+                with self.assertRaises(ValueError):m.require_volume_consumers(m.volume_consumer_snapshot(),directory)
+
 class Boundaries(unittest.TestCase):
     def test_only_expected_volume_consumer(self):
         with tempfile.TemporaryDirectory() as directory:

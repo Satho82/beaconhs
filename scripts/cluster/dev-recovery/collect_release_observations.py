@@ -571,6 +571,30 @@ def require_volume_consumers(containers,volume_path):
                 consumers.append(container["Name"])
     require(consumers==["/uvanoo-dev-minio"])
 
+def volume_consumer_snapshot():
+    # The listing includes mount metadata in one snapshot. Inspecting every listed
+    # container separately races unrelated short-lived containers disappearing.
+    snapshot=docker_get("/containers/json?all=1")
+    require(isinstance(snapshot,list) and len(snapshot)>0)
+    containers=[];ids=set();names=set()
+    for item in snapshot:
+        identity=item["Id"];aliases=item["Names"];mounts=item["Mounts"]
+        require(isinstance(identity,str) and len(identity)==64 and all(c in "0123456789abcdef" for c in identity) and identity not in ids)
+        require(isinstance(aliases,list) and len(aliases)==1 and isinstance(aliases[0],str) and aliases[0].startswith("/") and len(aliases[0])>1 and "/" not in aliases[0][1:] and aliases[0] not in names)
+        require(isinstance(mounts,list));ids.add(identity);names.add(aliases[0])
+        normalized=[]
+        for mount in mounts:
+            require(isinstance(mount,dict))
+            mount=dict(mount)
+            if mount.get("Type")=="volume" and not mount.get("Source"):
+                name=mount.get("Name");require(isinstance(name,str) and len(name)>0)
+                volume=docker(["volume","inspect",name])[0]
+                require(volume["Name"]==name)
+                mount["Source"]=volume["Mountpoint"]
+            normalized.append(mount)
+        containers.append({"Name":aliases[0],"Mounts":normalized})
+    return containers
+
 def minio_contents(config):
     _,baseline,observed=current_storage(config)
     module=storage_library(config)
@@ -579,8 +603,7 @@ def minio_contents(config):
     require(volume == config["minioVolume"])
     mount=Path(volume["Mountpoint"]);st=mount.stat()
     require({"resolved":str(mount.resolve()),"device":st.st_dev,"inode":st.st_ino} == config["minioVolumeIdentity"])
-    ids=[x["Id"] for x in docker_get("/containers/json?all=1")]
-    require_volume_consumers(docker(["inspect",*ids]) if ids else [],str(mount.resolve()))
+    require_volume_consumers(volume_consumer_snapshot(),str(mount.resolve()))
     container=docker(["inspect","uvanoo-dev-minio"])[0]
     require(container["Mounts"] == config["minioMounts"])
     require(container["Config"]["Image"] == config["minioImage"])

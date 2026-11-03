@@ -2,7 +2,15 @@ import { createHash } from 'node:crypto'
 import { execFileSync } from 'node:child_process'
 import { readFileSync, appendFileSync, mkdirSync, openSync, fstatSync, constants } from 'node:fs'
 import { resolve } from 'node:path'
-import { TARGET, persistConfiguration, release, requireValue as check } from './release.mjs'
+import {
+  TARGET,
+  assertBuildProvenance,
+  assertLiveFastSafety,
+  assertRecoverySourceBinding,
+  persistConfiguration,
+  release,
+  requireValue as check,
+} from './release.mjs'
 import { verifyReadiness, liveIO } from '../dev-readiness.mjs'
 import { readinessFetch } from './streaming-redirect.mjs'
 
@@ -73,6 +81,7 @@ const compose = async () => {
       d.composeFile.includes('APP_VERSION: ${APP_VERSION}'),
     'COMPOSE_IMAGE_BINDING_MISSING',
   )
+  assertRecoverySourceBinding(d.composeFile)
   return d
 }
 const service = () => inspect('service', 'inspect', `${TARGET.stack}_web`)
@@ -94,7 +103,8 @@ const io = {
     const digest = current.split('@')[1]
     check(
       s.Spec.TaskTemplate.ContainerSpec.Image === current &&
-        s.Spec.TaskTemplate.ContainerSpec.Env.includes(`APP_VERSION=${sha}`),
+        s.Spec.TaskTemplate.ContainerSpec.Env.includes(`APP_VERSION=${sha}`) &&
+        s.Spec.TaskTemplate.ContainerSpec.Env.includes(`UVANOO_RECOVERY_SOURCE_SHA=${sha}`),
       'CONTROL_PLANE_RUNTIME_DRIFT',
     )
     return { sha, digest, env: d.env, composeFile: d.composeFile, serviceVersion: s.Version.Index }
@@ -109,7 +119,7 @@ const io = {
     }
     return { changes, ancestor }
   },
-  async verifyCI(sha) {
+  async verifyCI(sha, digest) {
     const runs = JSON.parse(
       command('gh', [
         'api',
@@ -131,6 +141,13 @@ const io = {
         jobs.jobs.filter((j) => j.name === name && j.conclusion === 'success').length === 1,
         'CI_REQUIRED_JOB_MISSING',
       )
+    const imageJob = jobs.jobs.find((job) => job.name === 'Publish immutable V1.4 DEV candidate')
+    check(Number.isSafeInteger(imageJob?.id), 'CI_PUBLISH_JOB_MISSING')
+    const buildLog = command('gh', [
+      'api',
+      `repos/${TARGET.repository}/actions/jobs/${imageJob.id}/logs`,
+    ])
+    assertBuildProvenance(buildLog, sha, digest)
   },
   async verifyImage(sha, digest) {
     check(/^sha256:[a-f0-9]{64}$/.test(digest), 'INVALID_DIGEST')
@@ -196,6 +213,9 @@ const io = {
   async assertUnchanged(before) {
     const now = await io.snapshot()
     check(JSON.stringify(now) === JSON.stringify(before), 'CONCURRENT_CONFIGURATION_CHANGE')
+  },
+  async verifyActivationSafety() {
+    assertLiveFastSafety()
   },
   async persist(from, to) {
     await persistConfiguration({ compose, api }, from, to)

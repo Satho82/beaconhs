@@ -1,6 +1,18 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { plan, patchEnv, persistConfiguration, release, TARGET } from './release.mjs'
+import { spawnSync } from 'node:child_process'
+import { fileURLToPath } from 'node:url'
+import { checkPropertyIsolation } from './isolation.mjs'
+import {
+  assertBuildProvenance,
+  assertLiveFastSafety,
+  assertRecoverySourceBinding,
+  plan,
+  patchEnv,
+  persistConfiguration,
+  release,
+  TARGET,
+} from './release.mjs'
 const base = 'a'.repeat(40),
   sha = 'b'.repeat(40),
   digest = 'sha256:' + 'c'.repeat(64)
@@ -18,6 +30,7 @@ function fixture(failures = {}) {
     counts = {}
   const io = {}
   for (const method of [
+    'verifyActivationSafety',
     'verifyCI',
     'verifyImage',
     'preflight',
@@ -37,7 +50,7 @@ function fixture(failures = {}) {
   }
   io.snapshot = async () => ({ sha: base, digest })
   io.diff = async () => ({
-    changes: 'M\0apps/web/src/app/(app)/hospitality/handover/page.tsx\0',
+    changes: 'M\0apps/web/public/images/logo.png\0',
     ancestor: true,
   })
   return { io, calls }
@@ -66,8 +79,102 @@ test('rename out of sensitive path remains controlled', () =>
   ))
 test('non-ancestor fails to controlled', () =>
   assert.equal(plan(base, sha, '', false).mode, 'controlled'))
-test('routine application plan', () =>
-  assert.equal(plan(base, sha, 'M\0apps/web/src/components/button.tsx\0', true).mode, 'fast'))
+test('explicit static asset plan', () =>
+  assert.equal(plan(base, sha, 'M\0apps/web/public/images/logo.png\0', true).mode, 'fast'))
+for (const path of [
+  'apps/web/src/app/(app)/dashboard/_overview-access.ts',
+  'apps/web/src/app/(app)/dashboard/page.tsx',
+  'apps/web/src/app/(app)/dashboard/_property-overview.tsx',
+  'apps/web/src/components/button.tsx',
+  'apps/web/public/untrusted.svg',
+  'apps/web/public/untrusted.js',
+]) {
+  test(`source or unknown path requires controlled: ${path}`, () =>
+    assert.equal(plan(base, sha, `M\0${path}\0`, true).mode, 'controlled'))
+}
+test('live FAST activation stays disabled without atomic persistence and document-save safety', () => {
+  assert.throws(() => assertLiveFastSafety(), /FAST_ACTIVATION_SAFETY_UNAVAILABLE/)
+})
+test('CONTROLLED wrapper cannot guess a competing workflow run', () => {
+  const script = fileURLToPath(new URL('./controlled.mjs', import.meta.url))
+  for (let i = 0; i < 2; i++) {
+    const result = spawnSync(process.execPath, [script], {
+      env: { ...process.env, SOURCE: sha, EXECUTE: 'true', PATH: '' },
+      encoding: 'utf8',
+    })
+    assert.equal(result.status, 1)
+    assert.match(result.stderr, /CONTROLLED_DIRECT_WORKFLOW_REQUIRED/)
+  }
+})
+test('the candidate digest must match the exact successful build job record', () => {
+  const log = [
+    `time echo "IMAGE TAG=${TARGET.image}:v1.4-dev-${sha}"`,
+    `time echo "IMAGE DIGEST=${digest}"`,
+    `time echo "Immutable DEV candidate: ${TARGET.image}@${digest}"`,
+  ].join('\n')
+  assert.doesNotThrow(() => assertBuildProvenance(log, sha, digest))
+  assert.throws(
+    () => assertBuildProvenance(log, sha, 'sha256:' + 'd'.repeat(64)),
+    /IMAGE_BUILD_PROVENANCE_MISMATCH/,
+  )
+  assert.throws(
+    () => assertBuildProvenance('fake labels only', sha, digest),
+    /IMAGE_BUILD_PROVENANCE_MISMATCH/,
+  )
+  assert.throws(
+    () => assertBuildProvenance(log + '\n' + log, sha, digest),
+    /IMAGE_BUILD_PROVENANCE_MISMATCH/,
+  )
+})
+test('forged property checks reject a leaked sentinel and never report success', async () => {
+  const page = {
+    setCookie: async () => {},
+    goto: async () => {},
+    evaluate: async () => ({ history: true, leaked: true }),
+  }
+  await assert.rejects(
+    () =>
+      checkPropertyIsolation(
+        page,
+        TARGET.origin,
+        [{ property: 'forbidden', marker: 'sentinel' }],
+        'allowed',
+      ),
+    /FORGED_PROPERTY_ISOLATION_FAILED/,
+  )
+})
+test('forged property checks restore the allowed property after both denials', async () => {
+  const cookies = []
+  const page = {
+    setCookie: async (cookie) => cookies.push(cookie.value),
+    goto: async () => {},
+    evaluate: async () => ({ history: true, leaked: false }),
+  }
+  await checkPropertyIsolation(
+    page,
+    TARGET.origin,
+    [
+      { property: 'same-tenant', marker: 'first' },
+      { property: 'cross-tenant', marker: 'second' },
+    ],
+    'allowed',
+  )
+  assert.deepEqual(cookies, ['same-tenant', 'cross-tenant', 'allowed'])
+})
+test('web recovery identity must derive from the saved APP_VERSION', () => {
+  assert.doesNotThrow(() =>
+    assertRecoverySourceBinding(
+      'services:\n  web:\n    environment:\n      UVANOO_RECOVERY_SOURCE_SHA: ${APP_VERSION}\n  other:\n',
+    ),
+  )
+  assert.throws(
+    () =>
+      assertRecoverySourceBinding(
+        'services:\n  web:\n    environment:\n      UVANOO_RECOVERY_SOURCE_SHA: stale\n',
+      ),
+    /RECOVERY_SOURCE_BINDING_MISMATCH/,
+  )
+})
 test('environment patch rejects duplicates and preserves secrets', () => {
   assert.equal(
     patchEnv('IMAGE=old\nSECRET=untouched\n', { IMAGE: 'new' }),
@@ -139,7 +246,14 @@ test('successful rollout runs preflight and post-activation smoke', async () => 
     [false, true],
   )
 })
-for (const gate of ['verifyCI', 'verifyImage', 'preflight', 'smoke', 'assertUnchanged']) {
+for (const gate of [
+  'verifyCI',
+  'verifyImage',
+  'preflight',
+  'verifyActivationSafety',
+  'smoke',
+  'assertUnchanged',
+]) {
   test(`${gate} failure never mutates`, async () => {
     const { io, calls } = fixture({ [gate]: [1] })
     await assert.rejects(release(io, request))

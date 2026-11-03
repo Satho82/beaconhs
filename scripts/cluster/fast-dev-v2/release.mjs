@@ -15,21 +15,17 @@ export function plan(base, sha, changes, ancestor) {
   requireValue(/^[a-f0-9]{40}$/.test(base) && /^[a-f0-9]{40}$/.test(sha), 'INVALID_SOURCE')
   const paths = parseChanges(changes).flatMap((change) => change.paths)
   const categories = [...new Set(paths.flatMap(classifyPath))].sort()
-  const sensitive = paths.some((p) =>
-    /(?:auth|permission|tenant|wopi|collabora|recovery|migration|schema|middleware|proxy|instrumentation|security)/i.test(
-      p,
-    ),
-  )
-  const applicationPathsOnly = paths.every(
-    (p) =>
-      /^(?:apps\/web\/(?:src|public)\/|packages\/ui\/src\/|docs\/(?:screenshots|user-guide)\/)/.test(
-        p,
-      ) || p === 'README.md',
+  // Source files can contain authorization checks anywhere. Only explicitly
+  // reviewed static paths may enter FAST; every source or unknown path is controlled.
+  const staticOnly = paths.every(
+    (path) =>
+      path === 'README.md' ||
+      /^docs\/user-guide\/[A-Za-z0-9_./-]+\.md$/.test(path) ||
+      /^apps\/web\/public\/[A-Za-z0-9_./-]+\.(?:png|jpe?g|webp|ico)$/i.test(path),
   )
   const routine =
     ancestor &&
-    applicationPathsOnly &&
-    !sensitive &&
+    staticOnly &&
     categories.every((c) => ['WEB LOGIC', 'UI PRESENTATION', 'SHARED UI', 'DOCS ONLY'].includes(c))
   return {
     base,
@@ -39,7 +35,7 @@ export function plan(base, sha, changes, ancestor) {
     categories,
     databaseRestoreRequired: !routine,
     reason: routine
-      ? 'Application-only diff; schema and infrastructure unchanged'
+      ? 'Explicitly allowlisted static paths only'
       : 'Sensitive, shared, infrastructure or unknown change requires controlled admission',
   }
 }
@@ -54,6 +50,45 @@ export function patchEnv(env, values) {
     result = result.replace(pattern, () => `${key}=${value}`)
   }
   return result
+}
+// Dokploy currently lacks an atomic conditional environment update and this
+// single-replica deployment has no proven document-save drain. Never activate
+// FAST until those controls are implemented and independently rehearsed.
+export function assertLiveFastSafety() {
+  throw new Error('FAST_ACTIVATION_SAFETY_UNAVAILABLE')
+}
+export function assertBuildProvenance(log, sha, digest) {
+  requireValue(
+    /^[a-f0-9]{40}$/.test(sha) && /^sha256:[a-f0-9]{64}$/.test(digest),
+    'INVALID_CANDIDATE',
+  )
+  const clean = log.replace(/\x1b\[[0-9;]*m/g, '')
+  const lines = clean.split('\n').map((line) => line.replace(/^\S+\s+/, '').trim())
+  const tags = lines.filter((line) => line.startsWith('echo "IMAGE TAG='))
+  const digests = lines.filter((line) => line.startsWith('echo "IMAGE DIGEST='))
+  const candidates = lines.filter((line) => line.startsWith('echo "Immutable DEV candidate:'))
+  requireValue(
+    tags.length === 1 &&
+      tags[0] === `echo "IMAGE TAG=${TARGET.image}:v1.4-dev-${sha}"` &&
+      digests.length === 1 &&
+      digests[0] === `echo "IMAGE DIGEST=${digest}"` &&
+      candidates.length === 1 &&
+      candidates[0] === `echo "Immutable DEV candidate: ${TARGET.image}@${digest}"`,
+    'IMAGE_BUILD_PROVENANCE_MISMATCH',
+  )
+}
+export function assertRecoverySourceBinding(composeFile) {
+  const services = composeFile.split(/^  (?=[A-Za-z0-9_-]+:\s*$)/m)
+  const web = services.filter((service) => /^web:\s*$/m.test(service.split('\n')[0]))
+  requireValue(web.length === 1, 'WEB_SERVICE_BINDING_MISSING')
+  const references = web[0]
+    .split('\n')
+    .filter((line) => /^\s*UVANOO_RECOVERY_SOURCE_SHA\s*:/.test(line))
+  requireValue(
+    references.length === 1 &&
+      /^      UVANOO_RECOVERY_SOURCE_SHA:\s*\$\{APP_VERSION\}\s*$/.test(references[0]),
+    'RECOVERY_SOURCE_BINDING_MISMATCH',
+  )
 }
 export async function persistConfiguration(io, from, to) {
   const current = await io.compose()
@@ -81,7 +116,7 @@ export async function release(io, request) {
   const before = await io.snapshot()
   const diff = await io.diff(before.sha, request.sha)
   const impact = plan(before.sha, request.sha, diff.changes, diff.ancestor)
-  await io.verifyCI(request.sha)
+  await io.verifyCI(request.sha, request.digest)
   await io.verifyImage(request.sha, request.digest)
   await io.preflight(before)
   await io.record('plan', {
@@ -96,6 +131,7 @@ export async function release(io, request) {
     'OWNER_ENABLEMENT_AND_COMPATIBILITY_REQUIRED',
   )
   requireValue(impact.mode === 'fast', 'CONTROLLED_ADMISSION_REQUIRED')
+  await io.verifyActivationSafety()
   await io.verifyImage(before.sha, before.digest)
   // Smoke before mutation catches missing credentials and existing failures, avoiding false rollback.
   await io.smoke(before.sha, false)

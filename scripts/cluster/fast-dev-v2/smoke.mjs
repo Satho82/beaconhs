@@ -1,7 +1,9 @@
 import { createRequire } from 'node:module'
+import { execFileSync } from 'node:child_process'
 import { resolve } from 'node:path'
 import { TARGET, requireValue as check } from './release.mjs'
 import { submitHandover } from './submit.mjs'
+import { checkPropertyIsolation } from './isolation.mjs'
 
 // Reuse the workspace's pinned browser client. No saved interactive admin session.
 const require = createRequire(resolve('packages/forms-pdf/package.json'))
@@ -15,12 +17,47 @@ try {
     DEV_SMOKE_PASSWORD: password,
     DEV_SMOKE_PROPERTY_ID: property,
     DEV_SMOKE_FORBIDDEN_PROPERTY_ID: forbidden,
+    DEV_SMOKE_CROSS_TENANT_PROPERTY_ID: crossTenant,
+    DEV_SMOKE_FORBIDDEN_SENTINEL: forbiddenSentinel,
+    DEV_SMOKE_CROSS_TENANT_SENTINEL: crossSentinel,
     DEV_SMOKE_BROWSER: executablePath,
   } = process.env
   check(
-    email && password && property && forbidden && property !== forbidden && executablePath,
+    email &&
+      password &&
+      property &&
+      forbidden &&
+      crossTenant &&
+      executablePath &&
+      new Set([property, forbidden, crossTenant]).size === 3 &&
+      [property, forbidden, crossTenant].every((id) => /^[a-f0-9-]{36}$/.test(id)) &&
+      [forbiddenSentinel, crossSentinel].every((value) =>
+        /^DEV-ISOLATION-SENTINEL-[a-f0-9]{32}$/.test(value),
+      ) &&
+      forbiddenSentinel !== crossSentinel,
     'SMOKE_FIXTURE_REQUIRED',
   )
+  // Prove that both inaccessible records exist before testing their absence.
+  const inventory = execFileSync(
+    'docker',
+    [
+      'exec',
+      'uvanoo-dev-postgres',
+      'psql',
+      '-X',
+      '-qAt',
+      '-v',
+      'ON_ERROR_STOP=1',
+      '-U',
+      'uvanoo_dev',
+      '-d',
+      'uvanoo_dev',
+      '-c',
+      `BEGIN READ ONLY; SELECT (SELECT count(*) FROM hospitality_handovers WHERE property_id='${forbidden}' AND note='${forbiddenSentinel}'), (SELECT count(*) FROM hospitality_handovers WHERE property_id='${crossTenant}' AND note='${crossSentinel}'); ROLLBACK;`,
+    ],
+    { encoding: 'utf8', timeout: 10000 },
+  ).trim()
+  check(inventory === '1|1', 'ISOLATION_SENTINELS_MISSING')
   browser = await puppeteer.launch({ executablePath, headless: true })
   const page = await browser.newPage()
   page.setDefaultTimeout(30000)
@@ -65,6 +102,15 @@ try {
     properties.includes(property) && !properties.includes(forbidden),
     'PROPERTY_SCOPE_SMOKE_FAILED',
   )
+  await checkPropertyIsolation(
+    page,
+    TARGET.origin,
+    [
+      { property: forbidden, marker: forbiddenSentinel },
+      { property: crossTenant, marker: crossSentinel },
+    ],
+    property,
+  )
   let marker
   if (process.argv.includes('--create')) {
     marker = `DEV automated release smoke ${sha.slice(0, 12)} ${Date.now()}; no operational follow-up required`
@@ -92,6 +138,7 @@ try {
       current: 'PASS',
       history: 'PASS',
       propertyScope: 'PASS',
+      forgedPropertyIsolation: 'PASS',
       createdTestRecord: Boolean(marker),
     }),
   )

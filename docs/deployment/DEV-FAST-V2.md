@@ -1,6 +1,6 @@
 # DEV deployment V2
 
-Status: additive replacement under review; execution disabled until owner approval.
+Status: additive replacement under review; execution is fail-closed pending unresolved safety controls.
 The live release, original release workflows, backups, recovery evidence and maintenance
 watchdog remain unchanged. This document applies only to `dev.uvanoo.com` and
 `uvanoo_dev`; it does not change production or legacy procedures.
@@ -21,10 +21,12 @@ watchdog remain unchanged. This document applies only to `dev.uvanoo.com` and
 ## FAST DEV
 
 1. Existing Full Release CI validates and publishes the exact immutable feature image.
-2. Owner dispatches **Uvanoo DEV deploy V2**, mode `fast`, exact SHA and digest,
+2. Once the safety controls below are resolved, owner dispatches **Uvanoo DEV deploy V2**, mode `fast`, exact SHA and digest,
    `execute=true`, and confirms backward-compatible application writes.
-3. The runner checks actual live source, immutable image labels, successful authoritative
-   CI jobs, target identities, the small migration ledger against deployed source, infrastructure health, background-job pause and configuration drift.
+3. The runner checks actual live source, immutable image labels, the digest recorded by
+   the exact successful authoritative CI publish job, target identities, the small
+   migration ledger against deployed source, infrastructure health, background-job
+   pause and configuration drift. Missing or ambiguous provenance fails closed.
 4. A normal, dedicated tenant test account checks Current Handover, History and property
    scope. The rollout changes only web image and version, then repeats readiness and
    creates one clearly labelled Handover smoke record, verifying it in History.
@@ -34,15 +36,20 @@ watchdog remain unchanged. This document applies only to `dev.uvanoo.com` and
 Expected duration: **5–15 minutes after image availability**, excluding CI, runner queues
 and first-time dependency installation. This is a target, not a measured production SLA.
 No full restore, database-wide reconciliation or repeated tenant scan is required in FAST.
-Changes to database, tenant/auth code, permissions, storage, workers, WOPI, infrastructure,
-dependencies or unknown/shared paths route to CONTROLLED. A diff classifier cannot prove
-semantic compatibility; the owner's compatibility assertion and CI are both required.
+Only explicit static image and documentation paths are eligible; all source changes,
+unknown paths and sensitive/shared files route to CONTROLLED. A diff classifier cannot
+prove semantic compatibility; the owner's compatibility assertion and CI are both required.
+FAST activation is currently blocked in code: Dokploy does not expose an atomic conditional
+environment update, and the single web replica lacks a verified document-save drain or
+proven uninterrupted cutover. These controls and a real rollback rehearsal are required
+before activation can be enabled.
 
 ## CONTROLLED DEV
 
-Select `controlled` with the exact source and existing approved evidence/policy pins.
-V2 dispatches and waits for the existing `deploy-v1.4-dev-candidate.yml`; it does not
-claim success when dispatch merely succeeds. Migration compatibility, encrypted backup,
+Use the existing `deploy-v1.4-dev-candidate.yml` directly with the exact source and
+existing approved evidence/policy pins. V2 controlled execution fails closed because
+the GitHub dispatch API does not return the dispatched run ID and a competing same-SHA
+run could otherwise be misidentified. The V2 controlled dry run remains available. Migration compatibility, encrypted backup,
 restore/rollback verification, scoped tenant/storage integrity and source-bound admission
 remain enforced by that mechanism. Destructive changes require explicit separate approval.
 
@@ -69,16 +76,22 @@ Do not enable or merge for activation merely because CI passes.
 - Set repository secrets `DEV_SMOKE_EMAIL`, `DEV_SMOKE_PASSWORD` for a dedicated active
   DEV tenant member with Handover permission, never a Platform Admin session.
 - Set variables `DEV_SMOKE_PROPERTY_ID` (authorized fixture),
-  `DEV_SMOKE_FORBIDDEN_PROPERTY_ID` (known property in another tenant), and
-  `DEV_SMOKE_BROWSER` (sandbox-capable Chromium executable path).
+  `DEV_SMOKE_FORBIDDEN_PROPERTY_ID` (unassigned property in the same test tenant),
+  `DEV_SMOKE_CROSS_TENANT_PROPERTY_ID` (property in a second isolated test tenant),
+  `DEV_SMOKE_FORBIDDEN_SENTINEL` and `DEV_SMOKE_CROSS_TENANT_SENTINEL` (unique labelled
+  Handover records proving both forbidden-property checks), and `DEV_SMOKE_BROWSER`
+  (sandbox-capable Chromium executable path). The smoke verifies the two records exist
+  before forging each property cookie and checking no sentinel reaches the browser.
 - Set `DEV_FAST_V2_ENABLED=true` only after approval. Default is disabled. Only owner
   `Satho82` can dispatch; execution is restricted to the governed feature branch.
 - Run `execute=false` first. This reads runtime/configuration and checks CI, image,
   health and classification, but performs no deployment, smoke writes or database scans.
 
 The workflow uses the existing `deploy-dev` concurrency group. Local operators must use
-its flock lock too and avoid simultaneous external Dokploy edits. Config comparison fails
-closed on drift; this is operational coordination, not technical exclusion of root.
+its flock lock too. An independent Dokploy edit can race the GET/compare/save sequence;
+the lock is not shared with Dokploy and cannot prevent lost updates. FAST therefore
+remains disabled until atomic conditional persistence or a genuinely shared exclusion is
+implemented and verified.
 Registry login uses a temporary private directory removed on exit. No credentials are
 included in journals. Existing backups and recovery evidence are never pruned.
 

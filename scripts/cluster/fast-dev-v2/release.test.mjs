@@ -2,7 +2,13 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
-import { checkPropertyIsolation, payloadContainsSentinel } from './isolation.mjs'
+import { createServer } from 'node:http'
+import { gzipSync } from 'node:zlib'
+import {
+  checkPropertyIsolation,
+  payloadContainsSentinel,
+  readBoundedResponse,
+} from './isolation.mjs'
 import { assertAuthoritativeIdentity, assertVerifierIntegrity } from './identity.mjs'
 import {
   assertBuildProvenance,
@@ -136,15 +142,18 @@ function isolationPage({ found = false, hiddenLeak = false, searches = [] } = {}
     setCookie: async () => {},
     goto: async (url) => {
       searches.push(url)
-      const marker = isolationMarkers.find((value) => url.includes(value.slice(-16)))
-      return {
-        ok: () => true,
-        headers: () => ({}),
-        text: async () =>
-          (found || hiddenLeak) && marker ? `<script>${marker}</script>` : '<html></html>',
-      }
+      return { ok: () => true }
     },
-    evaluate: async () => ({ history: true, visible: found, dom: found }),
+    evaluate: async (fn, url) => {
+      if (fn === readBoundedResponse) {
+        const marker = isolationMarkers.find((value) => url.includes(value.slice(-16)))
+        return {
+          code: 'OK',
+          payload: (found || hiddenLeak) && marker ? `<script>${marker}</script>` : '<html></html>',
+        }
+      }
+      return { history: true, visible: found, dom: found }
+    },
   }
 }
 test('forged property checks require a positive control and reject visible or serialized leaks', async () => {
@@ -204,43 +213,48 @@ test('oversized or deeply encoded payloads fail closed', () => {
     /ISOLATION_PAYLOAD_TOO_LARGE/,
   )
 })
-test('oversized declared response is rejected before reading its body', async () => {
-  let read = false
-  const page = {
-    setCookie: async () => {},
-    goto: async () => ({
-      ok: () => true,
-      headers: () => ({ 'content-length': String(3 * 1024 * 1024) }),
-      text: async () => {
-        read = true
-        return ''
-      },
-    }),
+test('chunked and compressed decoded responses stop at the byte cap', async () => {
+  const oversized = Buffer.alloc(2 * 1024 * 1024 + 1, 97)
+  const compressed = gzipSync(oversized)
+  const server = createServer((request, response) => {
+    if (request.url === '/compressed') {
+      response.writeHead(200, { 'content-encoding': 'gzip', 'content-length': compressed.length })
+      response.end(compressed)
+    } else if (request.url === '/chunked') {
+      response.writeHead(200, { 'transfer-encoding': 'chunked' })
+      response.end(oversized)
+    } else {
+      response.writeHead(200, { 'transfer-encoding': 'chunked' })
+      response.end('small')
+    }
+  })
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve))
+  try {
+    const origin = `http://127.0.0.1:${server.address().port}`
+    assert.equal((await readBoundedResponse(origin + '/small', 2 * 1024 * 1024)).payload, 'small')
+    assert.equal(
+      (await readBoundedResponse(origin + '/chunked', 2 * 1024 * 1024)).code,
+      'ISOLATION_PAYLOAD_TOO_LARGE',
+    )
+    assert.equal(
+      (await readBoundedResponse(origin + '/compressed', 2 * 1024 * 1024)).code,
+      'ISOLATION_PAYLOAD_TOO_LARGE',
+    )
+  } finally {
+    server.closeAllConnections()
+    await new Promise((resolve) => server.close(resolve))
   }
-  await assert.rejects(
-    () =>
-      checkPropertyIsolation(
-        page,
-        page,
-        TARGET.origin,
-        [{ tenant: 'tenant', property: 'forbidden', marker: isolationMarkers[0] }],
-        'allowed',
-      ),
-    /ISOLATION_PAYLOAD_TOO_LARGE/,
-  )
-  assert.equal(read, false)
 })
 test('escaped forbidden sentinel in hidden payload fails isolation', async () => {
   const marker = isolationMarkers[0]
   const escaped = marker.replaceAll('-', String.raw`\u002d`)
   const negative = {
     setCookie: async () => {},
-    goto: async () => ({
-      ok: () => true,
-      headers: () => ({}),
-      text: async () => `<script>${escaped}</script>`,
-    }),
-    evaluate: async () => ({ history: true, visible: false, dom: false }),
+    goto: async () => ({ ok: () => true }),
+    evaluate: async (fn) =>
+      fn === readBoundedResponse
+        ? { code: 'OK', payload: `<script>${escaped}</script>` }
+        : { history: true, visible: false, dom: false },
   }
   await assert.rejects(
     () =>

@@ -179,8 +179,40 @@ def validate_stop_event(boundary,raw,bootstrap):
     require(timestamp(boundary["stoppedAt"]) >= timestamp(bootstrap["stopRequestedAt"]))
     require(not any(e["Action"] == "oom" and e["Actor"]["ID"] == boundary["containerId"] for e in events))
 
+def capture_proxy(config):
+    # A file hash alone does not prove Traefik loaded a deny-all capture route.
+    # Pin the actual proxy identity and parsed runtime configuration as well.
+    from capture_fence_guard import validate_loaded_proxy
+    proof = config["captureProxy"]
+    require(set(proof) == {"router", "middleware", "fencePath", "fenceSha256",
+                           "proxyId", "proxyStartedAt", "loadedConfigSha256"})
+    for key in ("router", "middleware"):
+        import re
+        require(re.fullmatch(r"uvanoo-dev-[a-z0-9-]+", proof[key]) is not None)
+    path = Path(proof["fencePath"])
+    require(path.parent == Path("/etc/dokploy/traefik/dynamic") and path.resolve() == path)
+    require(config["editingFenceHashes"].get(str(path)) == proof["fenceSha256"])
+    require(digest(path.read_bytes()) == proof["fenceSha256"])
+    found = docker(["inspect", "dokploy-traefik"])
+    require(len(found) == 1)
+    proxy = found[0]
+    require(proxy["Id"] == proof["proxyId"] and proxy["State"]["Running"] is True)
+    require(proxy["State"]["StartedAt"] == proof["proxyStartedAt"])
+    pid = proxy["State"]["Pid"]
+    require(type(pid) is int and pid > 0)
+    raw = execute(["nsenter", "-t", str(pid), "-n", "curl", "--silent", "--show-error",
+                   "--max-time", "1", "http://127.0.0.1:8080/api/rawdata"])
+    observed = validate_loaded_proxy(json.loads(raw), proof["router"], proof["middleware"])
+    require(observed == proof["loadedConfigSha256"])
+    again = docker(["inspect", "dokploy-traefik"])[0]
+    require(again["Id"] == proxy["Id"] and again["State"]["Pid"] == pid and
+            again["State"]["StartedAt"] == proxy["State"]["StartedAt"] and
+            again["State"]["Running"] is True)
+    return observed
+
 def collabora(config):
     # Reuse the governed validator; never infer a historical interval from stopped tasks.
+    proxy_hash = capture_proxy(config)
     sys.path.insert(0,str(Path(__file__).parent))
     require(digest(Path(__file__).with_name("observe_collabora_interval.py").read_bytes()) == config["intervalValidatorSha256"])
     from observe_collabora_interval import validate_samples
@@ -245,6 +277,7 @@ def collabora(config):
         "taskCoverageSha256":digest(canonical(boundaries)),
         "completionWatermark":interval["completionWatermark"],
         "bootstrapReceiptSha256":config["bootstrapReceiptSha256"],
+        "captureProxyConfigSha256":proxy_hash,
         "approvalReceiptSha256":config["historicalApprovalReceiptSha256"],"epoch":config["epoch"]}
 
 

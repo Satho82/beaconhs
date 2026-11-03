@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto'
 import { execFileSync } from 'node:child_process'
 import { readFileSync, appendFileSync, mkdirSync, openSync, fstatSync, constants } from 'node:fs'
 import { resolve } from 'node:path'
-import { TARGET, patchEnv, release, requireValue as check } from './release.mjs'
+import { TARGET, persistConfiguration, release, requireValue as check } from './release.mjs'
 import { verifyReadiness, liveIO } from '../dev-readiness.mjs'
 import { readinessFetch } from './streaming-redirect.mjs'
 
@@ -198,15 +198,7 @@ const io = {
     check(JSON.stringify(now) === JSON.stringify(before), 'CONCURRENT_CONFIGURATION_CHANGE')
   },
   async persist(from, to) {
-    const d = await compose()
-    const wanted = patchEnv(to.env, { IMAGE: image(to.digest), APP_VERSION: to.sha })
-    const expected = patchEnv(from.env, { IMAGE: image(from.digest), APP_VERSION: from.sha })
-    check(
-      d.composeFile === from.composeFile && [expected, wanted].includes(d.env),
-      'CONFIG_DRIFT_DO_NOT_OVERWRITE',
-    )
-    await api('update', { composeId: TARGET.composeId, env: wanted, composeFile: d.composeFile })
-    check((await compose()).env === wanted, 'CONFIG_PERSISTENCE_FAILED')
+    await persistConfiguration({ compose, api }, from, to)
   },
   async rollout(to) {
     // Only web changes. Do not redeploy the entire stack or wake historical jobs.

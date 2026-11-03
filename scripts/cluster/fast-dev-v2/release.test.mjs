@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { plan, patchEnv, release, TARGET } from './release.mjs'
+import { plan, patchEnv, persistConfiguration, release, TARGET } from './release.mjs'
 const base = 'a'.repeat(40),
   sha = 'b'.repeat(40),
   digest = 'sha256:' + 'c'.repeat(64)
@@ -74,6 +74,57 @@ test('environment patch rejects duplicates and preserves secrets', () => {
     'IMAGE=new\nSECRET=untouched\n',
   )
   assert.throws(() => patchEnv('IMAGE=x\nIMAGE=y', { IMAGE: 'z' }))
+})
+test('configuration persistence uses only the scoped environment endpoint', async () => {
+  const previous = {
+    sha: base,
+    digest,
+    env: `IMAGE=${TARGET.image}@${digest}\nAPP_VERSION=${base}\nSECRET=kept`,
+    composeFile: 'unchanged',
+  }
+  const next = { ...previous, sha }
+  let current = { env: previous.env, composeFile: previous.composeFile }
+  const calls = []
+  await persistConfiguration(
+    {
+      compose: async () => current,
+      api: async (method, body) => {
+        calls.push([method, body])
+        current = { ...current, env: body.env }
+      },
+    },
+    previous,
+    next,
+  )
+  assert.equal(calls[0][0], 'saveEnvironment')
+  assert.deepEqual(Object.keys(calls[0][1]).sort(), ['composeId', 'env'])
+  assert.equal(calls[0][1].composeId, TARGET.composeId)
+  assert.match(current.env, /SECRET=kept/)
+  assert.match(current.env, new RegExp(`APP_VERSION=${sha}`))
+})
+test('configuration persistence rejects drift before any write', async () => {
+  let writes = 0
+  const from = {
+    sha: base,
+    digest,
+    env: `IMAGE=${TARGET.image}@${digest}\nAPP_VERSION=${base}`,
+    composeFile: 'expected',
+  }
+  await assert.rejects(
+    () =>
+      persistConfiguration(
+        {
+          compose: async () => ({ env: from.env, composeFile: 'changed' }),
+          api: async () => {
+            writes++
+          },
+        },
+        from,
+        { ...from, sha },
+      ),
+    /CONFIG_DRIFT_DO_NOT_OVERWRITE/,
+  )
+  assert.equal(writes, 0)
 })
 test('dry run never mutates or performs write smoke', async () => {
   const { io, calls } = fixture()

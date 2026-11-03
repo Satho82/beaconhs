@@ -55,6 +55,22 @@ export function patchEnv(env, values) {
   }
   return result
 }
+export async function persistConfiguration(io, from, to) {
+  const current = await io.compose()
+  const image = (digest) => `${TARGET.image}@${digest}`
+  const wanted = patchEnv(to.env, { IMAGE: image(to.digest), APP_VERSION: to.sha })
+  const expected = patchEnv(from.env, { IMAGE: image(from.digest), APP_VERSION: from.sha })
+  requireValue(
+    current.composeFile === from.composeFile && [expected, wanted].includes(current.env),
+    'CONFIG_DRIFT_DO_NOT_OVERWRITE',
+  )
+  await io.api('saveEnvironment', { composeId: TARGET.composeId, env: wanted })
+  const saved = await io.compose()
+  requireValue(
+    saved.env === wanted && saved.composeFile === from.composeFile,
+    'CONFIG_PERSISTENCE_FAILED',
+  )
+}
 export async function release(io, request) {
   requireValue(request.repository === TARGET.repository, 'WRONG_REPOSITORY')
   requireValue(

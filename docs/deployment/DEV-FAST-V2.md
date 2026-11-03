@@ -62,7 +62,9 @@ Do not enable or merge for activation merely because CI passes.
   The runner must have access to the DEV-only lock file `/opt/uvanoo-dev/dev-v2-deploy.lock`.
   Store the service-scoped token at `/opt/uvanoo-dev/fast-v2-credentials/dokploy.token`
   with owner-only read access for the runner. Verify the token cannot access non-DEV
-  services or the Dokploy Docker API, and rotate it before its expiry. Never copy
+  services or the Dokploy Docker API, and rotate it before its expiry. Grant only
+  the DEV environment and service; configuration persistence uses Dokploy
+  `saveEnvironment` and does not require service-creation access. Never copy
   the root-owned maintenance token into the runner account.
 - Set repository secrets `DEV_SMOKE_EMAIL`, `DEV_SMOKE_PASSWORD` for a dedicated active
   DEV tenant member with Handover permission, never a Platform Admin session.

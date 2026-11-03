@@ -42,7 +42,13 @@ const groups = [
 describe('expandable sidebar', () => {
   it('renders one unified navigation with legacy destinations nested only under modules', async () => {
     const legacyGroups = [
-      { label: 'Overview', items: [{ href: '/feed', label: 'Feed', iconKey: 'rss' }] },
+      {
+        label: 'Overview',
+        items: [
+          { href: '/dashboard', label: 'Dashboard', iconKey: 'gauge' },
+          { href: '/feed', label: 'Feed', iconKey: 'rss' },
+        ],
+      },
       { label: 'Frontline', items: [{ href: '/journals', label: 'Journals', iconKey: 'journal' }] },
       {
         label: 'Administration',
@@ -58,10 +64,11 @@ describe('expandable sidebar', () => {
     expect(host.querySelectorAll('h2')).toHaveLength(0)
     expect(
       [...host.querySelectorAll('button[aria-expanded]')].map((button) => button.textContent),
-    ).toEqual(['Dashboard', 'Diary & Tasks'])
+    ).toEqual(['Diary & Tasks'])
     const feed = host.querySelector('a[href="/feed"]')!
     const diary = host.querySelector('a[href="/journals"]')!
-    expect(feed.closest('.uvanoo-nav-children')).not.toBeNull()
+    expect(feed.closest('.uvanoo-nav-children')).toBeNull()
+    expect(host.querySelector('a[href="/dashboard"]')).not.toBeNull()
     expect(diary.closest('.uvanoo-nav-children')).not.toBeNull()
     expect(host.querySelector('a[href="/admin/settings"]')).toBeNull()
     expect(host.textContent).not.toMatch(/Frontline|Administration|Knowledge|Assurance/)

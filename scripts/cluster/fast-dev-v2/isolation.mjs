@@ -115,6 +115,9 @@ async function findSentinel(page, origin, { property, tenant, marker }) {
   const fetched = payloadContainsSentinel(bounded.payload, marker)
   const observed = await page.evaluate(
     (marker, maxBytes) => {
+      // outerHTML is materialized before its size is checked, so this is not a
+      // hard memory bound on renderer allocation. FAST stays disabled until a
+      // genuinely bounded same-response verification method is validated.
       const html = document.documentElement.outerHTML
       if (html.length > maxBytes) return { code: 'ISOLATION_PAYLOAD_TOO_LARGE' }
       const encoder = new TextEncoder()

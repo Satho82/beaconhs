@@ -20,6 +20,9 @@ jobs:
           node --test scripts/cluster/fast-dev-v2/release.test.mjs scripts/cluster/dev-readiness.test.mjs
           node --check scripts/cluster/fast-dev-v2/run.mjs
           node --check scripts/cluster/fast-dev-v2/smoke.mjs
+          node --check scripts/cluster/fast-dev-v2/identity.mjs
+          node --check scripts/cluster/fast-dev-v2/isolation.mjs
+          python3 -B scripts/cluster/fast-dev-v2/test_verify_fixture_session.py
           node --check scripts/cluster/fast-dev-v2/controlled.mjs
           bash scripts/ci/v1.4-dev-candidate-deploy-contract.test.sh
           git diff --exit-code a8009246e841c03f2ab28ac294b127477d72d3c2 -- .github/workflows/deploy-dev.yml .github/workflows/ci.yml .github/workflows/deploy-v1.4-dev-candidate.yml scripts/cluster/dev-recovery packages/db/src/dev-safety-monitor.ts

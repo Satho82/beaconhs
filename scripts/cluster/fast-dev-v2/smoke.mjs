@@ -4,6 +4,7 @@ import { resolve } from 'node:path'
 import { TARGET, requireValue as check } from './release.mjs'
 import { submitHandover } from './submit.mjs'
 import { checkPropertyIsolation } from './isolation.mjs'
+import { assertAuthoritativeIdentity, readDatabaseSession } from './identity.mjs'
 
 // Reuse the workspace's pinned browser client. No saved interactive admin session.
 const require = createRequire(resolve('packages/forms-pdf/package.json'))
@@ -20,11 +21,21 @@ try {
     DEV_SMOKE_CROSS_TENANT_PROPERTY_ID: crossTenant,
     DEV_SMOKE_FORBIDDEN_SENTINEL: forbiddenSentinel,
     DEV_SMOKE_CROSS_TENANT_SENTINEL: crossSentinel,
+    DEV_SMOKE_AUDITOR_EMAIL: auditorEmail,
+    DEV_SMOKE_AUDITOR_PASSWORD: auditorPassword,
+    DEV_SMOKE_SAME_TENANT_ID: sameTenant,
+    DEV_SMOKE_CROSS_TENANT_ID: crossTenantId,
     DEV_SMOKE_BROWSER: executablePath,
   } = process.env
   check(
     email &&
       password &&
+      auditorEmail &&
+      auditorPassword &&
+      sameTenant &&
+      crossTenantId &&
+      sameTenant !== crossTenantId &&
+      [sameTenant, crossTenantId].every((id) => /^[a-f0-9-]{36}$/.test(id)) &&
       property &&
       forbidden &&
       crossTenant &&
@@ -86,15 +97,11 @@ try {
     const response = await fetch('/api/auth/get-session')
     const data = await response.json()
     return {
-      email: data?.user?.email,
-      impersonating: Boolean(data?.session?.impersonatedBy),
-      superAdmin: Boolean(data?.user?.isSuperAdmin),
+      user: { id: data?.user?.id, email: data?.user?.email },
+      session: { id: data?.session?.id, userId: data?.session?.userId },
     }
   })
-  check(
-    identity.email === email && !identity.impersonating && !identity.superAdmin,
-    'DEDICATED_TENANT_MEMBER_REQUIRED',
-  )
+  assertAuthoritativeIdentity(identity, email, readDatabaseSession)
   const properties = await page.$$eval('select[name="propertyId"] option', (options) =>
     options.map((option) => option.value),
   )
@@ -102,15 +109,49 @@ try {
     properties.includes(property) && !properties.includes(forbidden),
     'PROPERTY_SCOPE_SMOKE_FAILED',
   )
+  const auditContext = await browser.createBrowserContext()
+  const auditor = await auditContext.newPage()
+  auditor.setDefaultTimeout(30000)
+  await auditor.setRequestInterception(true)
+  auditor.on('request', (request) => {
+    const url = new URL(request.url())
+    if (url.origin === TARGET.origin || ['data:', 'blob:'].includes(url.protocol))
+      request.continue()
+    else request.abort()
+  })
+  await auditor.goto(TARGET.origin + '/login', { waitUntil: 'networkidle2' })
+  const auditorSignedIn = await auditor.evaluate(
+    async ({ email, password }) => {
+      const response = await fetch('/api/auth/sign-in/email', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      })
+      return response.ok
+    },
+    { email: auditorEmail, password: auditorPassword },
+  )
+  check(auditorSignedIn, 'AUDITOR_LOGIN_FAILED')
+  const auditorIdentity = await auditor.evaluate(async () => {
+    const response = await fetch('/api/auth/get-session')
+    const data = await response.json()
+    return {
+      user: { id: data?.user?.id, email: data?.user?.email },
+      session: { id: data?.session?.id, userId: data?.session?.userId },
+    }
+  })
+  assertAuthoritativeIdentity(auditorIdentity, auditorEmail, readDatabaseSession)
   await checkPropertyIsolation(
     page,
+    auditor,
     TARGET.origin,
     [
-      { property: forbidden, marker: forbiddenSentinel },
-      { property: crossTenant, marker: crossSentinel },
+      { tenant: sameTenant, property: forbidden, marker: forbiddenSentinel },
+      { tenant: crossTenantId, property: crossTenant, marker: crossSentinel },
     ],
     property,
   )
+  await auditContext.close()
   let marker
   if (process.argv.includes('--create')) {
     marker = `DEV automated release smoke ${sha.slice(0, 12)} ${Date.now()}; no operational follow-up required`

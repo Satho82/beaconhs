@@ -79,9 +79,18 @@ Do not enable or merge for activation merely because CI passes.
   `DEV_SMOKE_FORBIDDEN_PROPERTY_ID` (unassigned property in the same test tenant),
   `DEV_SMOKE_CROSS_TENANT_PROPERTY_ID` (property in a second isolated test tenant),
   `DEV_SMOKE_FORBIDDEN_SENTINEL` and `DEV_SMOKE_CROSS_TENANT_SENTINEL` (unique labelled
-  Handover records proving both forbidden-property checks), and `DEV_SMOKE_BROWSER`
-  (sandbox-capable Chromium executable path). The smoke verifies the two records exist
-  before forging each property cookie and checking no sentinel reaches the browser.
+  Handover records proving both forbidden-property checks), `DEV_SMOKE_SAME_TENANT_ID`,
+  `DEV_SMOKE_CROSS_TENANT_ID`, and `DEV_SMOKE_BROWSER` (sandbox-capable Chromium path).
+  Configure `DEV_SMOKE_AUDITOR_EMAIL` and `DEV_SMOKE_AUDITOR_PASSWORD` as secrets for a
+  separate read-only fixture user scoped only to the two sentinel properties. The smoke
+  searches each unique marker and requires the auditor to find it while the restricted
+  user cannot, avoiding false passes caused by pagination.
+  The session verifier is a root-owned, source-hash-checked command with a root-owned
+  pinned identity manifest; it returns only PASS/DENY for the two fixture accounts using
+  the existing read-only backup DB role. It does not expose a database password to the
+  runner. The current `ubuntu` runner nevertheless has pre-existing unrestricted sudo
+  and Docker access, so it is not least-privileged. Activation requires an isolated
+  dedicated runner or broker with a reviewed restricted privilege boundary.
 - Set `DEV_FAST_V2_ENABLED=true` only after approval. Default is disabled. Only owner
   `Satho82` can dispatch; execution is restricted to the governed feature branch.
 - Run `execute=false` first. This reads runtime/configuration and checks CI, image,

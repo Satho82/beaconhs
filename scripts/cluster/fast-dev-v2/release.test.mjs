@@ -3,6 +3,7 @@ import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { checkPropertyIsolation } from './isolation.mjs'
+import { assertAuthoritativeIdentity, assertVerifierIntegrity } from './identity.mjs'
 import {
   assertBuildProvenance,
   assertLiveFastSafety,
@@ -126,40 +127,103 @@ test('the candidate digest must match the exact successful build job record', ()
     /IMAGE_BUILD_PROVENANCE_MISMATCH/,
   )
 })
-test('forged property checks reject a leaked sentinel and never report success', async () => {
-  const page = {
+test('forged property checks require a positive control and reject a leaked sentinel', async () => {
+  const makePage = (found) => ({
     setCookie: async () => {},
     goto: async () => {},
-    evaluate: async () => ({ history: true, leaked: true }),
-  }
+    evaluate: async () => ({ history: true, found }),
+  })
+  const cases = [{ tenant: 'tenant', property: 'forbidden', marker: 'sentinel' }]
   await assert.rejects(
-    () =>
-      checkPropertyIsolation(
-        page,
-        TARGET.origin,
-        [{ property: 'forbidden', marker: 'sentinel' }],
-        'allowed',
-      ),
+    () => checkPropertyIsolation(makePage(false), makePage(false), TARGET.origin, cases, 'allowed'),
+    /ISOLATION_POSITIVE_CONTROL_FAILED/,
+  )
+  await assert.rejects(
+    () => checkPropertyIsolation(makePage(true), makePage(true), TARGET.origin, cases, 'allowed'),
     /FORGED_PROPERTY_ISOLATION_FAILED/,
   )
 })
-test('forged property checks restore the allowed property after both denials', async () => {
-  const cookies = []
-  const page = {
-    setCookie: async (cookie) => cookies.push(cookie.value),
-    goto: async () => {},
-    evaluate: async () => ({ history: true, leaked: false }),
-  }
+test('both positive and restricted checks search each marker before pagination', async () => {
+  const searches = []
+  const makePage = (found) => ({
+    setCookie: async () => {},
+    goto: async (url) => searches.push(url),
+    evaluate: async () => ({ history: true, found }),
+  })
   await checkPropertyIsolation(
-    page,
+    makePage(false),
+    makePage(true),
     TARGET.origin,
     [
-      { property: 'same-tenant', marker: 'first' },
-      { property: 'cross-tenant', marker: 'second' },
+      { tenant: 'one', property: 'first', marker: 'first-sentinel' },
+      { tenant: 'two', property: 'second', marker: 'second-sentinel' },
     ],
     'allowed',
   )
-  assert.deepEqual(cookies, ['same-tenant', 'cross-tenant', 'allowed'])
+  assert.equal(searches.filter((url) => url.includes('q=first-sentinel')).length, 2)
+  assert.equal(searches.filter((url) => url.includes('q=second-sentinel')).length, 2)
+})
+test('fixture verifier rejects stale files and unsafe ownership', () => {
+  const entries = Array.from({ length: 5 }, () => ({
+    uid: 0,
+    gid: 0,
+    mode: 0o755,
+    validType: true,
+  }))
+  const pin = 'a'.repeat(64)
+  assert.doesNotThrow(() => assertVerifierIntegrity('reviewed', 'reviewed', entries, pin))
+  assert.throws(
+    () => assertVerifierIntegrity('reviewed', 'stale', entries, pin),
+    /VERIFIER_SOURCE_MISMATCH/,
+  )
+  assert.throws(
+    () =>
+      assertVerifierIntegrity(
+        'reviewed',
+        'reviewed',
+        [{ ...entries[0], uid: 1000 }, ...entries.slice(1)],
+        pin,
+      ),
+    /VERIFIER_OWNERSHIP_INVALID/,
+  )
+  assert.throws(
+    () =>
+      assertVerifierIntegrity(
+        'reviewed',
+        'reviewed',
+        [{ ...entries[0], mode: 0o777 }, ...entries.slice(1)],
+        pin,
+      ),
+    /VERIFIER_OWNERSHIP_INVALID/,
+  )
+  assert.throws(
+    () => assertVerifierIntegrity('reviewed', 'reviewed', entries, 'missing'),
+    /VERIFIER_MANIFEST_PIN_INVALID/,
+  )
+})
+test('identity verification requires session IDs and authoritative non-admin non-impersonating state', () => {
+  const email = 'fixture@example.invalid'
+  const valid = {
+    user: { id: 'user-123', email },
+    session: { id: 'session-123', userId: 'user-123' },
+  }
+  assert.doesNotThrow(() => assertAuthoritativeIdentity(valid, email, () => 'PASS'))
+  assert.throws(
+    () => assertAuthoritativeIdentity({ user: { id: 'user-123', email } }, email, () => 'PASS'),
+    /IDENTITY_SESSION_METADATA_REQUIRED/,
+  )
+  assert.throws(
+    () => assertAuthoritativeIdentity(valid, email, () => ''),
+    /IDENTITY_DATABASE_CHECK_FAILED/,
+  )
+  assert.throws(
+    () => assertAuthoritativeIdentity(valid, email, () => 'DENY'),
+    /IDENTITY_DATABASE_CHECK_FAILED/,
+  )
+  assert.throws(
+    () => assertAuthoritativeIdentity(valid, email, () => 'DENY'),
+    /IDENTITY_DATABASE_CHECK_FAILED/,
+  )
 })
 test('web recovery identity must derive from the saved APP_VERSION', () => {
   assert.doesNotThrow(() =>

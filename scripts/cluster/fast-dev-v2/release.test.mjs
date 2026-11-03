@@ -139,6 +139,7 @@ function isolationPage({ found = false, hiddenLeak = false, searches = [] } = {}
       const marker = isolationMarkers.find((value) => url.includes(value.slice(-16)))
       return {
         ok: () => true,
+        headers: () => ({}),
         text: async () =>
           (found || hiddenLeak) && marker ? `<script>${marker}</script>` : '<html></html>',
       }
@@ -190,12 +191,55 @@ test('serialized sentinels cannot hide in escaped or split payloads', () => {
   assert.equal(payloadContainsSentinel(split, marker), true)
   assert.equal(payloadContainsSentinel('query=' + marker.slice(-16), marker), false)
 })
+test('oversized or deeply encoded payloads fail closed', () => {
+  const marker = isolationMarkers[0]
+  let nested = marker.replace('-', '%2d')
+  for (let i = 0; i < 9; i++) nested = nested.replaceAll('%', '%25')
+  assert.throws(
+    () => payloadContainsSentinel(nested, marker),
+    /ISOLATION_PAYLOAD_ENCODING_UNRESOLVED/,
+  )
+  assert.throws(
+    () => payloadContainsSentinel('x'.repeat(2 * 1024 * 1024 + 1), marker),
+    /ISOLATION_PAYLOAD_TOO_LARGE/,
+  )
+})
+test('oversized declared response is rejected before reading its body', async () => {
+  let read = false
+  const page = {
+    setCookie: async () => {},
+    goto: async () => ({
+      ok: () => true,
+      headers: () => ({ 'content-length': String(3 * 1024 * 1024) }),
+      text: async () => {
+        read = true
+        return ''
+      },
+    }),
+  }
+  await assert.rejects(
+    () =>
+      checkPropertyIsolation(
+        page,
+        page,
+        TARGET.origin,
+        [{ tenant: 'tenant', property: 'forbidden', marker: isolationMarkers[0] }],
+        'allowed',
+      ),
+    /ISOLATION_PAYLOAD_TOO_LARGE/,
+  )
+  assert.equal(read, false)
+})
 test('escaped forbidden sentinel in hidden payload fails isolation', async () => {
   const marker = isolationMarkers[0]
   const escaped = marker.replaceAll('-', String.raw`\u002d`)
   const negative = {
     setCookie: async () => {},
-    goto: async () => ({ ok: () => true, text: async () => `<script>${escaped}</script>` }),
+    goto: async () => ({
+      ok: () => true,
+      headers: () => ({}),
+      text: async () => `<script>${escaped}</script>`,
+    }),
     evaluate: async () => ({ history: true, visible: false, dom: false }),
   }
   await assert.rejects(

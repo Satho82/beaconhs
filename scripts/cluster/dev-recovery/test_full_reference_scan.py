@@ -38,6 +38,20 @@ class FullReferenceScanTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.execute(state=lambda: next(values))
 
+    def test_before_after_and_scanned_counts_must_all_match(self):
+        counts = {('public', 'attachments'): 1, ('public', 'empty'): 0}
+        result = scan.scan(self.scope, lambda: self.scope, lambda a, b: self.rows[(a, b)],
+                           lambda: {'counter': 1}, self.sha, counts,
+                           lambda a, b: counts[(a, b)])
+        self.assertEqual(len(result['tables']), 2)
+        calls = iter([1, 0, 1, 0, 2])
+        with self.assertRaises(ValueError):
+            scan.scan(self.scope, lambda: self.scope, lambda a, b: self.rows[(a, b)],
+                      lambda: {'counter': 1}, self.sha, counts, lambda a, b: next(calls))
+        with self.assertRaises(ValueError):
+            scan.scan(self.scope, lambda: self.scope, lambda a, b: [],
+                      lambda: {'counter': 1}, self.sha, counts, lambda a, b: counts[(a, b)])
+
     def test_timeouts_and_failed_row_fetch_are_not_coverage(self):
         def timeout(*args):
             raise TimeoutError('simulated table lock timeout')
@@ -71,14 +85,21 @@ class FullReferenceScanTest(unittest.TestCase):
         result = self.execute()
         result['columnScopeSha256'] = 'd' * 64
         result['primaryKeyScopeSha256'] = 'e' * 64
+        result['rowCountsSha256'] = 'f' * 64
+        result['snapshotModel'] = 'GUARDED_MULTITRANSACTION_WITH_EXPLICIT_PRIVILEGED_OPERATOR_RISK'
         digest = hashlib.sha256(scan.observer.canonical(result)).hexdigest()
         review = {'sourceSha': self.sha, 'status': 'REVIEWED', 'reviewer': 'independent reviewer',
-                  'scanSha256': digest, 'columnScopeSha256': 'd' * 64, 'primaryKeyScopeSha256': 'e' * 64,
+                  'scanSha256': digest, 'columnScopeSha256': 'd' * 64, 'primaryKeyScopeSha256': 'e' * 64, 'rowCountsSha256': 'f' * 64,
                   'sourceReferencePathsReviewed': True, 'unknownFormsResolved': True, 'classifications': [
                       {'table': ['public', 'attachments'],
+                       'rowSha256': result['occurrences'][0]['rowSha256'],
+                       'fieldPath': ['r2_key'],
                        'keySha256': hashlib.sha256(self.key.encode()).hexdigest(),
                        'category': 'attachment'}]}
         self.assertEqual(scan.validate_classifications(result, review)['unclassifiedAdditionalKeys'], 0)
+        wrong_path = dict(review['classifications'][0], fieldPath=['other'])
+        with self.assertRaises(ValueError):
+            scan.validate_classifications(result, dict(review, classifications=[wrong_path]))
         for bad in [dict(review, classifications=[]), dict(review, scanSha256='0' * 64),
                     dict(review, classifications=review['classifications'] * 2),
                     dict(review, sourceSha='c' * 40)]:
@@ -166,6 +187,25 @@ class FullReferenceScanTest(unittest.TestCase):
                 list(scan.execute_table(dict(config, approvedReadOnlySqlSha256=config['approvedReadOnlySqlSha256'][:1]),
                                    'public', 'large', keys, lambda: {'counter': 1}))
 
+    def test_scan_binding_rejects_wrong_oid_image_and_time(self):
+        config = {'sourceSha': self.sha, 'databaseOid': 123, 'imageDigest': 'sha256:' + 'd' * 64}
+        result = dict(config, startedAt='2026-11-03T10:01:00+00:00', finishedAt='2026-11-03T10:02:00+00:00')
+        samples = [{'observedAt': '2026-11-03T10:00:00+00:00'}, {'observedAt': '2026-11-03T10:03:00+00:00'}]
+        self.assertTrue(scan.validate_scan_binding(result, config, samples))
+        for bad in [dict(result, databaseOid=999), dict(result, imageDigest='sha256:' + 'e' * 64),
+                    dict(result, startedAt='2026-11-03T09:59:00+00:00'),
+                    dict(result, finishedAt='2026-11-03T10:04:00+00:00')]:
+            with self.assertRaises(ValueError):
+                scan.validate_scan_binding(bad, config, samples)
+
+    def test_manifest_image_and_database_must_match_scan_and_config(self):
+        binding = {'sourceSha': self.sha, 'databaseOid': 123, 'imageDigest': 'sha256:' + 'd' * 64}
+        self.assertTrue(scan.validate_manifest_binding(binding, dict(binding), dict(binding)))
+        for mismatch in [dict(binding, imageDigest='sha256:' + 'e' * 64),
+                         dict(binding, databaseOid=999), dict(binding, sourceSha='c' * 40)]:
+            with self.assertRaises(ValueError):
+                scan.validate_manifest_binding(binding, binding, mismatch)
+
     def test_every_scanned_key_must_have_object_head_and_latest_version(self):
         result = self.execute()
         key_hash = hashlib.sha256(self.key.encode()).hexdigest()
@@ -186,20 +226,43 @@ class FullReferenceScanTest(unittest.TestCase):
 
     def test_transient_audit_exception_never_covers_live_table_reference(self):
         key_hash = hashlib.sha256(self.key.encode()).hexdigest()
-        result = {'references': [{'table': ['public', 'audit_log'], 'keys': [self.key]}]}
+        result = {'references': [{'table': ['public', 'audit_log'], 'keys': [self.key]}],
+                  'occurrences': [{'table': ['public', 'audit_log'], 'keySha256': key_hash,
+                                   'fieldPath': ['metadata', 'r2Key'], 'transientAuditValidated': True}]}
         self.assertTrue(scan.validate_object_coverage(result, {}, {}, [], set(), {key_hash}))
         result['references'].append({'table': ['public', 'other'], 'keys': [self.key]})
         with self.assertRaises(ValueError):
             scan.validate_object_coverage(result, {}, {}, [], set(), {key_hash})
 
+    def test_transient_audit_exception_rejects_mixed_same_table_occurrences(self):
+        key_hash = hashlib.sha256(self.key.encode()).hexdigest()
+        result = {'references': [{'table': ['public', 'audit_log'], 'keys': [self.key]}],
+                  'occurrences': [{'table': ['public', 'audit_log'], 'keySha256': key_hash,
+                                   'fieldPath': ['metadata', 'r2Key'], 'transientAuditValidated': True},
+                                  {'table': ['public', 'audit_log'], 'keySha256': key_hash,
+                                   'fieldPath': ['summary'], 'transientAuditValidated': False}]}
+        with self.assertRaises(ValueError):
+            scan.validate_object_coverage(result, {}, {}, [], set(), {key_hash})
+
     def test_approved_attachment_exception_does_not_cover_other_table(self):
         key_hash = hashlib.sha256(self.key.encode()).hexdigest()
-        result = {'references': [{'table': ['public', 'attachments'], 'keys': [self.key]}]}
+        result = {'references': [{'table': ['public', 'attachments'], 'keys': [self.key]}],
+                  'occurrences': [{'table': ['public', 'attachments'], 'keySha256': key_hash,
+                                   'fieldPath': ['r2_key'], 'transientAuditValidated': False}]}
         allowed = {(('public', 'attachments'), key_hash)}
         self.assertTrue(scan.validate_object_coverage(result, {}, {}, [], allowed, set()))
         result['references'].append({'table': ['public', 'other'], 'keys': [self.key]})
         with self.assertRaises(ValueError):
             scan.validate_object_coverage(result, {}, {}, [], allowed, set())
+
+    def test_approved_missing_attachment_rejects_another_field_occurrence(self):
+        result = self.execute()
+        key_hash = hashlib.sha256(self.key.encode()).hexdigest()
+        result['occurrences'].append({'table': ['public', 'attachments'], 'keySha256': key_hash,
+                                      'fieldPath': ['metadata', 'objectKey'], 'transientAuditValidated': False})
+        with self.assertRaises(ValueError):
+            scan.validate_object_coverage(result, {}, {}, [],
+                                          {(('public', 'attachments'), key_hash)}, set())
 
     def test_extra_classified_but_missing_reference_is_rejected(self):
         result = self.execute()

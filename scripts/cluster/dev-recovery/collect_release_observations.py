@@ -686,6 +686,10 @@ def references(config):
                           config["fullReferenceClassification"]["sha256"])
     classified = full_reference_scan.validate_classifications(scan, review)
     require(classified["unclassifiedAdditionalKeys"] == 0)
+    # The actual full scan must be covered by the verified fenced interval,
+    # and must refer to the approved database and application image.
+    samples = verified_cross_store_interval(config)
+    full_reference_scan.validate_scan_binding(scan, config, samples)
     require(binding["sourceSha"]==config["sourceSha"] and binding["databaseOid"]==config["databaseOid"])
     require(binding["storageBaselineSha256"]==config["storageBaseline"]["sha256"])
     require(binding["fullScanSha256"]==config["storageFullScan"]["sha256"])
@@ -778,6 +782,9 @@ def cross_store(config):
     require(timestamp(samples[0]["observedAt"])<=timestamp(capture["captureStartedAt"])<=timestamp(capture["captureFinishedAt"])<=timestamp(samples[-1]["observedAt"]))
     manifest=private_json(Path("/opt/uvanoo-dev/release-evidence")/config["sourceSha"]/"manifest.json")
     require(manifest["sourceSha"]==config["sourceSha"] and manifest["databaseOid"]==config["databaseOid"])
+    import full_reference_scan
+    scan = private_json(config["storageFullScan"]["path"], config["storageFullScan"]["sha256"])
+    full_reference_scan.validate_manifest_binding(scan, config, manifest)
     require(capture["backupSha256"]==manifest["backup"]["sha256"])
     require(capture["restoreReceiptSha256"]==manifest["admission"]["restoreReceiptSha256"])
     require(timestamp(capture["captureStartedAt"])<=timestamp(manifest["backup"]["createdAt"])<=timestamp(capture["captureFinishedAt"]))

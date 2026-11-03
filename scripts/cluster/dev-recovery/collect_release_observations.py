@@ -212,7 +212,7 @@ def capture_proxy(config):
 
 def collabora(config):
     # Reuse the governed validator; never infer a historical interval from stopped tasks.
-    proxy_hash = capture_proxy(config)
+    capture_proxy(config)
     sys.path.insert(0,str(Path(__file__).parent))
     require(digest(Path(__file__).with_name("observe_collabora_interval.py").read_bytes()) == config["intervalValidatorSha256"])
     from observe_collabora_interval import validate_samples
@@ -277,7 +277,6 @@ def collabora(config):
         "taskCoverageSha256":digest(canonical(boundaries)),
         "completionWatermark":interval["completionWatermark"],
         "bootstrapReceiptSha256":config["bootstrapReceiptSha256"],
-        "captureProxyConfigSha256":proxy_hash,
         "approvalReceiptSha256":config["historicalApprovalReceiptSha256"],"epoch":config["epoch"]}
 
 

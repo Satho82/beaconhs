@@ -1,5 +1,6 @@
 import datetime
 import hashlib
+from pathlib import Path
 import unittest
 from unittest.mock import patch
 
@@ -98,12 +99,14 @@ class CaptureFenceGuardTest(unittest.TestCase):
         from json import dumps
         import hashlib
         file_hash = hashlib.sha256(payload).hexdigest()
-        config = {'editingFenceHashes': {path: file_hash}, 'captureProxy': {
+        guard_bytes = Path(__file__).with_name('capture_fence_guard.py').read_bytes()
+        config = {'captureGuardSha256': hashlib.sha256(guard_bytes).hexdigest(),
+                  'editingFenceHashes': {path: file_hash}, 'captureProxy': {
             'router': name, 'middleware': middleware, 'fencePath': path,
             'fenceSha256': file_hash, 'proxyId': 'proxy1', 'proxyStartedAt': 'start1',
             'loadedConfigSha256': loaded}}
         proxy = {'Id': 'proxy1', 'State': {'Running': True, 'Pid': 123, 'StartedAt': 'start1'}}
-        with patch.object(collector.Path, 'read_bytes', return_value=payload), \
+        with patch.object(collector.Path, 'read_bytes', side_effect=[guard_bytes, payload, guard_bytes, payload, guard_bytes, payload]), \
              patch.object(collector, 'docker', return_value=[proxy]), \
              patch.object(collector, 'execute', side_effect=lambda *args: dumps(self.proxy).encode()):
             self.assertEqual(collector.capture_proxy(config), loaded)
@@ -115,6 +118,24 @@ class CaptureFenceGuardTest(unittest.TestCase):
                                                     'entryPoints': ['websecure']}
             with self.assertRaises(ValueError):
                 collector.capture_proxy(config)
+
+    def test_changed_imported_guard_bytes_rejected(self):
+        config = {'captureGuardSha256': '0' * 64}
+        with patch.object(collector.Path, 'read_bytes', return_value=b'modified guard'):
+            with self.assertRaises(ValueError):
+                collector.capture_proxy(config)
+
+    def test_capture_state_changed_during_sample_is_rejected(self):
+        config = {'databaseWriteCounters': [], 'databaseOid': 1, 'zeroBaseline': {}}
+        with patch.object(collector, 'capture_proxy', side_effect=['a' * 64, 'b' * 64]), \
+             patch.object(collector, 'pg_observation', return_value={'stats': [], 'wopiEvents': 0, 'oid': 1}), \
+             patch.object(collector, 'current_storage', return_value=(None, {}, {})), \
+             patch.object(collector, 'storage_metrics', return_value={'writeCounters': {}, 'writers': 0}), \
+             patch.object(collector, 'redis_observation', return_value={'unapprovedClients': 0}), \
+             patch.object(collector, 'zero_state', return_value=([], [])), \
+             patch.object(collector, 'validate_zero_baseline'):
+            with self.assertRaises(ValueError):
+                collector.cross_store_sample(config)
 
     def test_nonterminal_worker_task_is_rejected_even_if_desired_zero(self):
         service = {'Spec': {'Name': 'uvanoo-v1-4-dev-gniriv_worker',

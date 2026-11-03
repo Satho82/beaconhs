@@ -132,11 +132,12 @@ class Intervals(unittest.TestCase):
         self.tmp=tempfile.TemporaryDirectory()
         self.path=Path(self.tmp.name)/"samples"
         self.config={"sourceSha":"a"*40,"epoch":"b"*64,"zeroBaseline":{},"databaseWriteCounters":[1,2,3],"minioWriteCounters":{},"storageBaseline":{"sha256":"c"*64},"crossStoreContinuationPath":str(self.path),"collectorSha256":m.digest(Path(m.__file__).read_bytes()),"samplerSha256":m.digest(Path(m.__file__).with_name("sample_release_interval.py").read_bytes())}
+        self.config["captureProxy"]={"loadedConfigSha256":"f"*64}
         now=time.time()
         self.samples=[]
         for n in range(31):
             at=dt.datetime.fromtimestamp(now-60+2*n,dt.timezone.utc).isoformat()
-            self.samples.append({"sourceSha":"a"*40,"epoch":"b"*64,"collectorSha256":self.config["collectorSha256"],"samplerSha256":self.config["samplerSha256"],"configSha256":m.interval_config_identity(self.config),"startedAt":at,"observedAt":at,"status":"OK","zeroBaselineSha256":m.digest(m.canonical({})),"databaseWriteCounters":[1,2,3],"storageWriteCounters":{},"storageBaselineSha256":"c"*64,"wopiEvents":0,"unapprovedPostgresClients":0,"unapprovedRedisClients":0,"storageWriters":0,"inventorySha256":"d"*64})
+            self.samples.append({"sourceSha":"a"*40,"epoch":"b"*64,"collectorSha256":self.config["collectorSha256"],"samplerSha256":self.config["samplerSha256"],"configSha256":m.interval_config_identity(self.config),"startedAt":at,"observedAt":at,"status":"OK","zeroBaselineSha256":m.digest(m.canonical({})),"databaseWriteCounters":[1,2,3],"storageWriteCounters":{},"storageBaselineSha256":"c"*64,"captureProxyConfigSha256":"f"*64,"wopiEvents":0,"unapprovedPostgresClients":0,"unapprovedRedisClients":0,"storageWriters":0,"inventorySha256":"d"*64})
     def tearDown(self):self.tmp.cleanup()
     def run_check(self):
         self.path.write_text("".join(json.dumps(x)+"\n" for x in self.samples))
@@ -161,6 +162,7 @@ class Intervals(unittest.TestCase):
     def test_changed_producer_code(self):self.samples[8]["collectorSha256"]="e"*64;self.reject()
     def test_changed_sampler_code(self):self.samples[8]["samplerSha256"]="e"*64;self.reject()
     def test_missing_observation(self):del self.samples[8]["storageWriters"];self.reject()
+    def test_capture_proxy_changed_during_interval(self):self.samples[8]["captureProxyConfigSha256"]="e"*64;self.reject()
 
 class VolumeSnapshot(unittest.TestCase):
     def item(self,name="/unrelated",mounts=None):

@@ -182,7 +182,10 @@ def validate_stop_event(boundary,raw,bootstrap):
 def capture_proxy(config):
     # A file hash alone does not prove Traefik loaded a deny-all capture route.
     # Pin the actual proxy identity and parsed runtime configuration as well.
-    from capture_fence_guard import validate_loaded_proxy
+    import capture_fence_guard
+    guard_path = Path(capture_fence_guard.__file__)
+    require(guard_path.resolve() == guard_path)
+    require(digest(guard_path.read_bytes()) == config["captureGuardSha256"])
     proof = config["captureProxy"]
     require(set(proof) == {"router", "middleware", "fencePath", "fenceSha256",
                            "proxyId", "proxyStartedAt", "loadedConfigSha256"})
@@ -202,7 +205,7 @@ def capture_proxy(config):
     require(type(pid) is int and pid > 0)
     raw = execute(["nsenter", "-t", str(pid), "-n", "curl", "--silent", "--show-error",
                    "--max-time", "1", "http://127.0.0.1:8080/api/rawdata"])
-    observed = validate_loaded_proxy(json.loads(raw), proof["router"], proof["middleware"])
+    observed = capture_fence_guard.validate_loaded_proxy(json.loads(raw), proof["router"], proof["middleware"])
     require(observed == proof["loadedConfigSha256"])
     again = docker(["inspect", "dokploy-traefik"])[0]
     require(again["Id"] == proxy["Id"] and again["State"]["Pid"] == pid and
@@ -270,6 +273,7 @@ def collabora(config):
     preservation=private_json(config["preservation"]["path"],config["preservation"]["sha256"])
     require(preservation["sourceOnlyInserted"] == 10370 and preservation["sharedConflictsResolved"] == 40)
     require(preservation["originalBeaconhsRetained"] is True and preservation["originalEncryptedBackupsRetained"] is True)
+    capture_proxy(config)
     return {"desiredReplicas":0,"activeTasks":0,"activeSessions":0,"pendingSaves":0,"failedSaves":0,
         "unknownOutcomes":0,"newActivityCoverageComplete":True,"editingBlocked":True,
         "historicalSaveStateUnknown":True,"knownUnsavedDocumentsPreserved":True,
@@ -697,6 +701,7 @@ def queue_safety(config):
 
 def cross_store_sample(config):
     started=dt.datetime.now(dt.timezone.utc).isoformat()
+    capture_hash = capture_proxy(config)
     with ThreadPoolExecutor(max_workers=5) as pool:
         pg=pool.submit(pg_observation,config);storage=pool.submit(current_storage,config)
         metrics=pool.submit(storage_metrics,config);redis=pool.submit(redis_observation)
@@ -706,6 +711,7 @@ def cross_store_sample(config):
     require(pg["stats"] == config["databaseWriteCounters"] and pg["wopiEvents"] == 0)
     require(pg["oid"] == config["databaseOid"])
     validate_zero_baseline(services,tasks,config["zeroBaseline"])
+    require(capture_proxy(config) == capture_hash)
     ended=dt.datetime.now(dt.timezone.utc).isoformat()
     require(0 <= timestamp(ended)-timestamp(started) <= 2.3)
     return {"sourceSha":config["sourceSha"],"epoch":config["epoch"],"collectorSha256":digest(Path(__file__).read_bytes()),"configSha256":interval_config_identity(config),"startedAt":started,"observedAt":ended,
@@ -713,6 +719,7 @@ def cross_store_sample(config):
         "databaseWriteCounters":pg["stats"],"wopiEvents":0,"unapprovedPostgresClients":0,
         "unapprovedRedisClients":redis["unapprovedClients"],"storageWriters":metrics["writers"],
         "storageWriteCounters":metrics["writeCounters"],"inventorySha256":digest(canonical(observed)),
+        "captureProxyConfigSha256":capture_hash,
         "storageBaselineSha256":config["storageBaseline"]["sha256"]}
 
 def verified_cross_store_interval(config):
@@ -731,6 +738,7 @@ def verified_cross_store_interval(config):
         require(sample["databaseWriteCounters"]==config["databaseWriteCounters"])
         require(sample["storageWriteCounters"]==config["minioWriteCounters"])
         require(sample["storageBaselineSha256"]==config["storageBaseline"]["sha256"])
+        require(sample["captureProxyConfigSha256"]==config["captureProxy"]["loadedConfigSha256"])
         require(all(sample[k]==0 for k in ["wopiEvents","unapprovedPostgresClients","unapprovedRedisClients","storageWriters"]))
         require(0<=timestamp(sample["observedAt"])-timestamp(sample["startedAt"])<=2.3)
         if previous:

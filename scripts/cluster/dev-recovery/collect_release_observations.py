@@ -179,8 +179,43 @@ def validate_stop_event(boundary,raw,bootstrap):
     require(timestamp(boundary["stoppedAt"]) >= timestamp(bootstrap["stopRequestedAt"]))
     require(not any(e["Action"] == "oom" and e["Actor"]["ID"] == boundary["containerId"] for e in events))
 
+def capture_proxy(config):
+    # A file hash alone does not prove Traefik loaded a deny-all capture route.
+    # Pin the actual proxy identity and parsed runtime configuration as well.
+    import capture_fence_guard
+    guard_path = Path(capture_fence_guard.__file__)
+    require(guard_path.resolve() == guard_path)
+    require(digest(guard_path.read_bytes()) == config["captureGuardSha256"])
+    proof = config["captureProxy"]
+    require(set(proof) == {"router", "middleware", "fencePath", "fenceSha256",
+                           "proxyId", "proxyStartedAt", "loadedConfigSha256"})
+    for key in ("router", "middleware"):
+        import re
+        require(re.fullmatch(r"uvanoo-dev-[a-z0-9-]+", proof[key]) is not None)
+    path = Path(proof["fencePath"])
+    require(path.parent == Path("/etc/dokploy/traefik/dynamic") and path.resolve() == path)
+    require(config["editingFenceHashes"].get(str(path)) == proof["fenceSha256"])
+    require(digest(path.read_bytes()) == proof["fenceSha256"])
+    found = docker(["inspect", "dokploy-traefik"])
+    require(len(found) == 1)
+    proxy = found[0]
+    require(proxy["Id"] == proof["proxyId"] and proxy["State"]["Running"] is True)
+    require(proxy["State"]["StartedAt"] == proof["proxyStartedAt"])
+    pid = proxy["State"]["Pid"]
+    require(type(pid) is int and pid > 0)
+    raw = execute(["nsenter", "-t", str(pid), "-n", "curl", "--silent", "--show-error",
+                   "--max-time", "1", "http://127.0.0.1:8080/api/rawdata"])
+    observed = capture_fence_guard.validate_loaded_proxy(json.loads(raw), proof["router"], proof["middleware"])
+    require(observed == proof["loadedConfigSha256"])
+    again = docker(["inspect", "dokploy-traefik"])[0]
+    require(again["Id"] == proxy["Id"] and again["State"]["Pid"] == pid and
+            again["State"]["StartedAt"] == proxy["State"]["StartedAt"] and
+            again["State"]["Running"] is True)
+    return observed
+
 def collabora(config):
     # Reuse the governed validator; never infer a historical interval from stopped tasks.
+    capture_proxy(config)
     sys.path.insert(0,str(Path(__file__).parent))
     require(digest(Path(__file__).with_name("observe_collabora_interval.py").read_bytes()) == config["intervalValidatorSha256"])
     from observe_collabora_interval import validate_samples
@@ -238,6 +273,7 @@ def collabora(config):
     preservation=private_json(config["preservation"]["path"],config["preservation"]["sha256"])
     require(preservation["sourceOnlyInserted"] == 10370 and preservation["sharedConflictsResolved"] == 40)
     require(preservation["originalBeaconhsRetained"] is True and preservation["originalEncryptedBackupsRetained"] is True)
+    capture_proxy(config)
     return {"desiredReplicas":0,"activeTasks":0,"activeSessions":0,"pendingSaves":0,"failedSaves":0,
         "unknownOutcomes":0,"newActivityCoverageComplete":True,"editingBlocked":True,
         "historicalSaveStateUnknown":True,"knownUnsavedDocumentsPreserved":True,
@@ -640,6 +676,20 @@ def references(config):
     require(scope["migrationLedgerTables"] == 1 and scope["unclassifiedAdditionalKeys"] == 0)
     binding=private_json(config["storageBinding"]["path"],config["storageBinding"]["sha256"])
     scan=private_json(config["storageFullScan"]["path"],config["storageFullScan"]["sha256"])
+    import full_reference_scan
+    scanner_path = Path(full_reference_scan.__file__)
+    require(scanner_path.resolve() == scanner_path and
+            digest(scanner_path.read_bytes()) == config["fullReferenceScannerSha256"])
+    require(scan["scannerSha256"] == config["fullReferenceScannerSha256"] and
+            scan["toolingSourceSha"] == config["toolingSourceSha"])
+    review = private_json(config["fullReferenceClassification"]["path"],
+                          config["fullReferenceClassification"]["sha256"])
+    classified = full_reference_scan.validate_classifications(scan, review)
+    require(classified["unclassifiedAdditionalKeys"] == 0)
+    # The actual full scan must be covered by the verified fenced interval,
+    # and must refer to the approved database and application image.
+    samples = verified_cross_store_interval(config)
+    full_reference_scan.validate_scan_binding(scan, config, samples)
     require(binding["sourceSha"]==config["sourceSha"] and binding["databaseOid"]==config["databaseOid"])
     require(binding["storageBaselineSha256"]==config["storageBaseline"]["sha256"])
     require(binding["fullScanSha256"]==config["storageFullScan"]["sha256"])
@@ -651,6 +701,20 @@ def references(config):
     allowed,recovery=module.allowlist();module.verify_recovery(recovery)
     missing,evidence=module.reconcile(baseline["database"],observed["objects"],allowed,
         observed["metadata"],observed["versions"],observed["queues"])
+    # A reviewed category is not proof that an additional key exists. Every
+    # scanned key must have a matching object, HEAD metadata and latest version,
+    # unless the existing reconciliation explicitly permits that missing key.
+    database = baseline["database"]
+    allowed_missing = {(('public', 'attachments'), module.sha(row[2].encode())) for row in database["rows"]
+                       if module.identity(row) in missing}
+    allowed_missing.update(((('public', 'tenants') if item['key'].startswith('tenants/') else
+                              ('public', 'platform_settings')), module.sha(item['key'].encode()))
+                           for item in module.brand_references(database) if item['identity'] in missing)
+    audit = module.audit_references(database, observed["objects"], observed["queues"])
+    transient_audit = {item["keySha256"] for item in audit
+                       if item["transient"] and not item["currentlyReferenced"] and not item["present"]}
+    full_reference_scan.validate_object_coverage(scan, observed["objects"], observed["metadata"],
+                                                 observed["versions"], allowed_missing, transient_audit)
     return {"missingObjects":len(missing),"mismatchedObjects":0,"allReferencesCovered":len(missing)==0,
         "receiptSha256":digest(evidence),"missingIdentitySha256":missing,
         "exceptionId":"owner-approved-dev-nine-20261029","recoveryEvidenceSha256":recovery}
@@ -665,6 +729,7 @@ def queue_safety(config):
 
 def cross_store_sample(config):
     started=dt.datetime.now(dt.timezone.utc).isoformat()
+    capture_hash = capture_proxy(config)
     with ThreadPoolExecutor(max_workers=5) as pool:
         pg=pool.submit(pg_observation,config);storage=pool.submit(current_storage,config)
         metrics=pool.submit(storage_metrics,config);redis=pool.submit(redis_observation)
@@ -674,6 +739,7 @@ def cross_store_sample(config):
     require(pg["stats"] == config["databaseWriteCounters"] and pg["wopiEvents"] == 0)
     require(pg["oid"] == config["databaseOid"])
     validate_zero_baseline(services,tasks,config["zeroBaseline"])
+    require(capture_proxy(config) == capture_hash)
     ended=dt.datetime.now(dt.timezone.utc).isoformat()
     require(0 <= timestamp(ended)-timestamp(started) <= 2.3)
     return {"sourceSha":config["sourceSha"],"epoch":config["epoch"],"collectorSha256":digest(Path(__file__).read_bytes()),"configSha256":interval_config_identity(config),"startedAt":started,"observedAt":ended,
@@ -681,6 +747,7 @@ def cross_store_sample(config):
         "databaseWriteCounters":pg["stats"],"wopiEvents":0,"unapprovedPostgresClients":0,
         "unapprovedRedisClients":redis["unapprovedClients"],"storageWriters":metrics["writers"],
         "storageWriteCounters":metrics["writeCounters"],"inventorySha256":digest(canonical(observed)),
+        "captureProxyConfigSha256":capture_hash,
         "storageBaselineSha256":config["storageBaseline"]["sha256"]}
 
 def verified_cross_store_interval(config):
@@ -699,6 +766,7 @@ def verified_cross_store_interval(config):
         require(sample["databaseWriteCounters"]==config["databaseWriteCounters"])
         require(sample["storageWriteCounters"]==config["minioWriteCounters"])
         require(sample["storageBaselineSha256"]==config["storageBaseline"]["sha256"])
+        require(sample["captureProxyConfigSha256"]==config["captureProxy"]["loadedConfigSha256"])
         require(all(sample[k]==0 for k in ["wopiEvents","unapprovedPostgresClients","unapprovedRedisClients","storageWriters"]))
         require(0<=timestamp(sample["observedAt"])-timestamp(sample["startedAt"])<=2.3)
         if previous:
@@ -714,6 +782,9 @@ def cross_store(config):
     require(timestamp(samples[0]["observedAt"])<=timestamp(capture["captureStartedAt"])<=timestamp(capture["captureFinishedAt"])<=timestamp(samples[-1]["observedAt"]))
     manifest=private_json(Path("/opt/uvanoo-dev/release-evidence")/config["sourceSha"]/"manifest.json")
     require(manifest["sourceSha"]==config["sourceSha"] and manifest["databaseOid"]==config["databaseOid"])
+    import full_reference_scan
+    scan = private_json(config["storageFullScan"]["path"], config["storageFullScan"]["sha256"])
+    full_reference_scan.validate_manifest_binding(scan, config, manifest)
     require(capture["backupSha256"]==manifest["backup"]["sha256"])
     require(capture["restoreReceiptSha256"]==manifest["admission"]["restoreReceiptSha256"])
     require(timestamp(capture["captureStartedAt"])<=timestamp(manifest["backup"]["createdAt"])<=timestamp(capture["captureFinishedAt"]))

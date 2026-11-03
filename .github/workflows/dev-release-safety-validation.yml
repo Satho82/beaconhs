@@ -1,5 +1,6 @@
 name: DEV release safety focused validation
 on:
+  workflow_dispatch:
   push:
     branches: [fix/uvanoo-v1.4-dev-release-safety-20261013]
     paths:
@@ -41,6 +42,9 @@ jobs:
           node --test scripts/cluster/dev-readiness.test.mjs scripts/cluster/dev-writer-fence.test.mjs
           bash scripts/ci/v1.4-dev-candidate-deploy-contract.test.sh
           ruby scripts/ci/dev-release-safety-contract.rb
+      - name: DEV recovery observer tests
+        working-directory: scripts/cluster/dev-recovery
+        run: python3 -B -m unittest discover -p 'test_*.py'
       - name: Record exact tested source
         run: |
           git rev-parse HEAD

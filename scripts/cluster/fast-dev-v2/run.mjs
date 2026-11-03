@@ -23,7 +23,7 @@ const envValue = (env, key) => {
 }
 const image = (digest) => `${TARGET.image}@${digest}`
 const api = async (method, body) => {
-  const token = readFileSync('/opt/uvanoo-dev/monitor-private/dokploy.token', 'utf8').trim()
+  const token = readFileSync('/opt/uvanoo-dev/fast-v2-credentials/dokploy.token', 'utf8').trim()
   const response = await fetch(
     `http://127.0.0.1:3000/api/compose.${method}${body ? '' : '?composeId=' + TARGET.composeId}`,
     {

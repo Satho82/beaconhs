@@ -58,8 +58,12 @@ Do not enable or merge for activation merely because CI passes.
 - Review this branch, regression/failure simulation results and non-deploying dry run.
 - Merge the approved V2 workflow into `feature/uvanoo-v1.4`.
 - On the existing authorized Dokploy runner, ensure Node/pnpm, Docker, GitHub CLI,
-  the existing private Dokploy token and a sandbox-capable Chromium binary are available.
+  a dedicated service-scoped DEV Dokploy token and a sandbox-capable Chromium binary are available.
   The runner must have access to the DEV-only lock file `/opt/uvanoo-dev/dev-v2-deploy.lock`.
+  Store the service-scoped token at `/opt/uvanoo-dev/fast-v2-credentials/dokploy.token`
+  with owner-only read access for the runner. Verify the token cannot access non-DEV
+  services or the Dokploy Docker API, and rotate it before its expiry. Never copy
+  the root-owned maintenance token into the runner account.
 - Set repository secrets `DEV_SMOKE_EMAIL`, `DEV_SMOKE_PASSWORD` for a dedicated active
   DEV tenant member with Handover permission, never a Platform Admin session.
 - Set variables `DEV_SMOKE_PROPERTY_ID` (authorized fixture),
@@ -111,7 +115,11 @@ Next.js streaming login redirects; the V2 adapter now recognizes only the exact
 same-origin login markers, with negative regression tests. Original readiness code
 and the old deployment paths remain intact.
 
-The replacement has not been activated against live DEV. Browser smoke credentials
-and the approved runner/browser setup must be provisioned before enablement; missing
-fixtures fail before any rollout. Simulated rollback coverage is not a claim that a
-live rollback rehearsal occurred.
+The replacement has not been activated against live DEV. A dedicated DEV smoke
+account, a sandboxed matching Chromium runner, and a service-scoped Dokploy token
+have been configured. The token can read the DEV service but cannot read the
+non-DEV service or Docker inventory. Authenticated Current/History Handover,
+property isolation and a labelled fixture creation passed on the isolated smoke
+tenant. The runner token must be rotated before its expiration. Simulated rollback
+coverage is not a claim that a live rollback rehearsal occurred; enablement remains
+blocked until rollout and rollback safeguards are reviewed and rehearsed.

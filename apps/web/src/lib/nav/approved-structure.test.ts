@@ -81,9 +81,8 @@ describe('approved navigation boundaries', () => {
     const before = structuredClone(groups)
     const result = approvedNavigation(groups, () => false, new Set())
     expect(result.map((group) => group.label)).toEqual(['Application'])
-    expect(
-      result[0]?.items.find((parent) => parent.label === 'Dashboard')?.children,
-    ).toContainEqual(item('/custom'))
+    expect(result[0]?.items).toContainEqual(item('/custom'))
+    expect(result[0]?.items.find((parent) => parent.label === 'Dashboard')).toBeUndefined()
     expect(
       result[0]?.items.find((parent) => parent.label === 'Diary & Tasks')?.children,
     ).toContainEqual(item('/apps/templates/abc/records'))
@@ -120,13 +119,37 @@ describe('approved navigation boundaries', () => {
     )
     expect(result.map((group) => group.label)).toEqual(['Application'])
     const parents = result[0]!.items
-    expect(parents.map((parent) => parent.label)).toEqual(
+    expect(
+      parents
+        .filter((parent) =>
+          APPROVED_APPLICATION_GROUPS.includes(
+            parent.label as (typeof APPROVED_APPLICATION_GROUPS)[number],
+          ),
+        )
+        .map((parent) => parent.label),
+    ).toEqual(
       APPROVED_APPLICATION_GROUPS.filter((label) =>
         parents.some((parent) => parent.label === label),
       ),
     )
-    expect(parents.every((parent) => parent.groupOnly && parent.children?.length)).toBe(true)
-    const destinations = parents.flatMap((parent) => parent.children!.map((child) => child.href))
+    expect(
+      parents
+        .filter(
+          (parent) =>
+            APPROVED_APPLICATION_GROUPS.includes(
+              parent.label as (typeof APPROVED_APPLICATION_GROUPS)[number],
+            ) && parent.label !== 'Dashboard',
+        )
+        .every((parent) => parent.groupOnly && parent.children?.length),
+    ).toBe(true)
+    expect(parents.find((parent) => parent.label === 'Dashboard')).toMatchObject({
+      href: '/dashboard',
+    })
+    expect(parents.find((parent) => parent.label === 'Dashboard')?.children).toBeUndefined()
+    const destinations = parents.flatMap((parent) => [
+      parent.href,
+      ...(parent.children ?? []).map((child) => child.href),
+    ])
     for (const original of groups.flatMap((group) => group.items))
       expect(destinations).toContain(original.href)
     expect(parents.find((parent) => parent.label === 'Risk')?.children).toEqual([

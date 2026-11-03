@@ -60,7 +60,7 @@ A normal password or magic-link sign-in does not activate a pending invitation. 
 
 The light left menu lists everything you can use. **Search menu** finds permitted destinations and expands matching groups. The coral parent and highlighted child show your current page. The coloured module strip opens the same authorised modules; scroll it horizontally on smaller screens. Platform Admin uses its separate navy navigation. Your organisation stays in the top header; role and property controls sit directly below it on desktop, tablet and phone. Long page titles and page actions wrap on smaller screens. Items are grouped:
 
-- **Dashboard** — overview, activity feed, inbox, assistant, help and saved custom workspace links.
+- **Dashboard** — opens your overview directly. Saved custom workspace links appear separately in the sidebar.
 - **Diary & Tasks** — your [Workspace](/my), tasks, journals and pinned operational forms. Property Diary and Manager Sign-off appear only for the selected property when entitled.
 - **Maintenance**, **Compliance**, **Risk**, **Inspections**, **Incidents**, **Action Plans**, **Training**, **People**, **Handover**, **Assets & Reminders**, and **Metering** are separate expandable modules. Documents sit under Compliance; authorised Toolbox Talk pins sit under Training.
 - **Reports** — the reports hub, permitted report tools and Insights. Reports is not merged with the separately documented Reporting module.
@@ -70,7 +70,7 @@ There is one navigation tree, not a second set of legacy category headings. Save
 
 You only see the items your role allows. If a page is missing, ask your supervisor or admin.
 
-The **Dashboard** shows your open work at a glance. Tap any card to jump to it.
+The **Dashboard** shows your open work at a glance. The overview shows permitted action plans, maintenance, training and meter readings for your authorised properties. Selecting a property narrows the overview where applicable. Tap a card to open its module. Your customised dashboard remains below the overview; use **Customise** to arrange its cards.
 
 ## Turning on dark mode
 

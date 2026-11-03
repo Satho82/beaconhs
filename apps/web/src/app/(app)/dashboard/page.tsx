@@ -10,6 +10,7 @@ import { WidgetCard } from './_widget-views'
 import { WIDGETS, WIDGET_CARD_KEY } from './_widget-registry'
 import { canSeeOrgAggregates, canSeeWidget } from './_widget-access'
 import { DashboardHeader } from './_dashboard-header'
+import { PropertyOverview } from './_property-overview'
 import { loadCardsForPalette } from '../insights/cards/_data'
 import { loadDashboardCardRenders } from '../insights/_data'
 import { ensureSystemCards } from '../insights/_system-cards'
@@ -50,7 +51,8 @@ export default async function DashboardPage() {
   // guarantee: a saved/edited/migrated layout can never surface another user's
   // data. Personal widgets always pass; placed Insights cards need analytics
   // access. Everything below renders from `widgets` / `visibleLayout`.
-  const complianceEnabled = (await loadEnabledModuleKeys(ctx)).has('hospitality.compliance')
+  const enabledModules = await loadEnabledModuleKeys(ctx)
+  const complianceEnabled = enabledModules.has('hospitality.compliance')
   const complianceWidgets = new Set([
     'kpi-training-compliance',
     'kpi-document-compliance',
@@ -127,6 +129,7 @@ export default async function DashboardPage() {
     <PageContainer>
       <div className="space-y-5">
         <DashboardHeader greeting={greeting} tenantSummary={tenantSummary} />
+        <PropertyOverview ctx={ctx} data={data} modules={enabledModules} />
 
         <DashboardGrid initialLayout={visibleLayout} nodes={nodes} role={role} mode="view" />
       </div>

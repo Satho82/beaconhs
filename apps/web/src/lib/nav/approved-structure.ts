@@ -796,6 +796,27 @@ export function approvedNavigation(
   }
   const items = APPROVED_APPLICATION_GROUPS.flatMap((group): SidebarNavItem[] => {
     const children = childrenByGroup.get(group)!
+    if (group === 'Dashboard') {
+      const dashboard = visible.get('/dashboard')
+      // Preserve user-defined destinations as standalone links, never children
+      // of Dashboard. Built-in shortcuts remain available in their own modules.
+      const builtIn = new Set(APPROVED_DESTINATIONS.map((entry) => entry.href))
+      const custom = children.filter((child) => !builtIn.has(child.href))
+      return [
+        ...(dashboard
+          ? [
+              {
+                ...dashboard,
+                moduleKey: group,
+                href: '/dashboard',
+                label: group,
+                ...PRESENTATION[group],
+              },
+            ]
+          : []),
+        ...custom,
+      ]
+    }
     if (!children.length) return []
     return [
       {

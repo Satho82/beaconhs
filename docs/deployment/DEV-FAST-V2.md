@@ -90,7 +90,11 @@ Do not enable or merge for activation merely because CI passes.
   escapes, HTML character references, URL encodings and split string fragments
   without executing the payload. A separate authenticated fetch streams decoded
   bytes and aborts above 2 MiB, including chunked or compressed responses; unresolved
-  nested encodings at the bounded decode limit also fail closed. These checks complement, but do not replace,
+  nested encodings at the bounded decode limit also fail closed. A bounded snapshot
+  of the navigation DOM is checked separately, but neither the DOM nor the second
+  fetch certifies the original navigation response bytes. FAST remains disabled
+  until a same-response verification method is independently validated.
+  These checks complement, but do not replace,
   server-side authorization and tenant-isolation tests.
   The session verifier is a root-owned, source-hash-checked command with a root-owned
   pinned identity manifest; it returns only PASS/DENY for the two fixture accounts using

@@ -112,30 +112,44 @@ async function findSentinel(page, origin, { property, tenant, marker }) {
   // never call Puppeteer's response.text(), which buffers without a hard bound.
   const bounded = await page.evaluate(readBoundedResponse, url, MAX_ISOLATION_PAYLOAD_BYTES)
   check(bounded.code === 'OK', bounded.code)
-  const serialized = payloadContainsSentinel(bounded.payload, marker)
+  const fetched = payloadContainsSentinel(bounded.payload, marker)
   const observed = await page.evaluate(
-    (marker) => ({
-      history: document.querySelector('h1')?.textContent?.includes('Handover History'),
-      visible: [...document.querySelectorAll('p')].some(
-        (item) => item.textContent.trim() === marker,
-      ),
-      dom: document.documentElement.textContent.includes(marker),
-    }),
+    (marker, maxBytes) => {
+      const html = document.documentElement.outerHTML
+      if (html.length > maxBytes) return { code: 'ISOLATION_PAYLOAD_TOO_LARGE' }
+      const encoder = new TextEncoder()
+      let size = 0
+      for (let i = 0; i < html.length; i += 8192) {
+        size += encoder.encode(html.slice(i, i + 8192)).byteLength
+        if (size > maxBytes) return { code: 'ISOLATION_PAYLOAD_TOO_LARGE' }
+      }
+      return {
+        code: 'OK',
+        html,
+        history: document.querySelector('h1')?.textContent?.includes('Handover History'),
+        visible: [...document.querySelectorAll('p')].some(
+          (item) => item.textContent.trim() === marker,
+        ),
+      }
+    },
     marker,
+    MAX_ISOLATION_PAYLOAD_BYTES,
   )
-  return { ...observed, serialized }
+  check(observed.code === 'OK', observed.code)
+  const navigation = payloadContainsSentinel(observed.html, marker)
+  return { history: observed.history, visible: observed.visible, fetched, navigation }
 }
 
 export async function checkPropertyIsolation(page, auditor, origin, cases, allowed) {
   for (const entry of cases) {
     const positive = await findSentinel(auditor, origin, entry)
     check(
-      positive.history && positive.visible && positive.serialized,
+      positive.history && positive.visible && positive.fetched && positive.navigation,
       'ISOLATION_POSITIVE_CONTROL_FAILED',
     )
     const negative = await findSentinel(page, origin, entry)
     check(
-      negative.history && !negative.visible && !negative.dom && !negative.serialized,
+      negative.history && !negative.visible && !negative.fetched && !negative.navigation,
       'FORGED_PROPERTY_ISOLATION_FAILED',
     )
   }

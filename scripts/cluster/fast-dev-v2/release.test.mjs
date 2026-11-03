@@ -137,7 +137,12 @@ const isolationMarkers = [
   'DEV-ISOLATION-SENTINEL-' + 'a'.repeat(32),
   'DEV-ISOLATION-SENTINEL-' + 'b'.repeat(32),
 ]
-function isolationPage({ found = false, hiddenLeak = false, searches = [] } = {}) {
+function isolationPage({
+  found = false,
+  hiddenLeak = false,
+  navigationLeak = false,
+  searches = [],
+} = {}) {
   return {
     setCookie: async () => {},
     goto: async (url) => {
@@ -152,7 +157,16 @@ function isolationPage({ found = false, hiddenLeak = false, searches = [] } = {}
           payload: (found || hiddenLeak) && marker ? `<script>${marker}</script>` : '<html></html>',
         }
       }
-      return { history: true, visible: found, dom: found }
+      return {
+        code: 'OK',
+        history: true,
+        visible: found,
+        html: found
+          ? url
+          : navigationLeak
+            ? url.replaceAll('-', String.raw`\u002d`)
+            : '<html></html>',
+      }
     },
   }
 }
@@ -177,6 +191,20 @@ test('forged property checks require a positive control and reject visible or se
     () =>
       checkPropertyIsolation(
         isolationPage({ hiddenLeak: true }),
+        isolationPage({ found: true }),
+        TARGET.origin,
+        cases,
+        'allowed',
+      ),
+    /FORGED_PROPERTY_ISOLATION_FAILED/,
+  )
+})
+test('a leak in navigation cannot be masked by a clean second fetch', async () => {
+  const cases = [{ tenant: 'tenant', property: 'forbidden', marker: isolationMarkers[0] }]
+  await assert.rejects(
+    () =>
+      checkPropertyIsolation(
+        isolationPage({ navigationLeak: true }),
         isolationPage({ found: true }),
         TARGET.origin,
         cases,
@@ -254,7 +282,7 @@ test('escaped forbidden sentinel in hidden payload fails isolation', async () =>
     evaluate: async (fn) =>
       fn === readBoundedResponse
         ? { code: 'OK', payload: `<script>${escaped}</script>` }
-        : { history: true, visible: false, dom: false },
+        : { code: 'OK', history: true, visible: false, html: '<html></html>' },
   }
   await assert.rejects(
     () =>

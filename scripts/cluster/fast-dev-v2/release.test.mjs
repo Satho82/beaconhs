@@ -127,41 +127,70 @@ test('the candidate digest must match the exact successful build job record', ()
     /IMAGE_BUILD_PROVENANCE_MISMATCH/,
   )
 })
-test('forged property checks require a positive control and reject a leaked sentinel', async () => {
-  const makePage = (found) => ({
+const isolationMarkers = [
+  'DEV-ISOLATION-SENTINEL-' + 'a'.repeat(32),
+  'DEV-ISOLATION-SENTINEL-' + 'b'.repeat(32),
+]
+function isolationPage({ found = false, hiddenLeak = false, searches = [] } = {}) {
+  return {
     setCookie: async () => {},
-    goto: async () => {},
-    evaluate: async () => ({ history: true, found }),
-  })
-  const cases = [{ tenant: 'tenant', property: 'forbidden', marker: 'sentinel' }]
+    goto: async (url) => {
+      searches.push(url)
+      const marker = isolationMarkers.find((value) => url.includes(value.slice(-16)))
+      return {
+        ok: () => true,
+        text: async () =>
+          (found || hiddenLeak) && marker ? `<script>${marker}</script>` : '<html></html>',
+      }
+    },
+    evaluate: async () => ({ history: true, visible: found, dom: found }),
+  }
+}
+test('forged property checks require a positive control and reject visible or serialized leaks', async () => {
+  const cases = [{ tenant: 'tenant', property: 'forbidden', marker: isolationMarkers[0] }]
   await assert.rejects(
-    () => checkPropertyIsolation(makePage(false), makePage(false), TARGET.origin, cases, 'allowed'),
+    () => checkPropertyIsolation(isolationPage(), isolationPage(), TARGET.origin, cases, 'allowed'),
     /ISOLATION_POSITIVE_CONTROL_FAILED/,
   )
   await assert.rejects(
-    () => checkPropertyIsolation(makePage(true), makePage(true), TARGET.origin, cases, 'allowed'),
+    () =>
+      checkPropertyIsolation(
+        isolationPage({ found: true }),
+        isolationPage({ found: true }),
+        TARGET.origin,
+        cases,
+        'allowed',
+      ),
+    /FORGED_PROPERTY_ISOLATION_FAILED/,
+  )
+  await assert.rejects(
+    () =>
+      checkPropertyIsolation(
+        isolationPage({ hiddenLeak: true }),
+        isolationPage({ found: true }),
+        TARGET.origin,
+        cases,
+        'allowed',
+      ),
     /FORGED_PROPERTY_ISOLATION_FAILED/,
   )
 })
-test('both positive and restricted checks search each marker before pagination', async () => {
+test('both controls search by unique partial markers before pagination', async () => {
   const searches = []
-  const makePage = (found) => ({
-    setCookie: async () => {},
-    goto: async (url) => searches.push(url),
-    evaluate: async () => ({ history: true, found }),
-  })
   await checkPropertyIsolation(
-    makePage(false),
-    makePage(true),
+    isolationPage({ searches }),
+    isolationPage({ found: true, searches }),
     TARGET.origin,
     [
-      { tenant: 'one', property: 'first', marker: 'first-sentinel' },
-      { tenant: 'two', property: 'second', marker: 'second-sentinel' },
+      { tenant: 'one', property: 'first', marker: isolationMarkers[0] },
+      { tenant: 'two', property: 'second', marker: isolationMarkers[1] },
     ],
     'allowed',
   )
-  assert.equal(searches.filter((url) => url.includes('q=first-sentinel')).length, 2)
-  assert.equal(searches.filter((url) => url.includes('q=second-sentinel')).length, 2)
+  for (const marker of isolationMarkers) {
+    assert.equal(searches.filter((url) => url.includes(`q=${marker.slice(-16)}`)).length, 2)
+    assert.equal(searches.filter((url) => url.includes(marker)).length, 0)
+  }
 })
 test('fixture verifier rejects stale files and unsafe ownership', () => {
   const entries = Array.from({ length: 5 }, () => ({

@@ -83,8 +83,9 @@ Do not enable or merge for activation merely because CI passes.
   `DEV_SMOKE_CROSS_TENANT_ID`, and `DEV_SMOKE_BROWSER` (sandbox-capable Chromium path).
   Configure `DEV_SMOKE_AUDITOR_EMAIL` and `DEV_SMOKE_AUDITOR_PASSWORD` as secrets for a
   separate read-only fixture user scoped only to the two sentinel properties. The smoke
-  searches each unique marker and requires the auditor to find it while the restricted
-  user cannot, avoiding false passes caused by pagination.
+  searches by a unique marker suffix and requires the auditor to find the complete
+  sentinel in the page while it is absent from the restricted user’s HTML, serialized
+  data and DOM. Searching the suffix avoids pagination and query-reflection false passes.
   The session verifier is a root-owned, source-hash-checked command with a root-owned
   pinned identity manifest; it returns only PASS/DENY for the two fixture accounts using
   the existing read-only backup DB role. It does not expose a database password to the

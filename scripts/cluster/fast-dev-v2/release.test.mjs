@@ -2,7 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
-import { checkPropertyIsolation } from './isolation.mjs'
+import { checkPropertyIsolation, payloadContainsSentinel } from './isolation.mjs'
 import { assertAuthoritativeIdentity, assertVerifierIntegrity } from './identity.mjs'
 import {
   assertBuildProvenance,
@@ -170,6 +170,41 @@ test('forged property checks require a positive control and reject visible or se
         isolationPage({ found: true }),
         TARGET.origin,
         cases,
+        'allowed',
+      ),
+    /FORGED_PROPERTY_ISOLATION_FAILED/,
+  )
+})
+test('serialized sentinels cannot hide in escaped or split payloads', () => {
+  const marker = isolationMarkers[0]
+  const escaped = marker.replaceAll('-', String.raw`\u002d`)
+  const twice = JSON.stringify({ note: escaped })
+  const split = marker.slice(0, 12) + '\",\"' + marker.slice(12)
+  assert.equal(payloadContainsSentinel(escaped, marker), true)
+  assert.equal(payloadContainsSentinel(twice, marker), true)
+  assert.equal(payloadContainsSentinel(marker.replaceAll('-', '&#45;'), marker), true)
+  assert.equal(payloadContainsSentinel(marker.replaceAll('-', String.raw`\x2d`), marker), true)
+  assert.equal(payloadContainsSentinel(marker.replaceAll('-', String.raw`\u{2d}`), marker), true)
+  assert.equal(payloadContainsSentinel(marker.replaceAll('-', String.raw`\055`), marker), true)
+  assert.equal(payloadContainsSentinel(marker.replaceAll('-', '%2d'), marker), true)
+  assert.equal(payloadContainsSentinel(split, marker), true)
+  assert.equal(payloadContainsSentinel('query=' + marker.slice(-16), marker), false)
+})
+test('escaped forbidden sentinel in hidden payload fails isolation', async () => {
+  const marker = isolationMarkers[0]
+  const escaped = marker.replaceAll('-', String.raw`\u002d`)
+  const negative = {
+    setCookie: async () => {},
+    goto: async () => ({ ok: () => true, text: async () => `<script>${escaped}</script>` }),
+    evaluate: async () => ({ history: true, visible: false, dom: false }),
+  }
+  await assert.rejects(
+    () =>
+      checkPropertyIsolation(
+        negative,
+        isolationPage({ found: true }),
+        TARGET.origin,
+        [{ tenant: 'tenant', property: 'forbidden', marker }],
         'allowed',
       ),
     /FORGED_PROPERTY_ISOLATION_FAILED/,

@@ -86,6 +86,10 @@ Do not enable or merge for activation merely because CI passes.
   searches by a unique marker suffix and requires the auditor to find the complete
   sentinel in the page while it is absent from the restricted user’s HTML, serialized
   data and DOM. Searching the suffix avoids pagination and query-reflection false passes.
+  Before inspecting serialized data, the smoke normalizes common JSON/JavaScript
+  escapes, HTML character references, URL encodings and split string fragments
+  without executing the payload. These checks complement, but do not replace,
+  server-side authorization and tenant-isolation tests.
   The session verifier is a root-owned, source-hash-checked command with a root-owned
   pinned identity manifest; it returns only PASS/DENY for the two fixture accounts using
   the existing read-only backup DB role. It does not expose a database password to the

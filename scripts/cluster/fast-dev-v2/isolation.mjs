@@ -1,5 +1,44 @@
 import { requireValue as check } from './release.mjs'
 
+// RSC and HTML can encode ASCII as JSON/JS escapes or character references.
+// Decode conservatively without executing page code. Collapsing string syntax
+// also detects markers split across adjacent serialized fragments.
+export function payloadContainsSentinel(payload, marker) {
+  let value = payload
+  for (let i = 0; i < 8; i++) {
+    if (value.includes(marker)) return true
+    const next = value
+      .replace(/\\+u\{([0-9a-f]{1,6})\}/gi, (_, hex) => {
+        const code = parseInt(hex, 16)
+        return code <= 127 ? String.fromCharCode(code) : _
+      })
+      .replace(/\\+u([0-9a-f]{4})/gi, (_, hex) => {
+        const code = parseInt(hex, 16)
+        return code <= 127 ? String.fromCharCode(code) : _
+      })
+      .replace(/\\+x([0-9a-f]{2})/gi, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
+      .replace(/\\+([0-7]{1,3})/g, (match, octal) => {
+        const code = parseInt(octal, 8)
+        return code <= 127 ? String.fromCharCode(code) : match
+      })
+      .replace(/\\+\r?\n/g, '')
+      .replace(/&#x([0-9a-f]+);/gi, (_, hex) => {
+        const code = parseInt(hex, 16)
+        return code <= 127 ? String.fromCharCode(code) : _
+      })
+      .replace(/&#([0-9]+);/g, (_, decimal) => {
+        const code = parseInt(decimal, 10)
+        return code <= 127 ? String.fromCharCode(code) : _
+      })
+      .replace(/&(?:hyphen|dash);/gi, '-')
+      .replace(/%([0-9a-f]{2})/gi, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
+    if (next === value) break
+    value = next
+  }
+  if (value.includes(marker)) return true
+  return value.replace(/["'\\,+\[\]{}()\s:]/g, '').includes(marker)
+}
+
 async function findSentinel(page, origin, { property, tenant, marker }) {
   check(/^DEV-ISOLATION-SENTINEL-[a-f0-9]{32}$/.test(marker), 'ISOLATION_SENTINEL_INVALID')
   // Search by only a suffix, so the full sentinel cannot appear merely because
@@ -25,7 +64,7 @@ async function findSentinel(page, origin, { property, tenant, marker }) {
     }),
     marker,
   )
-  return { ...observed, serialized: payload.includes(marker) }
+  return { ...observed, serialized: payloadContainsSentinel(payload, marker) }
 }
 
 export async function checkPropertyIsolation(page, auditor, origin, cases, allowed) {

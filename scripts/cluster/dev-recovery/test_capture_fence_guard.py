@@ -44,6 +44,12 @@ class CaptureFenceGuardTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate_loaded_proxy(self.proxy, 'capture', 'capture-deny')
 
+    def test_implicit_entrypoints_cannot_hide_competing_route(self):
+        self.proxy['routers']['implicit@file'] = {'status': 'enabled', 'priority': 20001,
+                                                 'using': ['websecure'], 'rule': 'Host(`dev.uvanoo.com`)'}
+        with self.assertRaises(ValueError):
+            validate_loaded_proxy(self.proxy, 'capture', 'capture-deny')
+
     def test_implicit_priority_uses_rule_length(self):
         self.proxy['routers']['implicit@file'] = {'status': 'enabled', 'priority': 0,
                                                    'entryPoints': ['websecure'],

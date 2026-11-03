@@ -676,6 +676,16 @@ def references(config):
     require(scope["migrationLedgerTables"] == 1 and scope["unclassifiedAdditionalKeys"] == 0)
     binding=private_json(config["storageBinding"]["path"],config["storageBinding"]["sha256"])
     scan=private_json(config["storageFullScan"]["path"],config["storageFullScan"]["sha256"])
+    import full_reference_scan
+    scanner_path = Path(full_reference_scan.__file__)
+    require(scanner_path.resolve() == scanner_path and
+            digest(scanner_path.read_bytes()) == config["fullReferenceScannerSha256"])
+    require(scan["scannerSha256"] == config["fullReferenceScannerSha256"] and
+            scan["toolingSourceSha"] == config["toolingSourceSha"])
+    review = private_json(config["fullReferenceClassification"]["path"],
+                          config["fullReferenceClassification"]["sha256"])
+    classified = full_reference_scan.validate_classifications(scan, review)
+    require(classified["unclassifiedAdditionalKeys"] == 0)
     require(binding["sourceSha"]==config["sourceSha"] and binding["databaseOid"]==config["databaseOid"])
     require(binding["storageBaselineSha256"]==config["storageBaseline"]["sha256"])
     require(binding["fullScanSha256"]==config["storageFullScan"]["sha256"])
@@ -687,6 +697,20 @@ def references(config):
     allowed,recovery=module.allowlist();module.verify_recovery(recovery)
     missing,evidence=module.reconcile(baseline["database"],observed["objects"],allowed,
         observed["metadata"],observed["versions"],observed["queues"])
+    # A reviewed category is not proof that an additional key exists. Every
+    # scanned key must have a matching object, HEAD metadata and latest version,
+    # unless the existing reconciliation explicitly permits that missing key.
+    database = baseline["database"]
+    allowed_missing = {(('public', 'attachments'), module.sha(row[2].encode())) for row in database["rows"]
+                       if module.identity(row) in missing}
+    allowed_missing.update(((('public', 'tenants') if item['key'].startswith('tenants/') else
+                              ('public', 'platform_settings')), module.sha(item['key'].encode()))
+                           for item in module.brand_references(database) if item['identity'] in missing)
+    audit = module.audit_references(database, observed["objects"], observed["queues"])
+    transient_audit = {item["keySha256"] for item in audit
+                       if item["transient"] and not item["currentlyReferenced"] and not item["present"]}
+    full_reference_scan.validate_object_coverage(scan, observed["objects"], observed["metadata"],
+                                                 observed["versions"], allowed_missing, transient_audit)
     return {"missingObjects":len(missing),"mismatchedObjects":0,"allReferencesCovered":len(missing)==0,
         "receiptSha256":digest(evidence),"missingIdentitySha256":missing,
         "exceptionId":"owner-approved-dev-nine-20261029","recoveryEvidenceSha256":recovery}

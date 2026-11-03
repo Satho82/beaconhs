@@ -36,7 +36,9 @@ def validate_loaded_proxy(data, router_name, middleware_name, priority=20000):
     # competing secure routers at equal or greater priority, even unrelated ones.
     for name, candidate in routers.items():
         if name != router_name + '@file' and candidate.get('status') == 'enabled':
-            if 'websecure' in candidate.get('entryPoints', []):
+            entrypoints = candidate.get('entryPoints') or candidate.get('using')
+            require(isinstance(entrypoints, list) and entrypoints)
+            if 'websecure' in entrypoints:
                 # Traefik's implicit priority is the rule length when priority
                 # is absent or zero; never treat an implicit rule as priority 0.
                 effective = candidate.get('priority', 0)

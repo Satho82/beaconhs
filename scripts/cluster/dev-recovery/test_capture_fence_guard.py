@@ -43,6 +43,13 @@ class CaptureFenceGuardTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate_loaded_proxy(self.proxy, 'capture', 'capture-deny')
 
+    def test_implicit_priority_uses_rule_length(self):
+        self.proxy['routers']['implicit@file'] = {'status': 'enabled', 'priority': 0,
+                                                   'entryPoints': ['websecure'],
+                                                   'rule': 'x' * 20000}
+        with self.assertRaises(ValueError):
+            validate_loaded_proxy(self.proxy, 'capture', 'capture-deny')
+
     def test_rejects_unloaded_and_unqualified_middleware(self):
         self.route['middlewares'] = ['capture-deny']
         with self.assertRaises(ValueError):

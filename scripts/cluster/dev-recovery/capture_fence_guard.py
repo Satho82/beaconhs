@@ -37,7 +37,15 @@ def validate_loaded_proxy(data, router_name, middleware_name, priority=20000):
     for name, candidate in routers.items():
         if name != router_name + '@file' and candidate.get('status') == 'enabled':
             if 'websecure' in candidate.get('entryPoints', []):
-                require(candidate.get('priority', 0) < priority)
+                # Traefik's implicit priority is the rule length when priority
+                # is absent or zero; never treat an implicit rule as priority 0.
+                effective = candidate.get('priority', 0)
+                require(type(effective) is int and effective >= 0)
+                if effective == 0:
+                    rule = candidate['rule']
+                    require(isinstance(rule, str))
+                    effective = len(rule)
+                require(effective < priority)
     normalized = json.dumps({'router': route, 'middleware': middleware}, sort_keys=True,
                             separators=(',', ':')).encode()
     return hashlib.sha256(normalized).hexdigest()
